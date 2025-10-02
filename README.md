@@ -37,12 +37,43 @@ The code is open for **non-commercial use** under the **Non-Commercial Open Soft
 
 ---
 
+## Implementation Status
+
+### ✅ Completed (Phase 1 - Early Foundation)
+
+**Reverse Geocoding Infrastructure** (2025-11-17)
+- Domain models: `LocationSample`, `PlaceVisit`, `GeocodedLocation`
+- Cross-platform reverse geocoding with caching
+  - Android: `Geocoder` API wrapper (supports API 33+ async methods)
+  - iOS: `CLGeocoder` wrapper from CoreLocation
+  - Intelligent spatial caching (100m proximity, 30-day TTL)
+- PlaceVisit detection using DBSCAN-like clustering
+- Location processing service with automatic geocoding integration
+- Comprehensive documentation and usage examples
+
+See: `shared/src/.../location/` and `shared/src/.../domain/model/`
+
+### 🚧 In Progress (Phase 1 - Foundation)
+
+- Project setup and build configuration
+- Core domain entities
+- SQLDelight database schema design
+- Location tracking platform implementations
+
+### 📋 Planned
+
+See [TODO.md](TODO.md) and [ROADMAP.md](ROADMAP.md) for complete task lists and timeline.
+
+---
+
 ## Tech Stack (High-Level)
 
 - **Core / Shared**
   - Kotlin Multiplatform (KMP) for shared domain, data, and sync logic.
   - Coroutines and Flow for async and reactive streams.
   - Kotlinx.serialization for data models and persistence formats.
+  - Kotlinx.datetime for cross-platform date/time handling.
+  - SQLDelight (planned) for cross-platform database.
 
 - **Android**
   - Kotlin, Android Gradle Plugin 8+, Kotlin 2.x toolchain.
