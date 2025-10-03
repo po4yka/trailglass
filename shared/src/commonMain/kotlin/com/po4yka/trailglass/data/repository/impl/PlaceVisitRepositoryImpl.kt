@@ -5,6 +5,7 @@ import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -19,10 +20,13 @@ class PlaceVisitRepositoryImpl(
 ) : PlaceVisitRepository {
 
     private val visitQueries = database.placeVisitQueries
+    private val logger = logger()
 
     override suspend fun insertVisit(visit: PlaceVisit) = withContext(Dispatchers.IO) {
-        // Insert the visit
-        visitQueries.insertVisit(
+        logger.info { "Inserting place visit: ${visit.id} at ${visit.city ?: "(${visit.centerLatitude}, ${visit.centerLongitude})"}" }
+        try {
+            // Insert the visit
+            visitQueries.insertVisit(
             id = visit.id,
             start_time = visit.startTime.toEpochMilliseconds(),
             end_time = visit.endTime.toEpochMilliseconds(),
@@ -38,9 +42,14 @@ class PlaceVisitRepositoryImpl(
             deleted_at = null
         )
 
-        // Link samples
-        visit.locationSampleIds.forEach { sampleId ->
-            visitQueries.linkSample(visit.id, sampleId)
+            // Link samples
+            visit.locationSampleIds.forEach { sampleId ->
+                visitQueries.linkSample(visit.id, sampleId)
+            }
+            logger.debug { "Successfully inserted place visit ${visit.id} with ${visit.locationSampleIds.size} linked samples" }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to insert place visit ${visit.id}" }
+            throw e
         }
     }
 

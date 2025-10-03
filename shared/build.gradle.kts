@@ -29,10 +29,12 @@ kotlin {
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.coroutines)
+            implementation(libs.kotlin.logging)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.android)
             implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.slf4j.android)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

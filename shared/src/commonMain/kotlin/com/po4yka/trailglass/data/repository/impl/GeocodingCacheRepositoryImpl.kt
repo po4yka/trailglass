@@ -3,6 +3,7 @@ package com.po4yka.trailglass.data.repository.impl
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.GeocodingCacheRepository
 import com.po4yka.trailglass.domain.model.GeocodedLocation
+import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -18,12 +19,14 @@ class GeocodingCacheRepositoryImpl(
 ) : GeocodingCacheRepository {
 
     private val queries = database.geocodingCacheQueries
+    private val logger = logger()
 
     override suspend fun get(
         latitude: Double,
         longitude: Double,
         radiusMeters: Double
     ): GeocodedLocation? = withContext(Dispatchers.IO) {
+        logger.trace { "Looking up geocoding cache for ($latitude, $longitude) within ${radiusMeters}m" }
         val now = Clock.System.now().toEpochMilliseconds()
 
         // Calculate bounding box for efficient DB query
@@ -37,7 +40,7 @@ class GeocodingCacheRepositoryImpl(
         ).executeAsList()
 
         // Find closest entry within radius using Haversine distance
-        candidates
+        val result = candidates
             .map { entry ->
                 val distance = calculateDistance(
                     latitude, longitude,
@@ -49,10 +52,18 @@ class GeocodingCacheRepositoryImpl(
             .minByOrNull { (_, distance) -> distance }
             ?.first
             ?.toGeocodedLocation()
+
+        if (result != null) {
+            logger.debug { "Cache HIT for ($latitude, $longitude): ${result.city ?: result.formattedAddress}" }
+        } else {
+            logger.trace { "Cache MISS for ($latitude, $longitude)" }
+        }
+        result
     }
 
     override suspend fun put(location: GeocodedLocation, ttlSeconds: Long) =
         withContext(Dispatchers.IO) {
+            logger.debug { "Caching geocoded location: ${location.city ?: location.formattedAddress} at (${location.latitude}, ${location.longitude})" }
             val now = Clock.System.now().toEpochMilliseconds()
             val expiresAt = now + (ttlSeconds * 1000)
 
@@ -74,6 +85,7 @@ class GeocodingCacheRepositoryImpl(
                 cached_at = now,
                 expires_at = expiresAt
             )
+            logger.trace { "Successfully cached geocoded location at ($id)" }
         }
 
     override suspend fun clearExpired() = withContext(Dispatchers.IO) {

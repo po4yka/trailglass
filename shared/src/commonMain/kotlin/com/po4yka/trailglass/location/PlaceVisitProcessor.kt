@@ -3,6 +3,7 @@ package com.po4yka.trailglass.location
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.location.geocoding.ReverseGeocoder
+import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
 import kotlin.math.*
 import kotlin.time.Duration
@@ -18,6 +19,8 @@ class PlaceVisitProcessor(
     private val spatialThresholdMeters: Double = 100.0
 ) {
 
+    private val logger = logger()
+
     /**
      * Process a list of location samples to detect place visits.
      *
@@ -25,18 +28,27 @@ class PlaceVisitProcessor(
      * @return List of detected PlaceVisits with geocoded information
      */
     suspend fun detectPlaceVisits(samples: List<LocationSample>): List<PlaceVisit> {
-        if (samples.isEmpty()) return emptyList()
+        if (samples.isEmpty()) {
+            logger.debug { "No samples to process for place visit detection" }
+            return emptyList()
+        }
+
+        logger.info { "Processing ${samples.size} location samples to detect place visits" }
 
         // Sort samples by timestamp
         val sortedSamples = samples.sortedBy { it.timestamp }
 
         // Group samples into clusters
         val clusters = clusterSamples(sortedSamples)
+        logger.debug { "Found ${clusters.size} clusters from ${samples.size} samples" }
 
         // Convert clusters to PlaceVisits with geocoding
-        return clusters.mapNotNull { cluster ->
+        val visits = clusters.mapNotNull { cluster ->
             createPlaceVisit(cluster)
         }
+
+        logger.info { "Detected ${visits.size} place visits after filtering by duration threshold (${minDurationThreshold})" }
+        return visits
     }
 
     /**
@@ -92,6 +104,7 @@ class PlaceVisitProcessor(
 
         // Filter out short visits
         if (duration < minDurationThreshold) {
+            logger.trace { "Filtered out cluster with duration $duration (threshold: $minDurationThreshold)" }
             return null
         }
 
@@ -99,8 +112,16 @@ class PlaceVisitProcessor(
         val centerLat = samples.map { it.latitude }.average()
         val centerLon = samples.map { it.longitude }.average()
 
+        logger.debug { "Creating place visit at ($centerLat, $centerLon) with ${samples.size} samples, duration: $duration" }
+
         // Perform reverse geocoding
         val geocoded = reverseGeocoder.reverseGeocode(centerLat, centerLon)
+
+        if (geocoded != null) {
+            logger.info { "Geocoded place visit: ${geocoded.city ?: geocoded.formattedAddress} (${geocoded.countryCode})" }
+        } else {
+            logger.warn { "Failed to geocode place visit at ($centerLat, $centerLon)" }
+        }
 
         return PlaceVisit(
             id = generatePlaceVisitId(startTime, centerLat, centerLon),

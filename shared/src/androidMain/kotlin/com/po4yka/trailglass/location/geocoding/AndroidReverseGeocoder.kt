@@ -5,6 +5,7 @@ import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import com.po4yka.trailglass.domain.model.GeocodedLocation
+import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 import kotlin.coroutines.resume
@@ -17,25 +18,38 @@ class AndroidReverseGeocoder(
 ) : ReverseGeocoder {
 
     private val geocoder = Geocoder(context)
+    private val logger = logger()
 
     override suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation? {
         if (!Geocoder.isPresent()) {
+            logger.warn { "Android Geocoder is not present on this device" }
             return null
         }
 
+        logger.trace { "Reverse geocoding ($latitude, $longitude) using Android Geocoder" }
+
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 // Use new async API on API 33+
+                logger.trace { "Using Android Geocoder async API (SDK ${Build.VERSION.SDK_INT})" }
                 reverseGeocodeAsync(latitude, longitude)
             } else {
                 // Use legacy blocking API on older versions
+                logger.trace { "Using Android Geocoder legacy API (SDK ${Build.VERSION.SDK_INT})" }
                 reverseGeocodeLegacy(latitude, longitude)
             }
+
+            if (result != null) {
+                logger.debug { "Android Geocoder success: ${result.city ?: result.formattedAddress}" }
+            } else {
+                logger.debug { "Android Geocoder returned no results for ($latitude, $longitude)" }
+            }
+            result
         } catch (e: IOException) {
-            // Network or service error
+            logger.error(e) { "Android Geocoder network/service error for ($latitude, $longitude)" }
             null
         } catch (e: Exception) {
-            // Other errors
+            logger.error(e) { "Android Geocoder unexpected error for ($latitude, $longitude)" }
             null
         }
     }
