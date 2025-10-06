@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
+    id("org.jetbrains.kotlinx.kover") version "0.9.0"
 }
 
 kotlin {
@@ -41,6 +42,18 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.kotest.assertions)
+            implementation(libs.sqldelight.sqlite)
+        }
+        androidUnitTest.dependencies {
+            implementation(libs.mockk.android)
+            implementation(libs.kotlin.testJunit)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.testExt.junit)
+            implementation(libs.androidx.espresso.core)
         }
     }
 }
@@ -62,6 +75,26 @@ sqldelight {
         create("TrailGlassDatabase") {
             packageName.set("com.po4yka.trailglass.db")
             srcDirs.setFrom("src/commonMain/sqldelight")
+        }
+    }
+}
+
+// Code coverage configuration
+kover {
+    reports {
+        filters {
+            excludes {
+                classes(
+                    "*.BuildConfig",
+                    "*.db.*", // Generated SQLDelight code
+                    "*.ComposableSingletons*"
+                )
+            }
+        }
+        verify {
+            rule {
+                minBound(75) // Target: 75%+ coverage
+            }
         }
     }
 }
