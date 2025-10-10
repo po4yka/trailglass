@@ -64,7 +64,7 @@ See **[Development Guide](docs/DEVELOPMENT.md)** for detailed setup instructions
 - **[Architecture](docs/ARCHITECTURE.md)**: System architecture, layers, state management, DI
 - **[Development](docs/DEVELOPMENT.md)**: Setup, running the app, debugging, troubleshooting
 - **[Testing](docs/TESTING.md)**: Testing strategy, coverage requirements (75%+)
-- **[Contributing](docs/CONTRIBUTING.md)**: Code style, PR process, commit conventions
+- **[Error Handling](docs/ERROR_HANDLING.md)**: Error types, retry mechanisms, analytics, offline mode
 
 ### 🔧 Feature Documentation
 - **[Location Tracking](docs/LOCATION_TRACKING.md)**: Platform location tracking implementation
@@ -126,6 +126,18 @@ See **[Development Guide](docs/DEVELOPMENT.md)** for detailed setup instructions
 - Android UI tests (Compose Test + Espresso)
 - iOS UI tests (XCTest)
 - Test scripts and documentation
+
+**Error Handling Infrastructure**
+- Sealed error class hierarchy (NetworkError, DatabaseError, LocationError, PhotoError, ValidationError)
+- Result<T> wrapper for type-safe error handling
+- User-friendly error messages separate from technical details
+- Platform-specific network connectivity monitoring (Android ConnectivityManager, iOS Network framework)
+- Retry mechanisms with exponential backoff (1s → 2s → 4s → 8s, max 30s)
+- Multiple retry policies (DEFAULT, AGGRESSIVE, CONSERVATIVE, NETWORK)
+- Error analytics with severity levels (INFO, WARNING, ERROR, FATAL)
+- Context-aware error mapping and logging
+- Offline mode support with automatic retry
+- Comprehensive error handling documentation
 
 ### 📋 Planned (Phase 2 - Enhanced Features)
 

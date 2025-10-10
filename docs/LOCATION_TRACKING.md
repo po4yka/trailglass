@@ -383,6 +383,129 @@ func scheduleProcessing() {
 - **Daily Samples**: ~5,000-10,000 (PASSIVE mode)
 - **Daily Storage**: ~1-2 MB uncompressed
 
+## Error Handling
+
+Location tracking implements comprehensive error handling following the patterns in [ERROR_HANDLING.md](ERROR_HANDLING.md).
+
+### Location Errors
+
+All location errors use the `TrailGlassError.LocationError` sealed class:
+
+```kotlin
+// Permission denied
+TrailGlassError.LocationError.PermissionDenied(
+    userMessage = "Location permission is required to track your travels.",
+    technicalMessage = "User denied location permission"
+)
+
+// Location unavailable
+TrailGlassError.LocationError.ServiceUnavailable(
+    userMessage = "Location services are unavailable. Please enable location in your device settings.",
+    technicalMessage = "Location services disabled or unavailable"
+)
+
+// Tracking failed
+TrailGlassError.LocationError.TrackingFailed(
+    userMessage = "Unable to track location. Please check your settings.",
+    technicalMessage = "Location tracking failed: timeout waiting for location update"
+)
+
+// Geocoding failed
+TrailGlassError.LocationError.GeocodingFailed(
+    userMessage = "Unable to load address information. Will retry automatically.",
+    technicalMessage = "Reverse geocoding API timeout"
+)
+```
+
+### Result Pattern
+
+All location operations return `Result<T>`:
+
+```kotlin
+// Start tracking
+when (val result = tracker.startTracking(TrackingMode.PASSIVE)) {
+    is Result.Success -> {
+        // Tracking started successfully
+        updateUI("Tracking active")
+    }
+    is Result.Error -> {
+        when (result.error) {
+            is TrailGlassError.LocationError.PermissionDenied -> {
+                // Show permission rationale
+                showPermissionDialog()
+            }
+            is TrailGlassError.LocationError.ServiceUnavailable -> {
+                // Guide to settings
+                showLocationServicesGuide()
+            }
+            else -> {
+                // Show generic error
+                showError(result.error.userMessage)
+            }
+        }
+    }
+}
+```
+
+### Retry Logic
+
+Location tracking uses automatic retry with exponential backoff:
+
+```kotlin
+// Retry geocoding with network-aware policy
+val address = retryWithNetwork(
+    policy = RetryPolicy.NETWORK,
+    networkConnectivity = networkConnectivity,
+    onRetry = { state ->
+        logger.info { "Retrying geocoding (attempt ${state.attempt})" }
+    }
+) {
+    geocoder.reverseGeocode(latitude, longitude)
+}
+```
+
+### Error Analytics
+
+Location errors are logged with context:
+
+```kotlin
+try {
+    val location = locationProvider.getCurrentLocation()
+} catch (e: Exception) {
+    val error = ErrorMapper.mapLocationException(e, LocationContext.TRACKING)
+    error.logToAnalytics(
+        errorAnalytics,
+        context = mapOf(
+            "operation" to "getCurrentLocation",
+            "mode" to trackingMode.name,
+            "hasPermission" to hasPermissions().toString()
+        ),
+        severity = ErrorSeverity.ERROR
+    )
+    return Result.Error(error)
+}
+```
+
+### Offline Mode
+
+Location tracking works offline:
+
+```kotlin
+// Check connectivity before geocoding
+val isOnline = networkConnectivity.isNetworkAvailable()
+
+if (isOnline) {
+    // Geocode immediately
+    geocoder.reverseGeocode(location)
+} else {
+    // Save sample without address
+    repository.insertLocationSample(sample.copy(address = null))
+
+    // Schedule geocoding for later (when online)
+    scheduleGeocodingRetry(sample.id)
+}
+```
+
 ## Best Practices
 
 ### 1. Permission Request Timing
@@ -561,6 +684,7 @@ log stream --predicate 'subsystem == "com.po4yka.trailglass"'
 ---
 
 **Related Documentation**:
-- [Location Processing Pipeline](../shared/src/commonMain/kotlin/com/po4yka/trailglass/location/README.md)
-- [Database Layer](../shared/src/commonMain/kotlin/com/po4yka/trailglass/data/README.md)
-- [Implementation Roadmap](../IMPLEMENTATION_NEXT_STEPS.md)
+- [Error Handling](ERROR_HANDLING.md) - Comprehensive error handling guide
+- [Architecture](ARCHITECTURE.md) - System architecture overview
+- [Development](DEVELOPMENT.md) - Development setup and debugging
+- [Testing](TESTING.md) - Testing strategy and coverage

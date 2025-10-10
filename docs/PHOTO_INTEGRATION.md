@@ -464,6 +464,230 @@ fun VisitDetailScreen(
 
 **Score**: 1.67 (0.67 time + 1.0 location) ⚠️ **Good match, likely related**
 
+## Error Handling
+
+Photo integration implements comprehensive error handling following the patterns in [ERROR_HANDLING.md](ERROR_HANDLING.md).
+
+### Photo Errors
+
+All photo errors use the `TrailGlassError.PhotoError` sealed class:
+
+```kotlin
+// Permission denied
+TrailGlassError.PhotoError.PermissionDenied(
+    userMessage = "Photo library access is required to attach photos to your travels.",
+    technicalMessage = "User denied photo library permission"
+)
+
+// Photo not found
+TrailGlassError.PhotoError.PhotoNotFound(
+    userMessage = "The photo you selected could not be found.",
+    technicalMessage = "Photo not found in MediaStore/PHAsset"
+)
+
+// Load failed
+TrailGlassError.PhotoError.LoadFailed(
+    userMessage = "Unable to load photo. Please try again.",
+    technicalMessage = "Failed to load photo from URI: IOException"
+)
+
+// Invalid photo
+TrailGlassError.PhotoError.InvalidPhoto(
+    userMessage = "This photo is not supported. Please select a different one.",
+    technicalMessage = "Unsupported image format or corrupted file"
+)
+
+// Attachment failed
+TrailGlassError.PhotoError.AttachmentFailed(
+    userMessage = "Unable to attach photo. Please try again.",
+    technicalMessage = "Failed to save photo attachment to database"
+)
+```
+
+### Result Pattern
+
+All photo operations return `Result<T>`:
+
+```kotlin
+// Attach photo to visit
+when (val result = useCase.execute(photoId, visitId, caption)) {
+    is AttachPhotoToVisitUseCase.Result.Success -> {
+        showSuccess("Photo attached successfully")
+    }
+    is AttachPhotoToVisitUseCase.Result.AlreadyAttached -> {
+        showWarning("This photo is already attached to this visit")
+    }
+    is AttachPhotoToVisitUseCase.Result.Error -> {
+        when (result.error) {
+            is TrailGlassError.PhotoError.PhotoNotFound -> {
+                showError("Photo no longer exists")
+            }
+            is TrailGlassError.PhotoError.AttachmentFailed -> {
+                showError(result.error.userMessage)
+                // Offer retry
+                showRetryButton()
+            }
+            else -> {
+                showError(result.error.userMessage)
+            }
+        }
+    }
+}
+```
+
+### Permission Handling
+
+Request permissions with proper error handling:
+
+```kotlin
+// Check permissions first
+val permissions = PhotoPermissions(activity)
+
+if (!permissions.hasPhotoPermissions()) {
+    if (permissions.shouldShowPhotoRationale()) {
+        // Show rationale dialog
+        showPhotoRationaleDialog {
+            permissions.requestPhotoPermissions { granted ->
+                when (granted) {
+                    true -> launchPhotoPicker()
+                    false -> {
+                        val error = TrailGlassError.PhotoError.PermissionDenied()
+                        error.logToAnalytics(errorAnalytics)
+                        showError(error.userMessage)
+                    }
+                }
+            }
+        }
+    } else {
+        permissions.requestPhotoPermissions { granted ->
+            if (granted) launchPhotoPicker()
+        }
+    }
+} else {
+    launchPhotoPicker()
+}
+```
+
+### Metadata Extraction Errors
+
+Handle metadata extraction failures gracefully:
+
+```kotlin
+suspend fun extractPhotoFromUri(uri: Uri): Result<Photo> {
+    return ErrorMapper.mapToResultSuspend {
+        try {
+            val metadata = extractMetadataFromUri(uri)
+
+            Photo(
+                id = "photo_${UUID.randomUUID()}",
+                uri = uri.toString(),
+                timestamp = metadata.timestamp ?: Clock.System.now(),
+                latitude = metadata.latitude,  // May be null
+                longitude = metadata.longitude,  // May be null
+                width = metadata.width,
+                height = metadata.height,
+                sizeBytes = metadata.sizeBytes,
+                mimeType = metadata.mimeType ?: "image/jpeg",
+                userId = userId,
+                addedAt = Clock.System.now()
+            )
+        } catch (e: Exception) {
+            val error = ErrorMapper.mapPhotoException(e, PhotoContext.LOAD)
+            error.logToAnalytics(
+                errorAnalytics,
+                context = mapOf("operation" to "extractMetadata", "uri" to uri.toString())
+            )
+            throw error
+        }
+    }
+}
+```
+
+### Retry Logic
+
+Photo operations support retry with backoff:
+
+```kotlin
+// Retry photo load with conservative policy
+val photo = retryWithPolicy(
+    policy = RetryPolicy.CONSERVATIVE,
+    onRetry = { state ->
+        logger.warn { "Retrying photo load (attempt ${state.attempt})" }
+        showRetryingIndicator()
+    }
+) {
+    photoPicker.extractPhotoFromUri(uri)
+}
+```
+
+### Error Analytics
+
+Photo errors are logged with context:
+
+```kotlin
+try {
+    val photo = photoRepository.insertPhoto(photo)
+} catch (e: Exception) {
+    val error = ErrorMapper.mapPhotoException(e, PhotoContext.ATTACH)
+    error.logToAnalytics(
+        errorAnalytics,
+        context = mapOf(
+            "operation" to "insertPhoto",
+            "photoId" to photo.id,
+            "hasLocation" to (photo.latitude != null).toString()
+        ),
+        severity = ErrorSeverity.ERROR
+    )
+    return Result.Error(error)
+}
+```
+
+### UI Error Handling
+
+Show errors in photo grid:
+
+```kotlin
+@Composable
+fun PhotoGrid(
+    photos: List<Photo>,
+    onPhotoClick: (Photo) -> Unit,
+    error: String? = null,
+    onRetry: () -> Unit = {}
+) {
+    when {
+        error != null -> {
+            ErrorView(
+                message = error,
+                icon = Icons.Default.Photo,
+                onRetry = onRetry
+            )
+        }
+        photos.isEmpty() -> {
+            EmptyPhotoView(
+                message = "No photos yet. Add photos from your library."
+            )
+        }
+        else -> {
+            LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                items(photos) { photo ->
+                    SubcomposeAsyncImage(
+                        model = Uri.parse(photo.uri),
+                        contentDescription = "Photo",
+                        error = {
+                            // Show placeholder for load errors
+                            PhotoErrorPlaceholder()
+                        },
+                        loading = {
+                            CircularProgressIndicator()
+                        }
+                    )
+                }
+            }
+        }
+    }
+}
+```
+
 ## Best Practices
 
 ### Performance
@@ -562,6 +786,7 @@ fun testPhotoAttachment() = runTest {
 ---
 
 **Related Documentation**:
-- [Location Processing](../shared/src/commonMain/kotlin/com/po4yka/trailglass/location/README.md)
-- [UI Implementation](UI_IMPLEMENTATION.md)
-- [Implementation Roadmap](../IMPLEMENTATION_NEXT_STEPS.md)
+- [Error Handling](ERROR_HANDLING.md) - Comprehensive error handling guide
+- [Architecture](ARCHITECTURE.md) - System architecture overview
+- [UI Implementation](UI_IMPLEMENTATION.md) - Material 3 UI components
+- [Testing](TESTING.md) - Testing strategy and coverage

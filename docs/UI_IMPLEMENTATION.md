@@ -204,6 +204,202 @@ Material 3 Typography scale:
 - Touch targets ≥48dp
 - Screen reader support via contentDescription
 
+## Error Handling
+
+UI layer implements comprehensive error handling following the patterns in [ERROR_HANDLING.md](ERROR_HANDLING.md).
+
+### Error State Display
+
+All screens handle three states: Loading, Error, Success:
+
+```kotlin
+@Composable
+fun StatsScreen(controller: StatsController) {
+    val state by controller.state.collectAsState()
+
+    when {
+        state.isLoading -> {
+            LoadingView()
+        }
+        state.error != null -> {
+            ErrorView(
+                message = state.error!!,  // User-friendly message
+                onRetry = { controller.refresh() }
+            )
+        }
+        state.stats != null -> {
+            StatsContent(stats = state.stats!!)
+        }
+        else -> {
+            EmptyStateView(
+                title = "No data yet",
+                message = "Start tracking to see your travel statistics"
+            )
+        }
+    }
+}
+```
+
+### Result Handling in Controllers
+
+Controllers convert `Result<T>` to UI state:
+
+```kotlin
+class TimelineController(
+    private val getTimelineUseCase: GetTimelineForDayUseCase,
+    private val errorAnalytics: ErrorAnalytics
+) {
+    private val _state = MutableStateFlow(TimelineState())
+    val state: StateFlow<TimelineState> = _state
+
+    fun loadDay(date: LocalDate) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+
+            when (val result = getTimelineUseCase.execute(date, userId)) {
+                is Result.Success -> {
+                    _state.update {
+                        it.copy(
+                            items = result.data,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    // Log to analytics
+                    result.error.logToAnalytics(
+                        errorAnalytics,
+                        context = mapOf("operation" to "loadTimeline", "date" to date.toString())
+                    )
+
+                    // Update UI with user-friendly message
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            error = result.error.userMessage  // "Unable to load timeline. Please try again."
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+### Network Errors
+
+UI shows appropriate messages for network errors:
+
+```kotlin
+when (val error = result.error) {
+    is TrailGlassError.NetworkError.NoConnection -> {
+        ErrorView(
+            message = "No internet connection",
+            icon = Icons.Default.CloudOff,
+            action = "Retry" to { controller.refresh() }
+        )
+    }
+    is TrailGlassError.NetworkError.Timeout -> {
+        ErrorView(
+            message = "Request timed out. Please try again.",
+            action = "Retry" to { controller.refresh() }
+        )
+    }
+    else -> {
+        ErrorView(
+            message = error.userMessage,
+            action = "Retry" to { controller.refresh() }
+        )
+    }
+}
+```
+
+### Offline Mode Indicator
+
+Show offline status in UI:
+
+```kotlin
+@Composable
+fun AppScaffold(networkConnectivity: NetworkConnectivity) {
+    val isOnline by networkConnectivity.isConnected.collectAsState(initial = true)
+
+    Scaffold(
+        topBar = {
+            if (!isOnline) {
+                OfflineBanner(
+                    message = "You're offline. Changes will sync when connected."
+                )
+            }
+        }
+    ) { /* Content */ }
+}
+```
+
+### Retry with Feedback
+
+Show retry progress:
+
+```kotlin
+@Composable
+fun ErrorView(
+    message: String,
+    onRetry: () -> Unit
+) {
+    var isRetrying by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(Icons.Default.Error, contentDescription = null)
+        Text(message, style = MaterialTheme.typography.bodyLarge)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                isRetrying = true
+                onRetry()
+            },
+            enabled = !isRetrying
+        ) {
+            if (isRetrying) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Text("Retry")
+            }
+        }
+    }
+}
+```
+
+### Error Toast/Snackbar
+
+For non-blocking errors:
+
+```kotlin
+val snackbarHostState = remember { SnackbarHostState() }
+
+LaunchedEffect(state.error) {
+    state.error?.let { errorMessage ->
+        snackbarHostState.showSnackbar(
+            message = errorMessage,
+            actionLabel = "Retry",
+            duration = SnackbarDuration.Long
+        ).let { result ->
+            if (result == SnackbarResult.ActionPerformed) {
+                controller.refresh()
+            }
+        }
+    }
+}
+```
+
 ## Performance
 
 **Optimizations**:
@@ -256,6 +452,7 @@ fun testStatsScreen() {
 ---
 
 **Related Documentation**:
-- [Location Processing Pipeline](../shared/src/commonMain/kotlin/com/po4yka/trailglass/location/README.md)
-- [Location Tracking](LOCATION_TRACKING.md)
-- [Implementation Roadmap](../IMPLEMENTATION_NEXT_STEPS.md)
+- [Error Handling](ERROR_HANDLING.md) - Comprehensive error handling guide
+- [Architecture](ARCHITECTURE.md) - System architecture overview
+- [Location Tracking](LOCATION_TRACKING.md) - Platform location tracking
+- [Testing](TESTING.md) - Testing strategy and coverage

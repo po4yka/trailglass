@@ -588,6 +588,238 @@ controller.moveCameraTo(
 - Routes: ~100 bytes per coordinate
 - Typical trip (30 days): ~50 markers + 40 routes = ~15KB
 
+## Error Handling
+
+Map visualization implements comprehensive error handling following the patterns in [ERROR_HANDLING.md](ERROR_HANDLING.md).
+
+### Map Loading Errors
+
+Handle map data loading errors:
+
+```kotlin
+@Composable
+fun MapScreen(controller: MapController) {
+    val state by controller.state.collectAsState()
+
+    when {
+        state.isLoading -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+        }
+        state.error != null -> {
+            ErrorView(
+                message = state.error!!,
+                icon = Icons.Default.Map,
+                onRetry = { controller.loadMapData(startTime, endTime) }
+            )
+        }
+        state.mapData.markers.isEmpty() && state.mapData.routes.isEmpty() -> {
+            EmptyMapView(
+                message = "No location data yet. Start tracking to see your travels on the map."
+            )
+        }
+        else -> {
+            MapView(controller = controller)
+        }
+    }
+}
+```
+
+### Network Errors
+
+Handle geocoding and map tile loading errors:
+
+```kotlin
+// Controller handling
+fun loadMapData(startTime: Instant, endTime: Instant) {
+    viewModelScope.launch {
+        _state.update { it.copy(isLoading = true, error = null) }
+
+        when (val result = getMapDataUseCase.execute(userId, startTime, endTime)) {
+            is Result.Success -> {
+                _state.update {
+                    it.copy(
+                        mapData = result.data,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+
+                // Auto-fit map to data
+                result.data.region?.let { region ->
+                    fitToRegion(region)
+                }
+            }
+            is Result.Error -> {
+                val errorMessage = when (result.error) {
+                    is TrailGlassError.NetworkError.NoConnection -> {
+                        "No internet connection. Showing cached map data."
+                    }
+                    is TrailGlassError.DatabaseError -> {
+                        "Unable to load map data. Please try again."
+                    }
+                    else -> result.error.userMessage
+                }
+
+                result.error.logToAnalytics(
+                    errorAnalytics,
+                    context = mapOf("operation" to "loadMapData")
+                )
+
+                _state.update {
+                    it.copy(isLoading = false, error = errorMessage)
+                }
+            }
+        }
+    }
+}
+```
+
+### Offline Mode
+
+Map visualization works offline with cached tiles:
+
+```kotlin
+// Check connectivity before loading
+val isOnline = networkConnectivity.isNetworkAvailable()
+
+if (!isOnline) {
+    // Show offline banner
+    showOfflineBanner("You're offline. Map tiles may not load.")
+
+    // Load markers/routes from local database (works offline)
+    val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
+
+    // Map tiles may be cached by Google Maps/MapKit
+}
+```
+
+### Camera Position Errors
+
+Handle invalid camera positions gracefully:
+
+```kotlin
+fun moveCameraTo(coordinate: Coordinate, zoom: Float) {
+    try {
+        // Validate coordinate
+        if (coordinate.latitude !in -90.0..90.0 ||
+            coordinate.longitude !in -180.0..180.0
+        ) {
+            logger.warn { "Invalid coordinate: $coordinate" }
+            return
+        }
+
+        // Validate zoom
+        val validZoom = zoom.coerceIn(1f, 20f)
+
+        _state.update {
+            it.copy(
+                cameraPosition = CameraPosition(
+                    target = coordinate,
+                    zoom = validZoom
+                )
+            )
+        }
+    } catch (e: Exception) {
+        logger.error(e) { "Failed to move camera" }
+        // Don't crash - just keep current position
+    }
+}
+```
+
+### Marker Click Errors
+
+Handle marker click errors safely:
+
+```kotlin
+Marker(
+    state = MarkerState(position = latLng),
+    title = marker.title,
+    onClick = {
+        try {
+            controller.selectMarker(marker)
+            onMarkerClick(marker)
+            true
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to handle marker click" }
+            false  // Return false to not consume the click
+        }
+    }
+)
+```
+
+### Map API Errors
+
+Handle Google Maps API errors (Android):
+
+```kotlin
+// In AndroidManifest.xml, add API key with error handling
+<meta-data
+    android:name="com.google.android.geo.API_KEY"
+    android:value="${MAPS_API_KEY}" />
+
+// Check if Google Play Services is available
+fun checkGooglePlayServices(context: Context): Boolean {
+    val availability = GoogleApiAvailability.getInstance()
+    val resultCode = availability.isGooglePlayServicesAvailable(context)
+
+    return when (resultCode) {
+        ConnectionResult.SUCCESS -> true
+        else -> {
+            // Show error dialog
+            if (availability.isUserResolvableError(resultCode)) {
+                availability.getErrorDialog(activity, resultCode, REQUEST_CODE)?.show()
+            } else {
+                showError("Google Play Services is required for maps")
+            }
+            false
+        }
+    }
+}
+```
+
+### Error Analytics
+
+Map errors are logged with context:
+
+```kotlin
+try {
+    val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
+} catch (e: Exception) {
+    val error = ErrorMapper.mapException(e)
+    error.logToAnalytics(
+        errorAnalytics,
+        context = mapOf(
+            "operation" to "loadMapData",
+            "startTime" to startTime.toString(),
+            "endTime" to endTime.toString(),
+            "markerCount" to mapData.markers.size.toString(),
+            "routeCount" to mapData.routes.size.toString()
+        ),
+        severity = ErrorSeverity.ERROR
+    )
+    throw error
+}
+```
+
+### Retry Logic
+
+Implement retry for map data loading:
+
+```kotlin
+// Retry with exponential backoff
+val mapData = retryWithPolicy(
+    policy = RetryPolicy.DEFAULT,
+    onRetry = { state ->
+        logger.info { "Retrying map data load (attempt ${state.attempt})" }
+        showRetryingIndicator()
+    }
+) {
+    getMapDataUseCase.execute(userId, startTime, endTime)
+}
+```
+
 ## Best Practices
 
 ### UX
@@ -689,6 +921,8 @@ fun testMapScreen() {
 ---
 
 **Related Documentation**:
-- [Location Processing](../shared/src/commonMain/kotlin/com/po4yka/trailglass/location/README.md)
-- [Photo Integration](PHOTO_INTEGRATION.md)
-- [UI Implementation](UI_IMPLEMENTATION.md)
+- [Error Handling](ERROR_HANDLING.md) - Comprehensive error handling guide
+- [Architecture](ARCHITECTURE.md) - System architecture overview
+- [Location Tracking](LOCATION_TRACKING.md) - Platform location tracking
+- [UI Implementation](UI_IMPLEMENTATION.md) - Material 3 UI components
+- [Testing](TESTING.md) - Testing strategy and coverage
