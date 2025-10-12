@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.ksp)
     id("org.jetbrains.kotlinx.kover") version "0.9.3"
 }
 
@@ -31,6 +32,7 @@ kotlin {
             implementation(libs.sqldelight.runtime)
             implementation(libs.sqldelight.coroutines)
             implementation(libs.kotlin.logging)
+            implementation(libs.kotlin.inject.runtime)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.android)
@@ -79,6 +81,14 @@ sqldelight {
     }
 }
 
+// KSP configuration for kotlin-inject
+dependencies {
+    add("kspCommonMainMetadata", libs.kotlin.inject.compiler)
+    add("kspAndroid", libs.kotlin.inject.compiler)
+    add("kspIosArm64", libs.kotlin.inject.compiler)
+    add("kspIosSimulatorArm64", libs.kotlin.inject.compiler)
+}
+
 // Code coverage configuration
 kover {
     reports {
@@ -87,7 +97,9 @@ kover {
                 classes(
                     "*.BuildConfig",
                     "*.db.*", // Generated SQLDelight code
-                    "*.ComposableSingletons*"
+                    "*.ComposableSingletons*",
+                    "*_Factory", // Generated kotlin-inject code
+                    "*Component*" // kotlin-inject components
                 )
             }
         }

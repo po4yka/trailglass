@@ -14,10 +14,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 
 /**
  * SQLDelight implementation of RouteSegmentRepository.
  */
+@Inject
 class RouteSegmentRepositoryImpl(
     private val database: TrailGlassDatabase
 ) : RouteSegmentRepository {

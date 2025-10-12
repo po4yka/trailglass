@@ -8,11 +8,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Controller for timeline feature.
  * Manages timeline state and user actions.
  */
+@Inject
 class TimelineController(
     private val getTimelineUseCase: GetTimelineForDayUseCase,
     private val coroutineScope: CoroutineScope,

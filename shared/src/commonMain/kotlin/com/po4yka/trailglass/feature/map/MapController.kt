@@ -9,10 +9,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Controller for map visualization.
  */
+@Inject
 class MapController(
     private val getMapDataUseCase: GetMapDataUseCase,
     private val coroutineScope: CoroutineScope,

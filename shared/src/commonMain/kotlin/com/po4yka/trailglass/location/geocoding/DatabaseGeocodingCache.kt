@@ -2,6 +2,7 @@ package com.po4yka.trailglass.location.geocoding
 
 import com.po4yka.trailglass.data.repository.GeocodingCacheRepository
 import com.po4yka.trailglass.domain.model.GeocodedLocation
+import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
@@ -9,6 +10,7 @@ import kotlin.time.Duration.Companion.days
  * Database-backed geocoding cache that persists across app restarts.
  * Replaces the in-memory GeocodingCache with persistent storage.
  */
+@Inject
 class DatabaseGeocodingCache(
     private val repository: GeocodingCacheRepository,
     private val proximityThresholdMeters: Double = 100.0,

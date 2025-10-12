@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
  * Controller for location tracking feature.
  * Manages tracking state and user actions.
  */
+@Inject
 class LocationTrackingController(
     private val locationTracker: LocationTracker,
     private val startTrackingUseCase: StartTrackingUseCase,

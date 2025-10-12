@@ -12,10 +12,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 
 /**
  * SQLDelight implementation of PlaceVisitRepository.
  */
+@Inject
 class PlaceVisitRepositoryImpl(
     private val database: Database
 ) : PlaceVisitRepository {

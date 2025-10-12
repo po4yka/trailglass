@@ -15,11 +15,13 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 
 /**
  * SQLDelight implementation of LocationRepository.
  * All operations return Result<T> for consistent error handling.
  */
+@Inject
 class LocationRepositoryImpl(
     private val database: Database
 ) : LocationRepository {

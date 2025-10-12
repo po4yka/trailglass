@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Controller for photo management.
  */
+@Inject
 class PhotoController(
     private val getPhotosForDayUseCase: GetPhotosForDayUseCase,
     private val suggestPhotosUseCase: SuggestPhotosForVisitUseCase,

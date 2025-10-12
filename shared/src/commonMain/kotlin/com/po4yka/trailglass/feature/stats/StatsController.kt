@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
  * Controller for stats feature.
  * Manages statistics state and period selection.
  */
+@Inject
 class StatsController(
     private val getStatsUseCase: GetStatsUseCase,
     private val coroutineScope: CoroutineScope,

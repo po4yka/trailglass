@@ -14,6 +14,7 @@ import kotlin.math.*
  * SQLDelight implementation of GeocodingCacheRepository.
  * Uses spatial bounding box queries followed by Haversine distance calculation.
  */
+@Inject
 class GeocodingCacheRepositoryImpl(
     private val database: Database
 ) : GeocodingCacheRepository {

@@ -12,10 +12,12 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 
 /**
  * SQLDelight implementation of TripRepository.
  */
+@Inject
 class TripRepositoryImpl(
     private val database: TrailGlassDatabase
 ) : TripRepository {

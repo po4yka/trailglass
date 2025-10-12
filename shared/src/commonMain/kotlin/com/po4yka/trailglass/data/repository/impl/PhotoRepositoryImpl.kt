@@ -13,6 +13,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -20,6 +21,7 @@ import kotlinx.datetime.atStartOfDayIn
 /**
  * SQLDelight implementation of PhotoRepository.
  */
+@Inject
 class PhotoRepositoryImpl(
     private val database: TrailGlassDatabase,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
