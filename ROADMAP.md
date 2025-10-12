@@ -67,9 +67,13 @@ This document outlines the development roadmap, release milestones, and timeline
 - [ ] Create photo attachment UI
 - [ ] Add photo galleries to Memories
 - [ ] Implement memorabilia feature
-- [ ] Add reverse geocoding for places
+- [x] Add reverse geocoding for places
+  - [x] Core geocoding infrastructure (Android & iOS)
+  - [x] Spatial caching layer
+  - [x] PlaceVisit clustering with geocoding
+  - [ ] Database persistence for geocoding cache
 
-**Deliverable:** Photos integrated into trips and memories
+**Deliverable:** Photos integrated into trips and memories (reverse geocoding ✅)
 
 #### Month 5: Maps & Enhanced Visualization
 - [ ] Integrate map views (MapKit, Google Maps)
@@ -361,6 +365,13 @@ This document outlines the development roadmap, release milestones, and timeline
 
 ---
 
-**Last updated:** 2025-11-16
+**Last updated:** 2025-11-17
 **Next review:** 2025-12-01
 **Status:** Phase 1 - Foundation (In Progress)
+
+**Recent Progress:**
+- ✅ Reverse geocoding infrastructure implemented (2025-11-17)
+  - Domain models: LocationSample, PlaceVisit, GeocodedLocation
+  - Platform geocoders: Android (Geocoder API), iOS (CLGeocoder)
+  - Caching layer with spatial proximity matching
+  - PlaceVisit clustering with geocoding integration

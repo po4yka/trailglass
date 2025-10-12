@@ -1,0 +1,104 @@
+-- Route segments table: movement between locations
+CREATE TABLE route_segments (
+    id TEXT NOT NULL PRIMARY KEY,
+    start_time INTEGER NOT NULL,
+    end_time INTEGER NOT NULL,
+    from_place_visit_id TEXT,
+    to_place_visit_id TEXT,
+    transport_type TEXT NOT NULL,
+    distance_meters REAL NOT NULL,
+    average_speed_mps REAL,
+    user_id TEXT NOT NULL,
+    trip_id TEXT,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER,
+    FOREIGN KEY (from_place_visit_id) REFERENCES place_visits(id),
+    FOREIGN KEY (to_place_visit_id) REFERENCES place_visits(id)
+);
+
+-- Indices for performance
+CREATE INDEX route_segments_time ON route_segments(start_time, end_time);
+CREATE INDEX route_segments_user ON route_segments(user_id);
+CREATE INDEX route_segments_trip ON route_segments(trip_id);
+CREATE INDEX route_segments_deleted ON route_segments(deleted_at) WHERE deleted_at IS NULL;
+
+-- Junction table: links route segments to location samples
+CREATE TABLE route_segment_samples (
+    route_segment_id TEXT NOT NULL,
+    location_sample_id TEXT NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    PRIMARY KEY (route_segment_id, location_sample_id),
+    FOREIGN KEY (route_segment_id) REFERENCES route_segments(id) ON DELETE CASCADE,
+    FOREIGN KEY (location_sample_id) REFERENCES location_samples(id) ON DELETE CASCADE
+);
+
+CREATE INDEX route_segment_samples_segment ON route_segment_samples(route_segment_id);
+CREATE INDEX route_segment_samples_sample ON route_segment_samples(location_sample_id);
+
+-- Simplified path points for route visualization
+CREATE TABLE route_path_points (
+    id TEXT NOT NULL PRIMARY KEY,
+    route_segment_id TEXT NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    sequence_number INTEGER NOT NULL,
+    FOREIGN KEY (route_segment_id) REFERENCES route_segments(id) ON DELETE CASCADE
+);
+
+CREATE INDEX route_path_points_segment ON route_path_points(route_segment_id, sequence_number);
+
+-- Queries
+insertSegment:
+INSERT INTO route_segments (
+    id, start_time, end_time, from_place_visit_id, to_place_visit_id,
+    transport_type, distance_meters, average_speed_mps,
+    user_id, trip_id, created_at, updated_at, deleted_at
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getSegmentById:
+SELECT * FROM route_segments
+WHERE id = ? AND deleted_at IS NULL;
+
+getSegmentsByTimeRange:
+SELECT * FROM route_segments
+WHERE user_id = ?
+  AND start_time <= ?
+  AND end_time >= ?
+  AND deleted_at IS NULL
+ORDER BY start_time ASC;
+
+getSegmentsByTrip:
+SELECT * FROM route_segments
+WHERE trip_id = ? AND deleted_at IS NULL
+ORDER BY start_time ASC;
+
+linkSample:
+INSERT OR IGNORE INTO route_segment_samples (route_segment_id, location_sample_id, sequence_number)
+VALUES (?, ?, ?);
+
+getSamplesForSegment:
+SELECT ls.* FROM location_samples ls
+INNER JOIN route_segment_samples rss ON ls.id = rss.location_sample_id
+WHERE rss.route_segment_id = ?
+  AND ls.deleted_at IS NULL
+ORDER BY rss.sequence_number ASC;
+
+insertPathPoint:
+INSERT INTO route_path_points (id, route_segment_id, latitude, longitude, sequence_number)
+VALUES (?, ?, ?, ?, ?);
+
+getPathPoints:
+SELECT * FROM route_path_points
+WHERE route_segment_id = ?
+ORDER BY sequence_number ASC;
+
+softDelete:
+UPDATE route_segments
+SET deleted_at = ?, updated_at = ?
+WHERE id = ?;
+
+deletePermanently:
+DELETE FROM route_segments
+WHERE id = ?;
