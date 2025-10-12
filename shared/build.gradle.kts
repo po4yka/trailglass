@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
-    id("org.jetbrains.kotlinx.kover") version "0.9.0"
+    id("org.jetbrains.kotlinx.kover") version "0.9.3"
 }
 
 kotlin {
