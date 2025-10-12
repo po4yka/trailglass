@@ -4,11 +4,13 @@ import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.domain.model.PhotoAttachment
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Clock
+import me.tatarka.inject.annotations.Inject
 import java.util.UUID
 
 /**
  * Use case for attaching a photo to a place visit.
  */
+@Inject
 class AttachPhotoToVisitUseCase(
     private val photoRepository: PhotoRepository
 ) {

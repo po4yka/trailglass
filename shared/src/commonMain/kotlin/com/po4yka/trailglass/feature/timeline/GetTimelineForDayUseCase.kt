@@ -5,11 +5,13 @@ import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.*
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Use case for getting the timeline for a specific day.
  * Combines place visits and route segments into a chronological timeline.
  */
+@Inject
 class GetTimelineForDayUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
     private val routeSegmentRepository: RouteSegmentRepository,

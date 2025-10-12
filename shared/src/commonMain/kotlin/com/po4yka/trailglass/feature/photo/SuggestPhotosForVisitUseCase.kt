@@ -10,6 +10,7 @@ import kotlin.math.*
  * Use case for suggesting photos that might belong to a place visit.
  * Uses time and location matching.
  */
+@Inject
 class SuggestPhotosForVisitUseCase(
     private val photoRepository: PhotoRepository,
     private val suggestionRadiusMeters: Double = 500.0 // 500m radius

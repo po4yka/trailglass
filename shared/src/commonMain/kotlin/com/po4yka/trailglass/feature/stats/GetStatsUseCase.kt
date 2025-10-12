@@ -4,10 +4,12 @@ import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.*
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Use case for getting statistics for a time period.
  */
+@Inject
 class GetStatsUseCase(
     private val tripRepository: TripRepository,
     private val placeVisitRepository: PlaceVisitRepository,

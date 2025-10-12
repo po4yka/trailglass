@@ -4,10 +4,12 @@ import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.LocalDate
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Use case for getting photos taken on a specific day.
  */
+@Inject
 class GetPhotosForDayUseCase(
     private val photoRepository: PhotoRepository
 ) {

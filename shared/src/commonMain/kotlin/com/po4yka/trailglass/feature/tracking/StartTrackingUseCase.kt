@@ -7,6 +7,7 @@ import com.po4yka.trailglass.logging.logger
 /**
  * Use case for starting location tracking.
  */
+@Inject
 class StartTrackingUseCase(
     private val locationTracker: LocationTracker
 ) {

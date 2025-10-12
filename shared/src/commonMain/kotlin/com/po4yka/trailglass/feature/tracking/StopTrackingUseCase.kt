@@ -6,6 +6,7 @@ import com.po4yka.trailglass.logging.logger
 /**
  * Use case for stopping location tracking.
  */
+@Inject
 class StopTrackingUseCase(
     private val locationTracker: LocationTracker
 ) {

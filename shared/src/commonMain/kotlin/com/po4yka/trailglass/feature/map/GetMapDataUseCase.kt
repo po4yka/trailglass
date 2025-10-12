@@ -5,10 +5,12 @@ import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Use case for getting map data (markers and routes) for display.
  */
+@Inject
 class GetMapDataUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
     private val routeSegmentRepository: RouteSegmentRepository
