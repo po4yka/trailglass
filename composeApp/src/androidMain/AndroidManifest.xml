@@ -17,6 +17,32 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Deep linking support -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- trailglass:// scheme -->
+                <data
+                    android:scheme="trailglass"
+                    android:host="app" />
+            </intent-filter>
+
+            <!-- HTTPS deep links for web integration -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- https://trailglass.app deep links -->
+                <data
+                    android:scheme="https"
+                    android:host="trailglass.app" />
+            </intent-filter>
         </activity>
     </application>
 

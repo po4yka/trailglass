@@ -91,13 +91,35 @@ fun checkPermissions()
 
 ### Navigation
 
-**Bottom Navigation** with 3 tabs:
-- **Stats**: Travel statistics
-- **Timeline**: Daily timeline view
-- **Settings**: Tracking and permissions
+**Architecture**: Decompose 3.2.0 for lifecycle-aware navigation
+
+**Bottom Navigation** with 4 tabs:
+- **Stats**: Travel statistics and analytics
+- **Timeline**: Daily timeline view with visits and routes
+- **Map**: Interactive map with location markers
+- **Settings**: Tracking controls and permissions
 
 **Files**:
-- `ui/navigation/Navigation.kt` - NavHost and bottom bar
+- `ui/navigation/RootComponent.kt` - Main navigation component with child stack
+- `ui/navigation/Navigation.kt` - Main scaffold with bottom navigation bar
+- `ui/navigation/StatsComponent.kt` - Stats screen component wrapper
+- `ui/navigation/TimelineComponent.kt` - Timeline screen component wrapper
+- `ui/navigation/MapComponent.kt` - Map screen component wrapper
+- `ui/navigation/SettingsComponent.kt` - Settings screen component wrapper
+
+**Deep Linking Support**:
+- `trailglass://app/stats` - Navigate to Stats screen
+- `trailglass://app/timeline` - Navigate to Timeline screen
+- `trailglass://app/map` - Navigate to Map screen
+- `trailglass://app/settings` - Navigate to Settings screen
+- `https://trailglass.app/*` - HTTPS deep links for web integration
+
+**Features**:
+- Lifecycle-aware component management
+- State preservation across configuration changes
+- Type-safe navigation with kotlinx.serialization
+- Automatic back button handling
+- Deep link intent processing in MainActivity
 
 ### Screens
 
@@ -191,11 +213,13 @@ Material 3 Typography scale:
 ## Iconography
 
 **Material Icons** from `androidx.compose.material.icons`:
-- `BarChart` - Stats
-- `ViewTimeline` - Timeline
-- `Settings` - Settings
-- `Public`, `CalendarToday` - Stats cards
-- `Place`, `DirectionsWalk`, `Flight` - Timeline items
+- `BarChart` - Stats tab
+- `ViewTimeline` - Timeline tab
+- `Map` - Map tab
+- `Settings` - Settings tab
+- `Public`, `CalendarToday`, `Flight`, `Place` - Stats cards
+- `Place`, `DirectionsWalk`, `DirectionsBike`, `DirectionsCar`, `Train`, `Flight`, `DirectionsBoat` - Timeline items
+- `GpsFixed`, `GpsOff` - Tracking status
 
 ## Accessibility
 

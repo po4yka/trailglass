@@ -25,6 +25,18 @@ interface RootComponent {
     fun navigateToScreen(config: Config)
 
     /**
+     * Handle deep link navigation.
+     * Parses deep link paths and navigates to the appropriate screen.
+     *
+     * Supported deep links:
+     * - trailglass://app/stats
+     * - trailglass://app/timeline
+     * - trailglass://app/map
+     * - trailglass://app/settings
+     */
+    fun handleDeepLink(path: String)
+
+    /**
      * Sealed class representing the navigation configurations.
      */
     @Serializable
@@ -73,6 +85,28 @@ class DefaultRootComponent(
 
     override fun navigateToScreen(config: RootComponent.Config) {
         navigation.replaceAll(config)
+    }
+
+    override fun handleDeepLink(path: String) {
+        val config = parseDeepLink(path)
+        if (config != null) {
+            navigateToScreen(config)
+        }
+    }
+
+    /**
+     * Parse deep link path to navigation configuration.
+     * Supports paths like: /stats, /timeline, /map, /settings
+     */
+    private fun parseDeepLink(path: String): RootComponent.Config? {
+        val cleanPath = path.trim('/').lowercase()
+        return when (cleanPath) {
+            "stats" -> RootComponent.Config.Stats
+            "timeline" -> RootComponent.Config.Timeline
+            "map" -> RootComponent.Config.Map
+            "settings" -> RootComponent.Config.Settings
+            else -> null
+        }
     }
 
     private fun createChild(

@@ -166,7 +166,7 @@ See feature documentation for detailed implementations.
 ### Android
 - **Kotlin**: Modern Android development
 - **Jetpack Compose**: Declarative UI with Material 3 Expressive theme
-- **Navigation Compose**: Type-safe navigation
+- **Decompose 3.2.0**: Lifecycle-aware navigation with state preservation and deep linking
 - **Lifecycle & ViewModel**: Android Architecture Components
 - **WorkManager**: Background location processing
 - **Coil**: Async image loading

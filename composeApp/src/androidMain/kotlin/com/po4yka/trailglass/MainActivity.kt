@@ -1,5 +1,6 @@
 package com.po4yka.trailglass
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,19 +22,45 @@ class MainActivity : ComponentActivity() {
         (application as TrailGlassApplication).appComponent
     }
 
+    private lateinit var rootComponent: RootComponent
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         // Create the root component with Decompose lifecycle integration
-        val rootComponent: RootComponent = DefaultRootComponent(
+        rootComponent = DefaultRootComponent(
             componentContext = defaultComponentContext(),
             appComponent = appComponent
         )
 
+        // Handle deep link if present in launch intent
+        handleIntent(intent)
+
         setContent {
             App(rootComponent = rootComponent)
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // Handle deep links when app is already running
+        handleIntent(intent)
+    }
+
+    /**
+     * Handle deep link intents.
+     * Supports both trailglass:// and https://trailglass.app URLs.
+     */
+    private fun handleIntent(intent: Intent) {
+        val data = intent.data ?: return
+
+        // Extract path from the URI
+        // For trailglass://app/stats -> path = "stats"
+        // For https://trailglass.app/timeline -> path = "timeline"
+        val path = data.path?.removePrefix("/") ?: data.host ?: return
+
+        rootComponent.handleDeepLink(path)
     }
 }
 
