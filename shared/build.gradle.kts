@@ -54,6 +54,9 @@ kotlin {
 
             // DataStore for preferences
             implementation(libs.datastore.preferences.core)
+
+            // Location services
+            implementation(libs.play.services.location)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

@@ -3,12 +3,15 @@ package com.po4yka.trailglass.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material.icons.filled.GpsNotFixed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -47,6 +50,37 @@ fun MapView(
                 onMarkerClick = onMarkerClick,
                 modifier = Modifier.fillMaxSize()
             )
+
+            // Follow mode toggle button
+            val scope = rememberCoroutineScope()
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        controller.toggleFollowMode()
+                    }
+                },
+                containerColor = if (state.isFollowModeEnabled) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surface
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 88.dp, end = 16.dp)
+            ) {
+                Icon(
+                    imageVector = if (state.isFollowModeEnabled) {
+                        Icons.Default.GpsFixed
+                    } else {
+                        Icons.Default.GpsNotFixed
+                    },
+                    contentDescription = if (state.isFollowModeEnabled) {
+                        "Disable follow mode"
+                    } else {
+                        "Enable follow mode"
+                    }
+                )
+            }
 
             // Fit to data button
             if (state.mapData.markers.isNotEmpty() || state.mapData.routes.isNotEmpty()) {

@@ -1,11 +1,15 @@
 package com.po4yka.trailglass.feature.map
 
 import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -20,11 +24,14 @@ import me.tatarka.inject.annotations.Inject
 @Inject
 class MapController(
     private val getMapDataUseCase: GetMapDataUseCase,
+    private val locationService: LocationService,
     private val coroutineScope: CoroutineScope,
     private val userId: String
 ) : MapEventSink {
 
     private val logger = logger()
+
+    private var locationTrackingJob: Job? = null
 
     /**
      * Map UI state.
@@ -34,6 +41,7 @@ class MapController(
         val cameraMove: CameraMove? = null,
         val selectedMarker: MapMarker? = null,
         val selectedRoute: MapRoute? = null,
+        val isFollowModeEnabled: Boolean = false,
         val isLoading: Boolean = false,
         val error: String? = null
     )
@@ -181,6 +189,84 @@ class MapController(
      */
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    /**
+     * Toggle follow mode on/off.
+     *
+     * When enabled, the camera will track the user's current location.
+     * When disabled, location tracking stops.
+     *
+     * @param zoom Zoom level to use when following (default: 15f - street level)
+     * @param tilt Camera tilt angle in degrees (default: 45f - perspective view)
+     * @param bearing Camera bearing in degrees (default: 0f - north up)
+     */
+    suspend fun toggleFollowMode(
+        zoom: Float = 15f,
+        tilt: Float = 45f,
+        bearing: Float = 0f
+    ) {
+        val isCurrentlyEnabled = _state.value.isFollowModeEnabled
+
+        if (isCurrentlyEnabled) {
+            // Disable follow mode
+            logger.info { "Disabling follow mode" }
+            locationTrackingJob?.cancel()
+            locationTrackingJob = null
+            _state.update { it.copy(isFollowModeEnabled = false) }
+        } else {
+            // Enable follow mode
+            logger.info { "Enabling follow mode" }
+
+            // Check permissions
+            if (!locationService.hasLocationPermission()) {
+                logger.warn { "Location permission not granted, cannot enable follow mode" }
+                _state.update {
+                    it.copy(
+                        error = "Location permission required for follow mode"
+                    )
+                }
+                return
+            }
+
+            // Get last known location and move camera there first
+            locationService.getLastKnownLocation()?.let { coordinate ->
+                val position = CameraPosition(
+                    target = coordinate,
+                    zoom = zoom,
+                    tilt = tilt,
+                    bearing = bearing
+                )
+                applyCameraMove(CameraMove.Ease(position, durationMs = 800))
+            }
+
+            // Start tracking location updates
+            locationTrackingJob = locationService.locationUpdates
+                .onEach { coordinate ->
+                    logger.debug { "Location update: ${coordinate.latitude}, ${coordinate.longitude}" }
+
+                    // Update camera to follow user
+                    val position = CameraPosition(
+                        target = coordinate,
+                        zoom = zoom,
+                        tilt = tilt,
+                        bearing = bearing
+                    )
+                    applyCameraMove(CameraMove.Ease(position, durationMs = 500))
+                }
+                .launchIn(coroutineScope)
+
+            _state.update { it.copy(isFollowModeEnabled = true) }
+        }
+    }
+
+    /**
+     * Check if location permission is granted.
+     *
+     * @return true if permission is granted, false otherwise
+     */
+    suspend fun hasLocationPermission(): Boolean {
+        return locationService.hasLocationPermission()
     }
 
     /**

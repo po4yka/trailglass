@@ -3,6 +3,8 @@ package com.po4yka.trailglass.di
 import android.content.Context
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.domain.service.AndroidLocationService
+import com.po4yka.trailglass.domain.service.LocationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,6 +16,7 @@ import me.tatarka.inject.annotations.Provides
  *
  * Provides Android-specific dependencies including:
  * - DatabaseDriverFactory (using Android SQLite)
+ * - LocationService (using Google Play Services)
  * - Application-level CoroutineScope
  * - User ID and Device ID
  */
@@ -25,6 +28,10 @@ class AndroidPlatformModule(
     @Provides
     override val databaseDriverFactory: DatabaseDriverFactory
         get() = DatabaseDriverFactory(context)
+
+    @Provides
+    override val locationService: LocationService
+        get() = AndroidLocationService(context)
 
     @Provides
     override val applicationScope: CoroutineScope

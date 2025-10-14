@@ -50,6 +50,9 @@ abstract class AppComponent(
     // Location processing (from LocationModule)
     abstract val locationProcessor: LocationProcessor
 
+    // Location service (from PlatformModule)
+    abstract val locationService: com.po4yka.trailglass.domain.service.LocationService
+
     // Feature controllers
     abstract val statsController: StatsController
     abstract val timelineController: TimelineController
