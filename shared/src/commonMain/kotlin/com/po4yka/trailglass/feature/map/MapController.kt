@@ -13,13 +13,16 @@ import me.tatarka.inject.annotations.Inject
 
 /**
  * Controller for map visualization.
+ *
+ * Implements [MapEventSink] to handle events from the map UI in a decoupled,
+ * testable manner.
  */
 @Inject
 class MapController(
     private val getMapDataUseCase: GetMapDataUseCase,
     private val coroutineScope: CoroutineScope,
     private val userId: String
-) {
+) : MapEventSink {
 
     private val logger = logger()
 
@@ -28,7 +31,7 @@ class MapController(
      */
     data class MapState(
         val mapData: MapDisplayData = MapDisplayData(),
-        val cameraPosition: CameraPosition? = null,
+        val cameraMove: CameraMove? = null,
         val selectedMarker: MapMarker? = null,
         val selectedRoute: MapRoute? = null,
         val isLoading: Boolean = false,
@@ -50,18 +53,21 @@ class MapController(
             try {
                 val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
 
-                // Set camera position to region center if available
-                val cameraPosition = mapData.region?.let { region ->
-                    CameraPosition(
-                        target = region.center,
-                        zoom = calculateZoomLevel(region)
+                // Set camera to region center with smooth animation if available
+                val cameraMove = mapData.region?.let { region ->
+                    CameraMove.Ease(
+                        position = CameraPosition(
+                            target = region.center,
+                            zoom = calculateZoomLevel(region)
+                        ),
+                        durationMs = 1500
                     )
                 }
 
                 _state.update {
                     it.copy(
                         mapData = mapData,
-                        cameraPosition = cameraPosition,
+                        cameraMove = cameraMove,
                         isLoading = false
                     )
                 }
@@ -108,31 +114,56 @@ class MapController(
     }
 
     /**
-     * Update camera position.
+     * Apply a camera movement command.
+     *
+     * @param cameraMove The camera movement command to apply
      */
-    fun updateCameraPosition(position: CameraPosition) {
-        _state.update { it.copy(cameraPosition = position) }
+    fun applyCameraMove(cameraMove: CameraMove) {
+        _state.update { it.copy(cameraMove = cameraMove) }
     }
 
     /**
-     * Move camera to coordinate.
+     * Move camera to coordinate with smooth animation.
+     *
+     * @param coordinate Target coordinate
+     * @param zoom Zoom level (default: 15f - street level)
+     * @param animated If true, uses smooth easing animation, otherwise instant (default: true)
+     * @param durationMs Animation duration in milliseconds (default: 1000ms)
      */
-    fun moveCameraTo(coordinate: Coordinate, zoom: Float = 15f) {
+    fun moveCameraTo(
+        coordinate: Coordinate,
+        zoom: Float = 15f,
+        animated: Boolean = true,
+        durationMs: Int = 1000
+    ) {
         val position = CameraPosition(target = coordinate, zoom = zoom)
-        updateCameraPosition(position)
+        val cameraMove = if (animated) {
+            CameraMove.Ease(position, durationMs)
+        } else {
+            CameraMove.Instant(position)
+        }
+        applyCameraMove(cameraMove)
     }
 
     /**
-     * Fit map to show all markers and routes.
+     * Fit map to show all markers and routes with smooth animation.
+     *
+     * @param animated If true, uses smooth easing animation, otherwise instant (default: true)
+     * @param durationMs Animation duration in milliseconds (default: 1200ms)
      */
-    fun fitToData() {
+    fun fitToData(animated: Boolean = true, durationMs: Int = 1200) {
         val region = _state.value.mapData.region
         if (region != null) {
             val position = CameraPosition(
                 target = region.center,
                 zoom = calculateZoomLevel(region)
             )
-            updateCameraPosition(position)
+            val cameraMove = if (animated) {
+                CameraMove.Ease(position, durationMs)
+            } else {
+                CameraMove.Instant(position)
+            }
+            applyCameraMove(cameraMove)
         }
     }
 
@@ -150,6 +181,55 @@ class MapController(
      */
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    /**
+     * Handle map events from the UI layer.
+     *
+     * This implements the [MapEventSink] interface, providing a clean
+     * event-driven API for map interactions.
+     */
+    override fun send(event: MapEvent) {
+        logger.debug { "Map event received: ${event::class.simpleName}" }
+
+        when (event) {
+            is MapEvent.MarkerTapped -> {
+                // Find and select the marker
+                val marker = _state.value.mapData.markers.find { it.id == event.markerId }
+                if (marker != null) {
+                    selectMarker(marker)
+                } else {
+                    logger.warn { "Marker not found: ${event.markerId}" }
+                }
+            }
+            is MapEvent.RouteTapped -> {
+                // Find and select the route
+                val route = _state.value.mapData.routes.find { it.id == event.routeId }
+                if (route != null) {
+                    selectRoute(route)
+                } else {
+                    logger.warn { "Route not found: ${event.routeId}" }
+                }
+            }
+            is MapEvent.MapTapped -> {
+                // Deselect any selected markers or routes
+                deselectMarker()
+                deselectRoute()
+            }
+            is MapEvent.CameraMoved -> {
+                // Update camera position in state for tracking
+                // Note: This is informational only, we don't update cameraMove
+                // to avoid feedback loops
+                logger.debug {
+                    "Camera moved to: ${event.position.target.latitude}, " +
+                    "${event.position.target.longitude}"
+                }
+            }
+            is MapEvent.MapReady -> {
+                logger.info { "Map is ready for interaction" }
+                // Could trigger initial data load or other setup here
+            }
+        }
     }
 
     /**

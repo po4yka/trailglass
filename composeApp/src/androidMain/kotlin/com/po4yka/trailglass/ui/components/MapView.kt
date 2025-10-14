@@ -42,14 +42,9 @@ fun MapView(
         } else {
             GoogleMapContent(
                 mapData = state.mapData,
-                cameraPosition = state.cameraPosition,
-                onMarkerClick = {
-                    controller.selectMarker(it)
-                    onMarkerClick(it)
-                },
-                onMapClick = {
-                    controller.deselectMarker()
-                },
+                cameraMove = state.cameraMove,
+                eventSink = controller,
+                onMarkerClick = onMarkerClick,
                 modifier = Modifier.fillMaxSize()
             )
 
@@ -71,35 +66,66 @@ fun MapView(
 @Composable
 private fun GoogleMapContent(
     mapData: MapDisplayData,
-    cameraPosition: CameraPosition?,
+    cameraMove: CameraMove?,
+    eventSink: MapEventSink,
     onMarkerClick: (MapMarker) -> Unit,
-    onMapClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Convert camera position
+    // Initialize camera position state
     val cameraPositionState = rememberCameraPositionState {
-        position = cameraPosition?.let {
-            CameraPosition.fromLatLngZoom(
-                LatLng(it.target.latitude, it.target.longitude),
-                it.zoom
-            )
-        } ?: CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
+        position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
     }
 
-    // Update camera when position changes
-    LaunchedEffect(cameraPosition) {
-        cameraPosition?.let {
-            cameraPositionState.position = CameraPosition.fromLatLngZoom(
-                LatLng(it.target.latitude, it.target.longitude),
-                it.zoom
-            )
+    // Apply camera movements with appropriate animations
+    LaunchedEffect(cameraMove) {
+        cameraMove?.let { move ->
+            when (move) {
+                is CameraMove.Instant -> {
+                    // Instant movement - no animation
+                    cameraPositionState.position = move.position.toGmsCameraPosition()
+                }
+                is CameraMove.Ease -> {
+                    // Smooth easing animation
+                    cameraPositionState.animate(
+                        update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
+                            move.position.toGmsCameraPosition()
+                        ),
+                        durationMs = move.durationMs
+                    )
+                }
+                is CameraMove.Fly -> {
+                    // Fly-to animation (using same as ease for now, could enhance with arc trajectory)
+                    cameraPositionState.animate(
+                        update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
+                            move.position.toGmsCameraPosition()
+                        ),
+                        durationMs = move.durationMs
+                    )
+                }
+                is CameraMove.FollowUser -> {
+                    // Follow user mode - not yet implemented
+                    // Would require location updates and continuous camera tracking
+                    // For now, do nothing - this will be implemented in future enhancement
+                }
+            }
         }
     }
 
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
-        onMapClick = { onMapClick() },
+        onMapClick = { latLng ->
+            // Send map tapped event
+            eventSink.send(
+                MapEvent.MapTapped(
+                    Coordinate(latitude = latLng.latitude, longitude = latLng.longitude)
+                )
+            )
+        },
+        onMapLoaded = {
+            // Send map ready event
+            eventSink.send(MapEvent.MapReady)
+        },
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
             myLocationButtonEnabled = true,
@@ -133,6 +159,9 @@ private fun GoogleMapContent(
                 title = marker.title,
                 snippet = marker.snippet,
                 onClick = {
+                    // Send marker tapped event
+                    eventSink.send(MapEvent.MarkerTapped(marker.id))
+                    // Also call the external callback for additional handling
                     onMarkerClick(marker)
                     true // Consume the event
                 }
@@ -177,4 +206,16 @@ private fun getRouteWidth(transportType: TransportType): Float {
         TransportType.BOAT -> 12f
         TransportType.UNKNOWN -> 8f
     }
+}
+
+/**
+ * Convert domain CameraPosition to Google Maps CameraPosition.
+ */
+private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPosition(): CameraPosition {
+    return CameraPosition.Builder()
+        .target(LatLng(target.latitude, target.longitude))
+        .zoom(zoom)
+        .tilt(tilt)
+        .bearing(bearing)
+        .build()
 }
