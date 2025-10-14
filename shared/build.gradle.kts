@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlinx.serialization)
     id("org.jetbrains.kotlinx.kover") version "0.9.3"
 }
 
@@ -33,14 +34,32 @@ kotlin {
             implementation(libs.sqldelight.coroutines)
             implementation(libs.kotlin.logging)
             implementation(libs.kotlin.inject.runtime)
+
+            // Serialization
+            implementation(libs.kotlinx.serialization.json)
+
+            // Ktor client for networking
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.android)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.slf4j.android)
+
+            // Ktor Android engine (OkHttp)
+            implementation(libs.ktor.client.okhttp)
+
+            // DataStore for preferences
+            implementation(libs.datastore.preferences.core)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
+
+            // Ktor iOS engine (Darwin)
+            implementation(libs.ktor.client.darwin)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
