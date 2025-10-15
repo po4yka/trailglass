@@ -128,13 +128,29 @@ private fun GoogleMapContent(
                     )
                 }
                 is CameraMove.Fly -> {
-                    // Fly-to animation (using same as ease for now, could enhance with arc trajectory)
-                    cameraPositionState.animate(
-                        update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
-                            move.position.toGmsCameraPosition()
-                        ),
-                        durationMs = move.durationMs
+                    // Fly-to animation with arc trajectory
+                    // Get current position
+                    val currentPosition = cameraPositionState.position.toDomainCameraPosition()
+
+                    // Calculate arc trajectory waypoints
+                    val arcWaypoints = ArcTrajectoryCalculator.calculateArcTrajectory(
+                        start = currentPosition,
+                        end = move.position,
+                        steps = 20 // 20 intermediate steps for smooth arc
                     )
+
+                    // Animate through each waypoint
+                    // Each segment gets a fraction of the total duration
+                    val segmentDuration = move.durationMs / arcWaypoints.size
+
+                    for (waypoint in arcWaypoints.drop(1)) { // Skip first (current position)
+                        cameraPositionState.animate(
+                            update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
+                                waypoint.toGmsCameraPosition()
+                            ),
+                            durationMs = segmentDuration
+                        )
+                    }
                 }
                 is CameraMove.FollowUser -> {
                     // Follow user mode - not yet implemented
@@ -252,4 +268,19 @@ private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPositio
         .tilt(tilt)
         .bearing(bearing)
         .build()
+}
+
+/**
+ * Convert Google Maps CameraPosition to domain CameraPosition.
+ */
+private fun CameraPosition.toDomainCameraPosition(): com.po4yka.trailglass.domain.model.CameraPosition {
+    return com.po4yka.trailglass.domain.model.CameraPosition(
+        target = Coordinate(
+            latitude = target.latitude,
+            longitude = target.longitude
+        ),
+        zoom = zoom,
+        tilt = tilt,
+        bearing = bearing
+    )
 }
