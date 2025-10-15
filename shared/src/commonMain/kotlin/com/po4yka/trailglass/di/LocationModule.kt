@@ -9,6 +9,8 @@ import com.po4yka.trailglass.location.geocoding.ReverseGeocoder
 import com.po4yka.trailglass.location.geocoding.createReverseGeocoder
 import com.po4yka.trailglass.location.trip.TripDetector
 import com.po4yka.trailglass.location.trip.TripDayAggregator
+import com.po4yka.trailglass.location.tracking.DefaultLocationTracker
+import com.po4yka.trailglass.location.tracking.LocationTracker
 import me.tatarka.inject.annotations.Provides
 
 /**
@@ -90,6 +92,27 @@ interface LocationModule {
             routeSegmentBuilder = routeSegmentBuilder,
             tripDetector = tripDetector,
             tripDayAggregator = tripDayAggregator
+        )
+    }
+
+    /**
+     * Provides LocationTracker.
+     */
+    @AppScope
+    @Provides
+    fun provideLocationTracker(
+        locationService: com.po4yka.trailglass.domain.service.LocationService,
+        locationRepository: com.po4yka.trailglass.data.repository.LocationRepository,
+        coroutineScope: kotlinx.coroutines.CoroutineScope,
+        userId: String,
+        deviceId: String
+    ): LocationTracker {
+        return DefaultLocationTracker(
+            locationService = locationService,
+            locationRepository = locationRepository,
+            coroutineScope = coroutineScope,
+            userId = userId,
+            deviceId = deviceId
         )
     }
 }

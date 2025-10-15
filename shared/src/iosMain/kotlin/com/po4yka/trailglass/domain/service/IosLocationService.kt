@@ -72,7 +72,11 @@ class IosLocationService : LocationService {
         locationManager.delegate = delegate
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.distanceFilter = 10.0 // Update every 10 meters
-        locationManager.allowsBackgroundLocationUpdates = false
+
+        // Enable background location updates
+        // This requires "location" in UIBackgroundModes in Info.plist
+        locationManager.allowsBackgroundLocationUpdates = true
+        locationManager.pausesLocationUpdatesAutomatically = false
 
         // Start location updates
         locationManager.startUpdatingLocation()

@@ -9,5 +9,13 @@
 	<string>TrailGlass needs access to your location to show your position on the map and track your travels.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>TrailGlass needs access to your location to track your travels and show your position on the map.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>TrailGlass needs access to your location in the background to automatically track your trips.</string>
+
+	<!-- Background modes for location tracking -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+	</array>
 </dict>
 </plist>
