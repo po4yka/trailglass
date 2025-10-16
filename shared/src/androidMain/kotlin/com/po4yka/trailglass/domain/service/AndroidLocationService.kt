@@ -121,5 +121,24 @@ class AndroidLocationService(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    override suspend fun requestLocationPermission(background: Boolean): Boolean {
+        // Android requires Activity context to request permissions.
+        // Permission requests should be handled at the UI layer using:
+        // - Jetpack Compose: rememberLauncherForActivityResult with RequestPermission
+        // - Activity: ActivityResultContracts.RequestPermission()
+        //
+        // This method returns false to indicate that permissions must be requested
+        // from the UI layer. The app should check hasLocationPermission() after
+        // the user grants/denies the permission request.
+
+        android.util.Log.w(
+            "AndroidLocationService",
+            "Permission request attempted from service. " +
+            "Permissions must be requested from Activity/Compose UI layer."
+        )
+
+        return false
+    }
+
     override fun isTracking(): Boolean = isCurrentlyTracking
 }

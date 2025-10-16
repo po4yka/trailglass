@@ -48,6 +48,18 @@ interface LocationService {
     suspend fun hasLocationPermission(): Boolean
 
     /**
+     * Request location permissions from the user.
+     *
+     * Platform-specific behavior:
+     * - Android: Returns false - permissions must be requested via Activity using Compose or Activity APIs
+     * - iOS: Triggers system permission dialog and returns result
+     *
+     * @param background Whether to request background location permission (always-on)
+     * @return true if permissions were granted, false otherwise or if platform requires UI-based request
+     */
+    suspend fun requestLocationPermission(background: Boolean = false): Boolean
+
+    /**
      * Check if location tracking is currently active.
      *
      * @return true if tracking, false otherwise

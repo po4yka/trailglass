@@ -112,9 +112,16 @@ class DefaultLocationTracker(
     }
 
     override suspend fun requestPermissions(): Boolean {
-        // Platform-specific permission request would happen here
-        // For now, just check current status
-        return locationService.hasLocationPermission()
+        // Request location permission from the platform-specific service
+        // On iOS: This triggers the system permission dialog
+        // On Android: This returns false - permissions must be requested from UI layer
+        val granted = locationService.requestLocationPermission(background = true)
+
+        if (!granted) {
+            logger.info { "Permission request initiated or requires UI-based request" }
+        }
+
+        return granted
     }
 
     /**

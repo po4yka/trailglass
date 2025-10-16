@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
 import com.po4yka.trailglass.location.tracking.TrackingMode
+import com.po4yka.trailglass.ui.permissions.rememberLocationPermissionLauncher
 
 /**
  * Settings screen for app configuration.
@@ -21,6 +22,13 @@ fun SettingsScreen(
     modifier: Modifier = Modifier
 ) {
     val uiState by trackingController.uiState.collectAsState()
+
+    // Android permission launcher
+    val permissionLauncher = rememberLocationPermissionLauncher { granted ->
+        if (granted) {
+            trackingController.checkPermissions()
+        }
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -44,7 +52,7 @@ fun SettingsScreen(
                 hasPermissions = uiState.hasPermissions,
                 onStartTracking = { trackingController.startTracking(TrackingMode.PASSIVE) },
                 onStopTracking = { trackingController.stopTracking() },
-                onRequestPermissions = { trackingController.requestPermissions() }
+                onRequestPermissions = { permissionLauncher.launch() }
             )
         }
 
@@ -60,7 +68,7 @@ fun SettingsScreen(
         item {
             PermissionsCard(
                 hasPermissions = uiState.hasPermissions,
-                onRequestPermissions = { trackingController.requestPermissions() }
+                onRequestPermissions = { permissionLauncher.launch() }
             )
         }
 

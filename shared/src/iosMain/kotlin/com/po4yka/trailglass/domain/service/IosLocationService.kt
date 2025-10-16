@@ -130,5 +130,33 @@ class IosLocationService : LocationService {
         }
     }
 
+    override suspend fun requestLocationPermission(background: Boolean): Boolean {
+        // Check current authorization status
+        val currentStatus = locationManager.authorizationStatus
+
+        // If already authorized, return true
+        if (currentStatus == kCLAuthorizationStatusAuthorizedAlways ||
+            (currentStatus == kCLAuthorizationStatusAuthorizedWhenInUse && !background)) {
+            return true
+        }
+
+        // Request appropriate permission level
+        if (background) {
+            // Request always authorization for background tracking
+            locationManager.requestAlwaysAuthorization()
+        } else {
+            // Request when-in-use authorization for foreground tracking
+            locationManager.requestWhenInUseAuthorization()
+        }
+
+        // Note: The actual permission result comes asynchronously via the delegate
+        // callback locationManagerDidChangeAuthorization. For immediate return,
+        // we check if we already had permission or if the request was initiated.
+        // The app should observe permission changes through the delegate.
+
+        // Return current status - the actual grant/deny will be reflected in subsequent checks
+        return hasLocationPermission()
+    }
+
     override fun isTracking(): Boolean = isCurrentlyTracking
 }
