@@ -26,7 +26,16 @@ class LocationPermissionState(
     var showRationaleDialog by mutableStateOf(false)
         private set
 
+    var showBackgroundLocationEducation by mutableStateOf(false)
+        private set
+
+    var showBackgroundLocationInstructions by mutableStateOf(false)
+        private set
+
     var permissionsGranted by mutableStateOf(checkPermissions())
+        private set
+
+    var backgroundPermissionGranted by mutableStateOf(checkBackgroundPermission())
         private set
 
     /**
@@ -62,12 +71,17 @@ class LocationPermissionState(
 
     fun onPermissionGranted() {
         permissionsGranted = true
+        backgroundPermissionGranted = checkBackgroundPermission()
         onPermissionResult(true)
     }
 
     fun onPermissionDenied() {
         permissionsGranted = false
         onPermissionResult(false)
+    }
+
+    fun onBackgroundPermissionGranted() {
+        backgroundPermissionGranted = true
     }
 
     fun showRationale() {
@@ -78,11 +92,44 @@ class LocationPermissionState(
         showRationaleDialog = false
     }
 
+    fun showBackgroundEducation() {
+        showBackgroundLocationEducation = true
+    }
+
+    fun dismissBackgroundEducation() {
+        showBackgroundLocationEducation = false
+    }
+
+    fun showBackgroundInstructions() {
+        showBackgroundLocationInstructions = true
+    }
+
+    fun dismissBackgroundInstructions() {
+        showBackgroundLocationInstructions = false
+    }
+
     fun openAppSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts("package", context.packageName, null)
         }
         context.startActivity(intent)
+    }
+
+    /**
+     * Request background location permission with proper educational flow.
+     * This follows Android best practices by showing education first,
+     * then redirecting to settings (required on Android 11+).
+     */
+    fun requestBackgroundPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Show educational content first
+            showBackgroundEducation()
+        }
+    }
+
+    fun refresh() {
+        permissionsGranted = checkPermissions()
+        backgroundPermissionGranted = checkBackgroundPermission()
     }
 }
 
@@ -132,6 +179,32 @@ fun rememberLocationPermissionState(
             onConfirm = {
                 state.dismissRationale()
                 state.openAppSettings()
+            }
+        )
+    }
+
+    // Show background location education
+    if (state.showBackgroundLocationEducation) {
+        BackgroundLocationBottomSheet(
+            onOpenSettings = {
+                state.dismissBackgroundEducation()
+                state.openAppSettings()
+            },
+            onDismiss = {
+                state.dismissBackgroundEducation()
+            }
+        )
+    }
+
+    // Show background location instructions
+    if (state.showBackgroundLocationInstructions) {
+        BackgroundLocationInstructionsDialog(
+            onOpenSettings = {
+                state.dismissBackgroundInstructions()
+                state.openAppSettings()
+            },
+            onDismiss = {
+                state.dismissBackgroundInstructions()
             }
         )
     }

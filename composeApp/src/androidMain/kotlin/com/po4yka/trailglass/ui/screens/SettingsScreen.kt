@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.ui.screens
 
+import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -8,10 +9,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
 import com.po4yka.trailglass.location.tracking.TrackingMode
 import com.po4yka.trailglass.ui.permissions.rememberLocationPermissionLauncher
+import com.po4yka.trailglass.ui.permissions.rememberLocationPermissionState
 
 /**
  * Settings screen for app configuration.
@@ -27,6 +32,28 @@ fun SettingsScreen(
     val permissionLauncher = rememberLocationPermissionLauncher { granted ->
         if (granted) {
             trackingController.checkPermissions()
+        }
+    }
+
+    // Permission state for background location
+    val permissionState = rememberLocationPermissionState { granted ->
+        if (granted) {
+            trackingController.checkPermissions()
+        }
+    }
+
+    // Lifecycle observer to refresh permissions when returning from settings
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                permissionState.refresh()
+                trackingController.checkPermissions()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -68,7 +95,11 @@ fun SettingsScreen(
         item {
             PermissionsCard(
                 hasPermissions = uiState.hasPermissions,
-                onRequestPermissions = { permissionLauncher.launch() }
+                hasBackgroundPermission = permissionState.backgroundPermissionGranted,
+                onRequestPermissions = { permissionLauncher.launch() },
+                onRequestBackgroundPermission = {
+                    permissionState.requestBackgroundPermission()
+                }
             )
         }
 
@@ -180,11 +211,14 @@ private fun TrackingStatusCard(
 @Composable
 private fun PermissionsCard(
     hasPermissions: Boolean,
+    hasBackgroundPermission: Boolean,
     onRequestPermissions: () -> Unit,
+    onRequestBackgroundPermission: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
+            // Foreground permission status
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -220,6 +254,62 @@ private fun PermissionsCard(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("Request Permission")
+                }
+            }
+
+            // Background permission status (Android 10+)
+            if (hasPermissions && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = if (hasBackgroundPermission) Icons.Default.CheckCircle else Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = if (hasBackgroundPermission)
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Column {
+                        Text(
+                            text = "Background Location",
+                            style = MaterialTheme.typography.titleSmall
+                        )
+
+                        Text(
+                            text = if (hasBackgroundPermission)
+                                "Always allowed"
+                            else
+                                "Only while using app",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                if (!hasBackgroundPermission) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "Enable background location to automatically track trips and visits even when the app is closed.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = onRequestBackgroundPermission,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Enable Background Tracking")
+                    }
                 }
             }
         }
