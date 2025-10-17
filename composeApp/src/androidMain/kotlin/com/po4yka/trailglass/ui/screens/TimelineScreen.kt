@@ -129,19 +129,36 @@ private fun VisitCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    Icons.Default.Place,
+                    getCategoryIcon(visit.category),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Text(
-                    text = visit.city ?: "Unknown location",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = visit.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    if (visit.city != null) {
+                        Text(
+                            text = visit.city!!,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+                if (visit.isFavorite) {
+                    Icon(
+                        Icons.Default.Star,
+                        contentDescription = "Favorite",
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
-            if (visit.approximateAddress != null) {
+            if (visit.approximateAddress != null && visit.userLabel == null && visit.poiName == null) {
                 Text(
                     text = visit.approximateAddress!!,
                     style = MaterialTheme.typography.bodySmall,
@@ -150,15 +167,73 @@ private fun VisitCard(
                 )
             }
 
-            if (visit.poiName != null) {
-                Text(
-                    text = visit.poiName!!,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(top = 4.dp)
+            // Duration chip
+            Row(
+                modifier = Modifier.padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                AssistChip(
+                    onClick = { },
+                    label = {
+                        Text(
+                            formatDuration(visit.duration),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Schedule,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 )
+
+                // Category chip
+                if (visit.category != com.po4yka.trailglass.domain.model.PlaceCategory.OTHER) {
+                    AssistChip(
+                        onClick = { },
+                        label = {
+                            Text(
+                                visit.category.name.lowercase().replaceFirstChar { it.uppercase() },
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        }
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun getCategoryIcon(category: com.po4yka.trailglass.domain.model.PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector {
+    return when (category) {
+        com.po4yka.trailglass.domain.model.PlaceCategory.HOME -> Icons.Default.Home
+        com.po4yka.trailglass.domain.model.PlaceCategory.WORK -> Icons.Default.Work
+        com.po4yka.trailglass.domain.model.PlaceCategory.FOOD -> Icons.Default.Restaurant
+        com.po4yka.trailglass.domain.model.PlaceCategory.SHOPPING -> Icons.Default.ShoppingBag
+        com.po4yka.trailglass.domain.model.PlaceCategory.FITNESS -> Icons.Default.FitnessCenter
+        com.po4yka.trailglass.domain.model.PlaceCategory.ENTERTAINMENT -> Icons.Default.Theaters
+        com.po4yka.trailglass.domain.model.PlaceCategory.TRAVEL -> Icons.Default.Flight
+        com.po4yka.trailglass.domain.model.PlaceCategory.HEALTHCARE -> Icons.Default.LocalHospital
+        com.po4yka.trailglass.domain.model.PlaceCategory.EDUCATION -> Icons.Default.School
+        com.po4yka.trailglass.domain.model.PlaceCategory.RELIGIOUS -> Icons.Default.Church
+        com.po4yka.trailglass.domain.model.PlaceCategory.SOCIAL -> Icons.Default.People
+        com.po4yka.trailglass.domain.model.PlaceCategory.OUTDOOR -> Icons.Default.Park
+        com.po4yka.trailglass.domain.model.PlaceCategory.SERVICE -> Icons.Default.Build
+        com.po4yka.trailglass.domain.model.PlaceCategory.OTHER -> Icons.Default.Place
+    }
+}
+
+private fun formatDuration(duration: kotlin.time.Duration): String {
+    val hours = duration.inWholeHours
+    val minutes = duration.inWholeMinutes % 60
+
+    return when {
+        hours > 0 && minutes > 0 -> "${hours}h ${minutes}m"
+        hours > 0 -> "${hours}h"
+        else -> "${minutes}m"
     }
 }
 
