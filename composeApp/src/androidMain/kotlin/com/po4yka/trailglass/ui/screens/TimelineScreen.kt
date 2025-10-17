@@ -13,6 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.feature.timeline.GetTimelineForDayUseCase
 import com.po4yka.trailglass.feature.timeline.TimelineController
+import com.po4yka.trailglass.ui.components.ErrorView
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
