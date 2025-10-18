@@ -3,9 +3,9 @@ package com.po4yka.trailglass.feature.photo
 import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.domain.model.PhotoAttachment
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
-import java.util.UUID
 
 /**
  * Use case for attaching a photo to a place visit.
@@ -41,7 +41,7 @@ class AttachPhotoToVisitUseCase(
 
         return try {
             val attachment = PhotoAttachment(
-                id = "attachment_${UUID.randomUUID()}",
+                id = "attachment_${UuidGenerator.randomUUID()}",
                 photoId = photoId,
                 placeVisitId = visitId,
                 attachedAt = Clock.System.now(),

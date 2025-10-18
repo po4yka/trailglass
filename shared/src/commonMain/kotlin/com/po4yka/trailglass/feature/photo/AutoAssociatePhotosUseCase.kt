@@ -5,9 +5,9 @@ import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.domain.model.PhotoAttachment
 import com.po4yka.trailglass.domain.model.PhotoWithMetadata
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
-import java.util.UUID
 
 /**
  * Automatically associates photos with place visits based on location and time.
@@ -74,7 +74,7 @@ class AutoAssociatePhotosUseCase(
                 if (bestMatch != null) {
                     // Create attachment
                     val attachment = PhotoAttachment(
-                        id = UUID.randomUUID().toString(),
+                        id = UuidGenerator.randomUUID(),
                         photoId = photo.id,
                         placeVisitId = bestMatch.id,
                         attachedAt = Clock.System.now(),

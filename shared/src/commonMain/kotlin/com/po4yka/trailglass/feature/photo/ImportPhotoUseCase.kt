@@ -4,10 +4,10 @@ import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.logging.logger
 import com.po4yka.trailglass.photo.PhotoMetadataExtractor
+import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
-import java.util.UUID
 
 /**
  * Use case for importing a photo into TrailGlass.
@@ -37,7 +37,7 @@ class ImportPhotoUseCase(
         return try {
             logger.info { "Importing photo from URI: $uri" }
 
-            val photoId = UUID.randomUUID().toString()
+            val photoId = UuidGenerator.randomUUID()
 
             // Extract metadata
             val metadata = metadataExtractor.extractMetadata(uri, photoId)

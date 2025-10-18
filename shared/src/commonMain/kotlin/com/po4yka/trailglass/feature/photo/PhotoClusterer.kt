@@ -5,9 +5,9 @@ import com.po4yka.trailglass.domain.model.PhotoCluster
 import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.domain.model.PhotoWithMetadata
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import java.util.UUID
 import kotlin.math.*
 import kotlin.time.Duration.Companion.hours
 
@@ -154,7 +154,7 @@ class PhotoClusterer(
         val thumbnailPhotoId = photos.first().photo.id
 
         return PhotoCluster(
-            id = UUID.randomUUID().toString(),
+            id = UuidGenerator.randomUUID(),
             centerLatitude = centerLat,
             centerLongitude = centerLon,
             startTime = startTime,
