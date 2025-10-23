@@ -58,7 +58,7 @@ abstract class AppComponent(
     abstract val apiClient: com.po4yka.trailglass.data.remote.TrailGlassApiClient
     abstract val syncCoordinator: com.po4yka.trailglass.data.sync.SyncCoordinator
     abstract val tokenProvider: com.po4yka.trailglass.data.remote.TokenProvider
-    abstract val syncableLocationRepository: SyncableLocationRepository
+    abstract val syncManager: com.po4yka.trailglass.data.sync.SyncManager
 
     // Feature controllers
     abstract val statsController: StatsController

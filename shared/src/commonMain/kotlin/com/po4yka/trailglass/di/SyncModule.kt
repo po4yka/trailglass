@@ -109,24 +109,36 @@ interface SyncModule {
     }
 
     /**
-     * Provides syncable location repository.
+     * Provides sync metadata repository.
      */
     @AppScope
     @Provides
-    fun provideSyncableLocationRepository(
-        locationRepository: com.po4yka.trailglass.data.repository.LocationRepository,
-        apiClient: TrailGlassApiClient,
-        syncCoordinator: SyncCoordinator,
-        deviceId: String
-    ): SyncableLocationRepository {
-        // Get the DAO from the repository
-        val dao = (locationRepository as com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl).locationDao
+    fun provideSyncMetadataRepository(
+        impl: com.po4yka.trailglass.data.sync.SyncMetadataRepositoryImpl
+    ): com.po4yka.trailglass.data.sync.SyncMetadataRepository = impl
 
-        return SyncableLocationRepository(
-            locationDao = dao,
-            apiClient = apiClient,
+    /**
+     * Provides centralized sync manager.
+     */
+    @AppScope
+    @Provides
+    fun provideSyncManager(
+        syncCoordinator: SyncCoordinator,
+        syncMetadataRepository: com.po4yka.trailglass.data.sync.SyncMetadataRepository,
+        placeVisitRepository: com.po4yka.trailglass.data.repository.PlaceVisitRepository,
+        tripRepository: com.po4yka.trailglass.data.repository.TripRepository,
+        apiClient: TrailGlassApiClient,
+        deviceId: String,
+        userId: String
+    ): com.po4yka.trailglass.data.sync.SyncManager {
+        return com.po4yka.trailglass.data.sync.SyncManager(
             syncCoordinator = syncCoordinator,
-            deviceId = deviceId
+            syncMetadataRepository = syncMetadataRepository,
+            placeVisitRepository = placeVisitRepository,
+            tripRepository = tripRepository,
+            apiClient = apiClient,
+            deviceId = deviceId,
+            userId = userId
         )
     }
 }
