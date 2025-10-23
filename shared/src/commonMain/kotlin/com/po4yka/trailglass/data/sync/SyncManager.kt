@@ -30,6 +30,7 @@ import me.tatarka.inject.annotations.Inject
 class SyncManager(
     private val syncCoordinator: SyncCoordinator,
     private val syncMetadataRepository: SyncMetadataRepository,
+    private val conflictRepository: ConflictRepository,
     private val placeVisitRepository: PlaceVisitRepository,
     private val tripRepository: TripRepository,
     private val apiClient: TrailGlassApiClient,
@@ -270,7 +271,7 @@ class SyncManager(
 
     /**
      * Handle sync conflicts.
-     * For now, uses automatic resolution. Manual resolution can be added later.
+     * Stores conflicts for manual resolution through UI.
      */
     private suspend fun handleConflicts(
         conflicts: List<com.po4yka.trailglass.data.remote.dto.SyncConflictDto>
@@ -279,23 +280,92 @@ class SyncManager(
 
         for (conflict in conflicts) {
             try {
-                // For now, use suggested resolution (usually KEEP_REMOTE for server authority)
-                // In a full implementation, this would present conflicts to the user
+                // Check if suggested resolution is automatic
+                if (conflict.suggestedResolution == "MERGE" || conflict.suggestedResolution == "KEEP_REMOTE") {
+                    // Apply automatic resolution
+                    val resolution = when (conflict.suggestedResolution) {
+                        "KEEP_REMOTE" -> ConflictResolutionChoice.KEEP_REMOTE
+                        "MERGE" -> ConflictResolutionChoice.MERGE
+                        else -> ConflictResolutionChoice.KEEP_REMOTE
+                    }
 
-                logger.warn {
-                    "Conflict detected for ${conflict.entityType}:${conflict.entityId}. " +
-                            "Using automatic resolution: ${conflict.suggestedResolution}"
+                    resolveConflictAutomatically(conflict, resolution)
+                    resolved++
+
+                    logger.info {
+                        "Automatically resolved conflict for ${conflict.entityType}:${conflict.entityId} " +
+                                "using ${conflict.suggestedResolution}"
+                    }
+                } else {
+                    // Store conflict for manual resolution
+                    conflictRepository.storeConflict(conflict.toStoredConflict())
+
+                    logger.warn {
+                        "Conflict stored for manual resolution: ${conflict.entityType}:${conflict.entityId}"
+                    }
                 }
-
-                // TODO: Implement proper conflict resolution UI
-                // For now, just log the conflict
-                resolved++
             } catch (e: Exception) {
-                logger.error(e) { "Failed to resolve conflict for ${conflict.entityId}" }
+                logger.error(e) { "Failed to handle conflict for ${conflict.entityId}" }
             }
         }
 
         return resolved
+    }
+
+    /**
+     * Automatically resolve a conflict without user interaction.
+     */
+    private suspend fun resolveConflictAutomatically(
+        conflict: com.po4yka.trailglass.data.remote.dto.SyncConflictDto,
+        choice: ConflictResolutionChoice
+    ) {
+        when (choice) {
+            ConflictResolutionChoice.KEEP_REMOTE -> {
+                // Remote wins - data will be applied in applyRemoteChanges
+                // Just mark local as synced with remote version
+                val entityType = when (conflict.entityType) {
+                    "PLACE_VISIT" -> EntityType.PLACE_VISIT
+                    "TRIP" -> EntityType.TRIP
+                    else -> return
+                }
+
+                syncMetadataRepository.markAsSynced(
+                    entityId = conflict.entityId,
+                    entityType = entityType,
+                    serverVersion = conflict.remoteVersion
+                )
+            }
+            ConflictResolutionChoice.KEEP_LOCAL -> {
+                // Local wins - force upload local version
+                // Mark for re-sync
+                val entityType = when (conflict.entityType) {
+                    "PLACE_VISIT" -> EntityType.PLACE_VISIT
+                    "TRIP" -> EntityType.TRIP
+                    else -> return
+                }
+
+                val metadata = syncMetadataRepository.getMetadata(conflict.entityId, entityType)
+                metadata?.let {
+                    syncMetadataRepository.upsertMetadata(
+                        it.copy(isPendingSync = true)
+                    )
+                }
+            }
+            ConflictResolutionChoice.MERGE -> {
+                // Merge resolution - use last-write-wins strategy
+                // In a more sophisticated implementation, this would merge fields
+                if (conflict.remoteVersion > conflict.localVersion) {
+                    resolveConflictAutomatically(conflict, ConflictResolutionChoice.KEEP_REMOTE)
+                } else {
+                    resolveConflictAutomatically(conflict, ConflictResolutionChoice.KEEP_LOCAL)
+                }
+            }
+            ConflictResolutionChoice.MANUAL -> {
+                // Should not happen in automatic resolution
+                // Store for manual resolution
+                conflictRepository.storeConflict(conflict.toStoredConflict())
+            }
+        }
     }
 
     /**
@@ -335,6 +405,7 @@ class SyncManager(
      */
     suspend fun getSyncStatus(): SyncStatusUiModel {
         val pendingCount = getPendingSyncCount()
+        val conflictCount = conflictRepository.getConflictCount()
         val lastSyncMetadata = syncMetadataRepository.getLastSyncedMetadata()
 
         return SyncStatusUiModel(
@@ -342,7 +413,7 @@ class SyncManager(
             progress = _syncProgress.value,
             lastSyncTime = lastSyncMetadata?.lastSynced,
             pendingCount = pendingCount,
-            conflictCount = 0, // TODO: Implement conflict count
+            conflictCount = conflictCount,
             lastError = (syncProgress.value as? SyncProgress.Failed)?.error
         )
     }
@@ -351,8 +422,55 @@ class SyncManager(
      * Get list of unresolved conflicts for UI.
      */
     suspend fun getUnresolvedConflicts(): List<ConflictUiModel> {
-        // TODO: Implement conflict storage and retrieval
-        return emptyList()
+        return conflictRepository.getPendingConflicts().map { conflict ->
+            convertToUiModel(conflict)
+        }
+    }
+
+    /**
+     * Convert StoredConflict to UI-friendly ConflictUiModel.
+     */
+    private suspend fun convertToUiModel(conflict: StoredConflict): ConflictUiModel {
+        // Get entity name based on type
+        val entityName = when (conflict.entityType) {
+            EntityType.PLACE_VISIT -> {
+                placeVisitRepository.getVisitById(conflict.entityId)?.place?.name ?: conflict.entityId
+            }
+            EntityType.TRIP -> {
+                tripRepository.getTripById(conflict.entityId)?.name ?: conflict.entityId
+            }
+            else -> conflict.entityId
+        }
+
+        return ConflictUiModel(
+            conflictId = conflict.conflictId,
+            entityType = conflict.entityType,
+            entityId = conflict.entityId,
+            entityName = entityName,
+            localVersion = conflict.localVersion,
+            remoteVersion = conflict.remoteVersion,
+            localModified = conflict.createdAt, // Approximation - could be improved
+            remoteModified = conflict.createdAt,
+            conflictDescription = buildConflictDescription(conflict),
+            localPreview = formatDataPreview(conflict.localData),
+            remotePreview = formatDataPreview(conflict.remoteData)
+        )
+    }
+
+    private fun buildConflictDescription(conflict: StoredConflict): String {
+        val fields = conflict.conflictedFields.joinToString(", ")
+        return "Conflicting changes in: $fields. " +
+               "Local version ${conflict.localVersion} vs Remote version ${conflict.remoteVersion}."
+    }
+
+    private fun formatDataPreview(data: String): String {
+        // Format JSON or data string for display
+        // Limit to 200 characters for preview
+        return if (data.length > 200) {
+            data.take(197) + "..."
+        } else {
+            data
+        }
     }
 
     /**
@@ -362,8 +480,64 @@ class SyncManager(
         conflictId: String,
         choice: ConflictResolutionChoice
     ): Result<Unit> {
-        // TODO: Implement conflict resolution
-        return Result.success(Unit)
+        return try {
+            val conflict = conflictRepository.getConflict(conflictId)
+                ?: return Result.failure(Exception("Conflict not found: $conflictId"))
+
+            logger.info { "Resolving conflict $conflictId with choice $choice" }
+
+            when (choice) {
+                ConflictResolutionChoice.KEEP_LOCAL -> {
+                    // Local wins - mark entity for re-upload
+                    val metadata = syncMetadataRepository.getMetadata(
+                        conflict.entityId,
+                        conflict.entityType
+                    )
+                    metadata?.let {
+                        syncMetadataRepository.upsertMetadata(
+                            it.copy(
+                                isPendingSync = true,
+                                localVersion = it.localVersion + 1
+                            )
+                        )
+                    }
+                }
+                ConflictResolutionChoice.KEEP_REMOTE -> {
+                    // Remote wins - fetch and apply remote version
+                    // Mark local as synced with remote version
+                    syncMetadataRepository.markAsSynced(
+                        entityId = conflict.entityId,
+                        entityType = conflict.entityType,
+                        serverVersion = conflict.remoteVersion
+                    )
+
+                    // Trigger a sync to get the remote data
+                    syncCoordinator.markSyncNeeded()
+                }
+                ConflictResolutionChoice.MERGE -> {
+                    // Merge using last-write-wins
+                    if (conflict.remoteVersion > conflict.localVersion) {
+                        resolveConflict(conflictId, ConflictResolutionChoice.KEEP_REMOTE)
+                    } else {
+                        resolveConflict(conflictId, ConflictResolutionChoice.KEEP_LOCAL)
+                    }
+                    return Result.success(Unit)
+                }
+                ConflictResolutionChoice.MANUAL -> {
+                    // User needs to manually resolve - keep conflict stored
+                    return Result.failure(Exception("Manual resolution not implemented"))
+                }
+            }
+
+            // Mark conflict as resolved
+            conflictRepository.markAsResolved(conflictId)
+
+            logger.info { "Conflict $conflictId resolved successfully with $choice" }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to resolve conflict $conflictId" }
+            Result.failure(e)
+        }
     }
 }
 

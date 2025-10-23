@@ -118,6 +118,15 @@ interface SyncModule {
     ): com.po4yka.trailglass.data.sync.SyncMetadataRepository = impl
 
     /**
+     * Provides conflict repository for manual resolution.
+     */
+    @AppScope
+    @Provides
+    fun provideConflictRepository(
+        impl: com.po4yka.trailglass.data.sync.ConflictRepositoryImpl
+    ): com.po4yka.trailglass.data.sync.ConflictRepository = impl
+
+    /**
      * Provides centralized sync manager.
      */
     @AppScope
@@ -125,6 +134,7 @@ interface SyncModule {
     fun provideSyncManager(
         syncCoordinator: SyncCoordinator,
         syncMetadataRepository: com.po4yka.trailglass.data.sync.SyncMetadataRepository,
+        conflictRepository: com.po4yka.trailglass.data.sync.ConflictRepository,
         placeVisitRepository: com.po4yka.trailglass.data.repository.PlaceVisitRepository,
         tripRepository: com.po4yka.trailglass.data.repository.TripRepository,
         apiClient: TrailGlassApiClient,
@@ -134,6 +144,7 @@ interface SyncModule {
         return com.po4yka.trailglass.data.sync.SyncManager(
             syncCoordinator = syncCoordinator,
             syncMetadataRepository = syncMetadataRepository,
+            conflictRepository = conflictRepository,
             placeVisitRepository = placeVisitRepository,
             tripRepository = tripRepository,
             apiClient = apiClient,
