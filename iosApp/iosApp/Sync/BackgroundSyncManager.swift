@@ -10,15 +10,14 @@ class BackgroundSyncManager {
     // Background task identifier - must match Info.plist entry
     private let syncTaskIdentifier = "com.po4yka.trailglass.sync"
 
-    private var syncCoordinator: SyncCoordinator?
-    private var deviceId: String?
+    private var syncManager: SyncManager?
 
     private init() {}
 
     /// Configure background sync with required dependencies
-    func configure(syncCoordinator: SyncCoordinator, deviceId: String) {
-        self.syncCoordinator = syncCoordinator
-        self.deviceId = deviceId
+    func configure(syncManager: SyncManager) {
+        self.syncManager = syncManager
+        print("BackgroundSyncManager configured successfully")
     }
 
     /// Register background task handlers
@@ -62,19 +61,15 @@ class BackgroundSyncManager {
         // Schedule next sync
         scheduleBackgroundSync()
 
-        guard let syncCoordinator = syncCoordinator,
-              let deviceId = deviceId else {
-            print("Sync coordinator or device ID not configured")
+        guard let syncManager = syncManager else {
+            print("SyncManager not configured")
             task.setTaskCompleted(success: false)
             return
         }
 
         // Create task to monitor
         let syncTask = Task {
-            await performBackgroundSync(
-                syncCoordinator: syncCoordinator,
-                deviceId: deviceId
-            )
+            await performBackgroundSync(syncManager: syncManager)
         }
 
         // Handle task expiration
@@ -91,33 +86,29 @@ class BackgroundSyncManager {
     }
 
     /// Perform the actual sync operation
-    private func performBackgroundSync(
-        syncCoordinator: SyncCoordinator,
-        deviceId: String
-    ) async -> Bool {
+    private func performBackgroundSync(syncManager: SyncManager) async -> Bool {
         print("Performing background sync...")
 
         do {
-            // Collect local changes (placeholder - implement actual collection)
-            let localChanges = LocalChanges(
-                locations: [],
-                placeVisits: [],
-                trips: [],
-                photos: [],
-                settings: nil
-            )
-
-            // Perform sync
-            let result = try await syncCoordinator.performSync(
-                deviceId: deviceId,
-                localChanges: localChanges
-            )
+            // Perform full sync using SyncManager
+            let result = try await syncManager.performFullSync()
 
             if result.isSuccess() {
-                print("Background sync completed successfully")
+                if let syncResult = result.getOrNull() as? SyncResult {
+                    print("Background sync completed successfully: " +
+                          "\(syncResult.uploaded) uploaded, " +
+                          "\(syncResult.downloaded) downloaded, " +
+                          "\(syncResult.conflicts) conflicts")
+                } else {
+                    print("Background sync completed successfully")
+                }
                 return true
             } else {
-                print("Background sync failed")
+                if let error = result.exceptionOrNull() {
+                    print("Background sync failed: \(error.localizedDescription)")
+                } else {
+                    print("Background sync failed")
+                }
                 return false
             }
         } catch {
@@ -128,16 +119,12 @@ class BackgroundSyncManager {
 
     /// Trigger immediate sync (when app is in foreground)
     func triggerImmediateSync() async -> Bool {
-        guard let syncCoordinator = syncCoordinator,
-              let deviceId = deviceId else {
-            print("Sync coordinator or device ID not configured")
+        guard let syncManager = syncManager else {
+            print("SyncManager not configured")
             return false
         }
 
-        return await performBackgroundSync(
-            syncCoordinator: syncCoordinator,
-            deviceId: deviceId
-        )
+        return await performBackgroundSync(syncManager: syncManager)
     }
 }
 
@@ -153,10 +140,10 @@ extension KotlinResult {
 }
 
 /// Helper to call suspend functions from Swift
-extension SyncCoordinator {
-    func performSync(deviceId: String, localChanges: LocalChanges) async throws -> KotlinResult<DeltaSyncResponse> {
+extension SyncManager {
+    func performFullSync() async throws -> KotlinResult<SyncResult> {
         return try await withCheckedThrowingContinuation { continuation in
-            self.performSync(deviceId: deviceId, localChanges: localChanges) { result, error in
+            self.performFullSync { result, error in
                 if let error = error {
                     continuation.resume(throwing: error)
                 } else if let result = result {
@@ -196,11 +183,9 @@ extension SyncCoordinator {
      // Register background tasks
      BackgroundSyncManager.shared.registerBackgroundTasks()
 
-     // Configure with dependencies
-     // BackgroundSyncManager.shared.configure(
-     //     syncCoordinator: yourSyncCoordinator,
-     //     deviceId: yourDeviceId
-     // )
+     // Configure with SyncManager from DI
+     let appComponent = createIOSAppComponent()
+     BackgroundSyncManager.shared.configure(syncManager: appComponent.syncManager)
 
      // Schedule first sync
      BackgroundSyncManager.shared.scheduleBackgroundSync()

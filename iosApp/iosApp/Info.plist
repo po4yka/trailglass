@@ -12,10 +12,18 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>TrailGlass needs access to your location in the background to automatically track your trips.</string>
 
-	<!-- Background modes for location tracking -->
+	<!-- Background modes for location tracking and sync -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>fetch</string>
+		<string>processing</string>
+	</array>
+
+	<!-- Background task scheduler identifiers for sync -->
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.po4yka.trailglass.sync</string>
 	</array>
 </dict>
 </plist>

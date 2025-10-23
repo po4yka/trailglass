@@ -45,4 +45,5 @@ interface SyncMetadataRepository {
     suspend fun deletemetadata(entityId: String, entityType: EntityType)
     suspend fun getAllPendingSync(): List<SyncMetadata>
     suspend fun getPendingSyncCount(): Int
+    suspend fun getLastSyncedMetadata(): SyncMetadata?
 }

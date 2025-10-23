@@ -74,5 +74,11 @@ class SyncMetadataRepositoryImpl : SyncMetadataRepository {
         metadata.values.count { it.isPendingSync && !it.isPendingDelete }
     }
 
+    override suspend fun getLastSyncedMetadata(): SyncMetadata? = mutex.withLock {
+        metadata.values
+            .filter { it.lastSynced != null }
+            .maxByOrNull { it.lastSynced!! }
+    }
+
     private fun getKey(entityId: String, entityType: EntityType) = "${entityType.name}:$entityId"
 }

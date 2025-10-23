@@ -329,6 +329,42 @@ class SyncManager(
     suspend fun getPendingSyncCount(): Int {
         return syncMetadataRepository.getPendingSyncCount()
     }
+
+    /**
+     * Get current sync status for UI display.
+     */
+    suspend fun getSyncStatus(): SyncStatusUiModel {
+        val pendingCount = getPendingSyncCount()
+        val lastSyncMetadata = syncMetadataRepository.getLastSyncedMetadata()
+
+        return SyncStatusUiModel(
+            isActive = _syncProgress.value is SyncProgress.InProgress,
+            progress = _syncProgress.value,
+            lastSyncTime = lastSyncMetadata?.lastSynced,
+            pendingCount = pendingCount,
+            conflictCount = 0, // TODO: Implement conflict count
+            lastError = (syncProgress.value as? SyncProgress.Failed)?.error
+        )
+    }
+
+    /**
+     * Get list of unresolved conflicts for UI.
+     */
+    suspend fun getUnresolvedConflicts(): List<ConflictUiModel> {
+        // TODO: Implement conflict storage and retrieval
+        return emptyList()
+    }
+
+    /**
+     * Resolve a conflict with the given choice.
+     */
+    suspend fun resolveConflict(
+        conflictId: String,
+        choice: ConflictResolutionChoice
+    ): Result<Unit> {
+        // TODO: Implement conflict resolution
+        return Result.success(Unit)
+    }
 }
 
 /**

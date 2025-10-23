@@ -2,9 +2,7 @@ package com.po4yka.trailglass.sync
 
 import android.content.Context
 import androidx.work.*
-import com.po4yka.trailglass.data.remote.TrailGlassApiClient
-import com.po4yka.trailglass.data.remote.dto.LocalChanges
-import com.po4yka.trailglass.data.sync.SyncCoordinator
+import com.po4yka.trailglass.TrailGlassApplication
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,39 +19,40 @@ class SyncWorker(
     private val logger = logger()
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        logger.info { "SyncWorker started" }
+        logger.info { "SyncWorker started (attempt ${runAttemptCount + 1}/$MAX_RETRIES)" }
 
         try {
-            // TODO: Get dependencies from DI container
-            // For now, this is a placeholder showing the structure
+            // Get app component from Application class
+            val application = applicationContext as? TrailGlassApplication
+            if (application == null) {
+                logger.error { "Cannot access TrailGlassApplication" }
+                return@withContext Result.failure()
+            }
 
-            // val syncCoordinator = getSyncCoordinator()
-            // val deviceId = getDeviceId()
+            val syncManager = application.appComponent.syncManager
 
-            // Perform sync
-            // val result = syncCoordinator.performSync(
-            //     deviceId = deviceId,
-            //     localChanges = collectLocalChanges()
-            // )
+            // Perform full sync
+            val result = syncManager.performFullSync()
 
-            // result.fold(
-            //     onSuccess = {
-            //         logger.info { "Background sync completed successfully" }
-            //         Result.success()
-            //     },
-            //     onFailure = { error ->
-            //         logger.error(error) { "Background sync failed" }
-            //         if (runAttemptCount < MAX_RETRIES) {
-            //             Result.retry()
-            //         } else {
-            //             Result.failure()
-            //         }
-            //     }
-            // )
-
-            // Placeholder for now
-            logger.info { "Sync worker completed (placeholder)" }
-            Result.success()
+            result.fold(
+                onSuccess = { syncResult ->
+                    logger.info {
+                        "Background sync completed: " +
+                        "${syncResult.uploaded} uploaded, " +
+                        "${syncResult.downloaded} downloaded, " +
+                        "${syncResult.conflicts} conflicts"
+                    }
+                    Result.success()
+                },
+                onFailure = { error ->
+                    logger.error(error) { "Background sync failed" }
+                    if (runAttemptCount < MAX_RETRIES) {
+                        Result.retry()
+                    } else {
+                        Result.failure()
+                    }
+                }
+            )
         } catch (e: Exception) {
             logger.error(e) { "Sync worker error" }
 
