@@ -55,6 +55,9 @@ kotlin {
             // DataStore for preferences
             implementation(libs.datastore.preferences.core)
 
+            // Security crypto for encrypted preferences
+            implementation(libs.androidx.security.crypto)
+
             // Location services
             implementation(libs.play.services.location)
         }

@@ -3,6 +3,9 @@ package com.po4yka.trailglass.di
 import android.content.Context
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
+import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
+import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.service.AndroidLocationService
 import com.po4yka.trailglass.domain.service.LocationService
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +22,9 @@ import me.tatarka.inject.annotations.Provides
  * - LocationService (using Google Play Services)
  * - Application-level CoroutineScope
  * - User ID and Device ID
+ * - Secure token storage (EncryptedSharedPreferences)
+ * - Device info provider
+ * - Sync state repository (DataStore)
  */
 @Inject
 class AndroidPlatformModule(
@@ -47,4 +53,31 @@ class AndroidPlatformModule(
             context.contentResolver,
             android.provider.Settings.Secure.ANDROID_ID
         ) ?: "unknown_device"
+
+    /**
+     * Provides Android-specific secure token storage.
+     */
+    @AppScope
+    @Provides
+    fun provideSecureTokenStorage(): SecureTokenStorage {
+        return SecureTokenStorage(context)
+    }
+
+    /**
+     * Provides Android-specific device info provider.
+     */
+    @AppScope
+    @Provides
+    fun providePlatformDeviceInfoProvider(): PlatformDeviceInfoProvider {
+        return PlatformDeviceInfoProvider(context)
+    }
+
+    /**
+     * Provides Android-specific sync state repository.
+     */
+    @AppScope
+    @Provides
+    fun provideSyncStateRepositoryImpl(): SyncStateRepositoryImpl {
+        return SyncStateRepositoryImpl(context)
+    }
 }

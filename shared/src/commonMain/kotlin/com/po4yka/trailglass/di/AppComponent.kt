@@ -17,6 +17,7 @@ import me.tatarka.inject.annotations.Provides
  * - Repositories (data layer)
  * - Location processors
  * - Feature controllers
+ * - Sync and backend API components
  *
  * Platform-specific implementations should create a component that includes
  * this interface along with platform-specific modules.
@@ -25,7 +26,7 @@ import me.tatarka.inject.annotations.Provides
 @Component
 abstract class AppComponent(
     @Component val platformModule: PlatformModule
-) : DataModule, LocationModule {
+) : DataModule, LocationModule, SyncModule {
 
     /**
      * Provides a CoroutineScope for application-level background work.
@@ -52,6 +53,12 @@ abstract class AppComponent(
 
     // Location service (from PlatformModule)
     abstract val locationService: com.po4yka.trailglass.domain.service.LocationService
+
+    // Sync components (from SyncModule)
+    abstract val apiClient: com.po4yka.trailglass.data.remote.TrailGlassApiClient
+    abstract val syncCoordinator: com.po4yka.trailglass.data.sync.SyncCoordinator
+    abstract val tokenProvider: com.po4yka.trailglass.data.remote.TokenProvider
+    abstract val syncableLocationRepository: SyncableLocationRepository
 
     // Feature controllers
     abstract val statsController: StatsController

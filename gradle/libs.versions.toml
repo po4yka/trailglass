@@ -34,6 +34,7 @@ ktor = "3.0.1"
 datastore = "1.1.1"
 workmanager = "2.10.0"
 secrets = "2.0.1"
+security-crypto = "1.1.0-alpha06"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -81,6 +82,7 @@ ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "k
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "datastore" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
