@@ -2,6 +2,8 @@ package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.data.network.IOSNetworkConnectivityMonitor
+import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
@@ -74,5 +76,14 @@ class IOSPlatformModule : PlatformModule {
     @Provides
     fun provideSyncStateRepositoryImpl(): SyncStateRepositoryImpl {
         return SyncStateRepositoryImpl()
+    }
+
+    /**
+     * Provides iOS-specific network connectivity monitor.
+     */
+    @AppScope
+    @Provides
+    fun provideNetworkConnectivityMonitor(): NetworkConnectivityMonitor {
+        return IOSNetworkConnectivityMonitor()
     }
 }

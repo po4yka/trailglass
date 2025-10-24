@@ -3,6 +3,8 @@ package com.po4yka.trailglass.di
 import android.content.Context
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.data.network.AndroidNetworkConnectivityMonitor
+import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
@@ -79,5 +81,14 @@ class AndroidPlatformModule(
     @Provides
     fun provideSyncStateRepositoryImpl(): SyncStateRepositoryImpl {
         return SyncStateRepositoryImpl(context)
+    }
+
+    /**
+     * Provides Android-specific network connectivity monitor.
+     */
+    @AppScope
+    @Provides
+    fun provideNetworkConnectivityMonitor(): NetworkConnectivityMonitor {
+        return AndroidNetworkConnectivityMonitor(context)
     }
 }

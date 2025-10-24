@@ -1,5 +1,8 @@
 package com.po4yka.trailglass.data.sync
 
+import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
+import com.po4yka.trailglass.data.network.NetworkState
+import com.po4yka.trailglass.data.network.allowsSync
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.data.remote.dto.LocalChanges
 import com.po4yka.trailglass.data.remote.dto.PlaceVisitDto
@@ -9,10 +12,14 @@ import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.data.sync.mapper.toDto
 import com.po4yka.trailglass.data.sync.mapper.toDomain
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
 
@@ -25,12 +32,14 @@ import me.tatarka.inject.annotations.Inject
  * - Download remote changes from server
  * - Resolve conflicts
  * - Update sync metadata
+ * - Monitor network connectivity and auto-sync when online
  */
 @Inject
 class SyncManager(
     private val syncCoordinator: SyncCoordinator,
     private val syncMetadataRepository: SyncMetadataRepository,
     private val conflictRepository: ConflictRepository,
+    private val networkMonitor: NetworkConnectivityMonitor,
     private val placeVisitRepository: PlaceVisitRepository,
     private val tripRepository: TripRepository,
     private val apiClient: TrailGlassApiClient,
@@ -38,14 +47,62 @@ class SyncManager(
     private val userId: String
 ) {
     private val logger = logger()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     private val _syncProgress = MutableStateFlow<SyncProgress>(SyncProgress.Idle)
     val syncProgress: StateFlow<SyncProgress> = _syncProgress.asStateFlow()
+
+    private var shouldAutoSyncWhenOnline = false
+
+    init {
+        // Start network monitoring
+        networkMonitor.startMonitoring()
+
+        // Listen for network state changes
+        scope.launch {
+            networkMonitor.networkState.collect { state ->
+                handleNetworkStateChange(state)
+            }
+        }
+    }
+
+    /**
+     * Handle network state changes and auto-trigger sync when online.
+     */
+    private fun handleNetworkStateChange(state: NetworkState) {
+        logger.info { "Network state changed: $state" }
+
+        when (state) {
+            is NetworkState.Connected -> {
+                if (shouldAutoSyncWhenOnline) {
+                    logger.info { "Network became available, triggering auto-sync" }
+                    scope.launch {
+                        performFullSync()
+                    }
+                    shouldAutoSyncWhenOnline = false
+                }
+            }
+            is NetworkState.Disconnected -> {
+                logger.warn { "Network disconnected" }
+            }
+            is NetworkState.Limited -> {
+                logger.warn { "Network limited: ${state.reason}" }
+            }
+        }
+    }
 
     /**
      * Perform full synchronization of all entity types.
      */
     suspend fun performFullSync(): Result<SyncResult> {
+        // Check network connectivity
+        if (!networkMonitor.networkState.value.allowsSync()) {
+            logger.warn { "Cannot sync: network not available" }
+            shouldAutoSyncWhenOnline = true
+            _syncProgress.value = SyncProgress.Failed("No network connection")
+            return Result.failure(Exception("No network connection"))
+        }
+
         logger.info { "Starting full sync for user $userId on device $deviceId" }
         _syncProgress.value = SyncProgress.InProgress(0, "Collecting local changes...")
 
@@ -407,6 +464,7 @@ class SyncManager(
         val pendingCount = getPendingSyncCount()
         val conflictCount = conflictRepository.getConflictCount()
         val lastSyncMetadata = syncMetadataRepository.getLastSyncedMetadata()
+        val networkInfo = networkMonitor.networkInfo.value
 
         return SyncStatusUiModel(
             isActive = _syncProgress.value is SyncProgress.InProgress,
@@ -414,7 +472,10 @@ class SyncManager(
             lastSyncTime = lastSyncMetadata?.lastSynced,
             pendingCount = pendingCount,
             conflictCount = conflictCount,
-            lastError = (syncProgress.value as? SyncProgress.Failed)?.error
+            lastError = (syncProgress.value as? SyncProgress.Failed)?.error,
+            networkState = networkInfo.state,
+            networkType = networkInfo.type,
+            isNetworkMetered = networkInfo.isMetered
         )
     }
 
