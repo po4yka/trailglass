@@ -7,6 +7,7 @@ import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.IosLocationService
 import com.po4yka.trailglass.domain.service.LocationService
 import kotlinx.coroutines.CoroutineScope
@@ -85,5 +86,14 @@ class IOSPlatformModule : PlatformModule {
     @Provides
     fun provideNetworkConnectivityMonitor(): NetworkConnectivityMonitor {
         return IOSNetworkConnectivityMonitor()
+    }
+
+    /**
+     * Provides iOS-specific permission manager.
+     */
+    @AppScope
+    @Provides
+    fun providePermissionManager(): PermissionManager {
+        return PermissionManager()
     }
 }

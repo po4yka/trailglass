@@ -26,7 +26,7 @@ import me.tatarka.inject.annotations.Provides
 @Component
 abstract class AppComponent(
     @Component val platformModule: PlatformModule
-) : DataModule, LocationModule, SyncModule {
+) : DataModule, LocationModule, SyncModule, PermissionModule {
 
     /**
      * Provides a CoroutineScope for application-level background work.
@@ -59,6 +59,9 @@ abstract class AppComponent(
     abstract val syncCoordinator: com.po4yka.trailglass.data.sync.SyncCoordinator
     abstract val tokenProvider: com.po4yka.trailglass.data.remote.TokenProvider
     abstract val syncManager: com.po4yka.trailglass.data.sync.SyncManager
+
+    // Permission components (from PermissionModule)
+    abstract val permissionFlowController: com.po4yka.trailglass.feature.permission.PermissionFlowController
 
     // Feature controllers
     abstract val statsController: StatsController

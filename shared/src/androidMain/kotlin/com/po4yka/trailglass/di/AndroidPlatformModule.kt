@@ -8,6 +8,7 @@ import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.AndroidLocationService
 import com.po4yka.trailglass.domain.service.LocationService
 import kotlinx.coroutines.CoroutineScope
@@ -90,5 +91,14 @@ class AndroidPlatformModule(
     @Provides
     fun provideNetworkConnectivityMonitor(): NetworkConnectivityMonitor {
         return AndroidNetworkConnectivityMonitor(context)
+    }
+
+    /**
+     * Provides Android-specific permission manager.
+     */
+    @AppScope
+    @Provides
+    fun providePermissionManager(): PermissionManager {
+        return PermissionManager(context)
     }
 }
