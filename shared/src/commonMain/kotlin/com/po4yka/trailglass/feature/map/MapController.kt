@@ -1,7 +1,10 @@
 package com.po4yka.trailglass.feature.map
 
 import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.permission.PermissionResult
+import com.po4yka.trailglass.domain.permission.PermissionType
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -25,6 +28,7 @@ import me.tatarka.inject.annotations.Inject
 class MapController(
     private val getMapDataUseCase: GetMapDataUseCase,
     private val locationService: LocationService,
+    private val permissionFlow: PermissionFlowController,
     private val coroutineScope: CoroutineScope,
     private val userId: String
 ) : MapEventSink {
@@ -32,6 +36,16 @@ class MapController(
     private val logger = logger()
 
     private var locationTrackingJob: Job? = null
+    private var pendingFollowModeParams: FollowModeParams? = null
+
+    /**
+     * Follow mode parameters.
+     */
+    private data class FollowModeParams(
+        val zoom: Float,
+        val tilt: Float,
+        val bearing: Float
+    )
 
     /**
      * Map UI state.
@@ -43,11 +57,60 @@ class MapController(
         val selectedRoute: MapRoute? = null,
         val isFollowModeEnabled: Boolean = false,
         val isLoading: Boolean = false,
-        val error: String? = null
+        val error: String? = null,
+        val hasLocationPermission: Boolean = false
     )
 
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
+
+    init {
+        // Observe permission results for follow mode
+        coroutineScope.launch {
+            permissionFlow.state.collect { permState ->
+                when (permState.lastResult) {
+                    is PermissionResult.Granted -> {
+                        logger.info { "Location permission granted for follow mode" }
+                        val params = pendingFollowModeParams
+                        if (params != null) {
+                            pendingFollowModeParams = null
+                            _state.update { it.copy(hasLocationPermission = true) }
+                            // Enable follow mode with pending params
+                            enableFollowModeInternal(params.zoom, params.tilt, params.bearing)
+                        } else {
+                            _state.update { it.copy(hasLocationPermission = true) }
+                        }
+                    }
+                    is PermissionResult.Denied,
+                    is PermissionResult.PermanentlyDenied -> {
+                        logger.warn { "Location permission denied for follow mode" }
+                        pendingFollowModeParams = null
+                        _state.update {
+                            it.copy(
+                                hasLocationPermission = false,
+                                error = "Location permission is required for follow mode"
+                            )
+                        }
+                    }
+                    is PermissionResult.Cancelled -> {
+                        logger.info { "Location permission request cancelled" }
+                        pendingFollowModeParams = null
+                    }
+                    is PermissionResult.Error -> {
+                        logger.error { "Permission error: ${permState.lastResult.message}" }
+                        pendingFollowModeParams = null
+                        _state.update { it.copy(error = permState.lastResult.message) }
+                    }
+                    null -> {
+                        // No result yet
+                    }
+                }
+            }
+        }
+
+        // Check permissions on init
+        checkPermissions()
+    }
 
     /**
      * Load map data for a time range.
@@ -196,6 +259,7 @@ class MapController(
      *
      * When enabled, the camera will track the user's current location.
      * When disabled, location tracking stops.
+     * This will request location permission if not already granted.
      *
      * @param zoom Zoom level to use when following (default: 15f - street level)
      * @param tilt Camera tilt angle in degrees (default: 45f - perspective view)
@@ -215,20 +279,33 @@ class MapController(
             locationTrackingJob = null
             _state.update { it.copy(isFollowModeEnabled = false) }
         } else {
-            // Enable follow mode
-            logger.info { "Enabling follow mode" }
+            // Enable follow mode - check permission first
+            logger.info { "User requested to enable follow mode" }
 
-            // Check permissions
-            if (!locationService.hasLocationPermission()) {
-                logger.warn { "Location permission not granted, cannot enable follow mode" }
-                _state.update {
-                    it.copy(
-                        error = "Location permission required for follow mode"
-                    )
-                }
-                return
+            val hasPermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
+
+            if (hasPermission) {
+                enableFollowModeInternal(zoom, tilt, bearing)
+            } else {
+                // Request permission
+                logger.info { "Location permission not granted, requesting..." }
+                pendingFollowModeParams = FollowModeParams(zoom, tilt, bearing)
+                permissionFlow.startPermissionFlow(PermissionType.LOCATION_FINE)
             }
+        }
+    }
 
+    /**
+     * Enable follow mode after permission is confirmed granted.
+     */
+    private fun enableFollowModeInternal(
+        zoom: Float,
+        tilt: Float,
+        bearing: Float
+    ) {
+        logger.info { "Enabling follow mode" }
+
+        coroutineScope.launch {
             // Get last known location and move camera there first
             locationService.getLastKnownLocation()?.let { coordinate ->
                 val position = CameraPosition(
@@ -266,7 +343,18 @@ class MapController(
      * @return true if permission is granted, false otherwise
      */
     suspend fun hasLocationPermission(): Boolean {
-        return locationService.hasLocationPermission()
+        return permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
+    }
+
+    /**
+     * Check permissions.
+     */
+    fun checkPermissions() {
+        coroutineScope.launch {
+            val hasPermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
+            _state.update { it.copy(hasLocationPermission = hasPermission) }
+            logger.debug { "Location permission check: $hasPermission" }
+        }
     }
 
     /**
