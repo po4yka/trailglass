@@ -14,7 +14,9 @@ fun PlaceVisit.toDto(
     syncAction: SyncAction = SyncAction.CREATE,
     localVersion: Long = 1,
     serverVersion: Long? = null,
-    deviceId: String
+    deviceId: String,
+    photoIds: List<String> = emptyList(),
+    tripId: String? = null
 ): PlaceVisitDto {
     return PlaceVisitDto(
         id = id,
@@ -35,8 +37,8 @@ fun PlaceVisit.toDto(
         },
         isFavorite = isFavorite,
         notes = userNotes,
-        photos = emptyList(), // TODO: Link photo IDs
-        tripId = null, // TODO: Link trip ID if part of a trip
+        photos = photoIds,
+        tripId = tripId,
         syncAction = syncAction,
         localVersion = localVersion,
         serverVersion = serverVersion,
@@ -79,18 +81,20 @@ fun Trip.toDto(
     syncAction: SyncAction = SyncAction.CREATE,
     localVersion: Long = 1,
     serverVersion: Long? = null,
-    deviceId: String
+    deviceId: String,
+    visitIds: List<String> = emptyList(),
+    photoIds: List<String> = emptyList()
 ): TripDto {
     return TripDto(
         id = id,
-        name = name,
+        name = name ?: "Unnamed Trip",
         startDate = startTime.toString(),
-        endDate = endTime.toString(),
+        endDate = endTime?.toString() ?: startTime.toString(),
         placeVisits = visitIds,
         photos = photoIds,
-        notes = notes,
-        totalDistance = null, // TODO: Calculate from route segments
-        countries = emptyList(), // TODO: Extract from place visits
+        notes = description,
+        totalDistance = if (totalDistanceMeters > 0) totalDistanceMeters else null,
+        countries = countriesVisited,
         syncAction = syncAction,
         localVersion = localVersion,
         serverVersion = serverVersion,
@@ -104,14 +108,16 @@ fun TripDto.toDomain(): Trip {
         id = id,
         name = name,
         startTime = Instant.parse(startDate),
-        endTime = Instant.parse(endDate),
-        visitIds = placeVisits,
-        photoIds = photos,
-        notes = notes,
-        routeSegmentIds = emptyList(), // Not in DTO
+        endTime = endDate.let { Instant.parse(it) },
+        primaryCountry = countries.firstOrNull(),
+        userId = createdBy ?: "unknown",
+        totalDistanceMeters = totalDistance ?: 0.0,
+        countriesVisited = countries,
+        description = notes,
+        isOngoing = false,
+        visitedPlaceCount = placeVisits.size,
         createdAt = lastModified?.let { Instant.parse(it) },
-        updatedAt = lastModified?.let { Instant.parse(it) },
-        userId = createdBy
+        updatedAt = lastModified?.let { Instant.parse(it) }
     )
 }
 

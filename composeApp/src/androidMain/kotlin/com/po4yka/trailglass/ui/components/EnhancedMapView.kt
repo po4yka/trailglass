@@ -253,12 +253,7 @@ private fun RenderRoute(
 
 @Composable
 private fun RenderHeatmap(heatmapData: HeatmapData) {
-    // Note: Google Maps Compose doesn't have direct heatmap support
-    // We would need to use TileOverlay with HeatmapTileProvider
-    // This is a placeholder that would require custom implementation
-    // using rememberMapEffect or a custom composable
-
-    // Convert heatmap points to LatLng
+    // Convert heatmap points to WeightedLatLng
     val heatmapPoints = remember(heatmapData) {
         heatmapData.points.map { point ->
             com.google.maps.android.heatmaps.WeightedLatLng(
@@ -268,9 +263,27 @@ private fun RenderHeatmap(heatmapData: HeatmapData) {
         }
     }
 
-    // This would need to be implemented using MapEffect
-    // For now, this is a placeholder comment
-    // TODO: Implement heatmap rendering using HeatmapTileProvider
+    // Render heatmap using MapEffect
+    MapEffect(heatmapPoints) { map ->
+        var tileOverlay: TileOverlay? = null
+
+        // Create heatmap tile provider with custom gradient colors
+        val heatmapProvider = HeatmapTileProvider.Builder()
+            .weightedData(heatmapPoints)
+            .radius(50) // Radius of influence for each point in pixels
+            .opacity(0.6) // Transparency of heatmap layer
+            .build()
+
+        // Add tile overlay to the map
+        tileOverlay = map.addTileOverlay(
+            TileOverlayOptions().tileProvider(heatmapProvider)
+        )
+
+        // Cleanup function: remove overlay when effect is disposed
+        onDispose {
+            tileOverlay?.remove()
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

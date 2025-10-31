@@ -200,11 +200,17 @@ class SyncManager(
         for (metadata in pendingPlaceVisits) {
             val visit = placeVisitRepository.getVisitById(metadata.entityId)
             if (visit != null) {
+                // Get photos attached to this visit
+                val visitPhotos = photoRepository.getPhotosForVisit(visit.id)
+                val photoIds = visitPhotos.map { it.id }
+
                 placeVisits.add(
                     visit.toDto(
                         localVersion = metadata.localVersion,
                         serverVersion = metadata.serverVersion,
-                        deviceId = metadata.deviceId
+                        deviceId = metadata.deviceId,
+                        photoIds = photoIds,
+                        tripId = null // Trip relationship not stored in current schema
                     )
                 )
             }
