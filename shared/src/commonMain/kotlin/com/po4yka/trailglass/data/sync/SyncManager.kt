@@ -7,10 +7,14 @@ import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.data.remote.dto.LocalChanges
 import com.po4yka.trailglass.data.remote.dto.PlaceVisitDto
 import com.po4yka.trailglass.data.remote.dto.TripDto
+import com.po4yka.trailglass.data.repository.LocationRepository
+import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.data.repository.SettingsRepository
 import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.data.sync.mapper.toDto
 import com.po4yka.trailglass.data.sync.mapper.toDomain
+import com.po4yka.trailglass.data.sync.mapper.toMetadataDto
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +46,9 @@ class SyncManager(
     private val networkMonitor: NetworkConnectivityMonitor,
     private val placeVisitRepository: PlaceVisitRepository,
     private val tripRepository: TripRepository,
+    private val locationRepository: LocationRepository,
+    private val photoRepository: PhotoRepository,
+    private val settingsRepository: SettingsRepository,
     private val apiClient: TrailGlassApiClient,
     private val deviceId: String,
     private val userId: String
@@ -184,6 +191,9 @@ class SyncManager(
     private suspend fun collectLocalChanges(): LocalChanges {
         val placeVisits = mutableListOf<PlaceVisitDto>()
         val trips = mutableListOf<TripDto>()
+        val locations = mutableListOf<com.po4yka.trailglass.data.remote.dto.LocationDto>()
+        val photos = mutableListOf<com.po4yka.trailglass.data.remote.dto.PhotoMetadataDto>()
+        var settingsDto: com.po4yka.trailglass.data.remote.dto.SettingsDto? = null
 
         // Collect pending place visits
         val pendingPlaceVisits = syncMetadataRepository.getPendingSync(EntityType.PLACE_VISIT)
@@ -215,12 +225,55 @@ class SyncManager(
             }
         }
 
+        // Collect pending location samples
+        val pendingLocations = syncMetadataRepository.getPendingSync(EntityType.LOCATION_SAMPLE)
+        for (metadata in pendingLocations) {
+            val location = locationRepository.getSampleById(metadata.entityId)
+            location.onSuccess { sample ->
+                if (sample != null) {
+                    locations.add(
+                        sample.toDto(
+                            localVersion = metadata.localVersion,
+                            serverVersion = metadata.serverVersion,
+                            deviceId = metadata.deviceId
+                        )
+                    )
+                }
+            }
+        }
+
+        // Collect pending photos
+        val pendingPhotos = syncMetadataRepository.getPendingSync(EntityType.PHOTO)
+        for (metadata in pendingPhotos) {
+            val photo = photoRepository.getPhotoById(metadata.entityId)
+            if (photo != null) {
+                photos.add(
+                    photo.toMetadataDto(
+                        localVersion = metadata.localVersion,
+                        serverVersion = metadata.serverVersion,
+                        deviceId = metadata.deviceId
+                    )
+                )
+            }
+        }
+
+        // Collect settings if pending
+        val pendingSettings = syncMetadataRepository.getPendingSync(EntityType.SETTINGS)
+        if (pendingSettings.isNotEmpty()) {
+            val settings = settingsRepository.getCurrentSettings()
+            val metadata = pendingSettings.first()
+            settingsDto = settings.toDto(
+                serverVersion = metadata.serverVersion,
+                lastModified = metadata.lastModified
+            )
+        }
+
         return LocalChanges(
-            locations = emptyList(), // TODO: Implement location sync
+            locations = locations,
             placeVisits = placeVisits,
             trips = trips,
-            photos = emptyList(), // TODO: Implement photo sync
-            settings = null // TODO: Implement settings sync
+            photos = photos,
+            settings = settingsDto
         )
     }
 

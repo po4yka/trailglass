@@ -172,41 +172,139 @@ fun PhotoMetadataDto.toDomain(localPath: String): Photo {
     )
 }
 
+// ========== Location Mappers ==========
+
+fun LocationSample.toDto(
+    syncAction: SyncAction = SyncAction.CREATE,
+    localVersion: Long = 1,
+    serverVersion: Long? = null,
+    deviceId: String
+): LocationDto {
+    return LocationDto(
+        id = id,
+        timestamp = timestamp.toString(),
+        latitude = latitude,
+        longitude = longitude,
+        altitude = null,
+        accuracy = accuracy,
+        speed = speed,
+        bearing = bearing,
+        provider = source.name,
+        batteryLevel = null,
+        clientTimestamp = timestamp.toString(),
+        syncAction = syncAction,
+        localVersion = localVersion,
+        serverVersion = serverVersion,
+        deviceId = deviceId
+    )
+}
+
+fun LocationDto.toDomain(userId: String): LocationSample {
+    return LocationSample(
+        id = id,
+        timestamp = Instant.parse(timestamp),
+        latitude = latitude,
+        longitude = longitude,
+        accuracy = accuracy,
+        speed = speed,
+        bearing = bearing,
+        source = try { LocationSource.valueOf(provider) } catch (e: Exception) { LocationSource.GPS },
+        tripId = null,
+        uploadedAt = serverVersion?.let { Instant.parse(timestamp) },
+        deviceId = deviceId ?: "unknown",
+        userId = userId
+    )
+}
+
 // ========== Settings Mappers ==========
 
-fun SettingsDto.toDomain(): Map<String, Any> {
-    // Convert DTO to a map for flexible settings handling
-    val settingsMap = mutableMapOf<String, Any>()
+fun AppSettings.toDto(
+    serverVersion: Long? = null,
+    lastModified: Instant
+): SettingsDto {
+    return SettingsDto(
+        trackingPreferences = TrackingPreferencesDto(
+            accuracy = trackingPreferences.accuracy.name,
+            updateInterval = trackingPreferences.updateInterval.name,
+            batteryOptimization = trackingPreferences.batteryOptimization,
+            trackWhenStationary = trackingPreferences.trackWhenStationary,
+            minimumDistance = trackingPreferences.minimumDistance
+        ),
+        privacySettings = PrivacySettingsDto(
+            dataRetentionDays = privacySettings.dataRetentionDays,
+            allowAnonymousAnalytics = privacySettings.shareAnalytics,
+            shareLocation = accountSettings.autoSync,
+            requireAuthentication = true,
+            autoBackup = privacySettings.autoBackup
+        ),
+        unitPreferences = UnitPreferencesDto(
+            distanceUnit = unitPreferences.distanceUnit.name,
+            temperatureUnit = unitPreferences.temperatureUnit.name,
+            timeFormat = unitPreferences.timeFormat.name,
+            firstDayOfWeek = "MONDAY" // Default
+        ),
+        appearanceSettings = AppearanceSettingsDto(
+            theme = appearanceSettings.theme.name,
+            accentColor = "#6200EE", // Default material purple
+            mapStyle = "STANDARD",
+            enableAnimations = !appearanceSettings.compactView
+        ),
+        serverVersion = serverVersion,
+        lastModified = lastModified.toString()
+    )
+}
 
-    trackingPreferences?.let { tracking ->
-        settingsMap["tracking_accuracy"] = tracking.accuracy
-        settingsMap["tracking_interval"] = tracking.updateInterval
-        settingsMap["tracking_battery_optimization"] = tracking.batteryOptimization
-        settingsMap["tracking_when_stationary"] = tracking.trackWhenStationary
-        settingsMap["tracking_minimum_distance"] = tracking.minimumDistance
-    }
-
-    privacySettings?.let { privacy ->
-        settingsMap["privacy_retention_days"] = privacy.dataRetentionDays
-        settingsMap["privacy_analytics"] = privacy.allowAnonymousAnalytics
-        settingsMap["privacy_share_location"] = privacy.shareLocation
-        settingsMap["privacy_require_auth"] = privacy.requireAuthentication
-        settingsMap["privacy_auto_backup"] = privacy.autoBackup
-    }
-
-    unitPreferences?.let { units ->
-        settingsMap["units_distance"] = units.distanceUnit
-        settingsMap["units_temperature"] = units.temperatureUnit
-        settingsMap["units_time_format"] = units.timeFormat
-        settingsMap["units_first_day"] = units.firstDayOfWeek
-    }
-
-    appearanceSettings?.let { appearance ->
-        settingsMap["appearance_theme"] = appearance.theme
-        settingsMap["appearance_accent"] = appearance.accentColor
-        settingsMap["appearance_map_style"] = appearance.mapStyle
-        settingsMap["appearance_animations"] = appearance.enableAnimations
-    }
-
-    return settingsMap
+fun SettingsDto.toDomain(): AppSettings {
+    return AppSettings(
+        trackingPreferences = TrackingPreferences(
+            accuracy = trackingPreferences?.let {
+                try { TrackingAccuracy.valueOf(it.accuracy) }
+                catch (e: Exception) { TrackingAccuracy.BALANCED }
+            } ?: TrackingAccuracy.BALANCED,
+            updateInterval = trackingPreferences?.let {
+                try { UpdateInterval.valueOf(it.updateInterval) }
+                catch (e: Exception) { UpdateInterval.NORMAL }
+            } ?: UpdateInterval.NORMAL,
+            batteryOptimization = trackingPreferences?.batteryOptimization ?: true,
+            trackWhenStationary = trackingPreferences?.trackWhenStationary ?: false,
+            minimumDistance = trackingPreferences?.minimumDistance ?: 10
+        ),
+        privacySettings = PrivacySettings(
+            dataRetentionDays = privacySettings?.dataRetentionDays ?: 365,
+            shareAnalytics = privacySettings?.allowAnonymousAnalytics ?: false,
+            shareCrashReports = true,
+            autoBackup = privacySettings?.autoBackup ?: true,
+            encryptBackups = true
+        ),
+        unitPreferences = UnitPreferences(
+            distanceUnit = unitPreferences?.let {
+                try { DistanceUnit.valueOf(it.distanceUnit) }
+                catch (e: Exception) { DistanceUnit.METRIC }
+            } ?: DistanceUnit.METRIC,
+            temperatureUnit = unitPreferences?.let {
+                try { TemperatureUnit.valueOf(it.temperatureUnit) }
+                catch (e: Exception) { TemperatureUnit.CELSIUS }
+            } ?: TemperatureUnit.CELSIUS,
+            timeFormat = unitPreferences?.let {
+                try { TimeFormat.valueOf(it.timeFormat) }
+                catch (e: Exception) { TimeFormat.TWENTY_FOUR_HOUR }
+            } ?: TimeFormat.TWENTY_FOUR_HOUR
+        ),
+        appearanceSettings = AppearanceSettings(
+            theme = appearanceSettings?.let {
+                try { AppTheme.valueOf(it.theme) }
+                catch (e: Exception) { AppTheme.SYSTEM }
+            } ?: AppTheme.SYSTEM,
+            useDeviceWallpaper = false,
+            showMapInTimeline = true,
+            compactView = appearanceSettings?.enableAnimations?.not() ?: false
+        ),
+        accountSettings = AccountSettings(
+            email = null,
+            autoSync = privacySettings?.shareLocation ?: true,
+            syncOnWifiOnly = true,
+            lastSyncTime = lastModified?.let { Instant.parse(it) }
+        ),
+        dataManagement = DataManagement()
+    )
 }
