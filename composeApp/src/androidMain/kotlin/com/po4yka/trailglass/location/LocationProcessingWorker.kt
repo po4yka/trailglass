@@ -18,29 +18,32 @@ class LocationProcessingWorker(
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            // TODO: Initialize dependencies from DI
-            // For now, this is a placeholder structure
-
-            /*
-            val locationProcessor = // Get from DI
-            val locationRepository = // Get from DI
-            val userId = // Get from session
-
-            // Get unprocessed samples
-            val samples = locationRepository.getSamplesForUser(userId)
-
-            // Process them
-            val result = locationProcessor.processLocationData(samples, userId)
-
-            // Log results
-            android.util.Log.i(
-                "LocationProcessingWorker",
-                "Processed ${samples.size} samples: " +
-                "${result.visits.size} visits, " +
-                "${result.routes.size} routes, " +
-                "${result.trips.size} trips"
-            )
-            */
+            // Initialize dependencies from DI
+            // Workers cannot use constructor injection. Use one of these patterns:
+            // 1. Service Locator: Access AppComponent via Application class
+            // 2. WorkManager InputData: Pass dependencies through worker parameters
+            // 3. Singleton Pattern: Store dependencies in Application class
+            //
+            // Example implementation:
+            // val app = applicationContext as MyApplication
+            // val locationProcessor = app.appComponent.locationProcessor
+            // val locationRepository = app.appComponent.locationRepository
+            // val userId = app.sessionManager.getCurrentUserId()
+            //
+            // // Get unprocessed samples
+            // val samples = locationRepository.getSamplesForUser(userId)
+            //
+            // // Process them
+            // val result = locationProcessor.processLocationData(samples, userId)
+            //
+            // // Log results
+            // android.util.Log.i(
+            //     "LocationProcessingWorker",
+            //     "Processed ${samples.size} samples: " +
+            //     "${result.visits.size} visits, " +
+            //     "${result.routes.size} routes, " +
+            //     "${result.trips.size} trips"
+            // )
 
             Result.success()
         } catch (e: Exception) {

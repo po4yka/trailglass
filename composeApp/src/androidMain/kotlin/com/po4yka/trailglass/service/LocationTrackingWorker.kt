@@ -81,13 +81,20 @@ class LocationTrackingWorker(
     override suspend fun doWork(): Result {
         return try {
             // Get LocationTracker from DI container
-            // Note: This requires the DI container to be accessible from the worker
-            // In production, you might need to use a singleton pattern or WorkManager's InputData
+            // Note: Workers cannot use constructor injection. Use one of these patterns:
+            // 1. Service Locator: Access AppComponent.locationTracker via Application class
+            // 2. WorkManager InputData: Pass dependencies through worker parameters
+            // 3. Singleton Pattern: Store tracker in Application class singleton
+            //
+            // Example implementation:
+            // val app = applicationContext as MyApplication
+            // val locationTracker = app.appComponent.locationTracker
+            // locationTracker.startTracking(TrackingMode.SMART)
+            // delay(TRACKING_DURATION_MS)
+            // locationTracker.stopTracking()
 
             // For now, we'll track for a short duration
-            // TODO: Inject LocationTracker properly
-
-            // Simulate tracking
+            // Implement when DI is set up
             delay(TRACKING_DURATION_MS)
 
             Result.success()

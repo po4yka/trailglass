@@ -58,29 +58,42 @@ actual class PermissionManager(
 
     /**
      * Request a permission from the user.
-     * Note: This is a simplified implementation. In production, you would need
-     * to use Activity Result API or a permission request delegate.
+     *
+     * Note: This implementation checks permission status and provides guidance.
+     * The actual permission request dialog must be triggered from UI layer using
+     * Activity Result API (recommended) or via Activity.requestPermissions().
+     *
+     * Integration pattern:
+     * 1. Call this method to get current status
+     * 2. If Denied/NotDetermined, use shouldShowRationale() to decide if rationale needed
+     * 3. Show rationale UI if needed
+     * 4. Trigger permission request via Activity Result API
+     * 5. Update permission state via updatePermissionState() after result
      */
     actual suspend fun requestPermission(permissionType: PermissionType): PermissionResult {
         val androidPermission = getAndroidPermission(permissionType)
-            ?: return PermissionResult.Error("Unknown permission type")
+            ?: return PermissionResult.Error("Unknown permission type: $permissionType")
 
         // Check if already granted
-        if (ContextCompat.checkSelfPermission(
-                context,
-                androidPermission
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
+        val currentStatus = ContextCompat.checkSelfPermission(context, androidPermission)
+        if (currentStatus == PackageManager.PERMISSION_GRANTED) {
             updatePermissionState(permissionType, PermissionState.Granted)
             return PermissionResult.Granted
         }
 
-        // In a real implementation, this would trigger the permission request dialog
-        // and wait for the result. For now, we return a placeholder.
-        // You would integrate this with your Activity's requestPermissions() method
-        // or use the Activity Result API.
+        // Permission not granted - check if we should show rationale
+        val shouldShowRationale = shouldShowRequestPermissionRationale(androidPermission)
 
-        return PermissionResult.Error("Permission request requires Activity context. Use platform-specific implementation.")
+        return if (shouldShowRationale) {
+            // User has denied before but not permanently
+            updatePermissionState(permissionType, PermissionState.Denied)
+            PermissionResult.Denied
+        } else {
+            // Either first request or permanently denied
+            // UI layer should call Activity Result API to show permission dialog
+            updatePermissionState(permissionType, PermissionState.NotDetermined)
+            PermissionResult.Cancelled // Indicates permission flow should be initiated from UI
+        }
     }
 
     /**

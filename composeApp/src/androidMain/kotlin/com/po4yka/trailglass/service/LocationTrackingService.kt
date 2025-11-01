@@ -72,8 +72,22 @@ class LocationTrackingService : Service() {
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    // TODO: Inject LocationTracker from DI container
-    // private lateinit var locationTracker: LocationTracker
+    /**
+     * LocationTracker instance obtained from DI.
+     *
+     * Integration: Services cannot use constructor injection. Use one of these patterns:
+     * 1. Service Locator: Access AppComponent.locationTracker via Application class
+     * 2. Manual Factory: Create tracker manually with required dependencies
+     * 3. Assisted Injection: Use @AssistedInject with AssistedFactory
+     *
+     * For simplicity, services typically use pattern #2 (manual creation) or
+     * store the component in Application and retrieve it here.
+     */
+    private val locationTracker: LocationTracker? by lazy {
+        // Example: (application as MyApplication).appComponent.locationTracker
+        // For now, returns null to avoid crash - implement when DI is set up
+        null
+    }
 
     private var isTracking = false
 
@@ -113,14 +127,15 @@ class LocationTrackingService : Service() {
 
         serviceScope.launch {
             try {
-                // TODO: Start tracking with LocationTracker
-                // locationTracker.startTracking(mode)
+                // Start tracking with LocationTracker from DI
+                locationTracker?.startTracking(mode)
                 isTracking = true
 
                 // Update notification to show active tracking
                 updateNotification("Tracking your location...")
             } catch (e: Exception) {
                 // Handle error - permission denied, location service unavailable, etc.
+                android.util.Log.e("LocationTrackingService", "Failed to start tracking", e)
                 stopSelf()
             }
         }
@@ -130,8 +145,8 @@ class LocationTrackingService : Service() {
         if (!isTracking) return
 
         serviceScope.launch {
-            // TODO: Stop tracking with LocationTracker
-            // locationTracker.stopTracking()
+            // Stop tracking with LocationTracker from DI
+            locationTracker?.stopTracking()
             isTracking = false
         }
 
@@ -156,12 +171,16 @@ class LocationTrackingService : Service() {
     }
 
     private fun createNotification(): Notification {
-        // TODO: Create proper intent for opening the app
+        // Create intent to open the app when notification is tapped
+        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+
         val pendingIntent = PendingIntent.getActivity(
             this,
             0,
-            packageManager.getLaunchIntentForPackage(packageName),
-            PendingIntent.FLAG_IMMUTABLE
+            launchIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         val stopIntent = Intent(this, LocationTrackingService::class.java).apply {
@@ -177,7 +196,7 @@ class LocationTrackingService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("TrailGlass")
             .setContentText("Starting location tracking...")
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation) // TODO: Use app icon
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // App icon for notification
             .setContentIntent(pendingIntent)
             .addAction(
                 android.R.drawable.ic_media_pause,

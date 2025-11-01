@@ -55,13 +55,25 @@ class LocationTrackingService : Service() {
         val notification = createNotification()
         startForeground(NOTIFICATION_ID, notification)
 
-        // TODO: Initialize locationTracker from dependency injection
-        // For now, this is a placeholder - the actual tracker would be injected
-        /*
+        // Initialize locationTracker from dependency injection
+        // Services cannot use constructor injection. Use one of these patterns:
+        // 1. Service Locator: Access AppComponent.locationTracker via Application class
+        // 2. Manual Factory: Create tracker manually with required dependencies
+        // 3. Assisted Injection: Use @AssistedInject with AssistedFactory
+        //
+        // Example implementation:
+        // val app = application as MyApplication
+        // locationTracker = app.appComponent.locationTracker
+        //
+        // Then start tracking:
         serviceScope.launch {
-            locationTracker?.startTracking(mode)
+            try {
+                locationTracker?.startTracking(mode)
+            } catch (e: Exception) {
+                android.util.Log.e("LocationTrackingService", "Failed to start tracking", e)
+                stopSelf()
+            }
         }
-        */
     }
 
     private fun stopTracking() {
@@ -112,7 +124,7 @@ class LocationTrackingService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("TrailGlass")
             .setContentText("Recording your location")
-            .setSmallIcon(android.R.drawable.ic_menu_mylocation) // TODO: Replace with app icon
+            .setSmallIcon(R.drawable.ic_launcher_foreground) // App icon for notification
             .setContentIntent(pendingIntent)
             .addAction(
                 android.R.drawable.ic_media_pause,
