@@ -1,0 +1,98 @@
+-- Place visits table: clustered locations where user stayed
+CREATE TABLE place_visits (
+    id TEXT NOT NULL PRIMARY KEY,
+    start_time INTEGER NOT NULL,
+    end_time INTEGER NOT NULL,
+    center_latitude REAL NOT NULL,
+    center_longitude REAL NOT NULL,
+    approximate_address TEXT,
+    poi_name TEXT,
+    city TEXT,
+    country_code TEXT,
+    user_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+-- Indices for performance
+CREATE INDEX place_visits_time ON place_visits(start_time, end_time);
+CREATE INDEX place_visits_user ON place_visits(user_id);
+CREATE INDEX place_visits_user_time ON place_visits(user_id, start_time DESC);
+CREATE INDEX place_visits_deleted ON place_visits(deleted_at) WHERE deleted_at IS NULL;
+
+-- Junction table: links place visits to location samples
+CREATE TABLE place_visit_samples (
+    place_visit_id TEXT NOT NULL,
+    location_sample_id TEXT NOT NULL,
+    PRIMARY KEY (place_visit_id, location_sample_id),
+    FOREIGN KEY (place_visit_id) REFERENCES place_visits(id) ON DELETE CASCADE,
+    FOREIGN KEY (location_sample_id) REFERENCES location_samples(id) ON DELETE CASCADE
+);
+
+CREATE INDEX place_visit_samples_visit ON place_visit_samples(place_visit_id);
+CREATE INDEX place_visit_samples_sample ON place_visit_samples(location_sample_id);
+
+-- Queries
+insertVisit:
+INSERT INTO place_visits (
+    id, start_time, end_time, center_latitude, center_longitude,
+    approximate_address, poi_name, city, country_code,
+    user_id, created_at, updated_at, deleted_at
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getVisitById:
+SELECT * FROM place_visits
+WHERE id = ? AND deleted_at IS NULL;
+
+getVisitsByTimeRange:
+SELECT * FROM place_visits
+WHERE user_id = ?
+  AND start_time <= ?
+  AND end_time >= ?
+  AND deleted_at IS NULL
+ORDER BY start_time ASC;
+
+getVisitsByUser:
+SELECT * FROM place_visits
+WHERE user_id = ? AND deleted_at IS NULL
+ORDER BY start_time DESC
+LIMIT ? OFFSET ?;
+
+updateVisit:
+UPDATE place_visits
+SET start_time = ?,
+    end_time = ?,
+    center_latitude = ?,
+    center_longitude = ?,
+    approximate_address = ?,
+    poi_name = ?,
+    city = ?,
+    country_code = ?,
+    updated_at = ?
+WHERE id = ?;
+
+linkSample:
+INSERT OR IGNORE INTO place_visit_samples (place_visit_id, location_sample_id)
+VALUES (?, ?);
+
+unlinkSample:
+DELETE FROM place_visit_samples
+WHERE place_visit_id = ? AND location_sample_id = ?;
+
+getSamplesForVisit:
+SELECT ls.* FROM location_samples ls
+INNER JOIN place_visit_samples pvs ON ls.id = pvs.location_sample_id
+WHERE pvs.place_visit_id = ?
+  AND ls.deleted_at IS NULL
+ORDER BY ls.timestamp ASC;
+
+softDelete:
+UPDATE place_visits
+SET deleted_at = ?, updated_at = ?
+WHERE id = ?;
+
+deletePermanently:
+DELETE FROM place_visits
+WHERE id = ?;

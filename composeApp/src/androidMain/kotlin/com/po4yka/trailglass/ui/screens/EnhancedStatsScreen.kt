@@ -1,0 +1,647 @@
+package com.po4yka.trailglass.ui.screens
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.domain.model.PlaceCategory
+import com.po4yka.trailglass.domain.model.TransportType
+import com.po4yka.trailglass.feature.stats.GetStatsUseCase
+import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
+import com.po4yka.trailglass.ui.components.ErrorView
+import com.po4yka.trailglass.ui.components.charts.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+
+/**
+ * Enhanced stats screen with comprehensive analytics and visualizations.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EnhancedStatsScreen(
+    controller: EnhancedStatsController,
+    modifier: Modifier = Modifier
+) {
+    val state by controller.state.collectAsState()
+
+    // Load current year on first composition
+    LaunchedEffect(Unit) {
+        val currentYear = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .year
+        controller.loadPeriod(GetStatsUseCase.Period.Year(currentYear))
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Statistics & Analytics") },
+                actions = {
+                    IconButton(onClick = { controller.refresh() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                    }
+                }
+            )
+        },
+        modifier = modifier.fillMaxSize()
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            // Period selector
+            PeriodSelector(
+                selectedPeriod = state.period,
+                onPeriodChange = { controller.loadPeriod(it) },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            when {
+                state.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                state.error != null -> {
+                    ErrorView(
+                        error = state.error!!,
+                        onRetry = { controller.refresh() },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                state.stats != null -> {
+                    EnhancedStatsContent(
+                        stats = state.stats!!,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                else -> {
+                    EmptyStatsView(modifier = Modifier.fillMaxSize())
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PeriodSelector(
+    selectedPeriod: GetStatsUseCase.Period?,
+    onPeriodChange: (GetStatsUseCase.Period) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val currentYear = Clock.System.now()
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .year
+
+    var isYearSelected by remember { mutableStateOf(true) }
+
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        tonalElevation = 2.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FilterChip(
+                selected = isYearSelected,
+                onClick = {
+                    isYearSelected = true
+                    onPeriodChange(GetStatsUseCase.Period.Year(currentYear))
+                },
+                label = { Text("Year") },
+                leadingIcon = if (isYearSelected) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null
+            )
+
+            FilterChip(
+                selected = !isYearSelected,
+                onClick = {
+                    isYearSelected = false
+                    val currentMonth = Clock.System.now()
+                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                        .monthNumber
+                    onPeriodChange(GetStatsUseCase.Period.Month(currentYear, currentMonth))
+                },
+                label = { Text("Month") },
+                leadingIcon = if (!isYearSelected) {
+                    { Icon(Icons.Default.Check, contentDescription = null) }
+                } else null
+            )
+        }
+    }
+}
+
+@Composable
+private fun EnhancedStatsContent(
+    stats: ComprehensiveStatistics,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Overview section
+        item {
+            SectionHeader("Overview")
+        }
+
+        item {
+            OverviewCards(stats)
+        }
+
+        // Distance statistics
+        item {
+            SectionHeader("Distance Traveled")
+        }
+
+        item {
+            DistanceStatsCard(stats)
+        }
+
+        // Transport type distribution
+        if (stats.distanceStats.byTransportType.isNotEmpty()) {
+            item {
+                TransportDistributionCard(stats)
+            }
+        }
+
+        // Place statistics
+        item {
+            SectionHeader("Places Visited")
+        }
+
+        item {
+            PlaceStatsCard(stats)
+        }
+
+        // Category distribution
+        if (stats.placeStats.visitsByCategory.isNotEmpty()) {
+            item {
+                CategoryDistributionCard(stats)
+            }
+        }
+
+        // Most visited places
+        if (stats.placeStats.mostVisitedPlaces.isNotEmpty()) {
+            item {
+                SectionHeader("Most Visited Places")
+            }
+
+            stats.placeStats.mostVisitedPlaces.take(5).forEach { place ->
+                item {
+                    MostVisitedPlaceCard(place)
+                }
+            }
+        }
+
+        // Travel patterns
+        item {
+            SectionHeader("Travel Patterns")
+        }
+
+        item {
+            TravelPatternsCard(stats)
+        }
+
+        // Activity heatmap
+        if (stats.travelPatterns.weekdayActivity.isNotEmpty()) {
+            item {
+                ActivityHeatmapCard(stats)
+            }
+        }
+
+        // Geographic statistics
+        item {
+            SectionHeader("Geography")
+        }
+
+        item {
+            GeographicStatsCard(stats)
+        }
+
+        // Top countries
+        if (stats.geographicStats.topCountries.isNotEmpty()) {
+            item {
+                TopCountriesCard(stats)
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.headlineSmall,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 8.dp)
+    )
+}
+
+@Composable
+private fun OverviewCards(stats: ComprehensiveStatistics) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatCard(
+                title = "Distance",
+                value = "${stats.distanceStats.totalDistanceKm.toInt()} km",
+                icon = Icons.Default.Straighten,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                title = "Countries",
+                value = "${stats.geographicStats.countries.size}",
+                icon = Icons.Default.Public,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            StatCard(
+                title = "Places",
+                value = "${stats.placeStats.totalPlaces}",
+                icon = Icons.Default.Place,
+                modifier = Modifier.weight(1f)
+            )
+            StatCard(
+                title = "Active Days",
+                value = "${stats.activeDays}",
+                icon = Icons.Default.CalendarToday,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatCard(
+    title: String,
+    value: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+
+            Text(
+                text = value,
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
+    }
+}
+
+@Composable
+private fun DistanceStatsCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Distance Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+
+            InfoRow("Total Distance", "${stats.distanceStats.totalDistanceKm.toInt()} km")
+            InfoRow("Average Speed", "${stats.distanceStats.averageSpeed.toInt()} km/h")
+
+            val hours = stats.distanceStats.totalDuration.inWholeHours
+            InfoRow("Total Time", "${hours}h ${(stats.distanceStats.totalDuration.inWholeMinutes % 60)}m")
+
+            stats.distanceStats.mostUsedTransportType?.let { type ->
+                InfoRow("Most Used", type.name.lowercase().replaceFirstChar { it.uppercase() })
+            }
+        }
+    }
+}
+
+@Composable
+private fun TransportDistributionCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "Distance by Transport Type",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            val transportColors = mapOf(
+                TransportType.WALK to Color(0xFF4CAF50),
+                TransportType.BIKE to Color(0xFF2196F3),
+                TransportType.CAR to Color(0xFFF44336),
+                TransportType.TRAIN to Color(0xFF9C27B0),
+                TransportType.PLANE to Color(0xFFFF9800),
+                TransportType.BOAT to Color(0xFF00BCD4),
+                TransportType.UNKNOWN to Color(0xFF9E9E9E)
+            )
+
+            val barData = stats.distanceStats.byTransportType.map { (type, meters) ->
+                BarData(
+                    label = type.name.take(4),
+                    value = (meters / 1000).toFloat(),
+                    formattedValue = "${(meters / 1000).toInt()}km",
+                    color = transportColors[type]
+                )
+            }.sortedByDescending { it.value }
+
+            BarChart(
+                data = barData,
+                showValues = true
+            )
+        }
+    }
+}
+
+@Composable
+private fun PlaceStatsCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Place Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+
+            InfoRow("Total Places", "${stats.placeStats.totalPlaces}")
+            InfoRow("Total Visits", "${stats.placeStats.totalVisits}")
+
+            val avgDuration = stats.placeStats.averageVisitDuration
+            val avgHours = avgDuration.inWholeHours
+            val avgMinutes = avgDuration.inWholeMinutes % 60
+            InfoRow("Avg Visit Duration", if (avgHours > 0) "${avgHours}h ${avgMinutes}m" else "${avgMinutes}m")
+
+            stats.placeStats.topCategory?.let { category ->
+                InfoRow("Top Category", category.name.lowercase().replaceFirstChar { it.uppercase() })
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryDistributionCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "Visits by Category",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            val categoryColors = mapOf(
+                PlaceCategory.HOME to Color(0xFF4CAF50),
+                PlaceCategory.WORK to Color(0xFF2196F3),
+                PlaceCategory.FOOD to Color(0xFFFF9800),
+                PlaceCategory.SHOPPING to Color(0xFFE91E63),
+                PlaceCategory.FITNESS to Color(0xFF9C27B0),
+                PlaceCategory.ENTERTAINMENT to Color(0xFFFF5722),
+                PlaceCategory.TRAVEL to Color(0xFF00BCD4),
+                PlaceCategory.HEALTHCARE to Color(0xFFF44336),
+                PlaceCategory.EDUCATION to Color(0xFF3F51B5),
+                PlaceCategory.RELIGIOUS to Color(0xFF795548),
+                PlaceCategory.SOCIAL to Color(0xFFCDDC39),
+                PlaceCategory.OUTDOOR to Color(0xFF8BC34A),
+                PlaceCategory.SERVICE to Color(0xFF607D8B),
+                PlaceCategory.OTHER to Color(0xFF9E9E9E)
+            )
+
+            val pieData = stats.placeStats.visitsByCategory
+                .filter { it.key != PlaceCategory.OTHER || it.value > 0 }
+                .map { (category, count) ->
+                    PieData(
+                        label = category.name.lowercase().replaceFirstChar { it.uppercase() },
+                        value = count.toFloat(),
+                        color = categoryColors[category] ?: Color.Gray
+                    )
+                }
+                .sortedByDescending { it.value }
+                .take(6)
+
+            if (pieData.isNotEmpty()) {
+                PieChart(data = pieData)
+            }
+        }
+    }
+}
+
+@Composable
+private fun MostVisitedPlaceCard(place: com.po4yka.trailglass.feature.stats.models.PlaceVisitCount) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = { Text(place.placeName) },
+            supportingContent = {
+                Text("${place.visitCount} visits • ${place.totalDuration.inWholeHours}h total")
+            },
+            trailingContent = {
+                Text(
+                    place.category.name.take(3),
+                    style = MaterialTheme.typography.labelSmall
+                )
+            },
+            leadingContent = {
+                Icon(Icons.Default.Place, contentDescription = null)
+            }
+        )
+    }
+}
+
+@Composable
+private fun TravelPatternsCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Travel Patterns", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+
+            stats.travelPatterns.peakTravelDay?.let { day ->
+                InfoRow("Most Active Day", day.name.lowercase().replaceFirstChar { it.uppercase() })
+            }
+
+            stats.travelPatterns.peakTravelHour?.let { hour ->
+                val timeRange = when (hour) {
+                    in 0..5 -> "Night (12AM-6AM)"
+                    in 6..11 -> "Morning (6AM-12PM)"
+                    in 12..17 -> "Afternoon (12PM-6PM)"
+                    else -> "Evening (6PM-12AM)"
+                }
+                InfoRow("Most Active Time", timeRange)
+            }
+
+            val split = stats.travelPatterns.weekdayVsWeekend
+            InfoRow("Weekday vs Weekend", "${split.weekdayPercentage.toInt()}% / ${split.weekendPercentage.toInt()}%")
+        }
+    }
+}
+
+@Composable
+private fun ActivityHeatmapCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Convert activity data to heatmap format
+            val heatmapData = stats.travelPatterns.weekdayActivity.mapValues { (_, activity) ->
+                stats.travelPatterns.hourlyActivity.mapValues { (_, hourActivity) ->
+                    hourActivity.totalEvents
+                }
+            }
+
+            ActivityHeatmap(data = heatmapData)
+        }
+    }
+}
+
+@Composable
+private fun GeographicStatsCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("Geographic Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+
+            InfoRow("Countries Visited", "${stats.geographicStats.countries.size}")
+            InfoRow("Cities Visited", "${stats.geographicStats.cities.size}")
+
+            stats.geographicStats.homeBase?.let { home ->
+                InfoRow("Home Base", home.city ?: home.name)
+            }
+
+            stats.geographicStats.furthestLocation?.let { furthest ->
+                InfoRow("Furthest Location", furthest.city ?: furthest.name)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopCountriesCard(stats: ComprehensiveStatistics) {
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                "Top Countries",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            stats.geographicStats.topCountries.take(5).forEach { country ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            country.countryCode,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            "${country.cities.size} cities",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+
+                    Text(
+                        "${country.visitCount} visits",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                if (country != stats.geographicStats.topCountries.last()) {
+                    HorizontalDivider()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
+
+@Composable
+private fun EmptyStatsView(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.BarChart,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "No statistics available",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = "Start tracking to see your travel statistics",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * Controller interface for enhanced stats screen.
+ * This would be implemented similarly to the existing StatsController.
+ */
+interface EnhancedStatsController {
+    val state: kotlinx.coroutines.flow.StateFlow<EnhancedStatsState>
+    fun loadPeriod(period: GetStatsUseCase.Period)
+    fun refresh()
+}
+
+data class EnhancedStatsState(
+    val period: GetStatsUseCase.Period? = null,
+    val stats: ComprehensiveStatistics? = null,
+    val isLoading: Boolean = false,
+    val error: String? = null
+)

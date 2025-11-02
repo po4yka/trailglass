@@ -1,0 +1,304 @@
+package com.po4yka.trailglass.ui.screens
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.domain.model.Trip
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration
+
+/**
+ * Screen showing all trips with filtering and sorting options.
+ */
+@Composable
+fun TripsScreen(
+    trips: List<Trip>,
+    onTripClick: (Trip) -> Unit = {},
+    onCreateTrip: () -> Unit = {},
+    onRefresh: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onCreateTrip,
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Create Trip")
+            }
+        }
+    ) { paddingValues ->
+        Column(modifier = Modifier.padding(paddingValues)) {
+            if (trips.isEmpty()) {
+                EmptyTripsView(
+                    onCreateTrip = onCreateTrip,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                TripsContent(
+                    trips = trips,
+                    onTripClick = onTripClick,
+                    onRefresh = onRefresh,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TripsContent(
+    trips: List<Trip>,
+    onTripClick: (Trip) -> Unit,
+    onRefresh: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Header
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Trips",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "${trips.size} total",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                IconButton(onClick = onRefresh) {
+                    Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                }
+            }
+        }
+
+        // Group trips: ongoing first, then by date
+        val ongoingTrips = trips.filter { it.isOngoing }
+        val completedTrips = trips.filter { !it.isOngoing }
+
+        // Ongoing trips section
+        if (ongoingTrips.isNotEmpty()) {
+            item {
+                SectionHeader("Ongoing")
+            }
+            items(ongoingTrips) { trip ->
+                TripCard(
+                    trip = trip,
+                    onClick = { onTripClick(trip) }
+                )
+            }
+        }
+
+        // Completed trips section
+        if (completedTrips.isNotEmpty()) {
+            item {
+                SectionHeader(if (ongoingTrips.isNotEmpty()) "Past Trips" else "All Trips")
+            }
+            items(completedTrips) { trip ->
+                TripCard(
+                    trip = trip,
+                    onClick = { onTripClick(trip) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SectionHeader(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.padding(vertical = 8.dp)
+    )
+}
+
+@Composable
+private fun TripCard(
+    trip: Trip,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = if (trip.isOngoing)
+                MaterialTheme.colorScheme.primaryContainer
+            else
+                MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            // Header row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = trip.displayName,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        if (trip.isOngoing) {
+                            Badge {
+                                Text("Ongoing")
+                            }
+                        }
+                    }
+
+                    // Date range
+                    val startDate = trip.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                    val dateText = if (trip.endTime != null) {
+                        val endDate = trip.endTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                        "${startDate.date} - ${endDate.date}"
+                    } else {
+                        "Started ${startDate.date}"
+                    }
+
+                    Text(
+                        text = dateText,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                // Auto-detected badge
+                if (trip.isAutoDetected) {
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.tertiaryContainer
+                    ) {
+                        Text(
+                            text = "Auto",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            // Description
+            if (trip.description != null) {
+                Text(
+                    text = trip.description!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(top = 8.dp),
+                    maxLines = 2
+                )
+            }
+
+            // Statistics
+            if (trip.summary.isNotEmpty()) {
+                Text(
+                    text = trip.summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            // Tags
+            if (trip.tags.isNotEmpty()) {
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    trip.tags.take(3).forEach { tag ->
+                        AssistChip(
+                            onClick = { },
+                            label = {
+                                Text(
+                                    text = tag,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Tag,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        )
+                    }
+                    if (trip.tags.size > 3) {
+                        Text(
+                            text = "+${trip.tags.size - 3}",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyTripsView(
+    onCreateTrip: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Icon(
+                Icons.Default.Luggage,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "No Trips Yet",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "Start tracking your adventures",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Button(onClick = onCreateTrip) {
+                Icon(Icons.Default.Add, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Create Trip")
+            }
+        }
+    }
+}

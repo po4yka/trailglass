@@ -1,0 +1,76 @@
+-- Location samples table: raw GPS/network location points
+CREATE TABLE location_samples (
+    id TEXT NOT NULL PRIMARY KEY,
+    timestamp INTEGER NOT NULL,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    accuracy REAL NOT NULL,
+    speed REAL,
+    bearing REAL,
+    source TEXT NOT NULL,
+    trip_id TEXT,
+    uploaded_at INTEGER,
+    device_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+-- Indices for performance
+CREATE INDEX location_samples_timestamp ON location_samples(timestamp);
+CREATE INDEX location_samples_user_trip ON location_samples(user_id, trip_id);
+CREATE INDEX location_samples_user_time ON location_samples(user_id, timestamp DESC);
+CREATE INDEX location_samples_deleted ON location_samples(deleted_at) WHERE deleted_at IS NULL;
+
+-- Queries
+insertSample:
+INSERT INTO location_samples (
+    id, timestamp, latitude, longitude, accuracy, speed, bearing,
+    source, trip_id, uploaded_at, device_id, user_id, created_at, updated_at, deleted_at
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getSampleById:
+SELECT * FROM location_samples
+WHERE id = ? AND deleted_at IS NULL;
+
+getSamplesByTimeRange:
+SELECT * FROM location_samples
+WHERE user_id = ?
+  AND timestamp BETWEEN ? AND ?
+  AND deleted_at IS NULL
+ORDER BY timestamp ASC;
+
+getSamplesByTrip:
+SELECT * FROM location_samples
+WHERE trip_id = ? AND deleted_at IS NULL
+ORDER BY timestamp ASC;
+
+getUnprocessedSamples:
+SELECT * FROM location_samples
+WHERE user_id = ?
+  AND trip_id IS NULL
+  AND deleted_at IS NULL
+ORDER BY timestamp ASC
+LIMIT ?;
+
+updateTripId:
+UPDATE location_samples
+SET trip_id = ?, updated_at = ?
+WHERE id = ?;
+
+softDelete:
+UPDATE location_samples
+SET deleted_at = ?, updated_at = ?
+WHERE id = ?;
+
+deletePermanently:
+DELETE FROM location_samples
+WHERE id = ?;
+
+deleteOldSamples:
+DELETE FROM location_samples
+WHERE user_id = ?
+  AND timestamp < ?
+  AND deleted_at IS NOT NULL;

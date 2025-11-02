@@ -1,0 +1,332 @@
+import SwiftUI
+import MapKit
+
+/**
+ * SwiftUI MapView wrapping MKMapView for TrailGlass.
+ *
+ * Usage:
+ * ```swift
+ * TrailGlassMapView(
+ *     markers: markers,
+ *     routes: routes,
+ *     region: region,
+ *     onMarkerTap: { marker in
+ *         // Handle marker tap
+ *     }
+ * )
+ * ```
+ */
+struct TrailGlassMapView: UIViewRepresentable {
+    let markers: [MapMarker]
+    let routes: [MapRoute]
+    let region: MapRegion?
+    let onMarkerTap: ((MapMarker) -> Void)?
+
+    func makeUIView(context: Context) -> MKMapView {
+        let mapView = MKMapView()
+        mapView.delegate = context.coordinator
+        mapView.showsUserLocation = true
+        mapView.showsCompass = true
+        mapView.showsScale = true
+        return mapView
+    }
+
+    func updateUIView(_ mapView: MKMapView, context: Context) {
+        // Update region
+        if let region = region {
+            let center = CLLocationCoordinate2D(
+                latitude: region.center.latitude,
+                longitude: region.center.longitude
+            )
+            let span = MKCoordinateSpan(
+                latitudeDelta: region.latitudeDelta,
+                longitudeDelta: region.longitudeDelta
+            )
+            let mkRegion = MKCoordinateRegion(center: center, span: span)
+            mapView.setRegion(mkRegion, animated: true)
+        }
+
+        // Update annotations (markers)
+        updateAnnotations(mapView: mapView, markers: markers)
+
+        // Update overlays (routes)
+        updateOverlays(mapView: mapView, routes: routes)
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(onMarkerTap: onMarkerTap)
+    }
+
+    private func updateAnnotations(mapView: MKMapView, markers: [MapMarker]) {
+        // Remove existing annotations
+        let existingAnnotations = mapView.annotations.filter { !($0 is MKUserLocation) }
+        mapView.removeAnnotations(existingAnnotations)
+
+        // Add new annotations
+        let annotations = markers.map { marker -> MKPointAnnotation in
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = CLLocationCoordinate2D(
+                latitude: marker.coordinate.latitude,
+                longitude: marker.coordinate.longitude
+            )
+            annotation.title = marker.title
+            annotation.subtitle = marker.snippet
+            return annotation
+        }
+
+        mapView.addAnnotations(annotations)
+    }
+
+    private func updateOverlays(mapView: MKMapView, routes: [MapRoute]) {
+        // Remove existing overlays
+        mapView.removeOverlays(mapView.overlays)
+
+        // Add new overlays
+        for route in routes {
+            let coordinates = route.coordinates.map { coord in
+                CLLocationCoordinate2D(
+                    latitude: coord.latitude,
+                    longitude: coord.longitude
+                )
+            }
+
+            let polyline = MKPolyline(coordinates: coordinates, count: coordinates.count)
+            polyline.title = route.transportType.rawValue // Store transport type
+            mapView.addOverlay(polyline)
+        }
+    }
+
+    // MARK: - Coordinator
+
+    class Coordinator: NSObject, MKMapViewDelegate {
+        let onMarkerTap: ((MapMarker) -> Void)?
+
+        init(onMarkerTap: ((MapMarker) -> Void)?) {
+            self.onMarkerTap = onMarkerTap
+        }
+
+        // Customize annotation views
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            guard !(annotation is MKUserLocation) else { return nil }
+
+            let identifier = "MarkerAnnotation"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+
+            if annotationView == nil {
+                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                annotationView?.canShowCallout = true
+
+                // Add info button
+                let infoButton = UIButton(type: .detailDisclosure)
+                annotationView?.rightCalloutAccessoryView = infoButton
+            } else {
+                annotationView?.annotation = annotation
+            }
+
+            // Customize marker color
+            annotationView?.markerTintColor = .systemTeal
+
+            return annotationView
+        }
+
+        // Handle annotation tap
+        func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+            // Would need to map back to MapMarker
+            // For now, this is a placeholder
+        }
+
+        // Customize route rendering
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let polyline = overlay as? MKPolyline {
+                let renderer = MKPolylineRenderer(polyline: polyline)
+
+                // Determine color based on transport type (from title)
+                let transportType = polyline.title ?? "UNKNOWN"
+                renderer.strokeColor = getColorForTransport(transportType)
+                renderer.lineWidth = getWidthForTransport(transportType)
+                renderer.lineCap = .round
+                renderer.lineJoin = .round
+
+                return renderer
+            }
+
+            return MKOverlayRenderer(overlay: overlay)
+        }
+
+        private func getColorForTransport(_ type: String) -> UIColor {
+            switch type {
+            case "WALK":
+                return UIColor(red: 0.30, green: 0.69, blue: 0.31, alpha: 1.0) // Green
+            case "BIKE":
+                return UIColor(red: 0.13, green: 0.59, blue: 0.95, alpha: 1.0) // Blue
+            case "CAR":
+                return UIColor(red: 0.96, green: 0.26, blue: 0.21, alpha: 1.0) // Red
+            case "TRAIN":
+                return UIColor(red: 0.61, green: 0.15, blue: 0.69, alpha: 1.0) // Purple
+            case "PLANE":
+                return UIColor(red: 1.0, green: 0.60, blue: 0.0, alpha: 1.0)   // Orange
+            case "BOAT":
+                return UIColor(red: 0.0, green: 0.74, blue: 0.83, alpha: 1.0)  // Cyan
+            default:
+                return UIColor.gray
+            }
+        }
+
+        private func getWidthForTransport(_ type: String) -> CGFloat {
+            switch type {
+            case "WALK":
+                return 3.0
+            case "BIKE":
+                return 4.0
+            case "CAR":
+                return 5.0
+            case "TRAIN":
+                return 6.0
+            case "PLANE":
+                return 7.0
+            case "BOAT":
+                return 5.0
+            default:
+                return 3.0
+            }
+        }
+    }
+}
+
+// MARK: - SwiftUI Integration Example
+
+struct MapScreenView: View {
+    @StateObject private var viewModel = MapViewModel()
+
+    var body: some View {
+        ZStack {
+            TrailGlassMapView(
+                markers: viewModel.markers,
+                routes: viewModel.routes,
+                region: viewModel.region,
+                onMarkerTap: { marker in
+                    viewModel.selectMarker(marker)
+                }
+            )
+            .edgesIgnoringSafeArea(.all)
+
+            // Selected marker info
+            if let selectedMarker = viewModel.selectedMarker {
+                VStack {
+                    Spacer()
+
+                    MarkerInfoCard(
+                        marker: selectedMarker,
+                        onClose: {
+                            viewModel.deselectMarker()
+                        }
+                    )
+                    .padding()
+                }
+            }
+
+            // Fit to data button
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        viewModel.fitToData()
+                    }) {
+                        Image(systemName: "location.circle.fill")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .frame(width: 56, height: 56)
+                            .background(Color.accentColor)
+                            .clipShape(Circle())
+                            .shadow(radius: 4)
+                    }
+                    .padding()
+                }
+            }
+        }
+        .onAppear {
+            viewModel.loadMapData()
+        }
+    }
+}
+
+struct MarkerInfoCard: View {
+    let marker: MapMarker
+    let onClose: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text(marker.title ?? "Unknown location")
+                        .font(.headline)
+
+                    if let snippet = marker.snippet {
+                        Text(snippet)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                }
+
+                Spacer()
+
+                Button(action: onClose) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+            }
+
+            HStack(spacing: 8) {
+                Button(action: {
+                    // Navigate to visit detail
+                }) {
+                    Label("Details", systemImage: "info.circle")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+
+                Button(action: {
+                    // Add photo
+                }) {
+                    Label("Photos", systemImage: "photo")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(radius: 8)
+    }
+}
+
+// MARK: - ViewModel (Example)
+
+class MapViewModel: ObservableObject {
+    @Published var markers: [MapMarker] = []
+    @Published var routes: [MapRoute] = []
+    @Published var region: MapRegion?
+    @Published var selectedMarker: MapMarker?
+
+    // Reference to shared controller
+    // private let mapController: MapController
+
+    func loadMapData() {
+        // Load data from mapController
+        // This would integrate with the shared Kotlin code
+    }
+
+    func selectMarker(_ marker: MapMarker) {
+        selectedMarker = marker
+    }
+
+    func deselectMarker() {
+        selectedMarker = nil
+    }
+
+    func fitToData() {
+        // Fit map to show all markers and routes
+    }
+}
