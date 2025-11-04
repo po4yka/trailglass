@@ -2,13 +2,16 @@ package com.po4yka.trailglass.photo
 
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.logging.logger
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import platform.Foundation.NSDate
 import platform.Photos.*
 import java.util.UUID
+import kotlin.coroutines.resume
 
 /**
  * iOS implementation of PhotoPicker using PHPicker and Photos framework.
@@ -77,7 +80,7 @@ class IOSPhotoPicker(
                 longitude = metadata.longitude,
                 width = metadata.width,
                 height = metadata.height,
-                sizeBytes = null, // Not easily available from PHAsset
+                sizeBytes = metadata.sizeBytes,
                 mimeType = metadata.mimeType,
                 userId = userId,
                 addedAt = Clock.System.now()
@@ -102,7 +105,8 @@ class IOSPhotoPicker(
     /**
      * Extract metadata from a PHAsset.
      */
-    private fun extractMetadataFromAsset(asset: PHAsset): PhotoMetadata {
+    @OptIn(ExperimentalForeignApi::class)
+    private suspend fun extractMetadataFromAsset(asset: PHAsset): PhotoMetadata {
         // Extract timestamp
         val creationDate = asset.creationDate as? NSDate
         val timestamp = if (creationDate != null) {
@@ -129,6 +133,9 @@ class IOSPhotoPicker(
             else -> "image/jpeg"
         }
 
+        // Extract file size using PHImageManager
+        val sizeBytes = extractFileSizeFromAsset(asset)
+
         return PhotoMetadata(
             uri = asset.localIdentifier,
             timestamp = timestamp,
@@ -136,8 +143,55 @@ class IOSPhotoPicker(
             longitude = longitude,
             width = width,
             height = height,
-            sizeBytes = null,
+            sizeBytes = sizeBytes,
             mimeType = mimeType
         )
+    }
+
+    /**
+     * Extract file size from PHAsset using PHImageManager.
+     * This requests the image resource info to get the actual file size.
+     */
+    @OptIn(ExperimentalForeignApi::class)
+    private suspend fun extractFileSizeFromAsset(asset: PHAsset): Long? {
+        return suspendCancellableCoroutine { continuation ->
+            val options = PHImageRequestOptions().apply {
+                deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat
+                networkAccessAllowed = true
+                synchronous = false
+            }
+
+            val imageManager = PHImageManager.defaultManager()
+
+            // Request image data to get file size info
+            imageManager.requestImageDataForAsset(
+                asset,
+                options = options,
+                resultHandler = { imageData, dataUTI, orientation, info ->
+                    if (imageData != null) {
+                        // Get the length of the image data
+                        val fileSize = imageData.length.toLong()
+                        logger.debug { "Extracted file size: $fileSize bytes" }
+                        continuation.resume(fileSize)
+                    } else {
+                        // Fallback: try to get from resources
+                        val resources = PHAssetResource.assetResourcesForAsset(asset)
+                        if (resources.isNotEmpty()) {
+                            val resource = resources.first() as? PHAssetResource
+                            resource?.let {
+                                // Try to get file size from resource
+                                // Note: PHAssetResource doesn't directly expose file size
+                                // We got the size from imageData above, so this is a fallback
+                                logger.warn { "Could not get image data, file size unavailable" }
+                                continuation.resume(null)
+                            } ?: continuation.resume(null)
+                        } else {
+                            logger.warn { "No image data or resources available for asset" }
+                            continuation.resume(null)
+                        }
+                    }
+                }
+            )
+        }
     }
 }
