@@ -38,7 +38,10 @@ class MainActivity : ComponentActivity() {
         handleIntent(intent)
 
         setContent {
-            App(rootComponent = rootComponent)
+            App(
+                rootComponent = rootComponent,
+                networkConnectivityMonitor = appComponent.networkConnectivityMonitor
+            )
         }
     }
 

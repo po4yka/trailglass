@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.navigation.MainScaffold
 import com.po4yka.trailglass.ui.navigation.RootComponent
 import com.po4yka.trailglass.ui.theme.TrailGlassTheme
@@ -14,7 +15,10 @@ import com.po4yka.trailglass.ui.theme.TrailGlassTheme
  * This is the entry point for the UI, integrating Decompose navigation.
  */
 @Composable
-fun App(rootComponent: RootComponent) {
+fun App(
+    rootComponent: RootComponent,
+    networkConnectivityMonitor: NetworkConnectivityMonitor
+) {
     TrailGlassTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
@@ -22,6 +26,7 @@ fun App(rootComponent: RootComponent) {
         ) {
             MainScaffold(
                 rootComponent = rootComponent,
+                networkConnectivityMonitor = networkConnectivityMonitor,
                 modifier = Modifier.fillMaxSize()
             )
         }

@@ -30,11 +30,21 @@ class TrailGlassApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        // Start network connectivity monitoring
+        startNetworkMonitoring()
+
         // Initialize sync coordinator
         initializeSyncCoordinator()
 
         // Schedule background sync
         scheduleBackgroundSync()
+    }
+
+    override fun onTerminate() {
+        super.onTerminate()
+
+        // Stop network connectivity monitoring
+        stopNetworkMonitoring()
     }
 
     /**
@@ -66,6 +76,32 @@ class TrailGlassApplication : Application() {
             println("Background sync scheduled successfully")
         } catch (e: Exception) {
             println("Failed to schedule background sync: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Start network connectivity monitoring.
+     */
+    private fun startNetworkMonitoring() {
+        try {
+            appComponent.networkConnectivityMonitor.startMonitoring()
+            println("Network connectivity monitoring started successfully")
+        } catch (e: Exception) {
+            println("Failed to start network monitoring: ${e.message}")
+            e.printStackTrace()
+        }
+    }
+
+    /**
+     * Stop network connectivity monitoring.
+     */
+    private fun stopNetworkMonitoring() {
+        try {
+            appComponent.networkConnectivityMonitor.stopMonitoring()
+            println("Network connectivity monitoring stopped")
+        } catch (e: Exception) {
+            println("Failed to stop network monitoring: ${e.message}")
             e.printStackTrace()
         }
     }

@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
+import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
+import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
 import com.po4yka.trailglass.ui.screens.MapScreen
 import com.po4yka.trailglass.ui.screens.SettingsScreen
 import com.po4yka.trailglass.ui.screens.StatsScreen
@@ -47,6 +49,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
 @Composable
 fun MainScaffold(
     rootComponent: RootComponent,
+    networkConnectivityMonitor: NetworkConnectivityMonitor,
     modifier: Modifier = Modifier
 ) {
     val childStack by rootComponent.childStack.subscribeAsState()
@@ -86,38 +89,43 @@ fun MainScaffold(
             }
         }
     ) { paddingValues ->
-        // Screen content using Decompose's Children
-        Children(
-            stack = childStack,
+        // Wrap content with network status indicator
+        NetworkStatusWrapper(
+            networkConnectivityMonitor = networkConnectivityMonitor,
             modifier = Modifier.padding(paddingValues)
-        ) { child ->
-            when (val instance = child.instance) {
-                is RootComponent.Child.Stats -> {
-                    StatsScreen(
-                        controller = instance.component.statsController,
-                        modifier = Modifier
-                    )
-                }
+        ) {
+            // Screen content using Decompose's Children
+            Children(
+                stack = childStack
+            ) { child ->
+                when (val instance = child.instance) {
+                    is RootComponent.Child.Stats -> {
+                        StatsScreen(
+                            controller = instance.component.statsController,
+                            modifier = Modifier
+                        )
+                    }
 
-                is RootComponent.Child.Timeline -> {
-                    TimelineScreen(
-                        controller = instance.component.timelineController,
-                        modifier = Modifier
-                    )
-                }
+                    is RootComponent.Child.Timeline -> {
+                        TimelineScreen(
+                            controller = instance.component.timelineController,
+                            modifier = Modifier
+                        )
+                    }
 
-                is RootComponent.Child.Map -> {
-                    MapScreen(
-                        controller = instance.component.mapController,
-                        modifier = Modifier
-                    )
-                }
+                    is RootComponent.Child.Map -> {
+                        MapScreen(
+                            controller = instance.component.mapController,
+                            modifier = Modifier
+                        )
+                    }
 
-                is RootComponent.Child.Settings -> {
-                    SettingsScreen(
-                        trackingController = instance.component.locationTrackingController,
-                        modifier = Modifier
-                    )
+                    is RootComponent.Child.Settings -> {
+                        SettingsScreen(
+                            trackingController = instance.component.locationTrackingController,
+                            modifier = Modifier
+                        )
+                    }
                 }
             }
         }

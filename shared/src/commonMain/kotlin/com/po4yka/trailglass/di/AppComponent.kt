@@ -54,6 +54,9 @@ abstract class AppComponent(
     // Location service (from PlatformModule)
     abstract val locationService: com.po4yka.trailglass.domain.service.LocationService
 
+    // Network connectivity monitor (from PlatformModule)
+    abstract val networkConnectivityMonitor: com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
+
     // Sync components (from SyncModule)
     abstract val apiClient: com.po4yka.trailglass.data.remote.TrailGlassApiClient
     abstract val syncCoordinator: com.po4yka.trailglass.data.sync.SyncCoordinator
