@@ -3,6 +3,7 @@ package com.po4yka.trailglass.di
 import com.po4yka.trailglass.data.repository.*
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.feature.photo.PhotoController
+import com.po4yka.trailglass.feature.route.RouteReplayController
 import com.po4yka.trailglass.feature.route.RouteViewController
 import com.po4yka.trailglass.feature.stats.StatsController
 import com.po4yka.trailglass.feature.timeline.TimelineController
@@ -74,6 +75,7 @@ abstract class AppComponent(
     abstract val photoController: PhotoController
     abstract val locationTrackingController: LocationTrackingController
     abstract val routeViewController: RouteViewController
+    abstract val routeReplayController: RouteReplayController
 
     companion object
 }
