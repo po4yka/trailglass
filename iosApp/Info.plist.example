@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Location Permission Descriptions -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>TrailGlass needs your location to track your travels and create your timeline.</string>
+
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>TrailGlass tracks your location in the background to automatically record your trips and create a complete timeline of your travels.</string>
+
+    <key>NSLocationAlwaysUsageDescription</key>
+    <string>TrailGlass needs access to your location even when the app is in the background to automatically track your trips.</string>
+
+    <!-- Background Modes -->
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>location</string>
+        <string>processing</string>
+    </array>
+
+    <!-- Privacy - Background Refresh -->
+    <key>UIBackgroundRefreshStatusDidChangeNotification</key>
+    <true/>
+
+    <!-- App Transport Security (if using HTTP for development) -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <false/>
+    </dict>
+</dict>
+</plist>
