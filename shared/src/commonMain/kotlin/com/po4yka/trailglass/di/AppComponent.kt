@@ -5,6 +5,7 @@ import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.feature.photo.PhotoController
 import com.po4yka.trailglass.feature.route.RouteReplayController
 import com.po4yka.trailglass.feature.route.RouteViewController
+import com.po4yka.trailglass.feature.route.TripStatisticsController
 import com.po4yka.trailglass.feature.stats.StatsController
 import com.po4yka.trailglass.feature.timeline.TimelineController
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
@@ -76,6 +77,7 @@ abstract class AppComponent(
     abstract val locationTrackingController: LocationTrackingController
     abstract val routeViewController: RouteViewController
     abstract val routeReplayController: RouteReplayController
+    abstract val tripStatisticsController: TripStatisticsController
 
     companion object
 }
