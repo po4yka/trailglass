@@ -22,11 +22,11 @@ import com.po4yka.trailglass.ui.components.TransportBreakdownSection
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripStatisticsScreen(
-    controller: TripStatisticsController,
     tripId: String,
+    controller: TripStatisticsController,
+    onBack: () -> Unit = {},
     tripName: String? = null,
     primaryCountry: String? = null,
-    onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()

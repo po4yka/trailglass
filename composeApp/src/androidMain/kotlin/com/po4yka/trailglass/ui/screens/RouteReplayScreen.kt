@@ -26,9 +26,9 @@ import com.po4yka.trailglass.ui.components.RouteReplayMapView
  */
 @Composable
 fun RouteReplayScreen(
-    controller: RouteReplayController,
     tripId: String,
-    onClose: () -> Unit,
+    controller: RouteReplayController,
+    onBack: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
@@ -84,7 +84,7 @@ fun RouteReplayScreen(
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            OutlinedButton(onClick = onClose) {
+                            OutlinedButton(onClick = onBack) {
                                 Text("Close")
                             }
                             Button(onClick = { controller.loadRoute(tripId) }) {
@@ -101,7 +101,7 @@ fun RouteReplayScreen(
                 // Replay content
                 RouteReplayContent(
                     controller = controller,
-                    onClose = onClose,
+                    onBack = onBack,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -109,7 +109,7 @@ fun RouteReplayScreen(
 
         // Close button (always visible)
         IconButton(
-            onClick = onClose,
+            onClick = onBack,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(16.dp)
@@ -131,7 +131,7 @@ fun RouteReplayScreen(
 @Composable
 private fun RouteReplayContent(
     controller: RouteReplayController,
-    onClose: () -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()

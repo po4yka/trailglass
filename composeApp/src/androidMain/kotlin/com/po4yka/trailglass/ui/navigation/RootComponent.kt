@@ -4,6 +4,8 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.router.stack.replaceAll
 import com.arkivanov.decompose.value.Value
 import com.po4yka.trailglass.di.AppComponent
@@ -52,6 +54,15 @@ interface RootComponent {
 
         @Serializable
         data object Settings : Config
+
+        @Serializable
+        data class RouteView(val tripId: String) : Config
+
+        @Serializable
+        data class RouteReplay(val tripId: String) : Config
+
+        @Serializable
+        data class TripStatistics(val tripId: String) : Config
     }
 
     /**
@@ -62,6 +73,9 @@ interface RootComponent {
         data class Timeline(val component: TimelineComponent) : Child()
         data class Map(val component: MapComponent) : Child()
         data class Settings(val component: SettingsComponent) : Child()
+        data class RouteView(val component: RouteViewComponent) : Child()
+        data class RouteReplay(val component: RouteReplayComponent) : Child()
+        data class TripStatistics(val component: TripStatisticsComponent) : Child()
     }
 }
 
@@ -84,7 +98,18 @@ class DefaultRootComponent(
     )
 
     override fun navigateToScreen(config: RootComponent.Config) {
-        navigation.replaceAll(config)
+        when (config) {
+            // Main screens - replace the stack
+            is RootComponent.Config.Stats,
+            is RootComponent.Config.Timeline,
+            is RootComponent.Config.Map,
+            is RootComponent.Config.Settings -> navigation.replaceAll(config)
+
+            // Detail screens - push onto stack
+            is RootComponent.Config.RouteView,
+            is RootComponent.Config.RouteReplay,
+            is RootComponent.Config.TripStatistics -> navigation.push(config)
+        }
     }
 
     override fun handleDeepLink(path: String) {
@@ -138,6 +163,35 @@ class DefaultRootComponent(
             component = DefaultSettingsComponent(
                 componentContext = componentContext,
                 locationTrackingController = appComponent.locationTrackingController
+            )
+        )
+
+        is RootComponent.Config.RouteView -> RootComponent.Child.RouteView(
+            component = DefaultRouteViewComponent(
+                componentContext = componentContext,
+                tripId = config.tripId,
+                routeViewController = appComponent.routeViewController,
+                onNavigateToReplay = { tripId -> navigateToScreen(RootComponent.Config.RouteReplay(tripId)) },
+                onNavigateToStatistics = { tripId -> navigateToScreen(RootComponent.Config.TripStatistics(tripId)) },
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.RouteReplay -> RootComponent.Child.RouteReplay(
+            component = DefaultRouteReplayComponent(
+                componentContext = componentContext,
+                tripId = config.tripId,
+                routeReplayController = appComponent.routeReplayController,
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.TripStatistics -> RootComponent.Child.TripStatistics(
+            component = DefaultTripStatisticsComponent(
+                componentContext = componentContext,
+                tripId = config.tripId,
+                tripStatisticsController = appComponent.tripStatisticsController,
+                onBack = { navigation.pop() }
             )
         )
     }

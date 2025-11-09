@@ -26,11 +26,11 @@ import com.po4yka.trailglass.ui.components.RouteSummaryCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouteViewScreen(
-    controller: RouteViewController,
     tripId: String,
+    controller: RouteViewController,
+    onNavigateToReplay: (String) -> Unit = {},
+    onNavigateToStatistics: (String) -> Unit = {},
     onBack: () -> Unit = {},
-    onNavigateToReplay: () -> Unit = {},
-    onNavigateToStatistics: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
@@ -73,7 +73,7 @@ fun RouteViewScreen(
                             text = { Text("Replay") },
                             onClick = {
                                 showMenu = false
-                                onNavigateToReplay()
+                                onNavigateToReplay(tripId)
                             },
                             leadingIcon = { Icon(Icons.Default.PlayArrow, null) }
                         )
@@ -81,7 +81,7 @@ fun RouteViewScreen(
                             text = { Text("Statistics") },
                             onClick = {
                                 showMenu = false
-                                onNavigateToStatistics()
+                                onNavigateToStatistics(tripId)
                             },
                             leadingIcon = { Icon(Icons.Default.BarChart, null) }
                         )
@@ -172,7 +172,7 @@ fun RouteViewScreen(
                         selectedPhotoMarker = state.selectedPhotoMarker,
                         onPhotoMarkerClick = { marker -> controller.selectPhotoMarker(marker) },
                         onCameraRecentered = { controller.acknowledgeRecenter() },
-                        onPlayClick = onNavigateToReplay,
+                        onPlayClick = { onNavigateToReplay(tripId) },
                         modifier = Modifier.fillMaxSize()
                     )
                 }

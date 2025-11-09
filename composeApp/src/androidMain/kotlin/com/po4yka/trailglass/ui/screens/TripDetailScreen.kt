@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.hours
 fun TripDetailScreen(
     trip: Trip,
     onBack: () -> Unit = {},
+    onViewRoute: () -> Unit = {},
     onEdit: () -> Unit = {},
     onShare: () -> Unit = {},
     onExport: (ExportFormat) -> Unit = {},
@@ -95,6 +96,21 @@ fun TripDetailScreen(
             // Trip header card
             item {
                 TripHeaderCard(trip)
+            }
+
+            // View Route button
+            item {
+                Button(
+                    onClick = onViewRoute,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Icon(Icons.Default.Map, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text("View Route on Map")
+                }
             }
 
             // Statistics card

@@ -28,6 +28,7 @@ fun PhotoDetailScreen(
     photoId: String,
     controller: PhotoDetailController,
     onNavigateBack: () -> Unit,
+    onViewOnRoute: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
@@ -82,6 +83,7 @@ fun PhotoDetailScreen(
                 PhotoDetailContent(
                     photoWithMetadata = state.photo!!,
                     onAttachToVisit = { controller.showAttachmentDialog() },
+                    onViewOnRoute = onViewOnRoute,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -95,6 +97,7 @@ fun PhotoDetailScreen(
 private fun PhotoDetailContent(
     photoWithMetadata: PhotoWithMetadata,
     onAttachToVisit: () -> Unit,
+    onViewOnRoute: ((String) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(

@@ -12,9 +12,12 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
 import com.po4yka.trailglass.ui.screens.MapScreen
+import com.po4yka.trailglass.ui.screens.RouteReplayScreen
+import com.po4yka.trailglass.ui.screens.RouteViewScreen
 import com.po4yka.trailglass.ui.screens.SettingsScreen
 import com.po4yka.trailglass.ui.screens.StatsScreen
 import com.po4yka.trailglass.ui.screens.TimelineScreen
+import com.po4yka.trailglass.ui.screens.TripStatisticsScreen
 
 /**
  * Main navigation destinations.
@@ -61,30 +64,40 @@ fun MainScaffold(
         is RootComponent.Child.Timeline -> Screen.Timeline
         is RootComponent.Child.Map -> Screen.Map
         is RootComponent.Child.Settings -> Screen.Settings
+        is RootComponent.Child.RouteView,
+        is RootComponent.Child.RouteReplay,
+        is RootComponent.Child.TripStatistics -> null // No bottom nav for route screens
     }
+
+    // Show bottom nav and top bar only for main screens
+    val showBottomNav = currentScreen != null
 
     Scaffold(
         modifier = modifier,
         topBar = {
-            TopAppBar(
-                title = { Text(currentScreen.title) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+            if (showBottomNav && currentScreen != null) {
+                TopAppBar(
+                    title = { Text(currentScreen.title) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    )
                 )
-            )
+            }
         },
         bottomBar = {
-            NavigationBar {
-                val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Settings)
+            if (showBottomNav && currentScreen != null) {
+                NavigationBar {
+                    val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Settings)
 
-                screens.forEach { screen ->
-                    NavigationBarItem(
-                        icon = { Icon(screen.icon, contentDescription = screen.title) },
-                        label = { Text(screen.title) },
-                        selected = currentScreen == screen,
-                        onClick = { rootComponent.navigateToScreen(Screen.toConfig(screen)) }
-                    )
+                    screens.forEach { screen ->
+                        NavigationBarItem(
+                            icon = { Icon(screen.icon, contentDescription = screen.title) },
+                            label = { Text(screen.title) },
+                            selected = currentScreen == screen,
+                            onClick = { rootComponent.navigateToScreen(Screen.toConfig(screen)) }
+                        )
+                    }
                 }
             }
         }
@@ -123,6 +136,35 @@ fun MainScaffold(
                     is RootComponent.Child.Settings -> {
                         SettingsScreen(
                             trackingController = instance.component.locationTrackingController,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.RouteView -> {
+                        RouteViewScreen(
+                            tripId = instance.component.tripId,
+                            controller = instance.component.routeViewController,
+                            onNavigateToReplay = instance.component.onNavigateToReplay,
+                            onNavigateToStatistics = instance.component.onNavigateToStatistics,
+                            onBack = instance.component.onBack,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.RouteReplay -> {
+                        RouteReplayScreen(
+                            tripId = instance.component.tripId,
+                            controller = instance.component.routeReplayController,
+                            onBack = instance.component.onBack,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.TripStatistics -> {
+                        TripStatisticsScreen(
+                            tripId = instance.component.tripId,
+                            controller = instance.component.tripStatisticsController,
+                            onBack = instance.component.onBack,
                             modifier = Modifier
                         )
                     }
