@@ -3,6 +3,9 @@ package com.po4yka.trailglass.feature.route
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.TripRoute
+import com.po4yka.trailglass.feature.route.export.ExportFormat
+import com.po4yka.trailglass.feature.route.export.ExportResult
+import com.po4yka.trailglass.feature.route.export.ExportRouteUseCase
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +31,7 @@ enum class MapStyle {
 @Inject
 class RouteViewController(
     private val getTripRouteUseCase: GetTripRouteUseCase,
+    private val exportRouteUseCase: ExportRouteUseCase,
     private val coroutineScope: CoroutineScope
 ) {
 
@@ -48,7 +52,11 @@ class RouteViewController(
 
         // UI state
         val showMapStyleSelector: Boolean = false,
-        val showStatistics: Boolean = false
+        val showStatistics: Boolean = false,
+
+        // Export state
+        val isExporting: Boolean = false,
+        val exportResult: ExportResult? = null
     )
 
     private val _state = MutableStateFlow(RouteViewState())
@@ -146,5 +154,40 @@ class RouteViewController(
             Coordinate(bounds.minLatitude, bounds.minLongitude),
             Coordinate(bounds.maxLatitude, bounds.maxLongitude)
         )
+    }
+
+    /**
+     * Export route to specified format.
+     */
+    fun exportRoute(tripName: String, format: ExportFormat) {
+        val route = _state.value.tripRoute ?: return
+
+        coroutineScope.launch {
+            logger.info { "Exporting route to $format" }
+            _state.value = _state.value.copy(isExporting = true)
+
+            exportRouteUseCase.execute(route, tripName, format)
+                .onSuccess { result ->
+                    logger.info { "Export successful: ${result.fileName}" }
+                    _state.value = _state.value.copy(
+                        isExporting = false,
+                        exportResult = result
+                    )
+                }
+                .onFailure { error ->
+                    logger.error(error) { "Export failed" }
+                    _state.value = _state.value.copy(
+                        isExporting = false,
+                        error = "Export failed: ${error.message}"
+                    )
+                }
+        }
+    }
+
+    /**
+     * Clear export result after handling.
+     */
+    fun clearExportResult() {
+        _state.value = _state.value.copy(exportResult = null)
     }
 }
