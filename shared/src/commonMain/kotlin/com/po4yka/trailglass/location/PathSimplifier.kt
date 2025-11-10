@@ -75,6 +75,7 @@ class PathSimplifier(
 
     /**
      * Calculate perpendicular distance from a point to a line segment.
+     * Uses proper spherical geometry for accuracy at all latitudes.
      *
      * @param point The point to measure from
      * @param lineStart Start of the line segment
@@ -86,26 +87,42 @@ class PathSimplifier(
         lineStart: Coordinate,
         lineEnd: Coordinate
     ): Double {
-        // Convert to Cartesian coordinates for easier calculation
-        val x0 = point.latitude
-        val y0 = point.longitude
-        val x1 = lineStart.latitude
-        val y1 = lineStart.longitude
-        val x2 = lineEnd.latitude
-        val y2 = lineEnd.longitude
-
         // Handle case where start and end are the same point
-        if (x1 == x2 && y1 == y2) {
+        if (lineStart.latitude == lineEnd.latitude && lineStart.longitude == lineEnd.longitude) {
             return haversineDistance(point, lineStart)
         }
 
-        // Calculate perpendicular distance using cross product
-        val numerator = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1)
-        val denominator = sqrt((y2 - y1).pow(2) + (x2 - x1).pow(2))
+        // Use cross-track distance formula for spherical geometry
+        // This is accurate at all latitudes unlike the previous degree-based approximation
 
-        // Convert to meters (approximate)
-        val distanceDegrees = numerator / denominator
-        return distanceDegrees * 111320.0 // degrees to meters at equator
+        val R = 6371000.0 // Earth radius in meters
+
+        val lat1 = Math.toRadians(lineStart.latitude)
+        val lon1 = Math.toRadians(lineStart.longitude)
+        val lat2 = Math.toRadians(lineEnd.latitude)
+        val lon2 = Math.toRadians(lineEnd.longitude)
+        val lat3 = Math.toRadians(point.latitude)
+        val lon3 = Math.toRadians(point.longitude)
+
+        // Distance from start to point
+        val dist13 = haversineDistance(lineStart, point) / R
+
+        // Bearing from start to end
+        val bearing12 = atan2(
+            sin(lon2 - lon1) * cos(lat2),
+            cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)
+        )
+
+        // Bearing from start to point
+        val bearing13 = atan2(
+            sin(lon3 - lon1) * cos(lat3),
+            cos(lat1) * sin(lat3) - sin(lat1) * cos(lat3) * cos(lon3 - lon1)
+        )
+
+        // Cross-track distance (perpendicular distance to great circle)
+        val crossTrackDistance = abs(asin(sin(dist13) * sin(bearing13 - bearing12))) * R
+
+        return crossTrackDistance
     }
 
     /**

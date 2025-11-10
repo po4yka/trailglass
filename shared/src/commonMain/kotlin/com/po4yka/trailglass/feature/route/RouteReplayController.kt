@@ -263,6 +263,7 @@ class RouteReplayController(
 
     /**
      * Calculate vehicle state at a given progress (0.0 to 1.0).
+     * Uses linear interpolation for smooth animation between route points.
      */
     private fun calculateVehicleStateAtProgress(route: TripRoute, progress: Float): VehicleState {
         val path = route.fullPath
@@ -275,12 +276,28 @@ class RouteReplayController(
             )
         }
 
-        // Find the position along the path
-        val totalPoints = path.size
-        val targetIndex = (progress * (totalPoints - 1)).toInt().coerceIn(0, totalPoints - 1)
+        if (path.size == 1) {
+            val point = path[0]
+            return VehicleState(
+                position = Coordinate(point.latitude, point.longitude),
+                bearing = 0.0,
+                currentPoint = point,
+                timestamp = point.timestamp
+            )
+        }
 
-        val currentPoint = path[targetIndex]
-        val nextPoint = if (targetIndex < totalPoints - 1) path[targetIndex + 1] else currentPoint
+        // Find the exact position along the path with interpolation
+        val totalPoints = path.size
+        val exactPosition = progress * (totalPoints - 1)
+        val baseIndex = exactPosition.toInt().coerceIn(0, totalPoints - 2)
+        val fraction = exactPosition - baseIndex
+
+        val currentPoint = path[baseIndex]
+        val nextPoint = path[baseIndex + 1]
+
+        // Linear interpolation (lerp) between current and next point for smooth animation
+        val interpolatedLat = lerp(currentPoint.latitude, nextPoint.latitude, fraction.toDouble())
+        val interpolatedLon = lerp(currentPoint.longitude, nextPoint.longitude, fraction.toDouble())
 
         // Calculate bearing between current and next point
         val bearing = calculateBearing(
@@ -288,12 +305,29 @@ class RouteReplayController(
             nextPoint.latitude, nextPoint.longitude
         )
 
+        // Interpolate timestamp
+        val currentMillis = currentPoint.timestamp.toEpochMilliseconds()
+        val nextMillis = nextPoint.timestamp.toEpochMilliseconds()
+        val interpolatedMillis = lerp(currentMillis.toDouble(), nextMillis.toDouble(), fraction.toDouble())
+        val interpolatedTimestamp = Instant.fromEpochMilliseconds(interpolatedMillis.toLong())
+
         return VehicleState(
-            position = Coordinate(currentPoint.latitude, currentPoint.longitude),
+            position = Coordinate(interpolatedLat, interpolatedLon),
             bearing = bearing,
-            currentPoint = currentPoint,
-            timestamp = currentPoint.timestamp
+            currentPoint = currentPoint, // Reference point for metadata (transport type, segment)
+            timestamp = interpolatedTimestamp
         )
+    }
+
+    /**
+     * Linear interpolation between two values.
+     * @param a Start value
+     * @param b End value
+     * @param t Interpolation factor (0.0 to 1.0)
+     * @return Interpolated value
+     */
+    private fun lerp(a: Double, b: Double, t: Double): Double {
+        return a + (b - a) * t
     }
 
     /**
