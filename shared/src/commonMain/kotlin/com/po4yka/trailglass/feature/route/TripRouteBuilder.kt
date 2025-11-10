@@ -9,8 +9,15 @@ import kotlin.math.sqrt
 /**
  * Builds complete TripRoute from location samples, route segments, place visits, and photos.
  * This is the main service for constructing route data for visualization and replay.
+ *
+ * Includes performance optimizations for large routes:
+ * - Adaptive point limiting based on route size
+ * - Pre-simplified path for initial display
  */
-class TripRouteBuilder {
+class TripRouteBuilder(
+    private val maxFullPathPoints: Int = 50000,  // Limit for very large routes
+    private val maxDisplayPoints: Int = 5000     // Optimal for smooth rendering
+) {
 
     private val logger = logger()
 
@@ -33,8 +40,18 @@ class TripRouteBuilder {
     ): TripRoute {
         logger.info { "Building trip route for trip ${trip.id} with ${locationSamples.size} samples" }
 
+        // Performance optimization: Limit points for very large routes
+        val optimizedSamples = if (locationSamples.size > maxFullPathPoints) {
+            logger.warn {
+                "Route has ${locationSamples.size} points, downsampling to $maxFullPathPoints for performance"
+            }
+            downsampleLocations(locationSamples, maxFullPathPoints)
+        } else {
+            locationSamples
+        }
+
         // Sort data chronologically
-        val sortedSamples = locationSamples.sortedBy { it.timestamp }
+        val sortedSamples = optimizedSamples.sortedBy { it.timestamp }
         val sortedSegments = routeSegments.sortedBy { it.startTime }
         val sortedVisits = placeVisits.sortedBy { it.startTime }
         val sortedPhotos = photos.sortedBy { it.timestamp }
@@ -294,5 +311,41 @@ class TripRouteBuilder {
         val c = 2 * kotlin.math.asin(kotlin.math.sqrt(a))
 
         return earthRadiusMeters * c
+    }
+
+    /**
+     * Downsample location samples to a target count using evenly-spaced sampling.
+     * This preserves temporal distribution while reducing point count for performance.
+     *
+     * @param samples Full list of location samples (sorted by time)
+     * @param targetCount Target number of points
+     * @return Downsampled list
+     */
+    private fun downsampleLocations(
+        samples: List<LocationSample>,
+        targetCount: Int
+    ): List<LocationSample> {
+        if (samples.size <= targetCount) return samples
+        if (targetCount < 2) return samples.take(1)
+
+        val result = mutableListOf<LocationSample>()
+
+        // Always include first point
+        result.add(samples.first())
+
+        // Calculate step size
+        val step = (samples.size - 1).toDouble() / (targetCount - 1)
+
+        // Sample evenly across the route
+        for (i in 1 until targetCount - 1) {
+            val index = (i * step).toInt()
+            result.add(samples[index])
+        }
+
+        // Always include last point
+        result.add(samples.last())
+
+        logger.debug { "Downsampled ${samples.size} points to ${result.size}" }
+        return result
     }
 }
