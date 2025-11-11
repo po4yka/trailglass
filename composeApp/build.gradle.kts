@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.secrets)
 }
 
 kotlin {
@@ -19,6 +21,20 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+
+            // Image loading
+            implementation(libs.coil.compose)
+
+            // Maps
+            implementation(libs.maps.compose)
+            implementation(libs.play.services.maps)
+            implementation(libs.play.services.location)
+
+            // Preferences
+            implementation(libs.datastore.preferences)
+
+            // Background work
+            implementation(libs.androidx.work.runtime)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -29,10 +45,22 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
+            implementation(libs.decompose)
+            implementation(libs.decompose.extensions.compose)
+
+            // Serialization (required for Decompose navigation)
+            implementation(libs.kotlinx.serialization.json)
+
             implementation(projects.shared)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.androidx.testExt.junit)
+            implementation(libs.androidx.espresso.core)
+            implementation(libs.androidx.compose.ui.test)
         }
     }
 }
@@ -47,6 +75,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {
@@ -66,5 +95,19 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
+// Secrets plugin configuration
+// API keys should be stored in local.properties:
+// MAPS_API_KEY=your_google_maps_api_key_here
+secrets {
+    // Default properties file for API keys
+    propertiesFileName = "local.properties"
+
+    // Default secrets file (optional)
+    defaultPropertiesFileName = "local.defaults.properties"
+
+    // Ignore missing secrets in builds (useful for CI/CD)
+    ignoreList.add("sdk.*")
+}

@@ -1,0 +1,142 @@
+-- Photos table
+CREATE TABLE IF NOT EXISTS photos (
+    id TEXT PRIMARY KEY NOT NULL,
+    uri TEXT NOT NULL,
+    timestamp INTEGER NOT NULL,
+    latitude REAL,
+    longitude REAL,
+    width INTEGER,
+    height INTEGER,
+    size_bytes INTEGER,
+    mime_type TEXT,
+    user_id TEXT NOT NULL,
+    added_at INTEGER NOT NULL
+);
+
+-- Indices for efficient querying
+CREATE INDEX IF NOT EXISTS photos_user_timestamp_idx ON photos(user_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS photos_location_idx ON photos(latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+CREATE INDEX IF NOT EXISTS photos_timestamp_idx ON photos(timestamp DESC);
+
+-- Photo attachments (linking photos to place visits)
+CREATE TABLE IF NOT EXISTS photo_attachments (
+    id TEXT PRIMARY KEY NOT NULL,
+    photo_id TEXT NOT NULL,
+    place_visit_id TEXT NOT NULL,
+    attached_at INTEGER NOT NULL,
+    caption TEXT,
+    FOREIGN KEY (photo_id) REFERENCES photos(id) ON DELETE CASCADE,
+    FOREIGN KEY (place_visit_id) REFERENCES place_visits(id) ON DELETE CASCADE
+);
+
+-- Index for finding photos by visit
+CREATE INDEX IF NOT EXISTS photo_attachments_visit_idx ON photo_attachments(place_visit_id);
+CREATE INDEX IF NOT EXISTS photo_attachments_photo_idx ON photo_attachments(photo_id);
+
+-- Queries
+
+-- Insert a photo
+insertPhoto:
+INSERT OR REPLACE INTO photos (
+    id, uri, timestamp, latitude, longitude, width, height,
+    size_bytes, mime_type, user_id, added_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+-- Get photo by ID
+getPhotoById:
+SELECT * FROM photos WHERE id = ?;
+
+-- Get photos for user
+getPhotosForUser:
+SELECT * FROM photos WHERE user_id = ? ORDER BY timestamp DESC;
+
+-- Get photos in time range
+getPhotosInTimeRange:
+SELECT * FROM photos
+WHERE user_id = ?
+  AND timestamp >= ?
+  AND timestamp <= ?
+ORDER BY timestamp DESC;
+
+-- Get photos near location (within bounding box)
+getPhotosNearLocation:
+SELECT * FROM photos
+WHERE user_id = ?
+  AND latitude IS NOT NULL
+  AND longitude IS NOT NULL
+  AND latitude BETWEEN ? AND ?
+  AND longitude BETWEEN ? AND ?
+ORDER BY timestamp DESC;
+
+-- Get photos for a specific day
+getPhotosForDay:
+SELECT * FROM photos
+WHERE user_id = ?
+  AND timestamp >= ?
+  AND timestamp < ?
+ORDER BY timestamp ASC;
+
+-- Count photos for user
+countPhotosForUser:
+SELECT COUNT(*) FROM photos WHERE user_id = ?;
+
+-- Delete photo
+deletePhoto:
+DELETE FROM photos WHERE id = ?;
+
+-- Photo Attachments
+
+-- Insert attachment
+insertAttachment:
+INSERT OR REPLACE INTO photo_attachments (
+    id, photo_id, place_visit_id, attached_at, caption
+) VALUES (?, ?, ?, ?, ?);
+
+-- Get attachments for photo
+getAttachmentsForPhoto:
+SELECT * FROM photo_attachments WHERE photo_id = ?;
+
+-- Get attachments for visit
+getAttachmentsForVisit:
+SELECT * FROM photo_attachments WHERE place_visit_id = ?;
+
+-- Get photos for visit (join)
+getPhotosForVisit:
+SELECT p.*
+FROM photos p
+INNER JOIN photo_attachments pa ON p.id = pa.photo_id
+WHERE pa.place_visit_id = ?
+ORDER BY p.timestamp ASC;
+
+-- Check if photo is attached to visit
+isPhotoAttachedToVisit:
+SELECT COUNT(*) > 0 FROM photo_attachments
+WHERE photo_id = ? AND place_visit_id = ?;
+
+-- Delete attachment
+deleteAttachment:
+DELETE FROM photo_attachments WHERE id = ?;
+
+-- Delete attachments for photo
+deleteAttachmentsForPhoto:
+DELETE FROM photo_attachments WHERE photo_id = ?;
+
+-- Delete attachments for visit
+deleteAttachmentsForVisit:
+DELETE FROM photo_attachments WHERE place_visit_id = ?;
+
+-- Count attachments for photo
+countAttachmentsForPhoto:
+SELECT COUNT(*) FROM photo_attachments WHERE photo_id = ?;
+
+-- Count attachments for visit
+countAttachmentsForVisit:
+SELECT COUNT(*) FROM photo_attachments WHERE place_visit_id = ?;
+
+-- Delete all photos
+deleteAll:
+DELETE FROM photos;
+
+-- Delete all photo attachments
+deleteAllAttachments:
+DELETE FROM photo_attachments;
