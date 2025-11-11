@@ -17,8 +17,9 @@ This document tracks all implementation tasks for the TrailGlass travel logging 
 
 ### Shared Module - Domain Layer
 - [ ] Define core domain entities
-  - [ ] `LocationSample` data class
-  - [ ] `PlaceVisit` data class
+  - [x] `LocationSample` data class
+  - [x] `PlaceVisit` data class
+  - [x] `GeocodedLocation` data class
   - [ ] `RouteSegment` data class
   - [ ] `Trip` and `TripDay` data classes
   - [ ] `TimelineItem` sealed class
@@ -52,12 +53,12 @@ This document tracks all implementation tasks for the TrailGlass travel logging 
 - [ ] Implement soft delete mechanism
 
 ### Shared Module - Location Processing
-- [ ] Create `LocationRecorder` interface
+- [x] Create `LocationRecorder` interface
 - [ ] Implement location smoothing algorithm
-- [ ] Build PlaceVisit clustering algorithm
-  - [ ] DBSCAN or similar spatial clustering
-  - [ ] Time-based grouping
-  - [ ] Duration threshold filtering
+- [x] Build PlaceVisit clustering algorithm
+  - [x] DBSCAN or similar spatial clustering
+  - [x] Time-based grouping
+  - [x] Duration threshold filtering
 - [ ] Implement RouteSegment builder
   - [ ] Path simplification (Douglas-Peucker)
   - [ ] Transport type inference
@@ -313,11 +314,14 @@ This document tracks all implementation tasks for the TrailGlass travel logging 
   - [ ] Photo preview/details
 
 ### Reverse Geocoding
-- [ ] Android: Implement Geocoder wrapper
-- [ ] iOS: Implement CLGeocoder wrapper
-- [ ] Shared: Geocoding cache layer
-- [ ] Add city/country extraction
-- [ ] Implement POI name detection
+- [x] Android: Implement Geocoder wrapper
+- [x] iOS: Implement CLGeocoder wrapper
+- [x] Shared: Geocoding cache layer
+- [x] Add city/country extraction
+- [x] Implement POI name detection
+- [ ] Persist geocoding cache to SQLDelight database
+- [ ] Add rate limiting for geocoding API calls
+- [ ] Implement offline geocoding with bundled city database
 
 ### Map Integration
 - [ ] Android: Google Maps / Mapbox setup
@@ -569,4 +573,4 @@ This document tracks all implementation tasks for the TrailGlass travel logging 
 
 ---
 
-**Last updated:** 2025-11-16
+**Last updated:** 2025-11-17

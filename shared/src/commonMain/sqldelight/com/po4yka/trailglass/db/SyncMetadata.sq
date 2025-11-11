@@ -1,0 +1,85 @@
+-- Sync metadata table: tracks sync state for all syncable entities
+CREATE TABLE sync_metadata (
+    entity_id TEXT NOT NULL,
+    entity_type TEXT NOT NULL,
+    local_version INTEGER NOT NULL DEFAULT 1,
+    server_version INTEGER,
+    last_modified INTEGER NOT NULL,
+    last_synced INTEGER,
+    is_pending_sync INTEGER NOT NULL DEFAULT 1,
+    is_pending_delete INTEGER NOT NULL DEFAULT 0,
+    sync_attempts INTEGER NOT NULL DEFAULT 0,
+    last_sync_error TEXT,
+    device_id TEXT NOT NULL,
+    PRIMARY KEY (entity_id, entity_type)
+);
+
+-- Indices for performance
+CREATE INDEX sync_metadata_pending ON sync_metadata(is_pending_sync, entity_type) WHERE is_pending_sync = 1;
+CREATE INDEX sync_metadata_device ON sync_metadata(device_id);
+CREATE INDEX sync_metadata_last_synced ON sync_metadata(last_synced);
+
+-- Queries
+upsertMetadata:
+INSERT OR REPLACE INTO sync_metadata (
+    entity_id, entity_type, local_version, server_version, last_modified,
+    last_synced, is_pending_sync, is_pending_delete, sync_attempts,
+    last_sync_error, device_id
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getMetadata:
+SELECT * FROM sync_metadata
+WHERE entity_id = ? AND entity_type = ?;
+
+getPendingSync:
+SELECT * FROM sync_metadata
+WHERE entity_type = ? AND is_pending_sync = 1
+LIMIT ?;
+
+getPendingDelete:
+SELECT * FROM sync_metadata
+WHERE entity_type = ? AND is_pending_delete = 1;
+
+getAllPendingSync:
+SELECT * FROM sync_metadata
+WHERE is_pending_sync = 1;
+
+getPendingSyncCount:
+SELECT COUNT(*) FROM sync_metadata
+WHERE is_pending_sync = 1;
+
+getLastSyncedMetadata:
+SELECT * FROM sync_metadata
+WHERE last_synced IS NOT NULL
+ORDER BY last_synced DESC
+LIMIT 1;
+
+markAsSynced:
+UPDATE sync_metadata
+SET is_pending_sync = 0,
+    is_pending_delete = 0,
+    server_version = ?,
+    last_synced = ?,
+    sync_attempts = 0,
+    last_sync_error = NULL
+WHERE entity_id = ? AND entity_type = ?;
+
+markSyncFailed:
+UPDATE sync_metadata
+SET sync_attempts = sync_attempts + 1,
+    last_sync_error = ?
+WHERE entity_id = ? AND entity_type = ?;
+
+deleteMetadata:
+DELETE FROM sync_metadata
+WHERE entity_id = ? AND entity_type = ?;
+
+clearOldSyncedMetadata:
+DELETE FROM sync_metadata
+WHERE is_pending_sync = 0
+  AND is_pending_delete = 0
+  AND last_synced < ?;
+
+deleteAll:
+DELETE FROM sync_metadata;
