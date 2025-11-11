@@ -19,6 +19,7 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +38,8 @@ import me.tatarka.inject.annotations.Inject
  * - Resolve conflicts
  * - Update sync metadata
  * - Monitor network connectivity and auto-sync when online
+ *
+ * IMPORTANT: Call [cleanup] when SyncManager is no longer needed to release resources.
  */
 @Inject
 class SyncManager(
@@ -54,7 +57,8 @@ class SyncManager(
     private val userId: String
 ) {
     private val logger = logger()
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val supervisorJob = SupervisorJob()
+    private val scope = CoroutineScope(supervisorJob + Dispatchers.Default)
 
     private val _syncProgress = MutableStateFlow<SyncProgress>(SyncProgress.Idle)
     val syncProgress: StateFlow<SyncProgress> = _syncProgress.asStateFlow()
@@ -658,6 +662,27 @@ class SyncManager(
             logger.error(e) { "Failed to resolve conflict $conflictId" }
             Result.failure(e)
         }
+    }
+
+    /**
+     * Cleanup method to release resources.
+     * MUST be called when SyncManager is no longer needed to prevent memory leaks.
+     *
+     * This method:
+     * - Stops network monitoring
+     * - Cancels all running coroutines
+     * - Releases the supervisor job
+     */
+    fun cleanup() {
+        logger.info { "Cleaning up SyncManager" }
+
+        // Stop network monitoring
+        networkMonitor.stopMonitoring()
+
+        // Cancel all coroutines in this scope
+        supervisorJob.cancel()
+
+        logger.debug { "SyncManager cleanup complete" }
     }
 }
 
