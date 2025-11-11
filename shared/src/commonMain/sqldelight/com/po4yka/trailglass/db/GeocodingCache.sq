@@ -1,0 +1,55 @@
+-- Geocoding cache table: stores reverse geocoding results
+CREATE TABLE geocoding_cache (
+    id TEXT NOT NULL PRIMARY KEY,
+    latitude REAL NOT NULL,
+    longitude REAL NOT NULL,
+    formatted_address TEXT,
+    city TEXT,
+    state TEXT,
+    country_code TEXT,
+    country_name TEXT,
+    postal_code TEXT,
+    poi_name TEXT,
+    street TEXT,
+    street_number TEXT,
+    cached_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+);
+
+-- Indices for spatial and temporal queries
+CREATE INDEX geocoding_cache_coords ON geocoding_cache(latitude, longitude);
+CREATE INDEX geocoding_cache_expiry ON geocoding_cache(expires_at);
+
+-- Queries
+insert:
+INSERT OR REPLACE INTO geocoding_cache (
+    id, latitude, longitude, formatted_address, city, state,
+    country_code, country_name, postal_code, poi_name,
+    street, street_number, cached_at, expires_at
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getByCoordinates:
+SELECT * FROM geocoding_cache
+WHERE latitude = ? AND longitude = ?
+  AND expires_at > ?
+LIMIT 1;
+
+-- Note: For proximity search, we'll implement Haversine distance in Kotlin
+-- This query gets candidates in a bounding box for efficiency
+getNearby:
+SELECT * FROM geocoding_cache
+WHERE latitude BETWEEN ? AND ?
+  AND longitude BETWEEN ? AND ?
+  AND expires_at > ?;
+
+clearExpired:
+DELETE FROM geocoding_cache
+WHERE expires_at <= ?;
+
+clearAll:
+DELETE FROM geocoding_cache;
+
+countCached:
+SELECT COUNT(*) FROM geocoding_cache
+WHERE expires_at > ?;

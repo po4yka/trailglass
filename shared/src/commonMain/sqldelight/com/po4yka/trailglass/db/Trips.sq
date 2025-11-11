@@ -1,0 +1,78 @@
+-- Trips table: logical grouping of visits and routes
+CREATE TABLE trips (
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT,
+    start_time INTEGER NOT NULL,
+    end_time INTEGER,
+    primary_country TEXT,
+    is_ongoing INTEGER NOT NULL DEFAULT 0,
+    user_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    deleted_at INTEGER
+);
+
+-- Indices for performance
+CREATE INDEX trips_user ON trips(user_id);
+CREATE INDEX trips_time ON trips(start_time, end_time);
+CREATE INDEX trips_ongoing ON trips(is_ongoing) WHERE is_ongoing = 1;
+CREATE INDEX trips_deleted ON trips(deleted_at) WHERE deleted_at IS NULL;
+
+-- Queries
+insertTrip:
+INSERT INTO trips (
+    id, name, start_time, end_time, primary_country, is_ongoing,
+    user_id, created_at, updated_at, deleted_at
+)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+
+getTripById:
+SELECT * FROM trips
+WHERE id = ? AND deleted_at IS NULL;
+
+getTripsByUser:
+SELECT * FROM trips
+WHERE user_id = ? AND deleted_at IS NULL
+ORDER BY start_time DESC
+LIMIT ? OFFSET ?;
+
+getOngoingTrips:
+SELECT * FROM trips
+WHERE user_id = ? AND is_ongoing = 1 AND deleted_at IS NULL
+ORDER BY start_time DESC;
+
+getTripsByTimeRange:
+SELECT * FROM trips
+WHERE user_id = ?
+  AND start_time <= ?
+  AND (end_time >= ? OR end_time IS NULL)
+  AND deleted_at IS NULL
+ORDER BY start_time ASC;
+
+updateTrip:
+UPDATE trips
+SET name = ?,
+    end_time = ?,
+    primary_country = ?,
+    is_ongoing = ?,
+    updated_at = ?
+WHERE id = ?;
+
+endTrip:
+UPDATE trips
+SET end_time = ?,
+    is_ongoing = 0,
+    updated_at = ?
+WHERE id = ?;
+
+softDelete:
+UPDATE trips
+SET deleted_at = ?, updated_at = ?
+WHERE id = ?;
+
+deletePermanently:
+DELETE FROM trips
+WHERE id = ?;
+
+deleteAll:
+DELETE FROM trips;
