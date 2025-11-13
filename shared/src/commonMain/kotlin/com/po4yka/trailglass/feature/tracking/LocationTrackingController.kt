@@ -2,12 +2,15 @@ package com.po4yka.trailglass.feature.tracking
 
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.location.tracking.TrackingMode
 import com.po4yka.trailglass.location.tracking.TrackingState
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
@@ -15,6 +18,8 @@ import me.tatarka.inject.annotations.Inject
 /**
  * Controller for location tracking feature.
  * Manages tracking state, user actions, and permission requests.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class LocationTrackingController(
@@ -22,10 +27,15 @@ class LocationTrackingController(
     private val startTrackingUseCase: StartTrackingUseCase,
     private val stopTrackingUseCase: StopTrackingUseCase,
     private val permissionFlow: PermissionFlowController,
-    private val coroutineScope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope
+) : Lifecycle {
 
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * Location tracking UI state.
@@ -43,14 +53,14 @@ class LocationTrackingController(
 
     init {
         // Observe tracking state from tracker
-        coroutineScope.launch {
+        controllerScope.launch {
             locationTracker.trackingState.collect { trackingState ->
                 _uiState.update { it.copy(trackingState = trackingState) }
             }
         }
 
         // Observe permission results
-        coroutineScope.launch {
+        controllerScope.launch {
             permissionFlow.state.collect { permState ->
                 when (permState.lastResult) {
                     is PermissionResult.Granted -> {
@@ -113,7 +123,7 @@ class LocationTrackingController(
     fun startTracking(mode: TrackingMode) {
         logger.info { "User requested to start tracking: $mode" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             // Check if we have permissions
             val hasPermissions = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
 
@@ -144,7 +154,7 @@ class LocationTrackingController(
     fun startBackgroundTracking(mode: TrackingMode) {
         logger.info { "User requested to start background tracking: $mode" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             // Check if we have foreground permissions first
             val hasFinePermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
 
@@ -189,7 +199,7 @@ class LocationTrackingController(
     private fun startTrackingInternal(mode: TrackingMode) {
         _uiState.update { it.copy(isProcessing = true, error = null) }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             when (val result = startTrackingUseCase.execute(mode)) {
                 is StartTrackingUseCase.Result.Success -> {
                     logger.info { "Tracking started successfully" }
@@ -221,7 +231,7 @@ class LocationTrackingController(
 
         _uiState.update { it.copy(isProcessing = true, error = null) }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             stopTrackingUseCase.execute()
             _uiState.update { it.copy(isProcessing = false) }
         }
@@ -231,7 +241,7 @@ class LocationTrackingController(
      * Check if permissions are granted.
      */
     fun checkPermissions() {
-        coroutineScope.launch {
+        controllerScope.launch {
             val hasFinePermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
             _uiState.update { it.copy(hasPermissions = hasFinePermission) }
             logger.debug { "Permissions check: $hasFinePermission" }
@@ -253,5 +263,17 @@ class LocationTrackingController(
     fun clearError() {
         _uiState.update { it.copy(error = null) }
         permissionFlow.clearError()
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up LocationTrackingController" }
+        controllerScope.cancel()
+        logger.debug { "LocationTrackingController cleanup complete" }
     }
 }

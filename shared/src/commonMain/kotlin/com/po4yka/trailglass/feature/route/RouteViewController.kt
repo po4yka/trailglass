@@ -3,11 +3,14 @@ package com.po4yka.trailglass.feature.route
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.TripRoute
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.route.export.ExportFormat
 import com.po4yka.trailglass.feature.route.export.ExportResult
 import com.po4yka.trailglass.feature.route.export.ExportRouteUseCase
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,15 +30,22 @@ enum class MapStyle {
 /**
  * Controller for the Route View screen.
  * Manages route data loading, map state, and replay controls.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class RouteViewController(
     private val getTripRouteUseCase: GetTripRouteUseCase,
     private val exportRouteUseCase: ExportRouteUseCase,
-    private val coroutineScope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope
+) : Lifecycle {
 
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * State for Route View screen.
@@ -66,7 +76,7 @@ class RouteViewController(
      * Load route data for a trip.
      */
     fun loadRoute(tripId: String) {
-        coroutineScope.launch {
+        controllerScope.launch {
             logger.info { "Loading route for trip $tripId" }
             _state.value = _state.value.copy(isLoading = true, error = null)
 
@@ -162,7 +172,7 @@ class RouteViewController(
     fun exportRoute(tripName: String, format: ExportFormat) {
         val route = _state.value.tripRoute ?: return
 
-        coroutineScope.launch {
+        controllerScope.launch {
             logger.info { "Exporting route to $format" }
             _state.value = _state.value.copy(isExporting = true)
 
@@ -189,5 +199,17 @@ class RouteViewController(
      */
     fun clearExportResult() {
         _state.value = _state.value.copy(exportResult = null)
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up RouteViewController" }
+        controllerScope.cancel()
+        logger.debug { "RouteViewController cleanup complete" }
     }
 }

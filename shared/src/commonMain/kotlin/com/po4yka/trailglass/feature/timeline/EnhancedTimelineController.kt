@@ -1,7 +1,10 @@
 package com.po4yka.trailglass.feature.timeline
 
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,14 +18,21 @@ import me.tatarka.inject.annotations.Inject
 
 /**
  * Enhanced controller for timeline feature with zoom levels and filtering.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class EnhancedTimelineController(
     private val getTimelineUseCase: GetTimelineUseCase,
-    private val coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope,
     private val userId: String
-) {
+) : Lifecycle {
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * Enhanced timeline UI state.
@@ -55,7 +65,7 @@ class EnhancedTimelineController(
 
         _state.update { it.copy(isLoading = true, error = null) }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             try {
                 val items = getTimelineUseCase.execute(
                     zoomLevel = currentState.zoomLevel,
@@ -176,5 +186,17 @@ class EnhancedTimelineController(
      */
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up EnhancedTimelineController" }
+        controllerScope.cancel()
+        logger.debug { "EnhancedTimelineController cleanup complete" }
     }
 }

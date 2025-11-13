@@ -1,8 +1,11 @@
 package com.po4yka.trailglass.feature.map
 
 import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,15 +16,22 @@ import me.tatarka.inject.annotations.Inject
 
 /**
  * Enhanced map controller with clustering and heatmap support.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class EnhancedMapController(
     private val getMapDataUseCase: GetMapDataUseCase,
     private val markerClusterer: MarkerClusterer,
     private val heatmapGenerator: HeatmapGenerator,
-    private val scope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope
+) : Lifecycle {
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * Enhanced map UI state.
@@ -56,7 +66,7 @@ class EnhancedMapController(
 
         _state.update { it.copy(isLoading = true, error = null) }
 
-        scope.launch {
+        controllerScope.launch {
             try {
                 // Load base map data
                 val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
@@ -138,7 +148,7 @@ class EnhancedMapController(
 
         // Re-cluster if clustering is enabled
         if (currentState.clusteringEnabled) {
-            scope.launch {
+            controllerScope.launch {
                 val allMarkers = currentState.mapData.markers +
                         currentState.mapData.clusters.flatMap { it.markers }
 
@@ -195,7 +205,7 @@ class EnhancedMapController(
 
         if (newValue) {
             // Generate heatmap
-            scope.launch {
+            controllerScope.launch {
                 val allMarkers = _state.value.mapData.markers +
                         _state.value.mapData.clusters.flatMap { it.markers }
 
@@ -329,5 +339,17 @@ class EnhancedMapController(
      */
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up EnhancedMapController" }
+        controllerScope.cancel()
+        logger.debug { "EnhancedMapController cleanup complete" }
     }
 }
