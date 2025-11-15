@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.repository.*
+import com.po4yka.trailglass.feature.auth.AuthController
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.feature.photo.PhotoController
 import com.po4yka.trailglass.feature.route.RouteReplayController
@@ -17,6 +18,7 @@ import me.tatarka.inject.annotations.Provides
  * Main application dependency injection component.
  *
  * This component provides all application-level dependencies including:
+ * - Authentication components
  * - Repositories (data layer)
  * - Location processors
  * - Feature controllers
@@ -29,7 +31,7 @@ import me.tatarka.inject.annotations.Provides
 @Component
 abstract class AppComponent(
     @Component val platformModule: PlatformModule
-) : DataModule, LocationModule, SyncModule, PermissionModule {
+) : DataModule, LocationModule, SyncModule, PermissionModule, AuthModule {
 
     /**
      * Provides a CoroutineScope for application-level background work.
@@ -68,6 +70,9 @@ abstract class AppComponent(
 
     // Permission components (from PermissionModule)
     abstract val permissionFlowController: com.po4yka.trailglass.feature.permission.PermissionFlowController
+
+    // Authentication (from AuthModule)
+    abstract val authController: AuthController
 
     // Feature controllers
     abstract val statsController: StatsController
