@@ -2,7 +2,7 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -11,7 +11,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /**
- * Common error view component for displaying errors with retry action.
+ * Reusable error view component.
  */
 @Composable
 fun ErrorView(
@@ -20,16 +20,16 @@ fun ErrorView(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(24.dp)
+            modifier = Modifier.padding(32.dp)
         ) {
             Icon(
-                Icons.Default.ErrorOutline,
+                imageVector = Icons.Default.Error,
                 contentDescription = null,
                 modifier = Modifier.size(64.dp),
                 tint = MaterialTheme.colorScheme.error
@@ -48,12 +48,7 @@ fun ErrorView(
                 textAlign = TextAlign.Center
             )
 
-            Button(
-                onClick = onRetry,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
+            Button(onClick = onRetry) {
                 Text("Retry")
             }
         }

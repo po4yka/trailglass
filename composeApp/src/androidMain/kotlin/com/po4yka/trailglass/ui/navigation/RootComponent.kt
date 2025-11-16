@@ -53,6 +53,9 @@ interface RootComponent {
         data object Map : Config
 
         @Serializable
+        data object Photos : Config
+
+        @Serializable
         data object Settings : Config
 
         @Serializable
@@ -63,6 +66,9 @@ interface RootComponent {
 
         @Serializable
         data class TripStatistics(val tripId: String) : Config
+
+        @Serializable
+        data class PhotoDetail(val photoId: String) : Config
     }
 
     /**
@@ -72,10 +78,12 @@ interface RootComponent {
         data class Stats(val component: StatsComponent) : Child()
         data class Timeline(val component: TimelineComponent) : Child()
         data class Map(val component: MapComponent) : Child()
+        data class Photos(val component: PhotosComponent) : Child()
         data class Settings(val component: SettingsComponent) : Child()
         data class RouteView(val component: RouteViewComponent) : Child()
         data class RouteReplay(val component: RouteReplayComponent) : Child()
         data class TripStatistics(val component: TripStatisticsComponent) : Child()
+        data class PhotoDetail(val component: PhotoDetailComponent) : Child()
     }
 }
 
@@ -103,12 +111,14 @@ class DefaultRootComponent(
             is RootComponent.Config.Stats,
             is RootComponent.Config.Timeline,
             is RootComponent.Config.Map,
+            is RootComponent.Config.Photos,
             is RootComponent.Config.Settings -> navigation.replaceAll(config)
 
             // Detail screens - push onto stack
             is RootComponent.Config.RouteView,
             is RootComponent.Config.RouteReplay,
-            is RootComponent.Config.TripStatistics -> navigation.push(config)
+            is RootComponent.Config.TripStatistics,
+            is RootComponent.Config.PhotoDetail -> navigation.push(config)
         }
     }
 
@@ -121,7 +131,7 @@ class DefaultRootComponent(
 
     /**
      * Parse deep link path to navigation configuration.
-     * Supports paths like: /stats, /timeline, /map, /settings
+     * Supports paths like: /stats, /timeline, /map, /photos, /settings
      */
     private fun parseDeepLink(path: String): RootComponent.Config? {
         val cleanPath = path.trim('/').lowercase()
@@ -129,6 +139,7 @@ class DefaultRootComponent(
             "stats" -> RootComponent.Config.Stats
             "timeline" -> RootComponent.Config.Timeline
             "map" -> RootComponent.Config.Map
+            "photos" -> RootComponent.Config.Photos
             "settings" -> RootComponent.Config.Settings
             else -> null
         }
@@ -156,6 +167,13 @@ class DefaultRootComponent(
             component = DefaultMapComponent(
                 componentContext = componentContext,
                 mapController = appComponent.mapController
+            )
+        )
+
+        is RootComponent.Config.Photos -> RootComponent.Child.Photos(
+            component = DefaultPhotosComponent(
+                componentContext = componentContext,
+                photoController = appComponent.photoController
             )
         )
 
@@ -191,6 +209,15 @@ class DefaultRootComponent(
                 componentContext = componentContext,
                 tripId = config.tripId,
                 tripStatisticsController = appComponent.tripStatisticsController,
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.PhotoDetail -> RootComponent.Child.PhotoDetail(
+            component = DefaultPhotoDetailComponent(
+                componentContext = componentContext,
+                photoController = appComponent.photoController,
+                photoId = config.photoId,
                 onBack = { navigation.pop() }
             )
         )

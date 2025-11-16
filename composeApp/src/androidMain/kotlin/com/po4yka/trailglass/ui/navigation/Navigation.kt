@@ -11,13 +11,7 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
-import com.po4yka.trailglass.ui.screens.MapScreen
-import com.po4yka.trailglass.ui.screens.RouteReplayScreen
-import com.po4yka.trailglass.ui.screens.RouteViewScreen
-import com.po4yka.trailglass.ui.screens.SettingsScreen
-import com.po4yka.trailglass.ui.screens.StatsScreen
-import com.po4yka.trailglass.ui.screens.TimelineScreen
-import com.po4yka.trailglass.ui.screens.TripStatisticsScreen
+import com.po4yka.trailglass.ui.screens.*
 
 /**
  * Main navigation destinations.
@@ -26,20 +20,24 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Stats : Screen("stats", "Stats", Icons.Default.BarChart)
     object Timeline : Screen("timeline", "Timeline", Icons.Default.ViewTimeline)
     object Map : Screen("map", "Map", Icons.Default.Map)
+    object Photos : Screen("photos", "Photos", Icons.Default.PhotoLibrary)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 
     companion object {
-        fun fromConfig(config: RootComponent.Config): Screen = when (config) {
+        fun fromConfig(config: RootComponent.Config): Screen? = when (config) {
             is RootComponent.Config.Stats -> Stats
             is RootComponent.Config.Timeline -> Timeline
             is RootComponent.Config.Map -> Map
+            is RootComponent.Config.Photos -> Photos
             is RootComponent.Config.Settings -> Settings
+            else -> null
         }
 
         fun toConfig(screen: Screen): RootComponent.Config = when (screen) {
             is Stats -> RootComponent.Config.Stats
             is Timeline -> RootComponent.Config.Timeline
             is Map -> RootComponent.Config.Map
+            is Photos -> RootComponent.Config.Photos
             is Settings -> RootComponent.Config.Settings
         }
     }
@@ -63,10 +61,12 @@ fun MainScaffold(
         is RootComponent.Child.Stats -> Screen.Stats
         is RootComponent.Child.Timeline -> Screen.Timeline
         is RootComponent.Child.Map -> Screen.Map
+        is RootComponent.Child.Photos -> Screen.Photos
         is RootComponent.Child.Settings -> Screen.Settings
         is RootComponent.Child.RouteView,
         is RootComponent.Child.RouteReplay,
-        is RootComponent.Child.TripStatistics -> null // No bottom nav for route screens
+        is RootComponent.Child.TripStatistics,
+        is RootComponent.Child.PhotoDetail -> null // No bottom nav for detail screens
     }
 
     // Show bottom nav and top bar only for main screens
@@ -88,7 +88,7 @@ fun MainScaffold(
         bottomBar = {
             if (showBottomNav && currentScreen != null) {
                 NavigationBar {
-                    val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Settings)
+                    val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Photos, Screen.Settings)
 
                     screens.forEach { screen ->
                         NavigationBarItem(
@@ -133,9 +133,28 @@ fun MainScaffold(
                         )
                     }
 
+                    is RootComponent.Child.Photos -> {
+                        PhotosScreenWrapper(
+                            photoController = instance.component.photoController,
+                            onPhotoClick = { photoId ->
+                                rootComponent.navigateToScreen(RootComponent.Config.PhotoDetail(photoId))
+                            },
+                            modifier = Modifier
+                        )
+                    }
+
                     is RootComponent.Child.Settings -> {
                         SettingsScreen(
                             trackingController = instance.component.locationTrackingController,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.PhotoDetail -> {
+                        PhotoDetailScreenWrapper(
+                            photoId = instance.component.photoId,
+                            photoController = instance.component.photoController,
+                            onNavigateBack = instance.component.onBack,
                             modifier = Modifier
                         )
                     }
