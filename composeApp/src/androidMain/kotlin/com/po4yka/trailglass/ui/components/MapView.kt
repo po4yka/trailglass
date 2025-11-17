@@ -188,10 +188,28 @@ private fun GoogleMapContent(
                 LatLng(coord.latitude, coord.longitude)
             }
 
+            // Determine route color based on transport type if not specified
+            val routeColor = if (route.color != null) {
+                Color(route.color)
+            } else {
+                getRouteColor(route.transportType)
+            }
+
+            // Draw outline for better visibility
             Polyline(
                 points = points,
-                color = Color(route.color ?: 0xFF2196F3.toInt()),
+                color = Color.White.copy(alpha = 0.7f),
+                width = getRouteWidth(route.transportType) + 4f,
+                geodesic = true,
+                clickable = false
+            )
+
+            // Draw main route line
+            Polyline(
+                points = points,
+                color = routeColor,
                 width = getRouteWidth(route.transportType),
+                geodesic = true,
                 clickable = true,
                 onClick = {
                     // Note: Polyline clicks aren't directly supported in Compose Maps
@@ -255,6 +273,21 @@ private fun getRouteWidth(transportType: TransportType): Float {
         TransportType.PLANE -> 16f
         TransportType.BOAT -> 12f
         TransportType.UNKNOWN -> 8f
+    }
+}
+
+/**
+ * Get route color based on transport type.
+ */
+private fun getRouteColor(transportType: TransportType): Color {
+    return when (transportType) {
+        TransportType.WALK -> Color(0xFF4CAF50)    // Green
+        TransportType.BIKE -> Color(0xFF2196F3)    // Blue
+        TransportType.CAR -> Color(0xFFF44336)     // Red
+        TransportType.TRAIN -> Color(0xFF9C27B0)   // Purple
+        TransportType.PLANE -> Color(0xFFFF9800)   // Orange
+        TransportType.BOAT -> Color(0xFF00BCD4)    // Cyan
+        TransportType.UNKNOWN -> Color(0xFF9E9E9E) // Grey
     }
 }
 
