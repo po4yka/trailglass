@@ -11,14 +11,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.feature.route.MapStyle
 import com.po4yka.trailglass.feature.route.RouteViewController
+import com.po4yka.trailglass.feature.route.export.ExportFormat
+import com.po4yka.trailglass.platform.AndroidRouteShareHandler
 import com.po4yka.trailglass.ui.components.RouteMapView
 import com.po4yka.trailglass.ui.components.RouteSummaryCard
+import kotlinx.coroutines.launch
 
 /**
  * Route View screen - displays trip route on a map with visualization controls.
@@ -34,10 +38,47 @@ fun RouteViewScreen(
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+    var showPrivacyDialog by remember { mutableStateOf(false) }
+    var pendingExport by remember { mutableStateOf<com.po4yka.trailglass.feature.route.export.ExportResult?>(null) }
 
     // Load route data on first composition
     LaunchedEffect(tripId) {
         controller.loadRoute(tripId)
+    }
+
+    // Show privacy dialog when export is ready
+    LaunchedEffect(state.exportResult) {
+        state.exportResult?.let { exportResult ->
+            pendingExport = exportResult
+            showPrivacyDialog = true
+        }
+    }
+
+    // Handle actual sharing after privacy confirmation
+    fun shareExport(exportResult: com.po4yka.trailglass.feature.route.export.ExportResult) {
+        scope.launch {
+            val shareHandler = AndroidRouteShareHandler(context)
+            shareHandler.shareRouteFile(
+                fileName = exportResult.fileName,
+                content = exportResult.content,
+                mimeType = exportResult.mimeType
+            ).onSuccess {
+                controller.clearExportResult()
+                snackbarHostState.showSnackbar(
+                    message = "Export ready to share",
+                    duration = SnackbarDuration.Short
+                )
+            }.onFailure { error ->
+                controller.clearExportResult()
+                snackbarHostState.showSnackbar(
+                    message = "Failed to share: ${error.message}",
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
     }
 
     Scaffold(
@@ -88,23 +129,43 @@ fun RouteViewScreen(
                         HorizontalDivider()
                         DropdownMenuItem(
                             text = { Text("Share Map") },
-                            onClick = { showMenu = false },
+                            onClick = {
+                                showMenu = false
+                                // TODO: Implement map snapshot sharing
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = "Map snapshot sharing coming soon!",
+                                        duration = SnackbarDuration.Short
+                                    )
+                                }
+                            },
                             leadingIcon = { Icon(Icons.Default.Share, null) }
                         )
                         DropdownMenuItem(
                             text = { Text("Export GPX") },
-                            onClick = { showMenu = false },
-                            leadingIcon = { Icon(Icons.Default.Download, null) }
+                            onClick = {
+                                showMenu = false
+                                val tripName = state.tripRoute?.trip?.displayName ?: "route"
+                                controller.exportRoute(tripName, ExportFormat.GPX)
+                            },
+                            leadingIcon = { Icon(Icons.Default.Download, null) },
+                            enabled = !state.isExporting
                         )
                         DropdownMenuItem(
                             text = { Text("Export KML") },
-                            onClick = { showMenu = false },
-                            leadingIcon = { Icon(Icons.Default.Download, null) }
+                            onClick = {
+                                showMenu = false
+                                val tripName = state.tripRoute?.trip?.displayName ?: "route"
+                                controller.exportRoute(tripName, ExportFormat.KML)
+                            },
+                            leadingIcon = { Icon(Icons.Default.Download, null) },
+                            enabled = !state.isExporting
                         )
                     }
                 }
             )
         },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         Box(
@@ -188,6 +249,44 @@ fun RouteViewScreen(
                     },
                     onDismiss = { controller.toggleMapStyleSelector() }
                 )
+            }
+
+            // Privacy warning dialog
+            if (showPrivacyDialog && pendingExport != null) {
+                PrivacyWarningDialog(
+                    exportResult = pendingExport!!,
+                    onConfirm = {
+                        showPrivacyDialog = false
+                        shareExport(pendingExport!!)
+                        pendingExport = null
+                    },
+                    onDismiss = {
+                        showPrivacyDialog = false
+                        controller.clearExportResult()
+                        pendingExport = null
+                    }
+                )
+            }
+
+            // Loading indicator for export
+            if (state.isExporting) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        CircularProgressIndicator()
+                        Text(
+                            text = "Preparing export...",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
             }
         }
     }
@@ -332,4 +431,84 @@ private fun MapStyleOption(
             }
         }
     }
+}
+
+/**
+ * Privacy warning dialog shown before sharing location data.
+ */
+@Composable
+private fun PrivacyWarningDialog(
+    exportResult: com.po4yka.trailglass.feature.route.export.ExportResult,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                Icons.Default.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error
+            )
+        },
+        title = {
+            Text("Privacy Warning")
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = exportResult.privacyInfo.warningMessage,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                HorizontalDivider()
+
+                // Show detailed privacy info
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        text = "File details:",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "• ${exportResult.privacyInfo.numberOfPoints} GPS points",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                    if (exportResult.privacyInfo.numberOfPhotos > 0) {
+                        Text(
+                            text = "• ${exportResult.privacyInfo.numberOfPhotos} photo locations",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Text(
+                        text = "• Timestamps included",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                Text(
+                    text = "Please ensure you trust the recipient before sharing.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Icon(Icons.Default.Share, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Share Anyway")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }

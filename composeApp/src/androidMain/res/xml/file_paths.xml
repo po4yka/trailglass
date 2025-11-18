@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Cache directory for shared routes and temporary files -->
+    <cache-path name="shared_routes" path="shared_routes/" />
+    <cache-path name="shared_images" path="shared_images/" />
+
+    <!-- Files directory for exported routes -->
+    <files-path name="exported_routes" path="exported_routes/" />
+
+    <!-- External cache for photos and large files -->
+    <external-cache-path name="external_cache" path="." />
+</paths>
