@@ -214,7 +214,8 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: $0,
                 shareCrashReports: privacy.shareCrashReports,
                 autoBackup: privacy.autoBackup,
-                encryptBackups: privacy.encryptBackups
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: privacy.enableE2EEncryption
             )) }
         ))
 
@@ -225,7 +226,8 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: privacy.shareAnalytics,
                 shareCrashReports: $0,
                 autoBackup: privacy.autoBackup,
-                encryptBackups: privacy.encryptBackups
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: privacy.enableE2EEncryption
             )) }
         ))
 
@@ -236,7 +238,8 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: privacy.shareAnalytics,
                 shareCrashReports: privacy.shareCrashReports,
                 autoBackup: $0,
-                encryptBackups: privacy.encryptBackups
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: privacy.enableE2EEncryption
             )) }
         ))
 
@@ -247,7 +250,20 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: privacy.shareAnalytics,
                 shareCrashReports: privacy.shareCrashReports,
                 autoBackup: privacy.autoBackup,
-                encryptBackups: $0
+                encryptBackups: $0,
+                enableE2EEncryption: privacy.enableE2EEncryption
+            )) }
+        ))
+
+        Toggle("End-to-End Encryption", isOn: Binding(
+            get: { privacy.enableE2EEncryption },
+            set: { onUpdate(PrivacySettings(
+                dataRetentionDays: privacy.dataRetentionDays,
+                shareAnalytics: privacy.shareAnalytics,
+                shareCrashReports: privacy.shareCrashReports,
+                autoBackup: privacy.autoBackup,
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: $0
             )) }
         ))
 

@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.feature.settings
 
+import com.po4yka.trailglass.data.security.SyncDataEncryption
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
@@ -23,6 +24,7 @@ class SettingsController(
     private val updateSettingsUseCase: UpdateSettingsUseCase,
     private val exportSettingsUseCase: ExportSettingsUseCase,
     private val clearDataUseCase: ClearDataUseCase,
+    private val syncDataEncryption: SyncDataEncryption,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
     private val logger = logger()
@@ -61,6 +63,23 @@ class SettingsController(
     fun updatePrivacySettings(privacy: PrivacySettings) {
         controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
+
+            // If E2E encryption is being enabled, initialize it
+            if (privacy.enableE2EEncryption && !currentSettings.privacySettings.enableE2EEncryption) {
+                logger.info { "Initializing E2E encryption" }
+                syncDataEncryption.initializeEncryption()
+                    .onSuccess {
+                        logger.info { "E2E encryption initialized successfully" }
+                    }
+                    .onFailure { e ->
+                        logger.error(e) { "Failed to initialize E2E encryption" }
+                        _state.value = _state.value.copy(
+                            error = "Failed to initialize encryption: ${e.message}"
+                        )
+                        return@launch
+                    }
+            }
+
             val updated = currentSettings.copy(privacySettings = privacy)
             updateSettingsUseCase.execute(updated)
         }

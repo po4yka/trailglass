@@ -76,6 +76,7 @@ abstract class AppComponent(
     abstract val syncCoordinator: com.po4yka.trailglass.data.sync.SyncCoordinator
     abstract val tokenProvider: com.po4yka.trailglass.data.remote.TokenProvider
     abstract val syncManager: com.po4yka.trailglass.data.sync.SyncManager
+    abstract val syncDataEncryption: com.po4yka.trailglass.data.security.SyncDataEncryption
 
     // Permission components (from PermissionModule)
     abstract val permissionFlowController: com.po4yka.trailglass.feature.permission.PermissionFlowController

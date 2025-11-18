@@ -14,6 +14,9 @@ import com.po4yka.trailglass.data.sync.SyncCoordinator
 import com.po4yka.trailglass.data.sync.SyncStateRepository
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.data.sync.SyncableEntity
+import com.po4yka.trailglass.data.security.EncryptionService
+import com.po4yka.trailglass.data.security.SyncDataEncryption
+import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Provides
 
 /**
@@ -153,5 +156,38 @@ interface SyncModule {
             deviceId = deviceId,
             userId = userId
         )
+    }
+
+    /**
+     * Provides encryption service for E2E encryption.
+     * Platform-specific implementation.
+     */
+    @AppScope
+    @Provides
+    fun provideEncryptionService(impl: EncryptionService): EncryptionService = impl
+
+    /**
+     * Provides JSON serializer for encryption.
+     */
+    @AppScope
+    @Provides
+    fun provideJson(): Json {
+        return Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = true
+        }
+    }
+
+    /**
+     * Provides sync data encryption for E2E encryption.
+     */
+    @AppScope
+    @Provides
+    fun provideSyncDataEncryption(
+        encryptionService: EncryptionService,
+        json: Json
+    ): SyncDataEncryption {
+        return SyncDataEncryption(encryptionService, json)
     }
 }
