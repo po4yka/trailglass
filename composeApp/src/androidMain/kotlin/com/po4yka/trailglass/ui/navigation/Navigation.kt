@@ -187,12 +187,21 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.Places -> {
+                        val placesState = instance.component.placesController.state.collectAsState().value
+
                         PlacesScreen(
-                            places = instance.component.placesController.state.collectAsState().value.places,
+                            places = placesState.places,
+                            searchQuery = placesState.searchQuery,
                             onPlaceClick = { place ->
                                 rootComponent.navigateToScreen(RootComponent.Config.PlaceDetail(place.id))
                             },
                             onRefresh = { instance.component.placesController.refresh() },
+                            onSearch = { query ->
+                                instance.component.placesController.search(query)
+                            },
+                            onClearSearch = {
+                                instance.component.placesController.clearSearch()
+                            },
                             modifier = Modifier
                         )
                     }

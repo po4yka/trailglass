@@ -40,10 +40,12 @@ class PlacesController(
      * Places UI state.
      */
     data class PlacesState(
+        val allPlaces: List<FrequentPlace> = emptyList(),
         val places: List<FrequentPlace> = emptyList(),
         val isLoading: Boolean = false,
         val error: String? = null,
-        val minSignificance: PlaceSignificance = PlaceSignificance.RARE
+        val minSignificance: PlaceSignificance = PlaceSignificance.RARE,
+        val searchQuery: String = ""
     )
 
     private val _state = MutableStateFlow(PlacesState())
@@ -52,6 +54,22 @@ class PlacesController(
     init {
         // Load places on initialization
         loadPlaces()
+    }
+
+    /**
+     * Filter places based on current search query.
+     */
+    private fun filterPlaces(allPlaces: List<FrequentPlace>, query: String): List<FrequentPlace> {
+        if (query.isBlank()) return allPlaces
+
+        val searchTerm = query.trim().lowercase()
+        return allPlaces.filter { place ->
+            place.displayName.lowercase().contains(searchTerm) ||
+            place.name?.lowercase()?.contains(searchTerm) == true ||
+            place.address?.lowercase()?.contains(searchTerm) == true ||
+            place.city?.lowercase()?.contains(searchTerm) == true ||
+            place.userLabel?.lowercase()?.contains(searchTerm) == true
+        }
     }
 
     /**
@@ -64,9 +82,16 @@ class PlacesController(
 
         controllerScope.launch {
             getFrequentPlacesUseCase.execute(userId, _state.value.minSignificance)
-                .onSuccess { places ->
-                    logger.info { "Loaded ${places.size} frequent places" }
-                    _state.update { it.copy(places = places, isLoading = false) }
+                .onSuccess { allPlaces ->
+                    logger.info { "Loaded ${allPlaces.size} frequent places" }
+                    val filteredPlaces = filterPlaces(allPlaces, _state.value.searchQuery)
+                    _state.update {
+                        it.copy(
+                            allPlaces = allPlaces,
+                            places = filteredPlaces,
+                            isLoading = false
+                        )
+                    }
                 }
                 .onFailure { error ->
                     logger.error(error) { "Failed to load frequent places" }
@@ -90,9 +115,16 @@ class PlacesController(
 
         controllerScope.launch {
             getFrequentPlacesUseCase.refresh(userId)
-                .onSuccess { places ->
-                    logger.info { "Refreshed ${places.size} frequent places" }
-                    _state.update { it.copy(places = places, isLoading = false) }
+                .onSuccess { allPlaces ->
+                    logger.info { "Refreshed ${allPlaces.size} frequent places" }
+                    val filteredPlaces = filterPlaces(allPlaces, _state.value.searchQuery)
+                    _state.update {
+                        it.copy(
+                            allPlaces = allPlaces,
+                            places = filteredPlaces,
+                            isLoading = false
+                        )
+                    }
                 }
                 .onFailure { error ->
                     logger.error(error) { "Failed to refresh frequent places" }
@@ -119,10 +151,15 @@ class PlacesController(
 
                     // Update local state immediately for better UX
                     _state.update { state ->
+                        val updatedAllPlaces = state.allPlaces.map { p ->
+                            if (p.id == placeId) updatedPlace else p
+                        }
+                        val updatedFilteredPlaces = state.places.map { p ->
+                            if (p.id == placeId) updatedPlace else p
+                        }
                         state.copy(
-                            places = state.places.map { p ->
-                                if (p.id == placeId) updatedPlace else p
-                            }
+                            allPlaces = updatedAllPlaces,
+                            places = updatedFilteredPlaces
                         )
                     }
 
@@ -154,6 +191,36 @@ class PlacesController(
     fun setMinSignificance(significance: PlaceSignificance) {
         _state.update { it.copy(minSignificance = significance) }
         loadPlaces()
+    }
+
+    /**
+     * Search places by query.
+     * Filters places by name, address, city, or user label.
+     */
+    fun search(query: String) {
+        logger.debug { "Searching places with query: $query" }
+
+        _state.update { state ->
+            val filteredPlaces = filterPlaces(state.allPlaces, query)
+            state.copy(
+                searchQuery = query,
+                places = filteredPlaces
+            )
+        }
+    }
+
+    /**
+     * Clear search query and show all places.
+     */
+    fun clearSearch() {
+        logger.debug { "Clearing search" }
+
+        _state.update { state ->
+            state.copy(
+                searchQuery = "",
+                places = state.allPlaces
+            )
+        }
     }
 
     /**

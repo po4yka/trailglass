@@ -20,8 +20,10 @@ struct SimplePlacesView: View {
                     ErrorView(error: error) {
                         viewModel.refresh()
                     }
-                } else if viewModel.places.isEmpty {
+                } else if viewModel.places.isEmpty && viewModel.searchQuery.isEmpty {
                     EmptyPlacesView()
+                } else if viewModel.places.isEmpty && !viewModel.searchQuery.isEmpty {
+                    NoSearchResultsView(query: viewModel.searchQuery)
                 } else {
                     PlacesList(
                         places: viewModel.places,
@@ -33,6 +35,13 @@ struct SimplePlacesView: View {
             }
             .navigationTitle("Places")
             .navigationBarTitleDisplayMode(.large)
+            .searchable(
+                text: $viewModel.searchQuery,
+                prompt: "Search places..."
+            )
+            .onChange(of: viewModel.searchQuery) { newValue in
+                viewModel.onSearchQueryChanged(newValue)
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { viewModel.refresh() }) {
@@ -171,6 +180,30 @@ struct EmptyPlacesView: View {
     }
 }
 
+/// No search results view
+struct NoSearchResultsView: View {
+    let query: String
+
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "magnifyingglass")
+                .font(.system(size: 64))
+                .foregroundColor(.secondary)
+
+            Text("No Results")
+                .font(.title2)
+                .fontWeight(.semibold)
+
+            Text("No places found matching \"\(query)\"")
+                .font(.body)
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
 /// Error view
 struct ErrorView: View {
     let error: String
@@ -207,11 +240,13 @@ class SimplePlacesViewModel: ObservableObject {
     private let controller: PlacesController
     private var stateObserver: Kotlinx_coroutines_coreJob?
     private var frequentPlaces: [FrequentPlace] = []
+    private var searchDebouncer: Timer?
 
     @Published var places: [FrequentPlaceItem] = []
     @Published var isLoading: Bool = false
     @Published var error: String?
     @Published var selectedPlace: FrequentPlaceItem?
+    @Published var searchQuery: String = ""
 
     init(controller: PlacesController) {
         self.controller = controller
@@ -220,6 +255,7 @@ class SimplePlacesViewModel: ObservableObject {
 
     deinit {
         stateObserver?.cancel(cause: nil)
+        searchDebouncer?.invalidate()
     }
 
     private func observeState() {
@@ -231,6 +267,11 @@ class SimplePlacesViewModel: ObservableObject {
                 self.error = state.error
                 self.frequentPlaces = state.places
                 self.places = state.places.map { FrequentPlaceItem(from: $0) }
+
+                // Update search query from controller if it was cleared externally
+                if state.searchQuery.isEmpty && !self.searchQuery.isEmpty {
+                    self.searchQuery = ""
+                }
             }
         }
     }
@@ -245,6 +286,14 @@ class SimplePlacesViewModel: ObservableObject {
 
     func getFrequentPlace(for item: FrequentPlaceItem) -> FrequentPlace? {
         return frequentPlaces.first { $0.id == item.id }
+    }
+
+    func onSearchQueryChanged(_ newQuery: String) {
+        // Debounce search to avoid too many updates
+        searchDebouncer?.invalidate()
+        searchDebouncer = Timer.scheduledTimer(withTimeInterval: 0.3, repeats: false) { [weak self] _ in
+            self?.controller.search(query: newQuery)
+        }
     }
 }
 
