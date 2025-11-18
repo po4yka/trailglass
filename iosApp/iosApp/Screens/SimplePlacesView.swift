@@ -23,7 +23,12 @@ struct SimplePlacesView: View {
                 } else if viewModel.places.isEmpty {
                     EmptyPlacesView()
                 } else {
-                    PlacesList(places: viewModel.places)
+                    PlacesList(
+                        places: viewModel.places,
+                        onPlaceTap: { place in
+                            viewModel.selectedPlace = place
+                        }
+                    )
                 }
             }
             .navigationTitle("Places")
@@ -35,6 +40,21 @@ struct SimplePlacesView: View {
                     }
                 }
             }
+            .sheet(item: $viewModel.selectedPlace) { selectedPlace in
+                if let frequentPlace = viewModel.getFrequentPlace(for: selectedPlace) {
+                    NavigationView {
+                        PlaceDetailView(
+                            place: frequentPlace,
+                            onToggleFavorite: {
+                                viewModel.toggleFavorite(selectedPlace.id)
+                            },
+                            onDismiss: {
+                                viewModel.selectedPlace = nil
+                            }
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -42,10 +62,14 @@ struct SimplePlacesView: View {
 /// List of frequent places
 struct PlacesList: View {
     let places: [FrequentPlaceItem]
+    let onPlaceTap: (FrequentPlaceItem) -> Void
 
     var body: some View {
         List(places) { place in
             PlaceRow(place: place)
+                .onTapGesture {
+                    onPlaceTap(place)
+                }
         }
         .listStyle(.plain)
     }
@@ -182,10 +206,12 @@ struct ErrorView: View {
 class SimplePlacesViewModel: ObservableObject {
     private let controller: PlacesController
     private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var frequentPlaces: [FrequentPlace] = []
 
     @Published var places: [FrequentPlaceItem] = []
     @Published var isLoading: Bool = false
     @Published var error: String?
+    @Published var selectedPlace: FrequentPlaceItem?
 
     init(controller: PlacesController) {
         self.controller = controller
@@ -203,6 +229,7 @@ class SimplePlacesViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
                 self.error = state.error
+                self.frequentPlaces = state.places
                 self.places = state.places.map { FrequentPlaceItem(from: $0) }
             }
         }
@@ -210,6 +237,14 @@ class SimplePlacesViewModel: ObservableObject {
 
     func refresh() {
         controller.refresh()
+    }
+
+    func toggleFavorite(_ placeId: String) {
+        controller.toggleFavorite(placeId: placeId)
+    }
+
+    func getFrequentPlace(for item: FrequentPlaceItem) -> FrequentPlace? {
+        return frequentPlaces.first { $0.id == item.id }
     }
 }
 

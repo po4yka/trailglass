@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.feature.places
 
+import com.po4yka.trailglass.data.repository.FrequentPlaceRepository
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceSignificance
 import com.po4yka.trailglass.feature.common.Lifecycle
@@ -23,6 +24,7 @@ import me.tatarka.inject.annotations.Inject
 @Inject
 class PlacesController(
     private val getFrequentPlacesUseCase: GetFrequentPlacesUseCase,
+    private val frequentPlaceRepository: FrequentPlaceRepository,
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
@@ -101,6 +103,48 @@ class PlacesController(
                         )
                     }
                 }
+        }
+    }
+
+    /**
+     * Toggle favorite status for a place.
+     */
+    fun toggleFavorite(placeId: String) {
+        controllerScope.launch {
+            try {
+                val place = frequentPlaceRepository.getPlaceById(placeId)
+                if (place != null) {
+                    val updatedPlace = place.copy(isFavorite = !place.isFavorite)
+                    frequentPlaceRepository.updatePlace(updatedPlace)
+
+                    // Update local state immediately for better UX
+                    _state.update { state ->
+                        state.copy(
+                            places = state.places.map { p ->
+                                if (p.id == placeId) updatedPlace else p
+                            }
+                        )
+                    }
+
+                    logger.info { "Toggled favorite for place $placeId to ${updatedPlace.isFavorite}" }
+                } else {
+                    logger.warn { "Place not found: $placeId" }
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to toggle favorite for place $placeId" }
+            }
+        }
+    }
+
+    /**
+     * Get a specific place by ID.
+     */
+    suspend fun getPlaceById(placeId: String): FrequentPlace? {
+        return try {
+            frequentPlaceRepository.getPlaceById(placeId)
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to get place $placeId" }
+            null
         }
     }
 

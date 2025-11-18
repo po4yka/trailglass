@@ -76,7 +76,8 @@ fun MainScaffold(
         is RootComponent.Child.RouteReplay,
         is RootComponent.Child.TripStatistics,
         is RootComponent.Child.PhotoDetail,
-        is RootComponent.Child.PlaceVisitDetail -> null // No bottom nav for detail screens
+        is RootComponent.Child.PlaceVisitDetail,
+        is RootComponent.Child.PlaceDetail -> null // No bottom nav for detail screens
     }
 
     // Show bottom nav and top bar only for main screens
@@ -189,8 +190,7 @@ fun MainScaffold(
                         PlacesScreen(
                             places = instance.component.placesController.state.collectAsState().value.places,
                             onPlaceClick = { place ->
-                                // Navigate to place visit detail if needed
-                                // For now, we can just log or do nothing
+                                rootComponent.navigateToScreen(RootComponent.Config.PlaceDetail(place.id))
                             },
                             onRefresh = { instance.component.placesController.refresh() },
                             modifier = Modifier
@@ -246,6 +246,24 @@ fun MainScaffold(
                         PlaceVisitDetailScreen(
                             placeVisitId = instance.component.placeVisitId,
                             apiClient = rootComponent.appComponent.apiClient,
+                            onNavigateBack = instance.component.onBack,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.PlaceDetail -> {
+                        val place = remember(instance.component.placeId) {
+                            derivedStateOf {
+                                instance.component.placesController.state.value.places
+                                    .find { it.id == instance.component.placeId }
+                            }
+                        }
+
+                        PlaceDetailScreen(
+                            place = place.value,
+                            onToggleFavorite = {
+                                instance.component.placesController.toggleFavorite(instance.component.placeId)
+                            },
                             onNavigateBack = instance.component.onBack,
                             modifier = Modifier
                         )

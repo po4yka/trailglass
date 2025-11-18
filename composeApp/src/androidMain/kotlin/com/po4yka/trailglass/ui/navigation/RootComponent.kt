@@ -83,6 +83,9 @@ interface RootComponent {
 
         @Serializable
         data class PlaceVisitDetail(val placeVisitId: String) : Config
+
+        @Serializable
+        data class PlaceDetail(val placeId: String) : Config
     }
 
     /**
@@ -101,6 +104,7 @@ interface RootComponent {
         data class TripStatistics(val component: TripStatisticsComponent) : Child()
         data class PhotoDetail(val component: PhotoDetailComponent) : Child()
         data class PlaceVisitDetail(val component: PlaceVisitDetailComponent) : Child()
+        data class PlaceDetail(val component: PlaceDetailComponent) : Child()
     }
 }
 
@@ -138,7 +142,8 @@ class DefaultRootComponent(
             is RootComponent.Config.RouteReplay,
             is RootComponent.Config.TripStatistics,
             is RootComponent.Config.PhotoDetail,
-            is RootComponent.Config.PlaceVisitDetail -> navigation.push(config)
+            is RootComponent.Config.PlaceVisitDetail,
+            is RootComponent.Config.PlaceDetail -> navigation.push(config)
         }
     }
 
@@ -262,6 +267,15 @@ class DefaultRootComponent(
             component = DefaultPlaceVisitDetailComponent(
                 componentContext = componentContext,
                 placeVisitId = config.placeVisitId,
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.PlaceDetail -> RootComponent.Child.PlaceDetail(
+            component = DefaultPlaceDetailComponent(
+                componentContext = componentContext,
+                placeId = config.placeId,
+                placesController = appComponent.placesController,
                 onBack = { navigation.pop() }
             )
         )
