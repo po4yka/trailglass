@@ -3,17 +3,19 @@ import shared
 
 /**
  * SwiftUI photo gallery screen showing photos grouped by date.
- * Matches Android PhotoGalleryScreen functionality.
+ * Matches Android PhotoGalleryScreen functionality with navigation to detail view.
  */
 struct PhotoGalleryView: View {
+    let appComponent: AppComponent
     @StateObject private var viewModel: PhotoGalleryViewModel
 
-    init(controller: PhotoGalleryController) {
-        _viewModel = StateObject(wrappedValue: PhotoGalleryViewModel(controller: controller))
+    init(appComponent: AppComponent) {
+        self.appComponent = appComponent
+        _viewModel = StateObject(wrappedValue: PhotoGalleryViewModel(controller: appComponent.photoGalleryController))
     }
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Group {
                 if viewModel.isLoading {
                     ProgressView()
@@ -22,7 +24,7 @@ struct PhotoGalleryView: View {
                 } else if !viewModel.photoGroups.isEmpty {
                     PhotoGalleryContent(
                         photoGroups: viewModel.photoGroups,
-                        onPhotoClick: viewModel.onPhotoClick
+                        appComponent: appComponent
                     )
                 } else {
                     EmptyGalleryView(onImportClick: viewModel.importPhotos)
@@ -49,11 +51,11 @@ struct PhotoGalleryView: View {
 }
 
 /**
- * Gallery content showing photo groups.
+ * Gallery content showing photo groups with navigation.
  */
 private struct PhotoGalleryContent: View {
     let photoGroups: [PhotoGroup]
-    let onPhotoClick: (String) -> Void
+    let appComponent: AppComponent
 
     var body: some View {
         ScrollView {
@@ -61,7 +63,7 @@ private struct PhotoGalleryContent: View {
                 ForEach(photoGroups, id: \.date) { group in
                     PhotoGroupSection(
                         group: group,
-                        onPhotoClick: onPhotoClick
+                        appComponent: appComponent
                     )
                 }
             }
@@ -75,7 +77,7 @@ private struct PhotoGalleryContent: View {
  */
 private struct PhotoGroupSection: View {
     let group: PhotoGroup
-    let onPhotoClick: (String) -> Void
+    let appComponent: AppComponent
 
     private let columns = [
         GridItem(.flexible()),
@@ -109,17 +111,31 @@ private struct PhotoGroupSection: View {
             // Photo grid
             LazyVGrid(columns: columns, spacing: 4) {
                 ForEach(group.photos, id: \.photo.id) { photoWithMeta in
-                    PhotoGridItem(
-                        photo: photoWithMeta,
-                        onClick: { onPhotoClick(photoWithMeta.photo.id) }
-                    )
+                    NavigationLink(destination: PhotoDetailView(photoId: photoWithMeta.photo.id, appComponent: appComponent)) {
+                        PhotoGridItem(photo: photoWithMeta)
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }
     }
 
     private func formatDate(_ date: Kotlinx_datetimeLocalDate) -> String {
-        // Format date appropriately
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+
+        // Convert Kotlinx LocalDate to Swift Date
+        let components = DateComponents(
+            year: Int(date.year),
+            month: Int(date.monthNumber),
+            day: Int(date.dayOfMonth)
+        )
+
+        if let swiftDate = Calendar.current.date(from: components) {
+            return formatter.string(from: swiftDate)
+        }
+
         return date.description()
     }
 }
@@ -129,46 +145,52 @@ private struct PhotoGroupSection: View {
  */
 private struct PhotoGridItem: View {
     let photo: PhotoWithMetadata
-    let onClick: () -> Void
 
     var body: some View {
-        Button(action: onClick) {
-            ZStack(alignment: .topTrailing) {
-                // Photo thumbnail
-                AsyncImage(url: URL(string: photo.photo.uri)) { phase in
-                    switch phase {
-                    case .empty:
-                        ProgressView()
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    case .failure:
-                        Image(systemName: "photo")
-                            .foregroundColor(.red)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-                .frame(height: 120)
-                .clipped()
-                .cornerRadius(8)
-
-                // Attachment indicator
-                if !photo.attachments.isEmpty {
-                    Image(systemName: "mappin.circle.fill")
-                        .font(.caption)
-                        .padding(4)
-                        .background(Color.blue.opacity(0.9))
-                        .foregroundColor(.white)
-                        .cornerRadius(4)
-                        .padding(4)
+        ZStack(alignment: .topTrailing) {
+            // Photo thumbnail
+            AsyncImage(url: URL(string: photo.photo.uri)) { phase in
+                switch phase {
+                case .empty:
+                    Rectangle()
+                        .fill(Color(.systemGray5))
+                        .overlay(ProgressView())
+                case .success(let image):
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                case .failure:
+                    Rectangle()
+                        .fill(Color(.systemGray5))
+                        .overlay(
+                            Image(systemName: "photo")
+                                .foregroundColor(.red)
+                        )
+                @unknown default:
+                    EmptyView()
                 }
             }
+            .frame(height: 120)
+            .clipped()
+            .cornerRadius(8)
+
+            // Attachment indicator
+            if !photo.attachments.isEmpty {
+                HStack(spacing: 2) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.caption2)
+                    Text("\(photo.attachments.count)")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                }
+                .padding(.horizontal, 6)
+                .padding(.vertical, 3)
+                .background(Color.blue.opacity(0.9))
+                .foregroundColor(.white)
+                .cornerRadius(6)
+                .padding(4)
+            }
         }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -233,6 +255,7 @@ private struct ErrorView: View {
  */
 class PhotoGalleryViewModel: ObservableObject {
     private let controller: PhotoGalleryController
+    private var stateObserver: Kotlinx_coroutines_coreJob?
 
     @Published var photoGroups: [PhotoGroup] = []
     @Published var isLoading: Bool = false
@@ -245,8 +268,15 @@ class PhotoGalleryViewModel: ObservableObject {
 
     private func observeState() {
         // Observe Kotlin StateFlow
-        // This requires a Kotlin-Swift bridge helper
-        // For now, this is a placeholder showing the structure
+        stateObserver = controller.state.subscribe { [weak self] state in
+            guard let self = self, let state = state else { return }
+
+            DispatchQueue.main.async {
+                self.photoGroups = state.photoGroups
+                self.isLoading = state.isLoading
+                self.error = state.error
+            }
+        }
     }
 
     func loadGallery() {
@@ -255,13 +285,19 @@ class PhotoGalleryViewModel: ObservableObject {
 
     func importPhotos() {
         controller.importPhotos()
+        // TODO: Show platform-specific photo picker
+        print("Import photos requested")
     }
 
     func refresh() {
         controller.refresh()
     }
 
-    func onPhotoClick(_ photoId: String) {
-        // Navigate to photo detail
+    deinit {
+        stateObserver?.cancel(cause: nil)
     }
+}
+
+#Preview {
+    Text("PhotoGalleryView Preview - Requires DI setup")
 }

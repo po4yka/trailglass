@@ -29,8 +29,8 @@ struct MainTabView: View {
                     Label("Map", systemImage: "map.fill")
                 }
 
-            // Photos tab - using PhotoController for photo gallery
-            PhotoGalleryView(controller: appComponent.photoController)
+            // Photos tab - using PhotoGalleryController for photo gallery with navigation
+            PhotoGalleryView(appComponent: appComponent)
                 .tabItem {
                     Label("Photos", systemImage: "photo.fill")
                 }
