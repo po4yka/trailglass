@@ -17,6 +17,11 @@ import kotlinx.serialization.Serializable
  */
 interface RootComponent {
     /**
+     * Access to the application component for DI.
+     */
+    val appComponent: AppComponent
+
+    /**
      * Child stack representing the navigation stack.
      */
     val childStack: Value<ChildStack<*, Child>>
@@ -100,7 +105,7 @@ interface RootComponent {
  */
 class DefaultRootComponent(
     componentContext: ComponentContext,
-    private val appComponent: AppComponent
+    override val appComponent: AppComponent
 ) : RootComponent, ComponentContext by componentContext {
 
     private val navigation = StackNavigation<RootComponent.Config>()

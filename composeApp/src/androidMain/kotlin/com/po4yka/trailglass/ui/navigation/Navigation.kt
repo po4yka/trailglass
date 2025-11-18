@@ -11,6 +11,7 @@ import com.arkivanov.decompose.extensions.compose.stack.Children
 import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
+import com.po4yka.trailglass.ui.dialogs.CreateTripDialog
 import com.po4yka.trailglass.ui.screens.*
 
 /**
@@ -76,6 +77,9 @@ fun MainScaffold(
 
     // Show bottom nav and top bar only for main screens
     val showBottomNav = currentScreen != null
+
+    // Dialog state for trip creation
+    var showCreateTripDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -158,13 +162,23 @@ fun MainScaffold(
                                 rootComponent.navigateToScreen(RootComponent.Config.RouteView(trip.id))
                             },
                             onCreateTrip = {
-                                // TODO: Show create trip dialog
-                                // Requires: trip creation UI dialog with form inputs
-                                // Controller: TripsController.createTrip() already available
+                                showCreateTripDialog = true
                             },
                             onRefresh = { instance.component.tripsController.refresh() },
                             modifier = Modifier
                         )
+
+                        // Trip creation dialog
+                        if (showCreateTripDialog) {
+                            CreateTripDialog(
+                                userId = rootComponent.appComponent.authRepository.getCurrentUserId() ?: "",
+                                onDismiss = { showCreateTripDialog = false },
+                                onConfirm = { trip ->
+                                    instance.component.tripsController.createTrip(trip)
+                                    showCreateTripDialog = false
+                                }
+                            )
+                        }
                     }
 
                     is RootComponent.Child.Settings -> {
@@ -215,7 +229,7 @@ fun MainScaffold(
                     is RootComponent.Child.PlaceVisitDetail -> {
                         PlaceVisitDetailScreen(
                             placeVisitId = instance.component.placeVisitId,
-                            apiClient = appComponent.apiClient,
+                            apiClient = rootComponent.appComponent.apiClient,
                             onNavigateBack = instance.component.onBack,
                             modifier = Modifier
                         )
