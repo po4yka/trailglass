@@ -29,6 +29,12 @@ struct MainTabView: View {
                     Label("Map", systemImage: "map.fill")
                 }
 
+            // Trips tab - using TripsController for trip management with filtering
+            TripsView(appComponent: appComponent)
+                .tabItem {
+                    Label("Trips", systemImage: "suitcase.fill")
+                }
+
             // Photos tab - using PhotoGalleryController for photo gallery with navigation
             PhotoGalleryView(appComponent: appComponent)
                 .tabItem {

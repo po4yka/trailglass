@@ -15,6 +15,7 @@ import com.po4yka.trailglass.feature.timeline.TimelineController
 import com.po4yka.trailglass.feature.timeline.EnhancedTimelineController
 import com.po4yka.trailglass.feature.settings.SettingsController
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
+import com.po4yka.trailglass.feature.trips.TripsController
 import com.po4yka.trailglass.location.LocationProcessor
 import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
@@ -93,6 +94,7 @@ abstract class AppComponent(
     abstract val routeViewController: RouteViewController
     abstract val routeReplayController: RouteReplayController
     abstract val tripStatisticsController: TripStatisticsController
+    abstract val tripsController: TripsController
 
     companion object
 }

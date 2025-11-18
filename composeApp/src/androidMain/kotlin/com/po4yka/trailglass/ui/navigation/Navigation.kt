@@ -21,6 +21,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Timeline : Screen("timeline", "Timeline", Icons.Default.ViewTimeline)
     object Map : Screen("map", "Map", Icons.Default.Map)
     object Photos : Screen("photos", "Photos", Icons.Default.PhotoLibrary)
+    object Trips : Screen("trips", "Trips", Icons.Default.CardTravel)
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 
     companion object {
@@ -29,6 +30,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
             is RootComponent.Config.Timeline -> Timeline
             is RootComponent.Config.Map -> Map
             is RootComponent.Config.Photos -> Photos
+            is RootComponent.Config.Trips -> Trips
             is RootComponent.Config.Settings -> Settings
             else -> null
         }
@@ -38,6 +40,7 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
             is Timeline -> RootComponent.Config.Timeline
             is Map -> RootComponent.Config.Map
             is Photos -> RootComponent.Config.Photos
+            is Trips -> RootComponent.Config.Trips
             is Settings -> RootComponent.Config.Settings
         }
     }
@@ -62,6 +65,7 @@ fun MainScaffold(
         is RootComponent.Child.Timeline -> Screen.Timeline
         is RootComponent.Child.Map -> Screen.Map
         is RootComponent.Child.Photos -> Screen.Photos
+        is RootComponent.Child.Trips -> Screen.Trips
         is RootComponent.Child.Settings -> Screen.Settings
         is RootComponent.Child.RouteView,
         is RootComponent.Child.RouteReplay,
@@ -88,7 +92,7 @@ fun MainScaffold(
         bottomBar = {
             if (showBottomNav && currentScreen != null) {
                 NavigationBar {
-                    val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Photos, Screen.Settings)
+                    val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Photos, Screen.Trips, Screen.Settings)
 
                     screens.forEach { screen ->
                         NavigationBarItem(
@@ -139,6 +143,18 @@ fun MainScaffold(
                             onPhotoClick = { photoId ->
                                 rootComponent.navigateToScreen(RootComponent.Config.PhotoDetail(photoId))
                             },
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.Trips -> {
+                        TripsScreen(
+                            trips = instance.component.tripsController.state.collectAsState().value.filteredTrips,
+                            onTripClick = { trip ->
+                                rootComponent.navigateToScreen(RootComponent.Config.RouteView(trip.id))
+                            },
+                            onCreateTrip = { /* TODO: Show create trip dialog */ },
+                            onRefresh = { instance.component.tripsController.refresh() },
                             modifier = Modifier
                         )
                     }

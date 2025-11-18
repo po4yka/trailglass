@@ -56,6 +56,9 @@ interface RootComponent {
         data object Photos : Config
 
         @Serializable
+        data object Trips : Config
+
+        @Serializable
         data object Settings : Config
 
         @Serializable
@@ -79,6 +82,7 @@ interface RootComponent {
         data class Timeline(val component: TimelineComponent) : Child()
         data class Map(val component: MapComponent) : Child()
         data class Photos(val component: PhotosComponent) : Child()
+        data class Trips(val component: TripsComponent) : Child()
         data class Settings(val component: SettingsComponent) : Child()
         data class RouteView(val component: RouteViewComponent) : Child()
         data class RouteReplay(val component: RouteReplayComponent) : Child()
@@ -112,6 +116,7 @@ class DefaultRootComponent(
             is RootComponent.Config.Timeline,
             is RootComponent.Config.Map,
             is RootComponent.Config.Photos,
+            is RootComponent.Config.Trips,
             is RootComponent.Config.Settings -> navigation.replaceAll(config)
 
             // Detail screens - push onto stack
@@ -140,6 +145,7 @@ class DefaultRootComponent(
             "timeline" -> RootComponent.Config.Timeline
             "map" -> RootComponent.Config.Map
             "photos" -> RootComponent.Config.Photos
+            "trips" -> RootComponent.Config.Trips
             "settings" -> RootComponent.Config.Settings
             else -> null
         }
@@ -174,6 +180,13 @@ class DefaultRootComponent(
             component = DefaultPhotosComponent(
                 componentContext = componentContext,
                 photoController = appComponent.photoController
+            )
+        )
+
+        is RootComponent.Config.Trips -> RootComponent.Child.Trips(
+            component = DefaultTripsComponent(
+                componentContext = componentContext,
+                tripsController = appComponent.tripsController
             )
         )
 
