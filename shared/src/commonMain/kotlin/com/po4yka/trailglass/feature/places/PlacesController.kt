@@ -2,6 +2,7 @@ package com.po4yka.trailglass.feature.places
 
 import com.po4yka.trailglass.data.repository.FrequentPlaceRepository
 import com.po4yka.trailglass.domain.model.FrequentPlace
+import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceSignificance
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
@@ -14,6 +15,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
+
+/**
+ * Sort options for places list.
+ */
+enum class PlaceSortOption {
+    MOST_VISITED,
+    RECENTLY_VISITED,
+    ALPHABETICAL,
+    BY_SIGNIFICANCE
+}
 
 /**
  * Controller for places feature.
@@ -45,7 +56,9 @@ class PlacesController(
         val isLoading: Boolean = false,
         val error: String? = null,
         val minSignificance: PlaceSignificance = PlaceSignificance.RARE,
-        val searchQuery: String = ""
+        val searchQuery: String = "",
+        val selectedCategories: Set<PlaceCategory> = emptySet(),
+        val sortOption: PlaceSortOption = PlaceSortOption.BY_SIGNIFICANCE
     )
 
     private val _state = MutableStateFlow(PlacesState())
@@ -57,18 +70,42 @@ class PlacesController(
     }
 
     /**
-     * Filter places based on current search query.
+     * Filter and sort places based on current state.
      */
-    private fun filterPlaces(allPlaces: List<FrequentPlace>, query: String): List<FrequentPlace> {
-        if (query.isBlank()) return allPlaces
+    private fun filterAndSortPlaces(
+        allPlaces: List<FrequentPlace>,
+        query: String,
+        categories: Set<PlaceCategory>,
+        sortOption: PlaceSortOption
+    ): List<FrequentPlace> {
+        // Filter by search query
+        var filtered = if (query.isBlank()) {
+            allPlaces
+        } else {
+            val searchTerm = query.trim().lowercase()
+            allPlaces.filter { place ->
+                place.displayName.lowercase().contains(searchTerm) ||
+                place.name?.lowercase()?.contains(searchTerm) == true ||
+                place.address?.lowercase()?.contains(searchTerm) == true ||
+                place.city?.lowercase()?.contains(searchTerm) == true ||
+                place.userLabel?.lowercase()?.contains(searchTerm) == true
+            }
+        }
 
-        val searchTerm = query.trim().lowercase()
-        return allPlaces.filter { place ->
-            place.displayName.lowercase().contains(searchTerm) ||
-            place.name?.lowercase()?.contains(searchTerm) == true ||
-            place.address?.lowercase()?.contains(searchTerm) == true ||
-            place.city?.lowercase()?.contains(searchTerm) == true ||
-            place.userLabel?.lowercase()?.contains(searchTerm) == true
+        // Filter by categories
+        if (categories.isNotEmpty()) {
+            filtered = filtered.filter { it.category in categories }
+        }
+
+        // Sort
+        return when (sortOption) {
+            PlaceSortOption.MOST_VISITED -> filtered.sortedByDescending { it.visitCount }
+            PlaceSortOption.RECENTLY_VISITED -> filtered.sortedByDescending { it.lastVisitTime }
+            PlaceSortOption.ALPHABETICAL -> filtered.sortedBy { it.displayName.lowercase() }
+            PlaceSortOption.BY_SIGNIFICANCE -> filtered.sortedWith(
+                compareByDescending<FrequentPlace> { it.significance.ordinal }
+                    .thenByDescending { it.visitCount }
+            )
         }
     }
 
@@ -84,7 +121,13 @@ class PlacesController(
             getFrequentPlacesUseCase.execute(userId, _state.value.minSignificance)
                 .onSuccess { allPlaces ->
                     logger.info { "Loaded ${allPlaces.size} frequent places" }
-                    val filteredPlaces = filterPlaces(allPlaces, _state.value.searchQuery)
+                    val currentState = _state.value
+                    val filteredPlaces = filterAndSortPlaces(
+                        allPlaces,
+                        currentState.searchQuery,
+                        currentState.selectedCategories,
+                        currentState.sortOption
+                    )
                     _state.update {
                         it.copy(
                             allPlaces = allPlaces,
@@ -117,7 +160,13 @@ class PlacesController(
             getFrequentPlacesUseCase.refresh(userId)
                 .onSuccess { allPlaces ->
                     logger.info { "Refreshed ${allPlaces.size} frequent places" }
-                    val filteredPlaces = filterPlaces(allPlaces, _state.value.searchQuery)
+                    val currentState = _state.value
+                    val filteredPlaces = filterAndSortPlaces(
+                        allPlaces,
+                        currentState.searchQuery,
+                        currentState.selectedCategories,
+                        currentState.sortOption
+                    )
                     _state.update {
                         it.copy(
                             allPlaces = allPlaces,
@@ -201,7 +250,12 @@ class PlacesController(
         logger.debug { "Searching places with query: $query" }
 
         _state.update { state ->
-            val filteredPlaces = filterPlaces(state.allPlaces, query)
+            val filteredPlaces = filterAndSortPlaces(
+                state.allPlaces,
+                query,
+                state.selectedCategories,
+                state.sortOption
+            )
             state.copy(
                 searchQuery = query,
                 places = filteredPlaces
@@ -216,10 +270,123 @@ class PlacesController(
         logger.debug { "Clearing search" }
 
         _state.update { state ->
+            val filteredPlaces = filterAndSortPlaces(
+                state.allPlaces,
+                "",
+                state.selectedCategories,
+                state.sortOption
+            )
             state.copy(
                 searchQuery = "",
-                places = state.allPlaces
+                places = filteredPlaces
             )
+        }
+    }
+
+    /**
+     * Toggle category filter.
+     */
+    fun toggleCategoryFilter(category: PlaceCategory) {
+        logger.debug { "Toggling category filter: $category" }
+
+        _state.update { state ->
+            val newCategories = if (category in state.selectedCategories) {
+                state.selectedCategories - category
+            } else {
+                state.selectedCategories + category
+            }
+
+            val filteredPlaces = filterAndSortPlaces(
+                state.allPlaces,
+                state.searchQuery,
+                newCategories,
+                state.sortOption
+            )
+
+            state.copy(
+                selectedCategories = newCategories,
+                places = filteredPlaces
+            )
+        }
+    }
+
+    /**
+     * Clear all category filters.
+     */
+    fun clearCategoryFilters() {
+        logger.debug { "Clearing category filters" }
+
+        _state.update { state ->
+            val filteredPlaces = filterAndSortPlaces(
+                state.allPlaces,
+                state.searchQuery,
+                emptySet(),
+                state.sortOption
+            )
+
+            state.copy(
+                selectedCategories = emptySet(),
+                places = filteredPlaces
+            )
+        }
+    }
+
+    /**
+     * Set sort option.
+     */
+    fun setSortOption(option: PlaceSortOption) {
+        logger.debug { "Setting sort option: $option" }
+
+        _state.update { state ->
+            val filteredPlaces = filterAndSortPlaces(
+                state.allPlaces,
+                state.searchQuery,
+                state.selectedCategories,
+                option
+            )
+
+            state.copy(
+                sortOption = option,
+                places = filteredPlaces
+            )
+        }
+    }
+
+    /**
+     * Update place category manually.
+     */
+    fun updatePlaceCategory(placeId: String, newCategory: PlaceCategory) {
+        controllerScope.launch {
+            try {
+                val place = frequentPlaceRepository.getPlaceById(placeId)
+                if (place != null) {
+                    val updatedPlace = place.copy(category = newCategory)
+                    frequentPlaceRepository.updatePlace(updatedPlace)
+
+                    // Update local state
+                    _state.update { state ->
+                        val updatedAllPlaces = state.allPlaces.map { p ->
+                            if (p.id == placeId) updatedPlace else p
+                        }
+                        val filteredPlaces = filterAndSortPlaces(
+                            updatedAllPlaces,
+                            state.searchQuery,
+                            state.selectedCategories,
+                            state.sortOption
+                        )
+                        state.copy(
+                            allPlaces = updatedAllPlaces,
+                            places = filteredPlaces
+                        )
+                    }
+
+                    logger.info { "Updated category for place $placeId to $newCategory" }
+                } else {
+                    logger.warn { "Place not found: $placeId" }
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to update category for place $placeId" }
+            }
         }
     }
 
