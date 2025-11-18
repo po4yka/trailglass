@@ -86,6 +86,9 @@ interface RootComponent {
 
         @Serializable
         data class PlaceDetail(val placeId: String) : Config
+
+        @Serializable
+        data object DeviceManagement : Config
     }
 
     /**
@@ -105,6 +108,7 @@ interface RootComponent {
         data class PhotoDetail(val component: PhotoDetailComponent) : Child()
         data class PlaceVisitDetail(val component: PlaceVisitDetailComponent) : Child()
         data class PlaceDetail(val component: PlaceDetailComponent) : Child()
+        data class DeviceManagement(val component: DeviceManagementComponent) : Child()
     }
 }
 
@@ -143,7 +147,8 @@ class DefaultRootComponent(
             is RootComponent.Config.TripStatistics,
             is RootComponent.Config.PhotoDetail,
             is RootComponent.Config.PlaceVisitDetail,
-            is RootComponent.Config.PlaceDetail -> navigation.push(config)
+            is RootComponent.Config.PlaceDetail,
+            is RootComponent.Config.DeviceManagement -> navigation.push(config)
         }
     }
 
@@ -276,6 +281,14 @@ class DefaultRootComponent(
                 componentContext = componentContext,
                 placeId = config.placeId,
                 placesController = appComponent.placesController,
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.DeviceManagement -> RootComponent.Child.DeviceManagement(
+            component = DefaultDeviceManagementComponent(
+                componentContext = componentContext,
+                deviceManagementController = appComponent.deviceManagementController,
                 onBack = { navigation.pop() }
             )
         )

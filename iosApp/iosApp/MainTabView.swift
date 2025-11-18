@@ -48,7 +48,7 @@ struct MainTabView: View {
                 }
 
             // Settings tab - using SettingsController for comprehensive settings
-            EnhancedSettingsView(controller: appComponent.settingsController)
+            EnhancedSettingsView(controller: appComponent.settingsController, appComponent: appComponent)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }

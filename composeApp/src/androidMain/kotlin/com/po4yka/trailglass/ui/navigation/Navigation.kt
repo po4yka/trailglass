@@ -77,7 +77,8 @@ fun MainScaffold(
         is RootComponent.Child.TripStatistics,
         is RootComponent.Child.PhotoDetail,
         is RootComponent.Child.PlaceVisitDetail,
-        is RootComponent.Child.PlaceDetail -> null // No bottom nav for detail screens
+        is RootComponent.Child.PlaceDetail,
+        is RootComponent.Child.DeviceManagement -> null // No bottom nav for detail screens
     }
 
     // Show bottom nav and top bar only for main screens
@@ -209,6 +210,9 @@ fun MainScaffold(
                     is RootComponent.Child.Settings -> {
                         SettingsScreen(
                             trackingController = instance.component.locationTrackingController,
+                            onNavigateToDeviceManagement = {
+                                rootComponent.navigateToScreen(RootComponent.Config.DeviceManagement)
+                            },
                             modifier = Modifier
                         )
                     }
@@ -274,6 +278,14 @@ fun MainScaffold(
                                 instance.component.placesController.toggleFavorite(instance.component.placeId)
                             },
                             onNavigateBack = instance.component.onBack,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.DeviceManagement -> {
+                        DeviceManagementScreen(
+                            controller = instance.component.deviceManagementController,
+                            onBack = instance.component.onBack,
                             modifier = Modifier
                         )
                     }

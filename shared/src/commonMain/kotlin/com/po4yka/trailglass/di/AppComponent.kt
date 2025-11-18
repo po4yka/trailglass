@@ -2,6 +2,7 @@ package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.repository.*
 import com.po4yka.trailglass.feature.auth.AuthController
+import com.po4yka.trailglass.feature.devices.DeviceManagementController
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.feature.photo.PhotoController
 import com.po4yka.trailglass.feature.photo.PhotoGalleryController
@@ -97,6 +98,7 @@ abstract class AppComponent(
     abstract val routeReplayController: RouteReplayController
     abstract val tripStatisticsController: TripStatisticsController
     abstract val tripsController: TripsController
+    abstract val deviceManagementController: DeviceManagementController
 
     companion object
 }
