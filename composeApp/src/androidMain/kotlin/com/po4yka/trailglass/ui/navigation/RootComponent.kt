@@ -179,7 +179,7 @@ class DefaultRootComponent(
         is RootComponent.Config.Photos -> RootComponent.Child.Photos(
             component = DefaultPhotosComponent(
                 componentContext = componentContext,
-                photoController = appComponent.photoController
+                photoGalleryController = appComponent.photoGalleryController
             )
         )
 
@@ -229,7 +229,7 @@ class DefaultRootComponent(
         is RootComponent.Config.PhotoDetail -> RootComponent.Child.PhotoDetail(
             component = DefaultPhotoDetailComponent(
                 componentContext = componentContext,
-                photoController = appComponent.photoController,
+                photoDetailController = appComponent.photoDetailController,
                 photoId = config.photoId,
                 onBack = { navigation.pop() }
             )

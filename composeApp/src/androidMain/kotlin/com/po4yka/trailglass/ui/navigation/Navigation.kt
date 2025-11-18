@@ -139,7 +139,7 @@ fun MainScaffold(
 
                     is RootComponent.Child.Photos -> {
                         PhotosScreenWrapper(
-                            photoController = instance.component.photoController,
+                            photoGalleryController = instance.component.photoGalleryController,
                             onPhotoClick = { photoId ->
                                 rootComponent.navigateToScreen(RootComponent.Config.PhotoDetail(photoId))
                             },
@@ -169,7 +169,7 @@ fun MainScaffold(
                     is RootComponent.Child.PhotoDetail -> {
                         PhotoDetailScreenWrapper(
                             photoId = instance.component.photoId,
-                            photoController = instance.component.photoController,
+                            photoDetailController = instance.component.photoDetailController,
                             onNavigateBack = instance.component.onBack,
                             modifier = Modifier
                         )

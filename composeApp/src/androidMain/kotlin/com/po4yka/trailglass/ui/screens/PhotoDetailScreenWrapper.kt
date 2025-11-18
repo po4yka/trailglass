@@ -2,69 +2,70 @@ package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.po4yka.trailglass.domain.model.PhotoWithMetadata
-import com.po4yka.trailglass.feature.photo.PhotoController
+import com.po4yka.trailglass.feature.photo.PhotoDetailController as SharedPhotoDetailController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 /**
- * Wrapper for PhotoDetailScreen that adapts PhotoController to PhotoDetailController interface.
+ * Wrapper for PhotoDetailScreen that adapts shared PhotoDetailController to Android interface.
+ * Bridges the shared Kotlin PhotoDetailController to the Android-specific PhotoDetailController interface.
  */
 @Composable
 fun PhotoDetailScreenWrapper(
     photoId: String,
-    photoController: PhotoController,
+    photoDetailController: SharedPhotoDetailController,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val controller = object : PhotoDetailController {
-        override val state: StateFlow<PhotoDetailState> = kotlinx.coroutines.flow.MutableStateFlow(
+    // Create adapter that implements Android PhotoDetailController interface
+    val androidController = object : PhotoDetailController {
+        private val adapterScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        private val _state = MutableStateFlow(
             PhotoDetailState(
                 photo = null,
                 isLoading = false,
                 error = null
             )
-        ).apply {
-            // Map PhotoController state to PhotoDetailState
-            kotlinx.coroutines.GlobalScope.launch {
-                photoController.state.collect { photoState ->
-                    val matchingPhoto = photoState.photos.find { it.id == photoId }
-                    value = PhotoDetailState(
-                        photo = matchingPhoto?.let { photo ->
-                            PhotoWithMetadata(
-                                photo = photo,
-                                metadata = null,
-                                attachments = emptyList(),
-                                clusterId = null
-                            )
-                        },
-                        isLoading = photoState.isLoading,
-                        error = photoState.error
+        )
+
+        override val state: StateFlow<PhotoDetailState> = _state.asStateFlow().also {
+            // Collect from shared controller and map to Android state
+            adapterScope.launch {
+                photoDetailController.state.collect { sharedState ->
+                    _state.value = PhotoDetailState(
+                        photo = sharedState.photo,
+                        isLoading = sharedState.isLoading,
+                        error = sharedState.error
                     )
                 }
             }
         }
 
         override fun loadPhoto(photoId: String) {
-            // Photo is already loaded via PhotoController state
-            // In a real implementation, this would fetch a specific photo
+            photoDetailController.loadPhoto(photoId = photoId)
         }
 
         override fun sharePhoto() {
-            // TODO: Implement share functionality
+            photoDetailController.sharePhoto()
         }
 
         override fun deletePhoto() {
-            // TODO: Implement delete functionality
+            photoDetailController.deletePhoto()
         }
 
         override fun showAttachmentDialog() {
-            // TODO: Implement attachment dialog
+            photoDetailController.showAttachmentDialog()
         }
     }
 
     PhotoDetailScreen(
         photoId = photoId,
-        controller = controller,
+        controller = androidController,
         onNavigateBack = onNavigateBack,
         modifier = modifier
     )
