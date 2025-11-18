@@ -16,6 +16,7 @@ import com.po4yka.trailglass.feature.stats.EnhancedStatsController
 import com.po4yka.trailglass.feature.timeline.TimelineController
 import com.po4yka.trailglass.feature.timeline.EnhancedTimelineController
 import com.po4yka.trailglass.feature.settings.SettingsController
+import com.po4yka.trailglass.feature.sync.ConflictResolutionController
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
 import com.po4yka.trailglass.feature.trips.TripsController
 import com.po4yka.trailglass.location.LocationProcessor
@@ -99,6 +100,7 @@ abstract class AppComponent(
     abstract val tripStatisticsController: TripStatisticsController
     abstract val tripsController: TripsController
     abstract val deviceManagementController: DeviceManagementController
+    abstract val conflictResolutionController: ConflictResolutionController
 
     companion object
 }
