@@ -128,15 +128,15 @@ fun MainScaffold(
             ) { child ->
                 when (val instance = child.instance) {
                     is RootComponent.Child.Stats -> {
-                        StatsScreen(
-                            controller = instance.component.statsController,
+                        EnhancedStatsScreen(
+                            controller = instance.component.enhancedStatsController,
                             modifier = Modifier
                         )
                     }
 
                     is RootComponent.Child.Timeline -> {
-                        TimelineScreen(
-                            controller = instance.component.timelineController,
+                        EnhancedTimelineScreen(
+                            controller = instance.component.enhancedTimelineController,
                             modifier = Modifier
                         )
                     }
