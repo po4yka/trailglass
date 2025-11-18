@@ -66,9 +66,6 @@ struct TripDetailView: View {
                             Button(action: { viewModel.exportTrip(format: "kml") }) {
                                 Label("Export as KML", systemImage: "globe")
                             }
-                            Button(action: { viewModel.exportTrip(format: "json") }) {
-                                Label("Export as JSON", systemImage: "doc.text")
-                            }
                         }
 
                         Divider()
@@ -87,10 +84,26 @@ struct TripDetailView: View {
             } message: {
                 Text("This action cannot be undone. All trip data will be permanently deleted.")
             }
+            .sheet(item: $viewModel.exportedFile) { exportedFile in
+                ShareSheet(activityItems: [createExportFile(from: exportedFile)])
+            }
         }
         .onAppear {
             viewModel.loadTrip()
         }
+    }
+
+    private func createExportFile(from exportedFile: ExportedFile) -> URL {
+        let tempDir = FileManager.default.temporaryDirectory
+        let fileURL = tempDir.appendingPathComponent(exportedFile.fileName)
+
+        do {
+            try exportedFile.content.write(to: fileURL, atomically: true, encoding: .utf8)
+        } catch {
+            print("Failed to write export file: \(error)")
+        }
+
+        return fileURL
     }
 }
 
@@ -402,6 +415,14 @@ private struct PlacesVisitedCard: View {
     }
 }
 
+/// Exported file data for sharing
+struct ExportedFile: Identifiable {
+    let id = UUID()
+    let fileName: String
+    let content: String
+    let mimeType: String
+}
+
 /// ViewModel for TripDetailView
 class TripDetailViewModel: ObservableObject {
     private let tripId: String
@@ -416,6 +437,8 @@ class TripDetailViewModel: ObservableObject {
     @Published var isLoading = true
     @Published var errorMessage: String?
     @Published var showDeleteAlert = false
+    @Published var exportedFile: ExportedFile?
+    @Published var isExporting = false
 
     init(tripId: String, statsController: TripStatisticsController, routeController: RouteViewController) {
         self.tripId = tripId
@@ -450,6 +473,18 @@ class TripDetailViewModel: ObservableObject {
 
             DispatchQueue.main.async {
                 self.routeData = state.routeData
+                self.isExporting = state.isExporting
+
+                // Handle export result
+                if let exportResult = state.exportResult {
+                    self.exportedFile = ExportedFile(
+                        fileName: exportResult.fileName,
+                        content: exportResult.content,
+                        mimeType: exportResult.mimeType
+                    )
+                    // Clear the result from controller after handling
+                    self.routeController.clearExportResult()
+                }
             }
         }
     }
@@ -460,8 +495,25 @@ class TripDetailViewModel: ObservableObject {
     }
 
     func exportTrip(format: String) {
-        // TODO: Implement export functionality
-        print("Export trip: \(tripId) as \(format)")
+        guard let tripName = tripStats?.tripName else {
+            errorMessage = "Cannot export: trip name not available"
+            return
+        }
+
+        // Convert format string to ExportFormat enum
+        let exportFormat: ExportFormat
+        switch format.lowercased() {
+        case "gpx":
+            exportFormat = ExportFormat.gpx
+        case "kml":
+            exportFormat = ExportFormat.kml
+        default:
+            errorMessage = "Unsupported export format: \(format)"
+            return
+        }
+
+        // Call export on route controller
+        routeController.exportRoute(tripName: tripName, format: exportFormat)
     }
 
     func deleteTrip() {
@@ -472,6 +524,24 @@ class TripDetailViewModel: ObservableObject {
     deinit {
         statsObserver?.cancel(cause: nil)
         routeObserver?.cancel(cause: nil)
+    }
+}
+
+/// SwiftUI wrapper for UIActivityViewController (share sheet)
+struct ShareSheet: UIViewControllerRepresentable {
+    let activityItems: [Any]
+    let applicationActivities: [UIActivity]? = nil
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        let controller = UIActivityViewController(
+            activityItems: activityItems,
+            applicationActivities: applicationActivities
+        )
+        return controller
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
+        // No updates needed
     }
 }
 
