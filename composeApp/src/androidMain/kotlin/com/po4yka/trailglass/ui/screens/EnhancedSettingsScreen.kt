@@ -419,6 +419,22 @@ private fun PrivacySettingsCard(
                     )
                 }
             )
+
+            HorizontalDivider()
+
+            ListItem(
+                headlineContent = { Text("End-to-End Encryption") },
+                supportingContent = { Text("Encrypt data before sync (requires key backup)") },
+                leadingContent = { Icon(Icons.Default.Security, contentDescription = null) },
+                trailingContent = {
+                    Switch(
+                        checked = privacy.enableE2EEncryption,
+                        onCheckedChange = {
+                            onUpdate(privacy.copy(enableE2EEncryption = it))
+                        }
+                    )
+                }
+            )
         }
     }
 }

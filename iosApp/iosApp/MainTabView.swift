@@ -11,105 +11,47 @@ struct MainTabView: View {
 
     var body: some View {
         TabView {
-            // Stats tab - using basic StatsController
-            StatsTabView(statsController: appComponent.statsController)
+            // Stats tab - using EnhancedStatsController for full featured stats
+            EnhancedStatsView(controller: appComponent.enhancedStatsController)
                 .tabItem {
                     Label("Stats", systemImage: "chart.bar.fill")
                 }
 
-            // Timeline tab - using basic TimelineController
-            TimelineTabView(timelineController: appComponent.timelineController)
+            // Timeline tab - using EnhancedTimelineController for full timeline with filters
+            EnhancedTimelineView(controller: appComponent.enhancedTimelineController)
                 .tabItem {
                     Label("Timeline", systemImage: "clock.fill")
                 }
 
-            // Map tab - using MapController
+            // Map tab - using MapController for map visualization
             MapScreen(mapController: appComponent.mapController)
                 .tabItem {
                     Label("Map", systemImage: "map.fill")
                 }
 
-            // Photos tab - using PhotoController
-            PhotosTabView(photoController: appComponent.photoController)
+            // Trips tab - using TripsController for trip management with filtering
+            TripsView(appComponent: appComponent)
+                .tabItem {
+                    Label("Trips", systemImage: "suitcase.fill")
+                }
+
+            // Places tab - using PlacesController for frequent places
+            SimplePlacesView(placesController: appComponent.placesController)
+                .tabItem {
+                    Label("Places", systemImage: "mappin.circle.fill")
+                }
+
+            // Photos tab - using PhotoGalleryController for photo gallery with navigation
+            PhotoGalleryView(appComponent: appComponent)
                 .tabItem {
                     Label("Photos", systemImage: "photo.fill")
                 }
 
-            // Settings tab - placeholder for now
-            SettingsTabView()
+            // Settings tab - using SettingsController for comprehensive settings
+            EnhancedSettingsView(controller: appComponent.settingsController, appComponent: appComponent)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }
-        }
-    }
-}
-
-/// Simple Stats tab wrapper
-struct StatsTabView: View {
-    let statsController: StatsController
-
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Stats View")
-                    .font(.largeTitle)
-                Text("Controller: StatsController")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            .navigationTitle("Stats")
-        }
-    }
-}
-
-/// Simple Timeline tab wrapper
-struct TimelineTabView: View {
-    let timelineController: TimelineController
-
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Timeline View")
-                    .font(.largeTitle)
-                Text("Controller: TimelineController")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            .navigationTitle("Timeline")
-        }
-    }
-}
-
-/// Simple Photos tab wrapper
-struct PhotosTabView: View {
-    let photoController: PhotoController
-
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Photos View")
-                    .font(.largeTitle)
-                Text("Controller: PhotoController")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            .navigationTitle("Photos")
-        }
-    }
-}
-
-/// Simple Settings tab wrapper
-struct SettingsTabView: View {
-    var body: some View {
-        NavigationView {
-            VStack {
-                Text("Settings View")
-                    .font(.largeTitle)
-                Text("TODO: SettingsController")
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            .navigationTitle("Settings")
         }
     }
 }

@@ -24,6 +24,7 @@ import com.po4yka.trailglass.ui.permissions.rememberLocationPermissionState
 @Composable
 fun SettingsScreen(
     trackingController: LocationTrackingController,
+    onNavigateToDeviceManagement: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by trackingController.uiState.collectAsState()
@@ -101,6 +102,52 @@ fun SettingsScreen(
                     permissionState.requestBackgroundPermission()
                 }
             )
+        }
+
+        // Account section
+        item {
+            Text(
+                text = "Account",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onNavigateToDeviceManagement
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Devices,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Device Management",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = "Manage your connected devices",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
 
         // About section

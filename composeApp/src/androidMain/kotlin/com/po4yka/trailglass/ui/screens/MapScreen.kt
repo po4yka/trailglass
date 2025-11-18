@@ -10,6 +10,7 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.MapMarker
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.ui.components.MapView
+import com.po4yka.trailglass.ui.dialogs.PhotoAttachmentInfoDialog
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -21,9 +22,11 @@ import kotlin.time.Duration.Companion.days
 @Composable
 fun MapScreen(
     controller: MapController,
+    onNavigateToPlaceVisitDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
+    var showPhotoAttachmentInfo by remember { mutableStateOf(false) }
 
     // Load last 30 days of data on first composition
     LaunchedEffect(Unit) {
@@ -32,12 +35,20 @@ fun MapScreen(
         controller.loadMapData(thirtyDaysAgo, now)
     }
 
+    // Photo attachment info dialog
+    if (showPhotoAttachmentInfo) {
+        PhotoAttachmentInfoDialog(
+            onDismiss = { showPhotoAttachmentInfo = false }
+        )
+    }
+
     Column(modifier = modifier.fillMaxSize()) {
         // Map
         MapView(
             controller = controller,
             onMarkerClick = { marker ->
-                // Could navigate to visit detail
+                // Navigate to visit detail
+                onNavigateToPlaceVisitDetail(marker.placeVisitId)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -49,6 +60,8 @@ fun MapScreen(
             MarkerInfoCard(
                 marker = marker,
                 onClose = { controller.deselectMarker() },
+                onViewDetails = { onNavigateToPlaceVisitDetail(marker.placeVisitId) },
+                onAddPhoto = { showPhotoAttachmentInfo = true },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -59,6 +72,8 @@ fun MapScreen(
 private fun MarkerInfoCard(
     marker: MapMarker,
     onClose: () -> Unit,
+    onViewDetails: () -> Unit,
+    onAddPhoto: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -104,7 +119,7 @@ private fun MarkerInfoCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
-                    onClick = { /* Navigate to visit detail */ },
+                    onClick = onViewDetails,
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Info, contentDescription = null)
@@ -113,12 +128,12 @@ private fun MarkerInfoCard(
                 }
 
                 OutlinedButton(
-                    onClick = { /* Add photo */ },
+                    onClick = onAddPhoto,
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Photos")
+                    Text("Add Photo")
                 }
             }
         }

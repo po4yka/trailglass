@@ -20,22 +20,85 @@ import kotlin.time.Duration
 @Composable
 fun PlacesScreen(
     places: List<FrequentPlace>,
+    searchQuery: String = "",
     onPlaceClick: (FrequentPlace) -> Unit = {},
     onRefresh: () -> Unit = {},
+    onSearch: (String) -> Unit = {},
+    onClearSearch: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var showSearch by remember { mutableStateOf(false) }
+
     Column(modifier = modifier.fillMaxSize()) {
-        if (places.isEmpty()) {
+        // Search bar
+        if (showSearch) {
+            SearchBar(
+                query = searchQuery,
+                onQueryChange = onSearch,
+                onClose = {
+                    showSearch = false
+                    onClearSearch()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+        }
+
+        if (places.isEmpty() && searchQuery.isBlank()) {
             EmptyPlacesView(modifier = Modifier.fillMaxSize())
+        } else if (places.isEmpty() && searchQuery.isNotBlank()) {
+            NoSearchResultsView(
+                query = searchQuery,
+                modifier = Modifier.fillMaxSize()
+            )
         } else {
             PlacesContent(
                 places = places,
                 onPlaceClick = onPlaceClick,
                 onRefresh = onRefresh,
+                showSearchButton = !showSearch,
+                onShowSearch = { showSearch = true },
                 modifier = Modifier.fillMaxSize()
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SearchBar(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier,
+        placeholder = { Text("Search places...") },
+        leadingIcon = {
+            Icon(Icons.Default.Search, contentDescription = "Search")
+        },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Clear, contentDescription = "Clear")
+                }
+            } else {
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Default.Close, contentDescription = "Close")
+                }
+            }
+        },
+        singleLine = true,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = MaterialTheme.shapes.large
+    )
 }
 
 @Composable
@@ -43,6 +106,8 @@ private fun PlacesContent(
     places: List<FrequentPlace>,
     onPlaceClick: (FrequentPlace) -> Unit,
     onRefresh: () -> Unit,
+    showSearchButton: Boolean = true,
+    onShowSearch: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -62,8 +127,15 @@ private fun PlacesContent(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
-                IconButton(onClick = onRefresh) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (showSearchButton) {
+                        IconButton(onClick = onShowSearch) {
+                            Icon(Icons.Default.Search, contentDescription = "Search")
+                        }
+                    }
+                    IconButton(onClick = onRefresh) {
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                    }
                 }
             }
         }
@@ -328,6 +400,40 @@ private fun EmptyPlacesView(modifier: Modifier = Modifier) {
             )
             Text(
                 text = "Enable location tracking to discover your frequent places",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+@Composable
+private fun NoSearchResultsView(
+    query: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(32.dp)
+        ) {
+            Icon(
+                Icons.Default.SearchOff,
+                contentDescription = null,
+                modifier = Modifier.size(64.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "No Results",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "No places found matching \"$query\"",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

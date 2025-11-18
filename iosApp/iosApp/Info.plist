@@ -25,5 +25,23 @@
 	<array>
 		<string>com.po4yka.trailglass.sync</string>
 	</array>
+
+	<!-- Camera permission for capturing trip photos -->
+	<key>NSCameraUsageDescription</key>
+	<string>TrailGlass needs camera access to capture photos of places you visit during your travels.</string>
+
+	<!-- Photo library permissions for attaching photos to trips -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TrailGlass needs access to your photo library to attach photos to your trips and places.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>TrailGlass needs permission to save photos you capture during your trips.</string>
+
+	<!-- Notification permission for trip updates and reminders -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>TrailGlass sends notifications for trip updates, sync status, and travel insights.</string>
+
+	<!-- Motion permission for activity recognition (walking, driving, etc.) -->
+	<key>NSMotionUsageDescription</key>
+	<string>TrailGlass uses motion data to detect your activity type (walking, driving, cycling) during trips.</string>
 </dict>
 </plist>
