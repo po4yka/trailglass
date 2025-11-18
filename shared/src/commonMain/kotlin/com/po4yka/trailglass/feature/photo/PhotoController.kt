@@ -4,9 +4,12 @@ import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +21,8 @@ import me.tatarka.inject.annotations.Inject
 /**
  * Controller for photo management.
  * Handles photo loading, selection, capture, and attachment with permission management.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class PhotoController(
@@ -25,11 +30,16 @@ class PhotoController(
     private val suggestPhotosUseCase: SuggestPhotosForVisitUseCase,
     private val attachPhotoUseCase: AttachPhotoToVisitUseCase,
     private val permissionFlow: PermissionFlowController,
-    private val coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope,
     private val userId: String
-) {
+) : Lifecycle {
 
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * Photo action that is pending permission grant.
@@ -59,7 +69,7 @@ class PhotoController(
 
     init {
         // Observe permission results
-        coroutineScope.launch {
+        controllerScope.launch {
             permissionFlow.state.collect { permState ->
                 when (permState.lastResult) {
                     is PermissionResult.Granted -> {
@@ -126,7 +136,7 @@ class PhotoController(
 
         _state.update { it.copy(isLoading = true, selectedDate = date, error = null) }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             try {
                 val photos = getPhotosForDayUseCase.execute(date, userId)
                 _state.update { it.copy(photos = photos, isLoading = false) }
@@ -145,7 +155,7 @@ class PhotoController(
     fun loadSuggestionsForVisit(visit: PlaceVisit) {
         logger.debug { "Loading photo suggestions for visit ${visit.id}" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             val hasPermission = permissionFlow.isPermissionGranted(PermissionType.PHOTO_LIBRARY)
 
             if (!hasPermission) {
@@ -180,7 +190,7 @@ class PhotoController(
     fun takePhoto() {
         logger.info { "User requested to take photo" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             val hasPermission = permissionFlow.isPermissionGranted(PermissionType.CAMERA)
 
             if (hasPermission) {
@@ -205,7 +215,7 @@ class PhotoController(
     fun selectFromLibrary() {
         logger.info { "User requested to select from library" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             val hasPermission = permissionFlow.isPermissionGranted(PermissionType.PHOTO_LIBRARY)
 
             if (hasPermission) {
@@ -278,7 +288,7 @@ class PhotoController(
 
         _state.update { it.copy(isLoading = true, error = null) }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             when (val result = attachPhotoUseCase.execute(photoId, visit.id, caption)) {
                 is AttachPhotoToVisitUseCase.Result.Success -> {
                     logger.info { "Successfully attached photo $photoId" }
@@ -302,7 +312,7 @@ class PhotoController(
      * Check if permissions are granted.
      */
     fun checkPermissions() {
-        coroutineScope.launch {
+        controllerScope.launch {
             val hasCameraPermission = permissionFlow.isPermissionGranted(PermissionType.CAMERA)
             val hasPhotoLibraryPermission = permissionFlow.isPermissionGranted(PermissionType.PHOTO_LIBRARY)
 
@@ -335,5 +345,17 @@ class PhotoController(
     fun clearError() {
         _state.update { it.copy(error = null) }
         permissionFlow.clearError()
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up PhotoController" }
+        controllerScope.cancel()
+        logger.debug { "PhotoController cleanup complete" }
     }
 }

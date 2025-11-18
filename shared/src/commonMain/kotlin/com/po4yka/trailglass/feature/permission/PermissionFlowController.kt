@@ -1,8 +1,11 @@
 package com.po4yka.trailglass.feature.permission
 
 import com.po4yka.trailglass.domain.permission.*
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,15 +21,22 @@ import me.tatarka.inject.annotations.Inject
  * 3. Request permission
  * 4. Handle denial (temporary or permanent)
  * 5. Navigate to settings if needed
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class PermissionFlowController(
     private val permissionManager: PermissionManager,
     private val rationaleProvider: PermissionRationaleProvider,
-    private val coroutineScope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope
+) : Lifecycle {
 
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * UI state for permission flow.
@@ -52,7 +62,7 @@ class PermissionFlowController(
     fun startPermissionFlow(permissionType: PermissionType) {
         logger.info { "Starting permission flow for $permissionType" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             try {
                 val currentState = permissionManager.checkPermission(permissionType)
                 val rationale = rationaleProvider.getRationale(permissionType)
@@ -164,7 +174,7 @@ class PermissionFlowController(
     fun onOpenSettingsClicked() {
         logger.info { "User chose to open settings" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             try {
                 permissionManager.openAppSettings()
                 _state.update {
@@ -261,7 +271,7 @@ class PermissionFlowController(
             )
         }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             try {
                 val result = permissionManager.requestPermission(permissionType)
                 logger.info { "Permission request result: $result" }
@@ -353,5 +363,17 @@ class PermissionFlowController(
             logger.error(e) { "Error getting permission state" }
             PermissionState.NotDetermined
         }
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up PermissionFlowController" }
+        controllerScope.cancel()
+        logger.debug { "PermissionFlowController cleanup complete" }
     }
 }

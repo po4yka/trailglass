@@ -447,52 +447,32 @@ private fun EnhancedMapErrorView(
 }
 
 /**
- * Get marker bitmap descriptor with custom color.
+ * Get marker bitmap descriptor with custom color and styling.
+ *
+ * Uses custom-generated bitmaps with proper marker shape and selection highlighting.
  */
 private fun getMarkerBitmapDescriptor(color: Int, isSelected: Boolean): BitmapDescriptor {
-    // Convert color to HSL for Google Maps
-    val hue = when {
-        isSelected -> BitmapDescriptorFactory.HUE_AZURE // Highlight color
-        else -> {
-            // Extract hue from color
-            val red = (color shr 16 and 0xFF) / 255f
-            val green = (color shr 8 and 0xFF) / 255f
-            val blue = (color and 0xFF) / 255f
-
-            val max = maxOf(red, green, blue)
-            val min = minOf(red, green, blue)
-            val delta = max - min
-
-            when {
-                delta == 0f -> 0f
-                max == red -> 60 * (((green - blue) / delta) % 6)
-                max == green -> 60 * (((blue - red) / delta) + 2)
-                else -> 60 * (((red - green) / delta) + 4)
-            }
-        }
-    }
-
-    return BitmapDescriptorFactory.defaultMarker(hue)
+    return MapMarkerBitmapGenerator.getCachedMarkerBitmap(
+        color = color,
+        isSelected = isSelected
+    )
 }
 
 /**
  * Get cluster bitmap descriptor with count badge.
+ *
+ * Generates custom circular cluster markers with count text overlay.
  */
 private fun getClusterBitmapDescriptor(
     count: Int,
     color: Int,
     isSelected: Boolean
 ): BitmapDescriptor {
-    // For now, use a colored marker
-    // In a full implementation, this would generate a custom bitmap with count text
-    val hue = when {
-        count < 10 -> BitmapDescriptorFactory.HUE_BLUE
-        count < 50 -> BitmapDescriptorFactory.HUE_ORANGE
-        count < 100 -> BitmapDescriptorFactory.HUE_ROSE
-        else -> BitmapDescriptorFactory.HUE_RED
-    }
-
-    return BitmapDescriptorFactory.defaultMarker(hue)
+    return MapMarkerBitmapGenerator.getCachedClusterBitmap(
+        count = count,
+        color = color,
+        isSelected = isSelected
+    )
 }
 
 /**

@@ -2,6 +2,24 @@
 
 TrailGlass UI is built with Jetpack Compose (Android) following Material 3 design guidelines.
 
+## UI Design Skills
+
+TrailGlass uses specialized design skills to ensure distinctive, high-quality UI components. These skills guide AI assistants and developers to create interfaces that avoid generic "AI slop" aesthetics.
+
+**Available Skills:**
+- **[Compose UI Design Skill](SKILLS/compose-ui-design-skill.md)** - Comprehensive UI design guidelines
+- **[Typography Skill](SKILLS/compose-typography-skill.md)** - Distinctive font selection and pairing
+- **[Motion Skill](SKILLS/compose-motion-skill.md)** - Purposeful animations and transitions
+- **[Theme Skill](SKILLS/compose-theme-skill.md)** - Brand colors and Material 3 implementation
+
+**When to Use:**
+- Generating new UI components
+- Refactoring existing components
+- Requesting AI assistance for UI code
+- Establishing design system patterns
+
+See [SKILLS/README.md](SKILLS/README.md) for detailed usage instructions.
+
 ## Architecture
 
 ```

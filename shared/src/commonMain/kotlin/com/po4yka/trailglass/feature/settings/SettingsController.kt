@@ -1,8 +1,11 @@
 package com.po4yka.trailglass.feature.settings
 
 import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,6 +14,8 @@ import me.tatarka.inject.annotations.Inject
 
 /**
  * Controller for managing app settings.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class SettingsController(
@@ -18,9 +23,14 @@ class SettingsController(
     private val updateSettingsUseCase: UpdateSettingsUseCase,
     private val exportSettingsUseCase: ExportSettingsUseCase,
     private val clearDataUseCase: ClearDataUseCase,
-    private val scope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope
+) : Lifecycle {
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     private val _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()
@@ -30,7 +40,7 @@ class SettingsController(
     }
 
     private fun loadSettings() {
-        scope.launch {
+        controllerScope.launch {
             getSettingsUseCase.execute().collect { settings ->
                 _state.value = _state.value.copy(
                     settings = settings,
@@ -41,7 +51,7 @@ class SettingsController(
     }
 
     fun updateTrackingPreferences(preferences: TrackingPreferences) {
-        scope.launch {
+        controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
             val updated = currentSettings.copy(trackingPreferences = preferences)
             updateSettingsUseCase.execute(updated)
@@ -49,7 +59,7 @@ class SettingsController(
     }
 
     fun updatePrivacySettings(privacy: PrivacySettings) {
-        scope.launch {
+        controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
             val updated = currentSettings.copy(privacySettings = privacy)
             updateSettingsUseCase.execute(updated)
@@ -57,7 +67,7 @@ class SettingsController(
     }
 
     fun updateUnitPreferences(units: UnitPreferences) {
-        scope.launch {
+        controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
             val updated = currentSettings.copy(unitPreferences = units)
             updateSettingsUseCase.execute(updated)
@@ -65,7 +75,7 @@ class SettingsController(
     }
 
     fun updateAppearanceSettings(appearance: AppearanceSettings) {
-        scope.launch {
+        controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
             val updated = currentSettings.copy(appearanceSettings = appearance)
             updateSettingsUseCase.execute(updated)
@@ -73,7 +83,7 @@ class SettingsController(
     }
 
     fun updateAccountSettings(account: AccountSettings) {
-        scope.launch {
+        controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
             val updated = currentSettings.copy(accountSettings = account)
             updateSettingsUseCase.execute(updated)
@@ -81,7 +91,7 @@ class SettingsController(
     }
 
     fun resetToDefaults() {
-        scope.launch {
+        controllerScope.launch {
             try {
                 _state.value = _state.value.copy(isLoading = true, error = null)
                 updateSettingsUseCase.resetToDefaults()
@@ -98,7 +108,7 @@ class SettingsController(
 
     fun exportSettings(): String? {
         var result: String? = null
-        scope.launch {
+        controllerScope.launch {
             try {
                 result = exportSettingsUseCase.exportSettings()
             } catch (e: Exception) {
@@ -110,7 +120,7 @@ class SettingsController(
     }
 
     fun importSettings(json: String) {
-        scope.launch {
+        controllerScope.launch {
             try {
                 _state.value = _state.value.copy(isLoading = true, error = null)
                 when (val result = exportSettingsUseCase.importSettings(json)) {
@@ -139,7 +149,7 @@ class SettingsController(
     }
 
     fun clearAllData() {
-        scope.launch {
+        controllerScope.launch {
             try {
                 _state.value = _state.value.copy(isLoading = true, error = null)
                 clearDataUseCase.execute()
@@ -152,6 +162,18 @@ class SettingsController(
                 )
             }
         }
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up SettingsController" }
+        controllerScope.cancel()
+        logger.debug { "SettingsController cleanup complete" }
     }
 }
 
