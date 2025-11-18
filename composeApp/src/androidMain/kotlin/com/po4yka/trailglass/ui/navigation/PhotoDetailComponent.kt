@@ -1,13 +1,13 @@
 package com.po4yka.trailglass.ui.navigation
 
 import com.arkivanov.decompose.ComponentContext
-import com.po4yka.trailglass.feature.photo.PhotoController
+import com.po4yka.trailglass.feature.photo.PhotoDetailController
 
 /**
  * Component for the Photo Detail screen.
  */
 interface PhotoDetailComponent {
-    val photoController: PhotoController
+    val photoDetailController: PhotoDetailController
     val photoId: String
     val onBack: () -> Unit
 }
@@ -17,7 +17,7 @@ interface PhotoDetailComponent {
  */
 class DefaultPhotoDetailComponent(
     componentContext: ComponentContext,
-    override val photoController: PhotoController,
+    override val photoDetailController: PhotoDetailController,
     override val photoId: String,
     override val onBack: () -> Unit
 ) : PhotoDetailComponent, ComponentContext by componentContext

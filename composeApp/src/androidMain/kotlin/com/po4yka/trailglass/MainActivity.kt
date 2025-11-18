@@ -9,8 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.arkivanov.decompose.defaultComponentContext
 import com.po4yka.trailglass.di.AppComponent
-import com.po4yka.trailglass.ui.navigation.DefaultRootComponent
-import com.po4yka.trailglass.ui.navigation.RootComponent
+import com.po4yka.trailglass.ui.navigation.AppRootComponent
+import com.po4yka.trailglass.ui.navigation.DefaultAppRootComponent
 
 class MainActivity : ComponentActivity() {
 
@@ -22,14 +22,14 @@ class MainActivity : ComponentActivity() {
         (application as TrailGlassApplication).appComponent
     }
 
-    private lateinit var rootComponent: RootComponent
+    private lateinit var appRootComponent: AppRootComponent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        // Create the root component with Decompose lifecycle integration
-        rootComponent = DefaultRootComponent(
+        // Create the app root component with authentication support
+        appRootComponent = DefaultAppRootComponent(
             componentContext = defaultComponentContext(),
             appComponent = appComponent
         )
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             App(
-                rootComponent = rootComponent,
+                appRootComponent = appRootComponent,
                 networkConnectivityMonitor = appComponent.networkConnectivityMonitor
             )
         }
@@ -63,7 +63,8 @@ class MainActivity : ComponentActivity() {
         // For https://trailglass.app/timeline -> path = "timeline"
         val path = data.path?.removePrefix("/") ?: data.host ?: return
 
-        rootComponent.handleDeepLink(path)
+        // Deep links only work when user is authenticated and in main app
+        // TODO: Handle deep linking to main screens once authenticated
     }
 }
 

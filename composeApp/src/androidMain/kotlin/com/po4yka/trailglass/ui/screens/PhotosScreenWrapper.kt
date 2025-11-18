@@ -1,76 +1,65 @@
 package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import com.po4yka.trailglass.domain.model.PhotoGroup
-import com.po4yka.trailglass.feature.photo.PhotoController
+import com.po4yka.trailglass.feature.photo.PhotoGalleryController as SharedPhotoGalleryController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 /**
- * Wrapper for PhotoGalleryScreen that adapts PhotoController to PhotoGalleryController interface.
+ * Wrapper for PhotoGalleryScreen that adapts shared PhotoGalleryController to Android interface.
+ * Bridges the shared Kotlin PhotoGalleryController to the Android-specific PhotoGalleryController interface.
  */
 @Composable
 fun PhotosScreenWrapper(
-    photoController: PhotoController,
+    photoGalleryController: SharedPhotoGalleryController,
     onPhotoClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val controller = object : PhotoGalleryController {
-        override val state: StateFlow<PhotoGalleryState> = kotlinx.coroutines.flow.MutableStateFlow(
+    // Create adapter that implements Android PhotoGalleryController interface
+    val androidController = object : PhotoGalleryController {
+        private val adapterScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+        private val _state = MutableStateFlow(
             PhotoGalleryState(
                 photoGroups = emptyList(),
                 isLoading = false,
                 error = null
             )
-        ).apply {
-            // Map PhotoController state to PhotoGalleryState
-            kotlinx.coroutines.GlobalScope.launch {
-                photoController.state.collect { photoState ->
-                    value = PhotoGalleryState(
-                        photoGroups = if (photoState.photos.isNotEmpty()) {
-                            listOf(PhotoGroup(
-                                date = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
-                                photos = photoState.photos.map { photo ->
-                                    com.po4yka.trailglass.domain.model.PhotoWithMetadata(
-                                        photo = photo,
-                                        metadata = null,
-                                        attachments = emptyList(),
-                                        clusterId = null
-                                    )
-                                }
-                            ))
-                        } else {
-                            emptyList()
-                        },
-                        isLoading = photoState.isLoading,
-                        error = photoState.error
+        )
+
+        override val state: StateFlow<PhotoGalleryState> = _state.asStateFlow().also {
+            // Collect from shared controller and map to Android state
+            adapterScope.launch {
+                photoGalleryController.state.collect { sharedState ->
+                    _state.value = PhotoGalleryState(
+                        photoGroups = sharedState.photoGroups,
+                        isLoading = sharedState.isLoading,
+                        error = sharedState.error
                     )
                 }
             }
         }
 
         override fun loadGallery() {
-            // Load photos for the current date
-            val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-            photoController.loadPhotosForDay(today)
+            photoGalleryController.loadGallery()
         }
 
         override fun importPhotos() {
-            photoController.requestSelectFromLibrary()
+            photoGalleryController.importPhotos()
         }
 
         override fun refresh() {
-            loadGallery()
+            photoGalleryController.refresh()
         }
     }
 
     PhotoGalleryScreen(
-        controller = controller,
+        controller = androidController,
         onPhotoClick = onPhotoClick,
         modifier = modifier
     )

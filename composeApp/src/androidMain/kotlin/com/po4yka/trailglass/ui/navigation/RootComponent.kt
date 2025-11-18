@@ -17,6 +17,11 @@ import kotlinx.serialization.Serializable
  */
 interface RootComponent {
     /**
+     * Access to the application component for DI.
+     */
+    val appComponent: AppComponent
+
+    /**
      * Child stack representing the navigation stack.
      */
     val childStack: Value<ChildStack<*, Child>>
@@ -56,6 +61,12 @@ interface RootComponent {
         data object Photos : Config
 
         @Serializable
+        data object Trips : Config
+
+        @Serializable
+        data object Places : Config
+
+        @Serializable
         data object Settings : Config
 
         @Serializable
@@ -69,6 +80,9 @@ interface RootComponent {
 
         @Serializable
         data class PhotoDetail(val photoId: String) : Config
+
+        @Serializable
+        data class PlaceVisitDetail(val placeVisitId: String) : Config
     }
 
     /**
@@ -79,11 +93,14 @@ interface RootComponent {
         data class Timeline(val component: TimelineComponent) : Child()
         data class Map(val component: MapComponent) : Child()
         data class Photos(val component: PhotosComponent) : Child()
+        data class Trips(val component: TripsComponent) : Child()
+        data class Places(val component: PlacesComponent) : Child()
         data class Settings(val component: SettingsComponent) : Child()
         data class RouteView(val component: RouteViewComponent) : Child()
         data class RouteReplay(val component: RouteReplayComponent) : Child()
         data class TripStatistics(val component: TripStatisticsComponent) : Child()
         data class PhotoDetail(val component: PhotoDetailComponent) : Child()
+        data class PlaceVisitDetail(val component: PlaceVisitDetailComponent) : Child()
     }
 }
 
@@ -92,7 +109,7 @@ interface RootComponent {
  */
 class DefaultRootComponent(
     componentContext: ComponentContext,
-    private val appComponent: AppComponent
+    override val appComponent: AppComponent
 ) : RootComponent, ComponentContext by componentContext {
 
     private val navigation = StackNavigation<RootComponent.Config>()
@@ -112,13 +129,16 @@ class DefaultRootComponent(
             is RootComponent.Config.Timeline,
             is RootComponent.Config.Map,
             is RootComponent.Config.Photos,
+            is RootComponent.Config.Trips,
+            is RootComponent.Config.Places,
             is RootComponent.Config.Settings -> navigation.replaceAll(config)
 
             // Detail screens - push onto stack
             is RootComponent.Config.RouteView,
             is RootComponent.Config.RouteReplay,
             is RootComponent.Config.TripStatistics,
-            is RootComponent.Config.PhotoDetail -> navigation.push(config)
+            is RootComponent.Config.PhotoDetail,
+            is RootComponent.Config.PlaceVisitDetail -> navigation.push(config)
         }
     }
 
@@ -140,6 +160,8 @@ class DefaultRootComponent(
             "timeline" -> RootComponent.Config.Timeline
             "map" -> RootComponent.Config.Map
             "photos" -> RootComponent.Config.Photos
+            "trips" -> RootComponent.Config.Trips
+            "places" -> RootComponent.Config.Places
             "settings" -> RootComponent.Config.Settings
             else -> null
         }
@@ -173,7 +195,21 @@ class DefaultRootComponent(
         is RootComponent.Config.Photos -> RootComponent.Child.Photos(
             component = DefaultPhotosComponent(
                 componentContext = componentContext,
-                photoController = appComponent.photoController
+                photoGalleryController = appComponent.photoGalleryController
+            )
+        )
+
+        is RootComponent.Config.Trips -> RootComponent.Child.Trips(
+            component = DefaultTripsComponent(
+                componentContext = componentContext,
+                tripsController = appComponent.tripsController
+            )
+        )
+
+        is RootComponent.Config.Places -> RootComponent.Child.Places(
+            component = DefaultPlacesComponent(
+                componentContext = componentContext,
+                placesController = appComponent.placesController
             )
         )
 
@@ -216,8 +252,16 @@ class DefaultRootComponent(
         is RootComponent.Config.PhotoDetail -> RootComponent.Child.PhotoDetail(
             component = DefaultPhotoDetailComponent(
                 componentContext = componentContext,
-                photoController = appComponent.photoController,
+                photoDetailController = appComponent.photoDetailController,
                 photoId = config.photoId,
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.PlaceVisitDetail -> RootComponent.Child.PlaceVisitDetail(
+            component = DefaultPlaceVisitDetailComponent(
+                componentContext = componentContext,
+                placeVisitId = config.placeVisitId,
                 onBack = { navigation.pop() }
             )
         )
