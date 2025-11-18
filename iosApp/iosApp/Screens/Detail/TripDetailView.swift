@@ -58,6 +58,12 @@ struct TripDetailView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
+                        Button(action: { viewModel.showRouteReplay = true }) {
+                            Label("Route Replay", systemImage: "play.circle.fill")
+                        }
+
+                        Divider()
+
                         Button(action: { viewModel.shareTrip() }) {
                             Label("Share", systemImage: "square.and.arrow.up")
                         }
@@ -89,6 +95,12 @@ struct TripDetailView: View {
             }
             .sheet(item: $viewModel.exportedFile) { exportedFile in
                 ShareSheet(activityItems: [createExportFile(from: exportedFile)])
+            }
+            .fullScreenCover(isPresented: $viewModel.showRouteReplay) {
+                RouteReplayView(
+                    tripId: tripId,
+                    controller: appComponent.routeReplayController
+                )
             }
         }
         .onAppear {
@@ -446,6 +458,7 @@ class TripDetailViewModel: ObservableObject {
     @Published var isLoading = true
     @Published var errorMessage: String?
     @Published var showDeleteAlert = false
+    @Published var showRouteReplay = false
     @Published var exportedFile: ExportedFile?
     @Published var isExporting = false
     @Published var tripDeleted = false
