@@ -21,6 +21,7 @@ import kotlin.time.Duration.Companion.days
 @Composable
 fun MapScreen(
     controller: MapController,
+    onNavigateToPlaceVisitDetail: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
@@ -37,7 +38,8 @@ fun MapScreen(
         MapView(
             controller = controller,
             onMarkerClick = { marker ->
-                // Could navigate to visit detail
+                // Navigate to visit detail
+                onNavigateToPlaceVisitDetail(marker.placeVisitId)
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -49,6 +51,7 @@ fun MapScreen(
             MarkerInfoCard(
                 marker = marker,
                 onClose = { controller.deselectMarker() },
+                onViewDetails = { onNavigateToPlaceVisitDetail(marker.placeVisitId) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -59,6 +62,7 @@ fun MapScreen(
 private fun MarkerInfoCard(
     marker: MapMarker,
     onClose: () -> Unit,
+    onViewDetails: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -104,7 +108,7 @@ private fun MarkerInfoCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 OutlinedButton(
-                    onClick = { /* Navigate to visit detail */ },
+                    onClick = onViewDetails,
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.Info, contentDescription = null)
@@ -113,7 +117,10 @@ private fun MarkerInfoCard(
                 }
 
                 OutlinedButton(
-                    onClick = { /* Add photo */ },
+                    onClick = {
+                        // TODO: Add photo attachment functionality
+                        // Requires photo picker and attachment to visit
+                    },
                     modifier = Modifier.weight(1f)
                 ) {
                     Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)

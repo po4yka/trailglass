@@ -70,7 +70,8 @@ fun MainScaffold(
         is RootComponent.Child.RouteView,
         is RootComponent.Child.RouteReplay,
         is RootComponent.Child.TripStatistics,
-        is RootComponent.Child.PhotoDetail -> null // No bottom nav for detail screens
+        is RootComponent.Child.PhotoDetail,
+        is RootComponent.Child.PlaceVisitDetail -> null // No bottom nav for detail screens
     }
 
     // Show bottom nav and top bar only for main screens
@@ -133,6 +134,9 @@ fun MainScaffold(
                     is RootComponent.Child.Map -> {
                         MapScreen(
                             controller = instance.component.mapController,
+                            onNavigateToPlaceVisitDetail = { placeVisitId ->
+                                rootComponent.navigateToScreen(RootComponent.Config.PlaceVisitDetail(placeVisitId))
+                            },
                             modifier = Modifier
                         )
                     }
@@ -153,7 +157,11 @@ fun MainScaffold(
                             onTripClick = { trip ->
                                 rootComponent.navigateToScreen(RootComponent.Config.RouteView(trip.id))
                             },
-                            onCreateTrip = { /* TODO: Show create trip dialog */ },
+                            onCreateTrip = {
+                                // TODO: Show create trip dialog
+                                // Requires: trip creation UI dialog with form inputs
+                                // Controller: TripsController.createTrip() already available
+                            },
                             onRefresh = { instance.component.tripsController.refresh() },
                             modifier = Modifier
                         )
@@ -200,6 +208,15 @@ fun MainScaffold(
                             tripId = instance.component.tripId,
                             controller = instance.component.tripStatisticsController,
                             onBack = instance.component.onBack,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.PlaceVisitDetail -> {
+                        PlaceVisitDetailScreen(
+                            placeVisitId = instance.component.placeVisitId,
+                            apiClient = appComponent.apiClient,
+                            onNavigateBack = instance.component.onBack,
                             modifier = Modifier
                         )
                     }
