@@ -5,15 +5,18 @@ import MapKit
 /// Trip detail screen showing comprehensive trip information and statistics
 struct TripDetailView: View {
     let tripId: String
+    let appComponent: AppComponent
     @StateObject private var viewModel: TripDetailViewModel
     @Environment(\.dismiss) private var dismiss
 
     init(tripId: String, appComponent: AppComponent) {
         self.tripId = tripId
+        self.appComponent = appComponent
         _viewModel = StateObject(wrappedValue: TripDetailViewModel(
             tripId: tripId,
             statsController: appComponent.tripStatisticsController,
-            routeController: appComponent.routeViewController
+            routeController: appComponent.routeViewController,
+            tripsController: appComponent.tripsController
         ))
     }
 
@@ -90,6 +93,11 @@ struct TripDetailView: View {
         }
         .onAppear {
             viewModel.loadTrip()
+        }
+        .onChange(of: viewModel.tripDeleted) { deleted in
+            if deleted {
+                dismiss()
+            }
         }
     }
 
@@ -428,6 +436,7 @@ class TripDetailViewModel: ObservableObject {
     private let tripId: String
     private let statsController: TripStatisticsController
     private let routeController: RouteViewController
+    private let tripsController: TripsController
 
     private var statsObserver: Kotlinx_coroutines_coreJob?
     private var routeObserver: Kotlinx_coroutines_coreJob?
@@ -439,11 +448,13 @@ class TripDetailViewModel: ObservableObject {
     @Published var showDeleteAlert = false
     @Published var exportedFile: ExportedFile?
     @Published var isExporting = false
+    @Published var tripDeleted = false
 
-    init(tripId: String, statsController: TripStatisticsController, routeController: RouteViewController) {
+    init(tripId: String, statsController: TripStatisticsController, routeController: RouteViewController, tripsController: TripsController) {
         self.tripId = tripId
         self.statsController = statsController
         self.routeController = routeController
+        self.tripsController = tripsController
     }
 
     func loadTrip() {
@@ -517,8 +528,11 @@ class TripDetailViewModel: ObservableObject {
     }
 
     func deleteTrip() {
-        // TODO: Implement delete functionality
-        print("Delete trip: \(tripId)")
+        tripsController.deleteTrip(tripId: tripId, onSuccess: { [weak self] in
+            DispatchQueue.main.async {
+                self?.tripDeleted = true
+            }
+        })
     }
 
     deinit {

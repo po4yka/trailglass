@@ -24,6 +24,7 @@ class TripsController(
     private val getTripsUseCase: GetTripsUseCase,
     private val createTripUseCase: CreateTripUseCase,
     private val updateTripUseCase: UpdateTripUseCase,
+    private val deleteTripUseCase: DeleteTripUseCase,
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
@@ -249,6 +250,39 @@ class TripsController(
                 is Result.Failure -> {
                     val error = result.exceptionOrNull()?.message ?: "Failed to update trip"
                     logger.error { "Failed to update trip: $error" }
+                    _state.update {
+                        it.copy(
+                            error = error,
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Delete a trip.
+     */
+    fun deleteTrip(tripId: String, onSuccess: () -> Unit = {}) {
+        logger.debug { "Deleting trip: $tripId" }
+
+        _state.update { it.copy(isLoading = true, error = null) }
+
+        controllerScope.launch {
+            when (val result = deleteTripUseCase.execute(tripId)) {
+                is Result.Success -> {
+                    logger.info { "Deleted trip: $tripId" }
+
+                    // Reload trips to reflect the deletion
+                    loadTrips()
+
+                    // Notify caller of successful deletion
+                    onSuccess()
+                }
+                is Result.Failure -> {
+                    val error = result.exceptionOrNull()?.message ?: "Failed to delete trip"
+                    logger.error { "Failed to delete trip: $error" }
                     _state.update {
                         it.copy(
                             error = error,
