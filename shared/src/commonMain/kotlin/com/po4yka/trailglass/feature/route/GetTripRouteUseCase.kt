@@ -5,6 +5,7 @@ import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Use case for retrieving a complete trip route with all associated data.
@@ -12,6 +13,7 @@ import kotlinx.coroutines.sync.withLock
  *
  * Includes caching to avoid reprocessing the same trip multiple times.
  */
+@Inject
 class GetTripRouteUseCase(
     private val tripRepository: TripRepository,
     private val locationRepository: LocationRepository,

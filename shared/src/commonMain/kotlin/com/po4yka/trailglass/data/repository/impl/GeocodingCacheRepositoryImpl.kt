@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import me.tatarka.inject.annotations.Inject
 import kotlin.math.*
 
 /**

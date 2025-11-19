@@ -10,14 +10,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Instant
-import me.tatarka.inject.annotations.Inject
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /**
  * Android implementation of SettingsStorage using DataStore.
  */
-@Inject
 actual class SettingsStorage(private val context: Context) {
 
     private val logger = logger()

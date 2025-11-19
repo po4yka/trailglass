@@ -6,13 +6,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Instant
-import me.tatarka.inject.annotations.Inject
 import platform.Foundation.NSUserDefaults
 
 /**
  * iOS implementation of SettingsStorage using UserDefaults.
  */
-@Inject
 actual class SettingsStorage {
 
     private val logger = logger()

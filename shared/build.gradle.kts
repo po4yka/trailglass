@@ -72,12 +72,12 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.turbine)
             implementation(libs.kotest.assertions)
-            implementation(libs.sqldelight.sqlite)
             implementation(libs.ktor.client.mock)
         }
         androidUnitTest.dependencies {
             implementation(libs.mockk.android)
             implementation(libs.kotlin.testJunit)
+            implementation(libs.sqldelight.sqlite)
         }
         androidInstrumentedTest.dependencies {
             implementation(libs.androidx.testExt.junit)

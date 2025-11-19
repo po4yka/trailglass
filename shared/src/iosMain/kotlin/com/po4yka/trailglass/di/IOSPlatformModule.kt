@@ -53,47 +53,46 @@ class IOSPlatformModule : PlatformModule {
         get() = UIDevice.currentDevice.identifierForVendor?.UUIDString ?: "unknown_device"
 
     /**
-     * Provides iOS-specific secure token storage.
-     */
-    @AppScope
-    @Provides
-    fun provideSecureTokenStorage(): SecureTokenStorage {
-        return SecureTokenStorage()
-    }
-
-    /**
-     * Provides iOS-specific device info provider.
-     */
-    @AppScope
-    @Provides
-    fun providePlatformDeviceInfoProvider(): PlatformDeviceInfoProvider {
-        return PlatformDeviceInfoProvider()
-    }
-
-    /**
-     * Provides iOS-specific sync state repository.
-     */
-    @AppScope
-    @Provides
-    fun provideSyncStateRepositoryImpl(): SyncStateRepositoryImpl {
-        return SyncStateRepositoryImpl()
-    }
-
-    /**
-     * Provides iOS-specific network connectivity monitor.
-     */
-    @AppScope
-    @Provides
-    fun provideNetworkConnectivityMonitor(): NetworkConnectivityMonitor {
-        return IOSNetworkConnectivityMonitor()
-    }
-
-    /**
      * Provides iOS-specific permission manager.
      */
-    @AppScope
     @Provides
-    fun providePermissionManager(): PermissionManager {
-        return PermissionManager()
-    }
+    override val permissionManager: PermissionManager
+        get() = PermissionManager()
+
+    /**
+     * Provides iOS-specific encryption service.
+     */
+    @Provides
+    override val encryptionService: com.po4yka.trailglass.data.security.EncryptionService
+        get() = com.po4yka.trailglass.data.security.EncryptionService()
+
+    /**
+     * Provides iOS-specific photo metadata extractor.
+     */
+    @Provides
+    override val photoMetadataExtractor: com.po4yka.trailglass.photo.PhotoMetadataExtractor
+        get() = com.po4yka.trailglass.photo.IOSPhotoMetadataExtractor()
+
+    /**
+     * Provides iOS-specific settings storage.
+     */
+    @Provides
+    override val settingsStorage: com.po4yka.trailglass.data.storage.SettingsStorage
+        get() = com.po4yka.trailglass.data.storage.SettingsStorage()
+
+    @Provides
+    override val secureTokenStorage: SecureTokenStorage
+        get() = SecureTokenStorage()
+
+    @Provides
+    override val platformDeviceInfoProvider: PlatformDeviceInfoProvider
+        get() = PlatformDeviceInfoProvider()
+
+    @Provides
+    override val syncStateRepositoryImpl: SyncStateRepositoryImpl
+        get() = SyncStateRepositoryImpl()
+
+    @Provides
+    override val networkConnectivityMonitor: NetworkConnectivityMonitor
+        get() = IOSNetworkConnectivityMonitor()
 }

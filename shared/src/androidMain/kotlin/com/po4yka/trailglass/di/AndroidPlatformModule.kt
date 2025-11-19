@@ -123,4 +123,11 @@ class AndroidPlatformModule(
     @Provides
     override val photoMetadataExtractor: PhotoMetadataExtractor
         get() = AndroidPhotoMetadataExtractor(context)
+
+    /**
+     * Provides Android-specific settings storage.
+     */
+    @Provides
+    override val settingsStorage: com.po4yka.trailglass.data.storage.SettingsStorage
+        get() = com.po4yka.trailglass.data.storage.SettingsStorage(context)
 }

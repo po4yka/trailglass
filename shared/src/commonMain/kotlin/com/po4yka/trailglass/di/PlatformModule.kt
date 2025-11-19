@@ -84,4 +84,9 @@ interface PlatformModule {
      * Platform-specific photo metadata extractor.
      */
     val photoMetadataExtractor: com.po4yka.trailglass.photo.PhotoMetadataExtractor
+
+    /**
+     * Platform-specific settings storage.
+     */
+    val settingsStorage: com.po4yka.trailglass.data.storage.SettingsStorage
 }
