@@ -27,6 +27,38 @@ class Database(driverFactory: DatabaseDriverFactory) {
     val geocodingCacheQueries get() = database.geocodingCacheQueries
 
     /**
+     * Access to route segments queries.
+     */
+    val routeSegmentsQueries get() = database.routeSegmentsQueries
+
+    /**
+     * Access to trips queries.
+     */
+    val tripsQueries get() = database.tripsQueries
+
+    /**
+     * Access to photos queries.
+     */
+    val photosQueries get() = database.photosQueries
+
+    /**
+     * Access to sync metadata queries.
+     */
+    val syncMetadataQueries get() = database.syncMetadataQueries
+
+    /**
+     * Access to sync conflicts queries.
+     */
+    val syncConflictsQueries get() = database.syncConflictsQueries
+
+    /**
+     * Execute a transaction.
+     */
+    fun transaction(body: app.cash.sqldelight.TransactionWithoutReturn.() -> Unit) {
+        database.transaction(body = body)
+    }
+
+    /**
      * Close the database connection.
      */
     fun close() {

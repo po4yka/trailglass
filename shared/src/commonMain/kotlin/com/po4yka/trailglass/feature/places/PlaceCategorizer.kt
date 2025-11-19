@@ -4,6 +4,7 @@ import com.po4yka.trailglass.domain.model.*
 import kotlinx.datetime.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Categorizes places based on POI names, visit patterns, and temporal data.
@@ -13,6 +14,7 @@ import kotlin.time.Duration.Companion.hours
  * - Visit frequency and duration
  * - Time of day patterns (work hours, evenings, weekends)
  */
+@Inject
 class PlaceCategorizer {
 
     /**

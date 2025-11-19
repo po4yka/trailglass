@@ -4,7 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
-import com.po4yka.trailglass.db.TrailGlassDatabase
+import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.RouteSegment
 import com.po4yka.trailglass.domain.model.TransportType
@@ -21,7 +21,7 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class RouteSegmentRepositoryImpl(
-    private val database: TrailGlassDatabase
+    private val database: Database
 ) : RouteSegmentRepository {
 
     private val logger = logger()

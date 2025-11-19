@@ -62,5 +62,21 @@ interface DataModule {
      */
     @AppScope
     @Provides
-    fun provideGeocodingCacheRepository(impl: GeocodingCacheRepositoryImpl): GeocodingCacheRepository = impl
+    fun provideGeocodingCacheRepository(database: Database): GeocodingCacheRepository {
+        return GeocodingCacheRepositoryImpl(database)
+    }
+
+    /**
+     * Provides FrequentPlaceRepository implementation.
+     */
+    @AppScope
+    @Provides
+    fun provideFrequentPlaceRepository(impl: FrequentPlaceRepositoryImpl): FrequentPlaceRepository = impl
+
+    /**
+     * Provides SettingsRepository implementation.
+     */
+    @AppScope
+    @Provides
+    fun provideSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository = impl
 }

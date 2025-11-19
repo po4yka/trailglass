@@ -6,10 +6,12 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import kotlin.math.*
 import kotlin.time.Duration.Companion.hours
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Associates photos with place visits based on location and time.
  */
+@Inject
 class PhotoLocationAssociator {
 
     private val logger = logger()

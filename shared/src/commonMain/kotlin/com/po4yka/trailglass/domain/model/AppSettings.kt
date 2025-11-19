@@ -61,7 +61,8 @@ data class PrivacySettings(
     val shareAnalytics: Boolean = false,
     val shareCrashReports: Boolean = true,
     val autoBackup: Boolean = true,
-    val encryptBackups: Boolean = true
+    val encryptBackups: Boolean = true,
+    val enableE2EEncryption: Boolean = false // End-to-end encryption for synced data
 )
 
 /**

@@ -7,10 +7,12 @@ import com.po4yka.trailglass.feature.stats.models.GeographicStatistics
 import com.po4yka.trailglass.feature.stats.models.LocationRecord
 import kotlin.math.*
 import kotlin.time.Duration
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Calculator for geographic statistics.
  */
+@Inject
 class GeographicStatisticsCalculator {
 
     /**

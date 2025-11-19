@@ -16,6 +16,12 @@ import kotlinx.coroutines.CoroutineScope
  *
  * Each platform (Android, iOS) should create a concrete implementation of this interface.
  */
+import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
+import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
+import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
+import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.domain.permission.PermissionManager
+
 interface PlatformModule {
     /**
      * Platform-specific database driver factory.
@@ -43,4 +49,39 @@ interface PlatformModule {
      * Device identifier.
      */
     val deviceId: String
+
+    /**
+     * Platform-specific secure token storage.
+     */
+    val secureTokenStorage: SecureTokenStorage
+
+    /**
+     * Platform-specific device info provider.
+     */
+    val platformDeviceInfoProvider: PlatformDeviceInfoProvider
+
+    /**
+     * Platform-specific sync state repository.
+     */
+    val syncStateRepositoryImpl: SyncStateRepositoryImpl
+
+    /**
+     * Platform-specific network connectivity monitor.
+     */
+    val networkConnectivityMonitor: NetworkConnectivityMonitor
+
+    /**
+     * Platform-specific permission manager.
+     */
+    val permissionManager: PermissionManager
+
+    /**
+     * Platform-specific encryption service.
+     */
+    val encryptionService: com.po4yka.trailglass.data.security.EncryptionService
+
+    /**
+     * Platform-specific photo metadata extractor.
+     */
+    val photoMetadataExtractor: com.po4yka.trailglass.photo.PhotoMetadataExtractor
 }

@@ -8,6 +8,9 @@ import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.data.security.EncryptionService
+import com.po4yka.trailglass.photo.PhotoMetadataExtractor
+import com.po4yka.trailglass.photo.AndroidPhotoMetadataExtractor
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.AndroidLocationService
 import com.po4yka.trailglass.domain.service.LocationService
@@ -60,45 +63,64 @@ class AndroidPlatformModule(
     /**
      * Provides Android-specific secure token storage.
      */
-    @AppScope
+    /**
+     * Provides Android-specific secure token storage.
+     */
     @Provides
-    fun provideSecureTokenStorage(): SecureTokenStorage {
-        return SecureTokenStorage(context)
-    }
+    override val secureTokenStorage: SecureTokenStorage
+        get() = SecureTokenStorage(context)
 
     /**
      * Provides Android-specific device info provider.
      */
-    @AppScope
+    /**
+     * Provides Android-specific device info provider.
+     */
     @Provides
-    fun providePlatformDeviceInfoProvider(): PlatformDeviceInfoProvider {
-        return PlatformDeviceInfoProvider(context)
-    }
+    override val platformDeviceInfoProvider: PlatformDeviceInfoProvider
+        get() = PlatformDeviceInfoProvider(context)
 
     /**
      * Provides Android-specific sync state repository.
      */
-    @AppScope
+    /**
+     * Provides Android-specific sync state repository.
+     */
     @Provides
-    fun provideSyncStateRepositoryImpl(): SyncStateRepositoryImpl {
-        return SyncStateRepositoryImpl(context)
-    }
+    override val syncStateRepositoryImpl: SyncStateRepositoryImpl
+        get() = SyncStateRepositoryImpl(context)
 
     /**
      * Provides Android-specific network connectivity monitor.
      */
-    @AppScope
+    /**
+     * Provides Android-specific network connectivity monitor.
+     */
     @Provides
-    fun provideNetworkConnectivityMonitor(): NetworkConnectivityMonitor {
-        return AndroidNetworkConnectivityMonitor(context)
-    }
+    override val networkConnectivityMonitor: NetworkConnectivityMonitor
+        get() = AndroidNetworkConnectivityMonitor(context)
 
     /**
      * Provides Android-specific permission manager.
      */
-    @AppScope
+    /**
+     * Provides Android-specific permission manager.
+     */
     @Provides
-    fun providePermissionManager(): PermissionManager {
-        return PermissionManager(context)
-    }
+    override val permissionManager: PermissionManager
+        get() = PermissionManager(context)
+
+    /**
+     * Provides Android-specific encryption service.
+     */
+    @Provides
+    override val encryptionService: EncryptionService
+        get() = EncryptionService()
+
+    /**
+     * Provides Android-specific photo metadata extractor.
+     */
+    @Provides
+    override val photoMetadataExtractor: PhotoMetadataExtractor
+        get() = AndroidPhotoMetadataExtractor(context)
 }

@@ -1,68 +1,11 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinAndroid)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.secrets)
-}
-
-kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
-    
-    sourceSets {
-        androidMain.dependencies {
-            implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
-
-            // Image loading
-            implementation(libs.coil.compose)
-
-            // Maps
-            implementation(libs.maps.compose)
-            implementation(libs.play.services.maps)
-            implementation(libs.play.services.location)
-
-            // Preferences
-            implementation(libs.datastore.preferences)
-
-            // Background work
-            implementation(libs.androidx.work.runtime)
-        }
-        commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
-            implementation(libs.androidx.lifecycle.viewmodelCompose)
-            implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.decompose)
-            implementation(libs.decompose.extensions.compose)
-
-            // Serialization (required for Decompose navigation)
-            implementation(libs.kotlinx.serialization.json)
-
-            implementation(projects.shared)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
-        }
-        androidInstrumentedTest.dependencies {
-            implementation(libs.androidx.testExt.junit)
-            implementation(libs.androidx.espresso.core)
-            implementation(libs.androidx.compose.ui.test)
-        }
-    }
 }
 
 android {
@@ -93,9 +36,54 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
+    }
+}
+
 dependencies {
-    debugImplementation(compose.uiTooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.material3)
+
+    // Image loading
+    implementation(libs.coil.compose)
+
+    // Maps
+    implementation(libs.maps.compose)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+
+    // Preferences
+    implementation(libs.datastore.preferences)
+
+    // Background work
+    implementation(libs.androidx.work.runtime)
+
+    implementation(libs.androidx.lifecycle.viewmodelCompose)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.decompose)
+    implementation(libs.decompose.extensions.compose)
+
+    // Serialization (required for Decompose navigation)
+    implementation(libs.kotlinx.serialization.json)
+
+    implementation(projects.shared)
+
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
+
+    androidTestImplementation(libs.androidx.testExt.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }
 
 // Secrets plugin configuration

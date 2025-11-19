@@ -4,7 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.po4yka.trailglass.data.repository.PhotoRepository
-import com.po4yka.trailglass.db.TrailGlassDatabase
+import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PhotoAttachment
 import com.po4yka.trailglass.logging.logger
@@ -23,7 +23,7 @@ import kotlinx.datetime.atStartOfDayIn
  */
 @Inject
 class PhotoRepositoryImpl(
-    private val database: TrailGlassDatabase,
+    private val database: Database,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) : PhotoRepository {
 

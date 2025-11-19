@@ -8,10 +8,12 @@ import com.po4yka.trailglass.feature.stats.models.WeekdaySplit
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Analyzer for travel patterns and temporal statistics.
  */
+@Inject
 class TravelPatternAnalyzer(
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {

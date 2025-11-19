@@ -5,10 +5,12 @@ import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.stats.models.DistanceStatistics
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Calculator for distance-related statistics.
  */
+@Inject
 class DistanceStatisticsCalculator {
 
     /**

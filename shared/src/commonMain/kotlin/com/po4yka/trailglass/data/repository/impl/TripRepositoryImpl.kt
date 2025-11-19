@@ -4,7 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.po4yka.trailglass.data.repository.TripRepository
-import com.po4yka.trailglass.db.TrailGlassDatabase
+import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.domain.model.Trip
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,7 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class TripRepositoryImpl(
-    private val database: TrailGlassDatabase
+    private val database: Database
 ) : TripRepository {
 
     private val logger = logger()

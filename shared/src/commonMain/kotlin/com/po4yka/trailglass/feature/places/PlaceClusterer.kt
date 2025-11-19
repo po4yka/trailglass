@@ -7,6 +7,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.math.*
 import kotlin.time.Duration
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Clusters place visits to identify frequently visited places using DBSCAN-like algorithm.
@@ -14,6 +15,7 @@ import kotlin.time.Duration
  * This helps identify places like "Home", "Work", "Favorite Cafe" by grouping
  * visits that are spatially close to each other.
  */
+@Inject
 class PlaceClusterer(
     private val categorizer: PlaceCategorizer = PlaceCategorizer(),
     private val clusterRadiusMeters: Double = 50.0,

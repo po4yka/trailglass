@@ -2,7 +2,7 @@ package com.po4yka.trailglass.feature.settings
 
 import com.po4yka.trailglass.data.repository.SettingsRepository
 import com.po4yka.trailglass.data.storage.SettingsStorage
-import com.po4yka.trailglass.db.TrailGlassDatabase
+import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -14,7 +14,7 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class ClearDataUseCase(
-    private val database: TrailGlassDatabase,
+    private val database: Database,
     private val settingsStorage: SettingsStorage
 ) {
     private val logger = logger()

@@ -3,7 +3,7 @@ package com.po4yka.trailglass.data.sync
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
-import com.po4yka.trailglass.db.TrailGlassDatabase
+import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -18,7 +18,7 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class SyncMetadataRepositoryImpl(
-    private val database: TrailGlassDatabase
+    private val database: Database
 ) : SyncMetadataRepository {
 
     private val logger = logger()

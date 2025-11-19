@@ -1,14 +1,17 @@
 import SwiftUI
+import shared
 
 /**
  * SwiftUI settings screen matching Android EnhancedSettingsScreen.
  * Comprehensive settings with all preference categories.
  */
 struct EnhancedSettingsView: View {
+    let appComponent: AppComponent
     @StateObject private var viewModel: SettingsViewModel
     @State private var showClearDataAlert = false
 
-    init(controller: SettingsController) {
+    init(controller: SettingsController, appComponent: AppComponent) {
+        self.appComponent = appComponent
         _viewModel = StateObject(wrappedValue: SettingsViewModel(controller: controller))
     }
 
@@ -21,6 +24,7 @@ struct EnhancedSettingsView: View {
                     SettingsContent(
                         settings: settings,
                         viewModel: viewModel,
+                        appComponent: appComponent,
                         onClearData: { showClearDataAlert = true }
                     )
                 } else {
@@ -58,6 +62,7 @@ struct EnhancedSettingsView: View {
 private struct SettingsContent: View {
     let settings: AppSettings
     let viewModel: SettingsViewModel
+    let appComponent: AppComponent
     let onClearData: () -> Void
 
     var body: some View {
@@ -97,7 +102,8 @@ private struct SettingsContent: View {
             // Account Section
             Section("Account & Sync") {
                 AccountSettingsSection(
-                    account: settings.accountSettings
+                    account: settings.accountSettings,
+                    appComponent: appComponent
                 )
             }
 
@@ -208,7 +214,8 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: $0,
                 shareCrashReports: privacy.shareCrashReports,
                 autoBackup: privacy.autoBackup,
-                encryptBackups: privacy.encryptBackups
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: privacy.enableE2EEncryption
             )) }
         ))
 
@@ -219,7 +226,8 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: privacy.shareAnalytics,
                 shareCrashReports: $0,
                 autoBackup: privacy.autoBackup,
-                encryptBackups: privacy.encryptBackups
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: privacy.enableE2EEncryption
             )) }
         ))
 
@@ -230,7 +238,8 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: privacy.shareAnalytics,
                 shareCrashReports: privacy.shareCrashReports,
                 autoBackup: $0,
-                encryptBackups: privacy.encryptBackups
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: privacy.enableE2EEncryption
             )) }
         ))
 
@@ -241,7 +250,20 @@ private struct PrivacySettingsSection: View {
                 shareAnalytics: privacy.shareAnalytics,
                 shareCrashReports: privacy.shareCrashReports,
                 autoBackup: privacy.autoBackup,
-                encryptBackups: $0
+                encryptBackups: $0,
+                enableE2EEncryption: privacy.enableE2EEncryption
+            )) }
+        ))
+
+        Toggle("End-to-End Encryption", isOn: Binding(
+            get: { privacy.enableE2EEncryption },
+            set: { onUpdate(PrivacySettings(
+                dataRetentionDays: privacy.dataRetentionDays,
+                shareAnalytics: privacy.shareAnalytics,
+                shareCrashReports: privacy.shareCrashReports,
+                autoBackup: privacy.autoBackup,
+                encryptBackups: privacy.encryptBackups,
+                enableE2EEncryption: $0
             )) }
         ))
 
@@ -352,6 +374,7 @@ private struct AppearanceSettingsSection: View {
  */
 private struct AccountSettingsSection: View {
     let account: AccountSettings
+    let appComponent: AppComponent
 
     var body: some View {
         HStack {
@@ -375,6 +398,15 @@ private struct AccountSettingsSection: View {
                     Text(formatTimestamp(lastSync))
                         .foregroundColor(.secondary)
                 }
+            }
+        }
+
+        // Device Management navigation
+        NavigationLink(destination: DeviceManagementView(controller: appComponent.deviceManagementController)) {
+            HStack {
+                Image(systemName: "externaldrive.connected.to.line.below")
+                    .frame(width: 24)
+                Text("Device Management")
             }
         }
     }

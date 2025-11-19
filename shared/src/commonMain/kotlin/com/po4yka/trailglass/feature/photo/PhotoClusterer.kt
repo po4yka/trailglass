@@ -10,10 +10,12 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.math.*
 import kotlin.time.Duration.Companion.hours
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Clusters photos by location and time proximity using DBSCAN-like algorithm.
  */
+@Inject
 class PhotoClusterer(
     private val maxDistanceMeters: Double = 200.0, // Max distance between photos in cluster
     private val maxTimeGapHours: Double = 2.0, // Max time gap between photos

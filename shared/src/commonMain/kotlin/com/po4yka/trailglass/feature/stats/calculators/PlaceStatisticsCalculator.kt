@@ -6,10 +6,12 @@ import com.po4yka.trailglass.feature.stats.models.PlaceStatistics
 import com.po4yka.trailglass.feature.stats.models.PlaceVisitCount
 import com.po4yka.trailglass.feature.stats.models.VisitRecord
 import kotlin.time.Duration
+import me.tatarka.inject.annotations.Inject
 
 /**
  * Calculator for place visit statistics.
  */
+@Inject
 class PlaceStatisticsCalculator {
 
     /**
