@@ -4,10 +4,13 @@ import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,17 +26,24 @@ import me.tatarka.inject.annotations.Inject
  *
  * Implements [MapEventSink] to handle events from the map UI in a decoupled,
  * testable manner.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class MapController(
     private val getMapDataUseCase: GetMapDataUseCase,
     private val locationService: LocationService,
     private val permissionFlow: PermissionFlowController,
-    private val coroutineScope: CoroutineScope,
+    coroutineScope: CoroutineScope,
     private val userId: String
-) : MapEventSink {
+) : MapEventSink, Lifecycle {
 
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     private var locationTrackingJob: Job? = null
     private var pendingFollowModeParams: FollowModeParams? = null
@@ -66,7 +76,7 @@ class MapController(
 
     init {
         // Observe permission results for follow mode
-        coroutineScope.launch {
+        controllerScope.launch {
             permissionFlow.state.collect { permState ->
                 when (permState.lastResult) {
                     is PermissionResult.Granted -> {
@@ -120,7 +130,7 @@ class MapController(
 
         _state.update { it.copy(isLoading = true, error = null) }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             try {
                 val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
 
@@ -305,7 +315,7 @@ class MapController(
     ) {
         logger.info { "Enabling follow mode" }
 
-        coroutineScope.launch {
+        controllerScope.launch {
             // Get last known location and move camera there first
             locationService.getLastKnownLocation()?.let { coordinate ->
                 val position = CameraPosition(
@@ -331,7 +341,7 @@ class MapController(
                     )
                     applyCameraMove(CameraMove.Ease(position, durationMs = 500))
                 }
-                .launchIn(coroutineScope)
+                .launchIn(controllerScope)
 
             _state.update { it.copy(isFollowModeEnabled = true) }
         }
@@ -350,7 +360,7 @@ class MapController(
      * Check permissions.
      */
     fun checkPermissions() {
-        coroutineScope.launch {
+        controllerScope.launch {
             val hasPermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
             _state.update { it.copy(hasLocationPermission = hasPermission) }
             logger.debug { "Location permission check: $hasPermission" }
@@ -423,5 +433,19 @@ class MapController(
             delta > 0.05 -> 15f   // Street level
             else -> 17f           // Building level
         }
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including flow collectors and location tracking.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up MapController" }
+        locationTrackingJob?.cancel()
+        locationTrackingJob = null
+        controllerScope.cancel()
+        logger.debug { "MapController cleanup complete" }
     }
 }

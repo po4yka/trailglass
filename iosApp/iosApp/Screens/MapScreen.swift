@@ -14,8 +14,8 @@ struct MapScreen: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Main map view
-                MapView(viewModel: viewModel)
+                // Main map view with routes and markers
+                EnhancedMapView(viewModel: viewModel)
 
                 // Loading indicator
                 if viewModel.isLoading {
@@ -81,75 +81,185 @@ struct MapScreen: View {
                 )
             }
         }
+        .onAppear {
+            viewModel.refreshData()
+        }
     }
 }
 
-/// Map view component
-struct MapView: View {
+/// Enhanced map view with routes and markers using MKMapView
+struct EnhancedMapView: UIViewRepresentable {
     @ObservedObject var viewModel: MapViewModel
 
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
-        span: MKCoordinateSpan(latitudeDelta: 180, longitudeDelta: 180)
-    )
+    func makeUIView(context: Context) -> MKMapView {
+        let mapView = MKMapView()
+        mapView.delegate = context.coordinator
+        mapView.showsUserLocation = true
+        mapView.showsCompass = true
+        mapView.showsScale = true
+        return mapView
+    }
 
-    var body: some View {
-        Map(coordinateRegion: $region, showsUserLocation: true, annotationItems: viewModel.markers) { marker in
-            MapAnnotation(coordinate: CLLocationCoordinate2D(
-                latitude: marker.latitude,
-                longitude: marker.longitude
-            )) {
-                MarkerView(marker: marker, isSelected: marker.id == viewModel.selectedMarkerId) {
-                    viewModel.selectMarker(marker)
-                }
+    func updateUIView(_ mapView: MKMapView, context: Context) {
+        // Update region
+        if let region = viewModel.regionUpdate {
+            mapView.setRegion(region, animated: true)
+            viewModel.clearRegionUpdate()
+        }
+
+        // Update markers (annotations)
+        updateAnnotations(mapView)
+
+        // Update routes (overlays)
+        updateOverlays(mapView)
+    }
+
+    private func updateAnnotations(_ mapView: MKMapView) {
+        let existingMarkers = mapView.annotations.compactMap { $0 as? MarkerAnnotation }
+        let newMarkerIds = Set(viewModel.markers.map { $0.id })
+        let existingMarkerIds = Set(existingMarkers.map { $0.id })
+
+        // Remove markers that no longer exist
+        let toRemove = existingMarkers.filter { !newMarkerIds.contains($0.id) }
+        mapView.removeAnnotations(toRemove)
+
+        // Add new markers
+        let toAdd = viewModel.markers.filter { !existingMarkerIds.contains($0.id) }
+        let newAnnotations = toAdd.map { MarkerAnnotation(marker: $0) }
+        mapView.addAnnotations(newAnnotations)
+    }
+
+    private func updateOverlays(_ mapView: MKMapView) {
+        let existingRoutes = mapView.overlays.compactMap { $0 as? RoutePolyline }
+        let newRouteIds = Set(viewModel.routes.map { $0.id })
+        let existingRouteIds = Set(existingRoutes.map { $0.id })
+
+        // Remove routes that no longer exist
+        let routesToRemove = existingRoutes.filter { !newRouteIds.contains($0.id) }
+        mapView.removeOverlays(routesToRemove)
+
+        // Add new routes
+        let routesToAdd = viewModel.routes.filter { !existingRouteIds.contains($0.id) }
+        for route in routesToAdd {
+            let coordinates = route.coordinates.map {
+                CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            }
+            let polyline = RoutePolyline(coordinates: coordinates, count: coordinates.count)
+            polyline.id = route.id
+            polyline.transportType = route.transportType.name
+            polyline.colorInt = route.color?.int32Value
+            mapView.addOverlay(polyline)
+        }
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject, MKMapViewDelegate {
+        var parent: EnhancedMapView
+
+        init(_ parent: EnhancedMapView) {
+            self.parent = parent
+        }
+
+        func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+            guard let markerAnnotation = annotation as? MarkerAnnotation else {
+                return nil
+            }
+
+            let identifier = "MarkerAnnotation"
+            var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
+
+            if annotationView == nil {
+                annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
+                annotationView?.canShowCallout = true
+            } else {
+                annotationView?.annotation = annotation
+            }
+
+            annotationView?.markerTintColor = .blue
+            annotationView?.glyphImage = UIImage(systemName: "mappin.circle.fill")
+
+            return annotationView
+        }
+
+        func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            guard let polyline = overlay as? RoutePolyline else {
+                return MKOverlayRenderer(overlay: overlay)
+            }
+
+            let renderer = MKPolylineRenderer(polyline: polyline)
+            renderer.strokeColor = colorForPolyline(polyline)
+            renderer.lineWidth = 4.0
+            renderer.lineCap = .round
+            renderer.lineJoin = .round
+            return renderer
+        }
+
+        func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+            if let markerAnnotation = view.annotation as? MarkerAnnotation {
+                parent.viewModel.selectMarker(markerAnnotation.marker)
             }
         }
-        .onAppear {
-            if let initialRegion = viewModel.getInitialRegion() {
-                region = initialRegion
+
+        private func colorForPolyline(_ polyline: RoutePolyline) -> UIColor {
+            if let colorInt = polyline.colorInt {
+                // Convert Android color int (ARGB) to UIColor
+                let alpha = CGFloat((colorInt >> 24) & 0xFF) / 255.0
+                let red = CGFloat((colorInt >> 16) & 0xFF) / 255.0
+                let green = CGFloat((colorInt >> 8) & 0xFF) / 255.0
+                let blue = CGFloat(colorInt & 0xFF) / 255.0
+                return UIColor(red: red, green: green, blue: blue, alpha: alpha)
             }
-        }
-        .onChange(of: viewModel.regionUpdate) { newRegion in
-            if let newRegion = newRegion {
-                region = newRegion
+
+            // Fallback color based on transport type
+            switch polyline.transportType?.uppercased() {
+            case "WALK":
+                return UIColor(red: 0.3, green: 0.69, blue: 0.31, alpha: 1.0) // Green
+            case "BIKE":
+                return UIColor(red: 0.13, green: 0.59, blue: 0.95, alpha: 1.0) // Blue
+            case "CAR":
+                return UIColor(red: 0.96, green: 0.26, blue: 0.21, alpha: 1.0) // Red
+            case "TRAIN":
+                return UIColor(red: 0.61, green: 0.15, blue: 0.69, alpha: 1.0) // Purple
+            case "PLANE":
+                return UIColor(red: 1.0, green: 0.6, blue: 0.0, alpha: 1.0) // Orange
+            case "BOAT":
+                return UIColor(red: 0.0, green: 0.74, blue: 0.83, alpha: 1.0) // Cyan
+            default:
+                return .gray
             }
         }
     }
 }
 
-/// Simple marker view
-struct MarkerView: View {
-    let marker: MapMarker
-    let isSelected: Bool
-    let onTap: () -> Void
+/// Custom marker annotation
+class MarkerAnnotation: NSObject, MKAnnotation {
+    let id: String
+    let coordinate: CLLocationCoordinate2D
+    let title: String?
+    let subtitle: String?
+    let marker: shared.MapMarker
 
-    var body: some View {
-        VStack(spacing: 0) {
-            ZStack {
-                Circle()
-                    .fill(Color.blue)
-                    .frame(width: isSelected ? 44 : 32, height: isSelected ? 44 : 32)
-                    .shadow(radius: isSelected ? 4 : 2)
-
-                Image(systemName: "mappin.circle.fill")
-                    .foregroundColor(.white)
-                    .font(.system(size: isSelected ? 20 : 14))
-            }
-
-            if isSelected, let title = marker.title {
-                Text(title)
-                    .font(.caption)
-                    .padding(4)
-                    .background(Color.white)
-                    .cornerRadius(4)
-                    .shadow(radius: 2)
-                    .offset(y: 4)
-            }
-        }
-        .onTapGesture {
-            onTap()
-        }
+    init(marker: shared.MapMarker) {
+        self.id = marker.id
+        self.coordinate = CLLocationCoordinate2D(
+            latitude: marker.coordinate.latitude,
+            longitude: marker.coordinate.longitude
+        )
+        self.title = marker.title
+        self.subtitle = marker.snippet
+        self.marker = marker
+        super.init()
     }
+}
+
+/// Custom polyline for routes
+class RoutePolyline: MKPolyline {
+    var id: String?
+    var transportType: String?
+    var colorInt: Int32?
 }
 
 /// Error banner
@@ -216,7 +326,8 @@ class MapViewModel: ObservableObject {
     private let controller: MapController
     private var stateObserver: Kotlinx_coroutines_coreJob?
 
-    @Published var markers: [MapMarker] = []
+    @Published var markers: [shared.MapMarker] = []
+    @Published var routes: [shared.MapRoute] = []
     @Published var selectedMarkerId: String?
     @Published var regionUpdate: MKCoordinateRegion?
     @Published var isLoading: Bool = false
@@ -239,7 +350,8 @@ class MapViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
                 self.error = state.error?.userMessage
-                self.markers = state.mapData.markers.map { MapMarker(from: $0) }
+                self.markers = state.mapData.markers
+                self.routes = state.mapData.routes
                 self.selectedMarkerId = state.selectedMarker?.id
                 self.needsLocationPermission = !state.hasLocationPermission
 
@@ -260,23 +372,12 @@ class MapViewModel: ObservableObject {
         }
     }
 
-    func getInitialRegion() -> MKCoordinateRegion? {
-        guard let region = controller.state.value?.mapData.region else { return nil }
-
-        return MKCoordinateRegion(
-            center: CLLocationCoordinate2D(
-                latitude: region.center.latitude,
-                longitude: region.center.longitude
-            ),
-            span: MKCoordinateSpan(
-                latitudeDelta: region.latitudeDelta,
-                longitudeDelta: region.longitudeDelta
-            )
-        )
+    func selectMarker(_ marker: shared.MapMarker) {
+        controller.selectMarker(markerId: marker.id)
     }
 
-    func selectMarker(_ marker: MapMarker) {
-        controller.selectMarker(markerId: marker.id)
+    func clearRegionUpdate() {
+        regionUpdate = nil
     }
 
     func centerOnUserLocation() {
@@ -299,23 +400,6 @@ class MapViewModel: ObservableObject {
         // This would be handled by the permission system
         // For now, just trigger a refresh to re-check permissions
         controller.refresh()
-    }
-}
-
-/// Map marker model for SwiftUI
-struct MapMarker: Identifiable {
-    let id: String
-    let latitude: Double
-    let longitude: Double
-    let title: String?
-    let snippet: String?
-
-    init(from marker: com.po4yka.trailglass.feature.map.MapMarker) {
-        self.id = marker.id
-        self.latitude = marker.coordinate.latitude
-        self.longitude = marker.coordinate.longitude
-        self.title = marker.title
-        self.snippet = marker.snippet
     }
 }
 

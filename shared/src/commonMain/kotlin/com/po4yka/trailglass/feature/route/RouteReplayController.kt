@@ -3,9 +3,12 @@ package com.po4yka.trailglass.feature.route
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.RoutePoint
 import com.po4yka.trailglass.domain.model.TripRoute
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,14 +51,21 @@ data class VehicleState(
 /**
  * Controller for Route Replay Mode.
  * Manages animated playback of route with vehicle movement and camera following.
+ *
+ * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
 class RouteReplayController(
     private val getTripRouteUseCase: GetTripRouteUseCase,
-    private val coroutineScope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope
+) : Lifecycle {
 
     private val logger = logger()
+
+    // Create a child scope that can be cancelled independently
+    private val controllerScope = CoroutineScope(
+        coroutineScope.coroutineContext + SupervisorJob()
+    )
 
     /**
      * State for Route Replay screen.
@@ -93,7 +103,7 @@ class RouteReplayController(
      * Load route data for replay.
      */
     fun loadRoute(tripId: String) {
-        coroutineScope.launch {
+        controllerScope.launch {
             logger.info { "Loading route for replay: $tripId" }
             _state.value = _state.value.copy(isLoading = true, error = null)
 
@@ -133,7 +143,7 @@ class RouteReplayController(
         animationJob?.cancel()
 
         // Start animation loop
-        animationJob = coroutineScope.launch {
+        animationJob = controllerScope.launch {
             animateRoute()
         }
     }
@@ -355,5 +365,19 @@ class RouteReplayController(
 
         // Normalize to 0-360
         return (bearingDeg + 360) % 360
+    }
+
+    /**
+     * Cleanup method to release resources and prevent memory leaks.
+     * MUST be called when this controller is no longer needed.
+     *
+     * Cancels all running coroutines including the animation job and flow collectors.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up RouteReplayController" }
+        animationJob?.cancel()
+        animationJob = null
+        controllerScope.cancel()
+        logger.debug { "RouteReplayController cleanup complete" }
     }
 }

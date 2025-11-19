@@ -194,4 +194,19 @@ class IOSPhotoPicker(
             )
         }
     }
+
+    /**
+     * Internal data class for extracting photo metadata from PHAsset.
+     * This is separate from the domain PhotoMetadata which contains EXIF data.
+     */
+    private data class PhotoMetadata(
+        val uri: String,
+        val timestamp: Instant,
+        val latitude: Double? = null,
+        val longitude: Double? = null,
+        val width: Int? = null,
+        val height: Int? = null,
+        val sizeBytes: Long? = null,
+        val mimeType: String? = null
+    )
 }

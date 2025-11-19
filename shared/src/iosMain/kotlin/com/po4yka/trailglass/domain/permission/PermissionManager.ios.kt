@@ -1,12 +1,17 @@
 package com.po4yka.trailglass.domain.permission
 
 import kotlinx.cinterop.*
+import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import me.tatarka.inject.annotations.Inject
 import platform.CoreLocation.*
 import platform.Foundation.*
+import platform.Photos.PHAuthorizationStatusAuthorized
+import platform.Photos.PHAuthorizationStatusDenied
+import platform.Photos.PHAuthorizationStatusNotDetermined
+import platform.Photos.PHAuthorizationStatusRestricted
 import platform.Photos.PHPhotoLibrary
 import platform.UIKit.UIApplication
 import platform.UIKit.UIApplicationOpenSettingsURLString
@@ -14,11 +19,15 @@ import platform.UserNotifications.UNAuthorizationOptionAlert
 import platform.UserNotifications.UNAuthorizationOptionBadge
 import platform.UserNotifications.UNAuthorizationOptionSound
 import platform.UserNotifications.UNUserNotificationCenter
+import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
 /**
  * iOS implementation of PermissionManager.
  * Uses iOS permission APIs (CoreLocation, Photos, UserNotifications).
+ *
+ * Properly implements CLLocationManagerDelegate to wait for user responses
+ * instead of immediately checking stale permission status.
  */
 @Inject
 @OptIn(ExperimentalForeignApi::class)
@@ -26,6 +35,71 @@ actual class PermissionManager {
 
     private val permissionStates = mutableMapOf<PermissionType, MutableStateFlow<PermissionState>>()
     private val locationManager = CLLocationManager()
+
+    // Store pending permission request continuations
+    private var locationPermissionContinuation: CancellableContinuation<PermissionResult>? = null
+    private var backgroundLocationContinuation: CancellableContinuation<PermissionResult>? = null
+
+    /**
+     * Delegate to receive location authorization callbacks from iOS.
+     */
+    private val locationDelegate = object : NSObject(), CLLocationManagerDelegateProtocol {
+        override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
+            val status = manager.authorizationStatus()
+
+            // Handle regular location permission
+            locationPermissionContinuation?.let { continuation ->
+                val result = when (status) {
+                    kCLAuthorizationStatusAuthorizedWhenInUse,
+                    kCLAuthorizationStatusAuthorizedAlways -> {
+                        updatePermissionState(PermissionType.LOCATION_FINE, PermissionState.Granted)
+                        PermissionResult.Granted
+                    }
+                    kCLAuthorizationStatusDenied -> {
+                        updatePermissionState(PermissionType.LOCATION_FINE, PermissionState.PermanentlyDenied)
+                        PermissionResult.PermanentlyDenied
+                    }
+                    kCLAuthorizationStatusRestricted -> {
+                        updatePermissionState(PermissionType.LOCATION_FINE, PermissionState.Restricted)
+                        PermissionResult.Denied
+                    }
+                    else -> PermissionResult.Cancelled
+                }
+                continuation.resume(result)
+                locationPermissionContinuation = null
+            }
+
+            // Handle background location permission
+            backgroundLocationContinuation?.let { continuation ->
+                val result = when (status) {
+                    kCLAuthorizationStatusAuthorizedAlways -> {
+                        updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.Granted)
+                        PermissionResult.Granted
+                    }
+                    kCLAuthorizationStatusAuthorizedWhenInUse -> {
+                        updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.Denied)
+                        PermissionResult.Denied
+                    }
+                    kCLAuthorizationStatusDenied -> {
+                        updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.PermanentlyDenied)
+                        PermissionResult.PermanentlyDenied
+                    }
+                    kCLAuthorizationStatusRestricted -> {
+                        updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.Restricted)
+                        PermissionResult.Denied
+                    }
+                    else -> PermissionResult.Cancelled
+                }
+                continuation.resume(result)
+                backgroundLocationContinuation = null
+            }
+        }
+    }
+
+    init {
+        // Set up the location manager delegate
+        locationManager.delegate = locationDelegate
+    }
 
     /**
      * Check the current state of a permission.
@@ -114,6 +188,19 @@ actual class PermissionManager {
         }
     }
 
+    /**
+     * Cleanup method to release resources.
+     * Should be called when PermissionManager is no longer needed.
+     */
+    fun cleanup() {
+        locationManager.delegate = null
+        locationPermissionContinuation?.cancel()
+        locationPermissionContinuation = null
+        backgroundLocationContinuation?.cancel()
+        backgroundLocationContinuation = null
+        permissionStates.clear()
+    }
+
     // MARK: - Location Permissions
 
     private fun checkLocationPermission(): PermissionState {
@@ -148,52 +235,74 @@ actual class PermissionManager {
     }
 
     private suspend fun requestLocationPermission(): PermissionResult {
+        // Check if permission is already determined
+        val currentStatus = CLLocationManager.authorizationStatus()
+        when (currentStatus) {
+            kCLAuthorizationStatusAuthorizedWhenInUse,
+            kCLAuthorizationStatusAuthorizedAlways -> {
+                return PermissionResult.Granted
+            }
+            kCLAuthorizationStatusDenied -> {
+                return PermissionResult.PermanentlyDenied
+            }
+            kCLAuthorizationStatusRestricted -> {
+                return PermissionResult.Denied
+            }
+            else -> {
+                // Need to request - continue below
+            }
+        }
+
         return suspendCancellableCoroutine { continuation ->
-            // Note: In a real implementation, you would set up a delegate
-            // to receive the authorization status callback
+            locationPermissionContinuation = continuation
+
+            // Request permission - delegate will receive callback
             locationManager.requestWhenInUseAuthorization()
 
-            // For this example, we immediately check the status
-            // In production, you'd wait for the delegate callback
-            val status = CLLocationManager.authorizationStatus()
-            val result = when (status) {
-                kCLAuthorizationStatusAuthorizedWhenInUse,
-                kCLAuthorizationStatusAuthorizedAlways -> PermissionResult.Granted
-
-                kCLAuthorizationStatusDenied -> PermissionResult.PermanentlyDenied
-
-                else -> PermissionResult.Cancelled
+            // Handle cancellation
+            continuation.invokeOnCancellation {
+                locationPermissionContinuation = null
             }
-
-            continuation.resume(result)
         }
     }
 
     private suspend fun requestBackgroundLocationPermission(): PermissionResult {
+        // Check if permission is already determined
+        val currentStatus = CLLocationManager.authorizationStatus()
+        when (currentStatus) {
+            kCLAuthorizationStatusAuthorizedAlways -> {
+                return PermissionResult.Granted
+            }
+            kCLAuthorizationStatusDenied -> {
+                return PermissionResult.PermanentlyDenied
+            }
+            kCLAuthorizationStatusRestricted -> {
+                return PermissionResult.Denied
+            }
+            else -> {
+                // Need to request - continue below
+            }
+        }
+
         return suspendCancellableCoroutine { continuation ->
+            backgroundLocationContinuation = continuation
+
+            // Request always authorization - delegate will receive callback
             locationManager.requestAlwaysAuthorization()
 
-            val status = CLLocationManager.authorizationStatus()
-            val result = when (status) {
-                kCLAuthorizationStatusAuthorizedAlways -> PermissionResult.Granted
-
-                kCLAuthorizationStatusDenied -> PermissionResult.PermanentlyDenied
-
-                else -> PermissionResult.Cancelled
+            // Handle cancellation
+            continuation.invokeOnCancellation {
+                backgroundLocationContinuation = null
             }
-
-            continuation.resume(result)
         }
     }
 
     // MARK: - Camera Permission
 
     private fun checkCameraPermission(): PermissionState {
-        // Import AVFoundation types
         val AVMediaTypeVideo = platform.AVFoundation.AVMediaTypeVideo
         val AVCaptureDevice = platform.AVFoundation.AVCaptureDevice.Companion
 
-        // Get authorization status
         val status = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
 
         return when (status) {
@@ -231,14 +340,10 @@ actual class PermissionManager {
 
     private fun checkPhotoLibraryPermission(): PermissionState {
         return when (PHPhotoLibrary.authorizationStatus()) {
-            3L -> PermissionState.Granted // PHAuthorizationStatusAuthorized
-
-            2L -> PermissionState.PermanentlyDenied // PHAuthorizationStatusDenied
-
-            1L -> PermissionState.Restricted // PHAuthorizationStatusRestricted
-
-            0L -> PermissionState.NotDetermined // PHAuthorizationStatusNotDetermined
-
+            PHAuthorizationStatusAuthorized -> PermissionState.Granted
+            PHAuthorizationStatusDenied -> PermissionState.PermanentlyDenied
+            PHAuthorizationStatusRestricted -> PermissionState.Restricted
+            PHAuthorizationStatusNotDetermined -> PermissionState.NotDetermined
             else -> PermissionState.NotDetermined
         }
     }
@@ -247,8 +352,8 @@ actual class PermissionManager {
         return suspendCancellableCoroutine { continuation ->
             PHPhotoLibrary.requestAuthorization { status ->
                 val result = when (status) {
-                    3L -> PermissionResult.Granted // Authorized
-                    2L -> PermissionResult.PermanentlyDenied // Denied
+                    PHAuthorizationStatusAuthorized -> PermissionResult.Granted
+                    PHAuthorizationStatusDenied -> PermissionResult.PermanentlyDenied
                     else -> PermissionResult.Cancelled
                 }
                 continuation.resume(result)
@@ -260,7 +365,7 @@ actual class PermissionManager {
 
     private fun checkNotificationPermission(): PermissionState {
         // Notification authorization check requires async API
-        // For this stub, return NotDetermined
+        // Return NotDetermined as we can't synchronously check
         return PermissionState.NotDetermined
     }
 
