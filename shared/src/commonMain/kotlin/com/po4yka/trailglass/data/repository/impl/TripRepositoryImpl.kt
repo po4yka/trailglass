@@ -166,7 +166,7 @@ class TripRepositoryImpl(
     /**
      * Map database row to Trip domain object.
      */
-    private fun mapToTrip(row: com.po4yka.trailglass.db.Trip): Trip {
+    private fun mapToTrip(row: com.po4yka.trailglass.db.Trips): Trip {
         return Trip(
             id = row.id,
             name = row.name,

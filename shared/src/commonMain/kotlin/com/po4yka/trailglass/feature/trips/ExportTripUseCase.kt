@@ -45,7 +45,8 @@ class ExportTripUseCase(
                 ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
 
             // Get location samples for the trip
-            val locationSamples = locationRepository.getLocationsForTrip(tripId)
+            val locationsResult = locationRepository.getSamplesForTrip(tripId)
+            val locationSamples = locationsResult.getOrNull() ?: emptyList()
 
             logger.info { "Exporting trip $tripId with ${locationSamples.size} location samples" }
 

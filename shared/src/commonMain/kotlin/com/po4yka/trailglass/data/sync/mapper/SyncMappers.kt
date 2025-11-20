@@ -132,25 +132,19 @@ fun Photo.toMetadataDto(
     return PhotoMetadataDto(
         id = id,
         timestamp = timestamp.toString(),
-        location = location?.let { CoordinateDto(it.latitude, it.longitude) },
-        placeVisitId = placeVisitId,
-        tripId = tripId,
-        caption = caption,
-        url = null, // Server will provide URL after upload
+        location = if (latitude != null && longitude != null) {
+            CoordinateDto(latitude, longitude)
+        } else null,
+        placeVisitId = null, // Not stored in Photo, use PhotoAttachment instead
+        tripId = null, // Not stored in Photo
+        caption = null, // Not stored in Photo, use PhotoAttachment instead
+        url = uri, // Use the photo URI
         thumbnailUrl = null,
-        exifData = exifData?.let {
-            ExifDataDto(
-                cameraModel = it.cameraModel,
-                focalLength = it.focalLength,
-                aperture = it.aperture,
-                iso = it.iso,
-                shutterSpeed = it.shutterSpeed
-            )
-        },
+        exifData = null, // EXIF data not in base Photo model
         syncAction = syncAction,
         localVersion = localVersion,
         serverVersion = serverVersion,
-        lastModified = timestamp.toString(),
+        lastModified = addedAt.toString(),
         deviceId = deviceId
     )
 }
@@ -158,23 +152,12 @@ fun Photo.toMetadataDto(
 fun PhotoMetadataDto.toDomain(localPath: String): Photo {
     return Photo(
         id = id,
-        filePath = localPath,
+        uri = url ?: localPath,
         timestamp = Instant.parse(timestamp),
-        location = location?.let { Coordinate(it.latitude, it.longitude) },
-        placeVisitId = placeVisitId,
-        tripId = tripId,
-        caption = caption,
-        exifData = exifData?.let {
-            ExifData(
-                cameraModel = it.cameraModel,
-                focalLength = it.focalLength,
-                aperture = it.aperture,
-                iso = it.iso,
-                shutterSpeed = it.shutterSpeed
-            )
-        },
-        uploadedAt = lastModified?.let { Instant.parse(it) },
-        userId = deviceId
+        latitude = location?.latitude,
+        longitude = location?.longitude,
+        userId = deviceId,
+        addedAt = lastModified?.let { Instant.parse(it) } ?: Instant.parse(timestamp)
     )
 }
 

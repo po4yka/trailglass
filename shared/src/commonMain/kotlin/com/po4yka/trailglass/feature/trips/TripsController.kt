@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
+import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
 
 /**
  * Controller for trips list view.
@@ -123,8 +124,8 @@ class TripsController(
 
         controllerScope.launch {
             when (val result = getTripsUseCase.execute(userId)) {
-                is Result.Success -> {
-                    val trips = result.getOrThrow()
+                is TrailGlassResult.Success -> {
+                    val trips = result.data
                     val ongoing = trips.filter { it.isOngoing }
                     val completed = trips.filter { !it.isOngoing }
 
@@ -139,8 +140,8 @@ class TripsController(
 
                     logger.info { "Loaded ${trips.size} trips (${ongoing.size} ongoing, ${completed.size} completed)" }
                 }
-                is Result.Failure -> {
-                    val error = result.exceptionOrNull()?.message ?: "Unknown error"
+                is TrailGlassResult.Error -> {
+                    val error = result.error.userMessage
                     logger.error { "Failed to load trips: $error" }
                     _state.update {
                         it.copy(
@@ -210,15 +211,25 @@ class TripsController(
         _state.update { it.copy(isLoading = true, error = null, showCreateDialog = false) }
 
         controllerScope.launch {
-            when (val result = createTripUseCase.execute(trip)) {
-                is Result.Success -> {
-                    logger.info { "Created trip: ${trip.id}" }
+            val result = createTripUseCase.execute(
+                userId = userId,
+                name = trip.name,
+                startTime = trip.startTime,
+                endTime = trip.endTime,
+                description = trip.description,
+                isAutoDetected = trip.isAutoDetected,
+                detectionConfidence = trip.detectionConfidence
+            )
+
+            when (result) {
+                is TrailGlassResult.Success -> {
+                    logger.info { "Created trip: ${result.data.id}" }
 
                     // Reload trips to include the new one
                     loadTrips()
                 }
-                is Result.Failure -> {
-                    val error = result.exceptionOrNull()?.message ?: "Failed to create trip"
+                is TrailGlassResult.Error -> {
+                    val error = result.error.userMessage
                     logger.error { "Failed to create trip: $error" }
                     _state.update {
                         it.copy(
@@ -231,24 +242,31 @@ class TripsController(
         }
     }
 
-    /**
-     * Update an existing trip.
-     */
     fun updateTrip(trip: Trip) {
         logger.debug { "Updating trip: ${trip.id}" }
 
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            when (val result = updateTripUseCase.execute(trip)) {
-                is Result.Success -> {
-                    logger.info { "Updated trip: ${trip.id}" }
+            val result = updateTripUseCase.execute(
+                tripId = trip.id,
+                name = trip.name,
+                description = trip.description,
+                endTime = trip.endTime,
+                coverPhotoUri = trip.coverPhotoUri,
+                tags = trip.tags,
+                isPublic = trip.isPublic
+            )
+
+            when (result) {
+                is TrailGlassResult.Success -> {
+                    logger.info { "Updated trip: ${result.data.id}" }
 
                     // Reload trips to reflect the update
                     loadTrips()
                 }
-                is Result.Failure -> {
-                    val error = result.exceptionOrNull()?.message ?: "Failed to update trip"
+                is TrailGlassResult.Error -> {
+                    val error = result.error.userMessage
                     logger.error { "Failed to update trip: $error" }
                     _state.update {
                         it.copy(
@@ -271,7 +289,7 @@ class TripsController(
 
         controllerScope.launch {
             when (val result = deleteTripUseCase.execute(tripId)) {
-                is Result.Success -> {
+                is TrailGlassResult.Success -> {
                     logger.info { "Deleted trip: $tripId" }
 
                     // Reload trips to reflect the deletion
@@ -280,8 +298,8 @@ class TripsController(
                     // Notify caller of successful deletion
                     onSuccess()
                 }
-                is Result.Failure -> {
-                    val error = result.exceptionOrNull()?.message ?: "Failed to delete trip"
+                is TrailGlassResult.Error -> {
+                    val error = result.error.userMessage
                     logger.error { "Failed to delete trip: $error" }
                     _state.update {
                         it.copy(

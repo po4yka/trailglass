@@ -98,10 +98,14 @@ class EnhancedTimelineController(
     fun navigateNext() {
         val currentState = _state.value
         val nextDate = when (currentState.zoomLevel) {
-            TimelineZoomLevel.DAY -> currentState.selectedDate.plus(1, kotlinx.datetime.DateTimeUnit.DAY)
-            TimelineZoomLevel.WEEK -> currentState.selectedDate.plus(7, kotlinx.datetime.DateTimeUnit.DAY)
-            TimelineZoomLevel.MONTH -> currentState.selectedDate.plus(1, kotlinx.datetime.DateTimeUnit.MONTH)
-            TimelineZoomLevel.YEAR -> currentState.selectedDate.plus(1, kotlinx.datetime.DateTimeUnit.YEAR)
+            TimelineZoomLevel.DAY -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() + 1)
+            TimelineZoomLevel.WEEK -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() + 7)
+            TimelineZoomLevel.MONTH -> {
+                val year = if (currentState.selectedDate.monthNumber == 12) currentState.selectedDate.year + 1 else currentState.selectedDate.year
+                val month = if (currentState.selectedDate.monthNumber == 12) 1 else currentState.selectedDate.monthNumber + 1
+                kotlinx.datetime.LocalDate(year, month, 1)
+            }
+            TimelineZoomLevel.YEAR -> kotlinx.datetime.LocalDate(currentState.selectedDate.year + 1, currentState.selectedDate.monthNumber, 1)
         }
         selectDate(nextDate)
     }
@@ -112,10 +116,14 @@ class EnhancedTimelineController(
     fun navigatePrevious() {
         val currentState = _state.value
         val previousDate = when (currentState.zoomLevel) {
-            TimelineZoomLevel.DAY -> currentState.selectedDate.minus(1, kotlinx.datetime.DateTimeUnit.DAY)
-            TimelineZoomLevel.WEEK -> currentState.selectedDate.minus(7, kotlinx.datetime.DateTimeUnit.DAY)
-            TimelineZoomLevel.MONTH -> currentState.selectedDate.minus(1, kotlinx.datetime.DateTimeUnit.MONTH)
-            TimelineZoomLevel.YEAR -> currentState.selectedDate.minus(1, kotlinx.datetime.DateTimeUnit.YEAR)
+            TimelineZoomLevel.DAY -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() - 1)
+            TimelineZoomLevel.WEEK -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() - 7)
+            TimelineZoomLevel.MONTH -> {
+                val year = if (currentState.selectedDate.monthNumber == 1) currentState.selectedDate.year - 1 else currentState.selectedDate.year
+                val month = if (currentState.selectedDate.monthNumber == 1) 12 else currentState.selectedDate.monthNumber - 1
+                kotlinx.datetime.LocalDate(year, month, 1)
+            }
+            TimelineZoomLevel.YEAR -> kotlinx.datetime.LocalDate(currentState.selectedDate.year - 1, currentState.selectedDate.monthNumber, 1)
         }
         selectDate(previousDate)
     }

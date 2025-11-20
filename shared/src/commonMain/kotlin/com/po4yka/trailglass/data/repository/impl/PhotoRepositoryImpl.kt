@@ -300,7 +300,7 @@ class PhotoRepositoryImpl(
     /**
      * Map database row to Photo domain object.
      */
-    private fun mapToPhoto(row: com.po4yka.trailglass.db.Photo): Photo {
+    private fun mapToPhoto(row: com.po4yka.trailglass.db.Photos): Photo {
         return Photo(
             id = row.id,
             uri = row.uri,

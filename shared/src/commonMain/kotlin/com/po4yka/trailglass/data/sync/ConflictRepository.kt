@@ -48,23 +48,15 @@ interface ConflictRepository {
  */
 fun SyncConflictDto.toStoredConflict(): StoredConflict {
     return StoredConflict(
-        conflictId = conflictId,
-        entityType = when (entityType) {
-            "PLACE_VISIT" -> EntityType.PLACE_VISIT
-            "TRIP" -> EntityType.TRIP
-            "PHOTO" -> EntityType.PHOTO
-            "LOCATION_SAMPLE" -> EntityType.LOCATION_SAMPLE
-            "ROUTE_SEGMENT" -> EntityType.ROUTE_SEGMENT
-            "SETTINGS" -> EntityType.SETTINGS
-            else -> EntityType.PLACE_VISIT // Default fallback
-        },
+        conflictId = "${entityType.name}_${entityId}_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
+        entityType = entityType,
         entityId = entityId,
-        localVersion = localVersion,
-        remoteVersion = remoteVersion,
-        localData = localData.toString(), // Assuming localData is a map or JSON-serializable
-        remoteData = remoteData.toString(),
-        conflictedFields = conflictedFields,
-        suggestedResolution = suggestedResolution,
+        localVersion = localVersion["version"]?.toLongOrNull() ?: 0L,
+        remoteVersion = remoteVersion["version"]?.toLongOrNull() ?: 0L,
+        localData = localVersion.toString(),
+        remoteData = remoteVersion.toString(),
+        conflictedFields = emptyList(), // Not provided in DTO
+        suggestedResolution = suggestedResolution.name,
         createdAt = kotlinx.datetime.Clock.System.now()
     )
 }

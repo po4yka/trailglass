@@ -6,6 +6,8 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import kotlin.random.Random
+import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
+import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for creating a new trip (manual or from detection).
@@ -33,7 +35,7 @@ class CreateTripUseCase(
         description: String? = null,
         isAutoDetected: Boolean = false,
         detectionConfidence: Float = 0f
-    ): Result<Trip> {
+    ): TrailGlassResult<Trip> {
         return try {
             val now = Clock.System.now()
 
@@ -53,9 +55,9 @@ class CreateTripUseCase(
 
             tripRepository.upsertTrip(trip)
 
-            Result.success(trip)
+            TrailGlassResult.Success(trip)
         } catch (e: Exception) {
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 

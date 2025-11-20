@@ -19,8 +19,9 @@ CREATE INDEX trips_ongoing ON trips(is_ongoing) WHERE is_ongoing = 1;
 CREATE INDEX trips_deleted ON trips(deleted_at) WHERE deleted_at IS NULL;
 
 -- Queries
-insertTrip:
-INSERT INTO trips (
+-- Queries
+upsertTrip:
+INSERT OR REPLACE INTO trips (
     id, name, start_time, end_time, primary_country, is_ongoing,
     user_id, created_at, updated_at, deleted_at
 )
@@ -30,7 +31,12 @@ getTripById:
 SELECT * FROM trips
 WHERE id = ? AND deleted_at IS NULL;
 
-getTripsByUser:
+getTripsForUser:
+SELECT * FROM trips
+WHERE user_id = ? AND deleted_at IS NULL
+ORDER BY start_time DESC;
+
+getTripsWithPagination:
 SELECT * FROM trips
 WHERE user_id = ? AND deleted_at IS NULL
 ORDER BY start_time DESC
@@ -41,7 +47,7 @@ SELECT * FROM trips
 WHERE user_id = ? AND is_ongoing = 1 AND deleted_at IS NULL
 ORDER BY start_time DESC;
 
-getTripsByTimeRange:
+getTripsInRange:
 SELECT * FROM trips
 WHERE user_id = ?
   AND start_time <= ?
@@ -58,7 +64,7 @@ SET name = ?,
     updated_at = ?
 WHERE id = ?;
 
-endTrip:
+completeTrip:
 UPDATE trips
 SET end_time = ?,
     is_ongoing = 0,
@@ -70,9 +76,13 @@ UPDATE trips
 SET deleted_at = ?, updated_at = ?
 WHERE id = ?;
 
-deletePermanently:
+deleteTrip:
 DELETE FROM trips
 WHERE id = ?;
+
+getTripCount:
+SELECT count(*) FROM trips
+WHERE user_id = ? AND deleted_at IS NULL;
 
 deleteAll:
 DELETE FROM trips;

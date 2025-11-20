@@ -68,8 +68,8 @@ class LocationRepositoryImpl(
             logger.debug { "Fetching samples for user $userId from $startTime to $endTime" }
             val samples = queries.getSamplesByTimeRange(
                 user_id = userId,
-                start = startTime.toEpochMilliseconds(),
-                end = endTime.toEpochMilliseconds()
+                timestamp = startTime.toEpochMilliseconds(),
+                timestamp_ = endTime.toEpochMilliseconds()
             ).executeAsList().map { it.toLocationSample() }
             logger.info { "Found ${samples.size} location samples for user $userId" }
             samples
@@ -100,6 +100,7 @@ class LocationRepositoryImpl(
                     updated_at = Clock.System.now().toEpochMilliseconds(),
                     id = sampleId
                 )
+                Unit
             }
         }
 
@@ -107,6 +108,7 @@ class LocationRepositoryImpl(
         resultOf {
             val now = Clock.System.now().toEpochMilliseconds()
             queries.softDelete(deleted_at = now, updated_at = now, id = id)
+            Unit
         }
     }
 
@@ -114,6 +116,7 @@ class LocationRepositoryImpl(
         withContext(Dispatchers.IO) {
             resultOf {
                 queries.deleteOldSamples(userId, beforeTime.toEpochMilliseconds())
+                Unit
             }
         }
 

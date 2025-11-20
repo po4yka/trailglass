@@ -27,7 +27,8 @@ class DatabaseLocationService(
 
     override suspend fun processSamples() {
         // Get unprocessed samples
-        val unprocessedSamples = locationRepository.getUnprocessedSamples(userId, limit = 1000)
+        val result = locationRepository.getUnprocessedSamples(userId, limit = 1000)
+        val unprocessedSamples = result.getOrNull() ?: return
 
         if (unprocessedSamples.isEmpty()) return
 
@@ -44,7 +45,7 @@ class DatabaseLocationService(
      * Get location samples for a time range.
      */
     suspend fun getSamples(startTime: Instant, endTime: Instant): List<LocationSample> {
-        return locationRepository.getSamples(userId, startTime, endTime)
+        return locationRepository.getSamples(userId, startTime, endTime).getOrNull() ?: emptyList()
     }
 
     /**

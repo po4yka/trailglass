@@ -28,13 +28,14 @@ actual class SecureTokenStorage(private val context: Context) {
         )
     }
 
-    actual suspend fun saveTokens(tokens: AuthTokens) = withContext(Dispatchers.IO) {
+    actual suspend fun saveTokens(tokens: AuthTokens): Unit = withContext(Dispatchers.IO) {
         sharedPreferences.edit().apply {
             putString(KEY_ACCESS_TOKEN, tokens.accessToken)
             putString(KEY_REFRESH_TOKEN, tokens.refreshToken)
             putLong(KEY_EXPIRES_AT, tokens.expiresAt)
             apply()
         }
+        Unit
     }
 
     actual suspend fun getTokens(): AuthTokens? = withContext(Dispatchers.IO) {
@@ -49,13 +50,14 @@ actual class SecureTokenStorage(private val context: Context) {
         }
     }
 
-    actual suspend fun clearTokens() = withContext(Dispatchers.IO) {
+    actual suspend fun clearTokens(): Unit = withContext(Dispatchers.IO) {
         sharedPreferences.edit().apply {
             remove(KEY_ACCESS_TOKEN)
             remove(KEY_REFRESH_TOKEN)
             remove(KEY_EXPIRES_AT)
             apply()
         }
+        Unit
     }
 
     companion object {

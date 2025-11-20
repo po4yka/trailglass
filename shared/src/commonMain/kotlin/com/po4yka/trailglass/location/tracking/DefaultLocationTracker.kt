@@ -131,9 +131,11 @@ class DefaultLocationTracker(
         val now = Clock.System.now()
 
         // Create Location object for detectors
+        // Create Location object for detectors
         val location = Location(
-            coordinate = coordinate,
-            timestamp = now,
+            latitude = coordinate.latitude,
+            longitude = coordinate.longitude,
+            time = now.toEpochMilliseconds(),
             accuracy = null,
             altitude = null,
             speed = null,
@@ -168,7 +170,7 @@ class DefaultLocationTracker(
         )
 
         // Save to repository
-        locationRepository.saveLocation(sample)
+        locationRepository.insertSample(sample)
         locationsRecordedToday++
 
         // Emit to observers

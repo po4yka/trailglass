@@ -5,6 +5,8 @@ import com.po4yka.trailglass.domain.model.Trip
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
+import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
+import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for retrieving trips.
@@ -21,15 +23,15 @@ class GetTripsUseCase(
      * @param userId User ID
      * @return Result with list of trips or error
      */
-    suspend fun execute(userId: String): Result<List<Trip>> {
+    suspend fun execute(userId: String): TrailGlassResult<List<Trip>> {
         return try {
             val trips = tripRepository.getTripsForUser(userId)
                 .sortedByDescending { it.startTime }
 
-            Result.success(trips)
+            TrailGlassResult.Success(trips)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get trips for user $userId" }
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 
@@ -39,15 +41,15 @@ class GetTripsUseCase(
      * @param tripId Trip ID
      * @return Result with Trip or error
      */
-    suspend fun getById(tripId: String): Result<Trip> {
+    suspend fun getById(tripId: String): TrailGlassResult<Trip> {
         return try {
             val trip = tripRepository.getTripById(tripId)
-                ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
+                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
 
-            Result.success(trip)
+            TrailGlassResult.Success(trip)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get trip $tripId" }
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 
@@ -57,15 +59,15 @@ class GetTripsUseCase(
      * @param userId User ID
      * @return Result with list of ongoing trips or error
      */
-    suspend fun getOngoing(userId: String): Result<List<Trip>> {
+    suspend fun getOngoing(userId: String): TrailGlassResult<List<Trip>> {
         return try {
             val trips = tripRepository.getOngoingTrips(userId)
                 .sortedByDescending { it.startTime }
 
-            Result.success(trips)
+            TrailGlassResult.Success(trips)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get ongoing trips for user $userId" }
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 
@@ -81,15 +83,15 @@ class GetTripsUseCase(
         userId: String,
         startTime: Instant,
         endTime: Instant
-    ): Result<List<Trip>> {
+    ): TrailGlassResult<List<Trip>> {
         return try {
             val trips = tripRepository.getTripsInRange(userId, startTime, endTime)
                 .sortedByDescending { it.startTime }
 
-            Result.success(trips)
+            TrailGlassResult.Success(trips)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get trips in range for user $userId" }
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 }

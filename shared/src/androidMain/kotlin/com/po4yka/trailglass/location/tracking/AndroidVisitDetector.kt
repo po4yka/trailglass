@@ -94,11 +94,13 @@ class AndroidVisitDetector(
     private suspend fun checkForVisits() {
         // Get recent location samples (last 30 minutes)
         val lookbackTime = Clock.System.now() - 30.minutes
-        val recentSamples = locationRepository.getLocationSamplesInTimeRange(
+        val recentSamplesResult = locationRepository.getSamples(
             userId = userId,
             startTime = lookbackTime,
             endTime = Clock.System.now()
-        ).first()
+        )
+
+        val recentSamples = recentSamplesResult.getOrNull() ?: emptyList()
 
         if (recentSamples.isEmpty()) {
             logger.trace { "No recent samples for visit detection" }
@@ -201,7 +203,7 @@ class AndroidVisitDetector(
 
         // Create a VISIT-type location sample (Android equivalent of iOS CLVisit)
         val visitSample = LocationSample(
-            id = uuidGenerator.generate(),
+            id = uuidGenerator.randomUUID(),
             timestamp = visit.arrivalTime, // Use arrival time for visit timestamp
             latitude = visit.latitude,
             longitude = visit.longitude,
@@ -217,7 +219,7 @@ class AndroidVisitDetector(
 
         // Save the VISIT sample to database
         try {
-            locationRepository.insertLocationSample(visitSample)
+            locationRepository.insertSample(visitSample)
             logger.info {
                 "Created VISIT-type location sample (Android equivalent of iOS CLVisit) " +
                 "for visit lasting $duration"

@@ -54,7 +54,7 @@ class GetStatsUseCase(
         logger.debug { "Found ${trips.size} trips" }
 
         // Get visits in range
-        val visits = placeVisitRepository.getVisitsInRange(userId, startTime, endTime)
+        val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
         logger.debug { "Found ${visits.size} visits" }
 
         // Extract countries and cities

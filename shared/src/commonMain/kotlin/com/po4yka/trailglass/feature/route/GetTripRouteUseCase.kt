@@ -6,6 +6,8 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import me.tatarka.inject.annotations.Inject
+import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
+import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for retrieving a complete trip route with all associated data.
@@ -44,7 +46,7 @@ class GetTripRouteUseCase(
      * @param forceRefresh If true, bypass cache and fetch fresh data
      * @return Result containing TripRoute or error
      */
-    suspend fun execute(tripId: String, forceRefresh: Boolean = false): Result<TripRoute> {
+    suspend fun execute(tripId: String, forceRefresh: Boolean = false): TrailGlassResult<TripRoute> {
         return try {
             // Check cache first (unless force refresh)
             if (enableCache && !forceRefresh) {
@@ -58,21 +60,18 @@ class GetTripRouteUseCase(
             logger.info { "Fetching route for trip $tripId" }
 
             // 1. Get trip details
-            val trip = tripRepository.getTripById(tripId).getOrElse {
-                logger.error(it) { "Failed to fetch trip $tripId" }
-                return Result.failure(it)
-            }
+            val trip = tripRepository.getTripById(tripId)
+                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
 
             // 2. Get all location samples for the trip time range
             val endTime = trip.endTime ?: kotlinx.datetime.Clock.System.now()
-            val allSamples = locationRepository.getSamples(
+            val samplesResult = locationRepository.getSamples(
                 userId = trip.userId,
                 startTime = trip.startTime,
                 endTime = endTime
-            ).getOrElse {
-                logger.error(it) { "Failed to fetch location samples for trip $tripId" }
-                return Result.failure(it)
-            }
+            )
+            val allSamples = samplesResult.getOrNull()
+                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Failed to fetch location samples for trip $tripId"))
 
             // 3. Filter and validate location samples
             val filteredSamples = locationSampleFilter.filterAndValidate(allSamples)
@@ -103,6 +102,7 @@ class GetTripRouteUseCase(
             // 4. Get route segments
             val routeSegments = try {
                 routeSegmentRepository.getRouteSegmentsInRange(
+                    userId = trip.userId,
                     startTime = trip.startTime,
                     endTime = endTime
                 )
@@ -172,11 +172,11 @@ class GetTripRouteUseCase(
                 }
             }
 
-            Result.success(tripRoute)
+            TrailGlassResult.Success(tripRoute)
 
         } catch (e: Exception) {
             logger.error(e) { "Unexpected error fetching trip route for $tripId" }
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 

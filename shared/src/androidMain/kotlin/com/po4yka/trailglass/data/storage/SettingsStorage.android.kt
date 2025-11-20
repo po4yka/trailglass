@@ -23,40 +23,40 @@ actual class SettingsStorage(private val context: Context) {
     // Preference keys
     private object Keys {
         // Tracking
-        val TRACKING_ACCURACY = stringKey("tracking_accuracy")
-        val TRACKING_UPDATE_INTERVAL = stringKey("tracking_update_interval")
-        val TRACKING_BATTERY_OPT = booleanKey("tracking_battery_opt")
-        val TRACKING_WHEN_STATIONARY = booleanKey("tracking_when_stationary")
-        val TRACKING_MIN_DISTANCE = intKey("tracking_min_distance")
+        val TRACKING_ACCURACY = stringPreferencesKey("tracking_accuracy")
+        val TRACKING_UPDATE_INTERVAL = stringPreferencesKey("tracking_update_interval")
+        val TRACKING_BATTERY_OPT = booleanPreferencesKey("tracking_battery_opt")
+        val TRACKING_WHEN_STATIONARY = booleanPreferencesKey("tracking_when_stationary")
+        val TRACKING_MIN_DISTANCE = intPreferencesKey("tracking_min_distance")
 
         // Privacy
-        val PRIVACY_RETENTION_DAYS = intKey("privacy_retention_days")
-        val PRIVACY_SHARE_ANALYTICS = booleanKey("privacy_share_analytics")
-        val PRIVACY_SHARE_CRASH = booleanKey("privacy_share_crash")
-        val PRIVACY_AUTO_BACKUP = booleanKey("privacy_auto_backup")
-        val PRIVACY_ENCRYPT_BACKUPS = booleanKey("privacy_encrypt_backups")
+        val PRIVACY_RETENTION_DAYS = intPreferencesKey("privacy_retention_days")
+        val PRIVACY_SHARE_ANALYTICS = booleanPreferencesKey("privacy_share_analytics")
+        val PRIVACY_SHARE_CRASH = booleanPreferencesKey("privacy_share_crash")
+        val PRIVACY_AUTO_BACKUP = booleanPreferencesKey("privacy_auto_backup")
+        val PRIVACY_ENCRYPT_BACKUPS = booleanPreferencesKey("privacy_encrypt_backups")
 
         // Units
-        val UNIT_DISTANCE = stringKey("unit_distance")
-        val UNIT_TEMPERATURE = stringKey("unit_temperature")
-        val UNIT_TIME_FORMAT = stringKey("unit_time_format")
+        val UNIT_DISTANCE = stringPreferencesKey("unit_distance")
+        val UNIT_TEMPERATURE = stringPreferencesKey("unit_temperature")
+        val UNIT_TIME_FORMAT = stringPreferencesKey("unit_time_format")
 
         // Appearance
-        val APPEARANCE_THEME = stringKey("appearance_theme")
-        val APPEARANCE_DEVICE_WALLPAPER = booleanKey("appearance_device_wallpaper")
-        val APPEARANCE_MAP_IN_TIMELINE = booleanKey("appearance_map_in_timeline")
-        val APPEARANCE_COMPACT_VIEW = booleanKey("appearance_compact_view")
+        val APPEARANCE_THEME = stringPreferencesKey("appearance_theme")
+        val APPEARANCE_DEVICE_WALLPAPER = booleanPreferencesKey("appearance_device_wallpaper")
+        val APPEARANCE_MAP_IN_TIMELINE = booleanPreferencesKey("appearance_map_in_timeline")
+        val APPEARANCE_COMPACT_VIEW = booleanPreferencesKey("appearance_compact_view")
 
         // Account
-        val ACCOUNT_EMAIL = stringKey("account_email")
-        val ACCOUNT_AUTO_SYNC = booleanKey("account_auto_sync")
-        val ACCOUNT_SYNC_WIFI_ONLY = booleanKey("account_sync_wifi_only")
-        val ACCOUNT_LAST_SYNC = longKey("account_last_sync")
+        val ACCOUNT_EMAIL = stringPreferencesKey("account_email")
+        val ACCOUNT_AUTO_SYNC = booleanPreferencesKey("account_auto_sync")
+        val ACCOUNT_SYNC_WIFI_ONLY = booleanPreferencesKey("account_sync_wifi_only")
+        val ACCOUNT_LAST_SYNC = longPreferencesKey("account_last_sync")
 
         // Data Management
-        val DATA_LAST_EXPORT = longKey("data_last_export")
-        val DATA_LAST_BACKUP = longKey("data_last_backup")
-        val DATA_STORAGE_MB = doubleKey("data_storage_mb")
+        val DATA_LAST_EXPORT = longPreferencesKey("data_last_export")
+        val DATA_LAST_BACKUP = longPreferencesKey("data_last_backup")
+        val DATA_STORAGE_MB = doublePreferencesKey("data_storage_mb")
     }
 
     actual fun getSettingsFlow(): Flow<AppSettings> {

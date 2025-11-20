@@ -43,7 +43,12 @@ class RouteSegmentRepositoryImpl(
                     to_place_visit_id = segment.toPlaceVisitId,
                     transport_type = segment.transportType.name,
                     distance_meters = segment.distanceMeters,
-                    average_speed_mps = segment.averageSpeedMps
+                    average_speed_mps = segment.averageSpeedMps,
+                    user_id = segment.userId,
+                    trip_id = segment.tripId,
+                    created_at = segment.createdAt?.toEpochMilliseconds() ?: kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
+                    updated_at = segment.updatedAt?.toEpochMilliseconds(),
+                    deleted_at = null
                 )
 
                 // Insert location sample associations
@@ -58,6 +63,7 @@ class RouteSegmentRepositoryImpl(
                 // Insert simplified path points
                 segment.simplifiedPath.forEachIndexed { index, coordinate ->
                     queries.insertSimplifiedPathPoint(
+                        id = uuidGenerator.randomUUID(),
                         route_segment_id = segment.id,
                         sequence_number = index.toLong(),
                         latitude = coordinate.latitude,
@@ -91,7 +97,7 @@ class RouteSegmentRepositoryImpl(
             // Load associated sample IDs
             val sampleIds = queries.getRouteSegmentSamples(segmentId)
                 .executeAsList()
-                .map { it.location_sample_id }
+                .map { it.id }
 
             // Load simplified path points
             val pathPoints = queries.getSimplifiedPathPoints(segmentId)
@@ -108,12 +114,14 @@ class RouteSegmentRepositoryImpl(
     }
 
     override suspend fun getRouteSegmentsInRange(
+        userId: String,
         startTime: Instant,
         endTime: Instant
     ): List<RouteSegment> = withContext(Dispatchers.IO) {
         logger.debug { "Getting route segments in range $startTime to $endTime" }
         try {
             val segmentRows = queries.getRouteSegmentsInRange(
+                user_id = userId,
                 start_time = startTime.toEpochMilliseconds(),
                 end_time = endTime.toEpochMilliseconds()
             )
@@ -125,7 +133,7 @@ class RouteSegmentRepositoryImpl(
             val segments = segmentRows.map { row ->
                 val sampleIds = queries.getRouteSegmentSamples(row.id)
                     .executeAsList()
-                    .map { it.location_sample_id }
+                    .map { it.id }
 
                 val pathPoints = queries.getSimplifiedPathPoints(row.id)
                     .executeAsList()
@@ -210,7 +218,7 @@ class RouteSegmentRepositoryImpl(
      * Map database row to RouteSegment domain object.
      */
     private fun mapToRouteSegment(
-        row: com.po4yka.trailglass.db.RouteSegment,
+        row: com.po4yka.trailglass.db.Route_segments,
         sampleIds: List<String>,
         pathPoints: List<Coordinate>
     ): RouteSegment {

@@ -101,7 +101,7 @@ class PhotoLocationAssociator {
         // Distance score (0.0 to 1.0, decays with distance)
         val distance = calculateDistance(
             photoLat, photoLon,
-            visit.location.latitude, visit.location.longitude
+            visit.centerLatitude, visit.centerLongitude
         )
         val distanceScore = calculateDistanceScore(distance)
 

@@ -17,7 +17,7 @@ data class AuthTokens(
 /**
  * Expect/actual for platform-specific secure token storage.
  */
-expect class SecureTokenStorage() {
+expect class SecureTokenStorage {
     suspend fun saveTokens(tokens: AuthTokens)
     suspend fun getTokens(): AuthTokens?
     suspend fun clearTokens()

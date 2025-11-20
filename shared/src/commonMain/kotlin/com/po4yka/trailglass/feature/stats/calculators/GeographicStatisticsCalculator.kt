@@ -30,7 +30,7 @@ class GeographicStatisticsCalculator {
             )
         }
 
-        val countries = visits.mapNotNull { it.country }.toSet()
+        val countries = visits.mapNotNull { it.countryCode }.toSet()
         val cities = visits.mapNotNull { it.city }.toSet()
 
         val topCountries = calculateTopCountries(visits)
@@ -54,8 +54,8 @@ class GeographicStatisticsCalculator {
      */
     private fun calculateTopCountries(visits: List<PlaceVisit>): List<CountryStats> {
         return visits
-            .filter { it.country != null }
-            .groupBy { it.country!! }
+            .filter { it.countryCode != null }
+            .groupBy { it.countryCode!! }
             .map { (country, countryVisits) ->
                 CountryStats(
                     countryCode = country,
@@ -80,7 +80,7 @@ class GeographicStatisticsCalculator {
             .map { (city, cityVisits) ->
                 CityStats(
                     city = city,
-                    countryCode = cityVisits.firstOrNull()?.country,
+                    countryCode = cityVisits.firstOrNull()?.countryCode,
                     visitCount = cityVisits.size,
                     totalDuration = cityVisits.fold(Duration.ZERO) { acc, visit ->
                         acc + visit.duration
@@ -101,7 +101,7 @@ class GeographicStatisticsCalculator {
         val locationClusters = mutableMapOf<String, MutableList<PlaceVisit>>()
 
         visits.forEach { visit ->
-            val key = "${(visit.location.latitude * 1000).toInt()},${(visit.location.longitude * 1000).toInt()}"
+            val key = "${(visit.centerLatitude * 1000).toInt()},${(visit.centerLongitude * 1000).toInt()}"
             locationClusters.getOrPut(key) { mutableListOf() }.add(visit)
         }
 
@@ -112,9 +112,9 @@ class GeographicStatisticsCalculator {
         return LocationRecord(
             name = representative.displayName,
             city = representative.city,
-            country = representative.country,
-            latitude = representative.location.latitude,
-            longitude = representative.location.longitude
+            country = representative.countryCode,
+            latitude = representative.centerLatitude,
+            longitude = representative.centerLongitude
         )
     }
 
@@ -127,16 +127,16 @@ class GeographicStatisticsCalculator {
         val furthest = visits.maxByOrNull { visit ->
             calculateDistance(
                 homeBase.latitude, homeBase.longitude,
-                visit.location.latitude, visit.location.longitude
+                visit.centerLatitude, visit.centerLongitude
             )
         } ?: return null
 
         return LocationRecord(
             name = furthest.displayName,
             city = furthest.city,
-            country = furthest.country,
-            latitude = furthest.location.latitude,
-            longitude = furthest.location.longitude
+            country = furthest.countryCode,
+            latitude = furthest.centerLatitude,
+            longitude = furthest.centerLongitude
         )
     }
 

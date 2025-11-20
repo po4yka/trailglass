@@ -64,11 +64,11 @@ class GetTimelineForDayUseCase(
         val dayEnd = date.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
         // Get visits for the day
-        val visits = placeVisitRepository.getVisitsInRange(userId, dayStart, dayEnd)
+        val visits = placeVisitRepository.getVisits(userId, dayStart, dayEnd)
         logger.debug { "Found ${visits.size} visits for $date" }
 
         // Get routes for the day
-        val routes = routeSegmentRepository.getRouteSegmentsInRange(dayStart, dayEnd)
+        val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, dayStart, dayEnd)
         logger.debug { "Found ${routes.size} routes for $date" }
 
         // Build timeline items

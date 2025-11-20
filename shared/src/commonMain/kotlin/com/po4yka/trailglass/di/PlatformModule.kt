@@ -26,67 +26,67 @@ interface PlatformModule {
     /**
      * Platform-specific database driver factory.
      */
-    val databaseDriverFactory: DatabaseDriverFactory
+    fun databaseDriverFactory(): DatabaseDriverFactory
 
     /**
      * Platform-specific location service.
      * Provides real-time location tracking functionality.
      */
-    val locationService: LocationService
+    fun locationService(): LocationService
 
     /**
      * Application-level coroutine scope.
      * Should be tied to application lifecycle.
      */
-    val applicationScope: CoroutineScope
+    fun applicationScope(): CoroutineScope
 
     /**
      * Current user ID.
      */
-    val userId: String
+    fun userId(): String
 
     /**
      * Device identifier.
      */
-    val deviceId: String
+    fun deviceId(): String
 
     /**
      * Platform-specific secure token storage.
      */
-    val secureTokenStorage: SecureTokenStorage
+    fun secureTokenStorage(): SecureTokenStorage
 
     /**
      * Platform-specific device info provider.
      */
-    val platformDeviceInfoProvider: PlatformDeviceInfoProvider
+    fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider
 
     /**
      * Platform-specific sync state repository.
      */
-    val syncStateRepositoryImpl: SyncStateRepositoryImpl
+    fun syncStateRepositoryImpl(): SyncStateRepositoryImpl
 
     /**
      * Platform-specific network connectivity monitor.
      */
-    val networkConnectivityMonitor: NetworkConnectivityMonitor
+    fun networkConnectivityMonitor(): NetworkConnectivityMonitor
 
     /**
      * Platform-specific permission manager.
      */
-    val permissionManager: PermissionManager
+    fun permissionManager(): PermissionManager
 
     /**
      * Platform-specific encryption service.
      */
-    val encryptionService: com.po4yka.trailglass.data.security.EncryptionService
+    fun encryptionService(): com.po4yka.trailglass.data.security.EncryptionService
 
     /**
      * Platform-specific photo metadata extractor.
      */
-    val photoMetadataExtractor: com.po4yka.trailglass.photo.PhotoMetadataExtractor
+    fun photoMetadataExtractor(): com.po4yka.trailglass.photo.PhotoMetadataExtractor
 
     /**
      * Platform-specific settings storage.
      */
-    val settingsStorage: com.po4yka.trailglass.data.storage.SettingsStorage
+    fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage
 }

@@ -44,6 +44,12 @@ data class PlaceVisit(
         get() = endTime - startTime
 
     /**
+     * Convenience property for accessing location as a Coordinate.
+     */
+    val location: Coordinate
+        get() = Coordinate(centerLatitude, centerLongitude)
+
+    /**
      * Get a display name for this place.
      * Priority: userLabel > poiName > approximateAddress > coordinates
      */
@@ -67,5 +73,13 @@ data class PlaceVisit(
             }
         }
 
-    private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)
+    private fun Double.format(decimals: Int): String {
+        // Simple truncation for KMP compatibility
+        val str = this.toString()
+        val dotIndex = str.indexOf('.')
+        if (dotIndex >= 0 && dotIndex + decimals + 1 < str.length) {
+            return str.substring(0, dotIndex + decimals + 1)
+        }
+        return str
+    }
 }

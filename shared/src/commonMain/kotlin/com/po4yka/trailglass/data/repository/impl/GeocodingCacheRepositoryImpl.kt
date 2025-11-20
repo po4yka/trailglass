@@ -108,6 +108,10 @@ class GeocodingCacheRepositoryImpl(
      * Calculate bounding box coordinates for a given center point and radius.
      * Returns (minLat, maxLat, minLon, maxLon)
      */
+    /**
+     * Calculate bounding box coordinates for a given center point and radius.
+     * Returns (minLat, maxLat, minLon, maxLon)
+     */
     private fun calculateBoundingBox(
         centerLat: Double,
         centerLon: Double,
@@ -118,13 +122,11 @@ class GeocodingCacheRepositoryImpl(
         // Angular distance in radians
         val radDist = radiusMeters / earthRadiusMeters
 
-        val minLat = centerLat - Math.toDegrees(radDist)
-        val maxLat = centerLat + Math.toDegrees(radDist)
+        val minLat = centerLat - (radDist * 180.0 / PI)
+        val maxLat = centerLat + (radDist * 180.0 / PI)
 
         // Adjust for longitude changes based on latitude
-        val deltaLon = Math.toDegrees(
-            asin(sin(radDist) / cos(Math.toRadians(centerLat)))
-        )
+        val deltaLon = (asin(sin(radDist) / cos(centerLat * PI / 180.0))) * 180.0 / PI
 
         val minLon = centerLon - deltaLon
         val maxLon = centerLon + deltaLon
@@ -142,11 +144,11 @@ class GeocodingCacheRepositoryImpl(
     ): Double {
         val earthRadiusMeters = 6371000.0
 
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
+        val dLat = (lat2 - lat1) * PI / 180.0
+        val dLon = (lon2 - lon1) * PI / 180.0
 
         val a = sin(dLat / 2).pow(2) +
-                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 
         val c = 2 * asin(sqrt(a))

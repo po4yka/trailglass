@@ -72,8 +72,8 @@ class PlaceVisitRepositoryImpl(
     ): List<PlaceVisit> = withContext(Dispatchers.IO) {
         visitQueries.getVisitsByTimeRange(
             user_id = userId,
-            endTime = endTime.toEpochMilliseconds(),
-            startTime = startTime.toEpochMilliseconds()
+            start_time = endTime.toEpochMilliseconds(),
+            end_time = startTime.toEpochMilliseconds()
         ).executeAsList().map { visit ->
             val sampleIds = visitQueries.getSamplesForVisit(visit.id)
                 .executeAsList()

@@ -38,24 +38,24 @@ class AndroidPlatformModule(
 ) : PlatformModule {
 
     @Provides
-    override val databaseDriverFactory: DatabaseDriverFactory
-        get() = DatabaseDriverFactory(context)
+    override fun databaseDriverFactory(): DatabaseDriverFactory =
+        DatabaseDriverFactory(context)
 
     @Provides
-    override val locationService: LocationService
-        get() = AndroidLocationService(context)
+    override fun locationService(): LocationService =
+        AndroidLocationService(context)
 
     @Provides
-    override val applicationScope: CoroutineScope
-        get() = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    override fun applicationScope(): CoroutineScope =
+        CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
-    override val userId: String
-        get() = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
+    override fun userId(): String =
+        DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
 
     @Provides
-    override val deviceId: String
-        get() = android.provider.Settings.Secure.getString(
+    override fun deviceId(): String =
+        android.provider.Settings.Secure.getString(
             context.contentResolver,
             android.provider.Settings.Secure.ANDROID_ID
         ) ?: "unknown_device"
@@ -67,8 +67,8 @@ class AndroidPlatformModule(
      * Provides Android-specific secure token storage.
      */
     @Provides
-    override val secureTokenStorage: SecureTokenStorage
-        get() = SecureTokenStorage(context)
+    override fun secureTokenStorage(): SecureTokenStorage =
+        SecureTokenStorage(context)
 
     /**
      * Provides Android-specific device info provider.
@@ -77,8 +77,8 @@ class AndroidPlatformModule(
      * Provides Android-specific device info provider.
      */
     @Provides
-    override val platformDeviceInfoProvider: PlatformDeviceInfoProvider
-        get() = PlatformDeviceInfoProvider(context)
+    override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider =
+        PlatformDeviceInfoProvider(context)
 
     /**
      * Provides Android-specific sync state repository.
@@ -87,8 +87,8 @@ class AndroidPlatformModule(
      * Provides Android-specific sync state repository.
      */
     @Provides
-    override val syncStateRepositoryImpl: SyncStateRepositoryImpl
-        get() = SyncStateRepositoryImpl(context)
+    override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl =
+        SyncStateRepositoryImpl(context)
 
     /**
      * Provides Android-specific network connectivity monitor.
@@ -97,8 +97,8 @@ class AndroidPlatformModule(
      * Provides Android-specific network connectivity monitor.
      */
     @Provides
-    override val networkConnectivityMonitor: NetworkConnectivityMonitor
-        get() = AndroidNetworkConnectivityMonitor(context)
+    override fun networkConnectivityMonitor(): NetworkConnectivityMonitor =
+        AndroidNetworkConnectivityMonitor(context)
 
     /**
      * Provides Android-specific permission manager.
@@ -107,27 +107,27 @@ class AndroidPlatformModule(
      * Provides Android-specific permission manager.
      */
     @Provides
-    override val permissionManager: PermissionManager
-        get() = PermissionManager(context)
+    override fun permissionManager(): PermissionManager =
+        PermissionManager(context)
 
     /**
      * Provides Android-specific encryption service.
      */
     @Provides
-    override val encryptionService: EncryptionService
-        get() = EncryptionService()
+    override fun encryptionService(): EncryptionService =
+        EncryptionService()
 
     /**
      * Provides Android-specific photo metadata extractor.
      */
     @Provides
-    override val photoMetadataExtractor: PhotoMetadataExtractor
-        get() = AndroidPhotoMetadataExtractor(context)
+    override fun photoMetadataExtractor(): PhotoMetadataExtractor =
+        AndroidPhotoMetadataExtractor(context)
 
     /**
      * Provides Android-specific settings storage.
      */
     @Provides
-    override val settingsStorage: com.po4yka.trailglass.data.storage.SettingsStorage
-        get() = com.po4yka.trailglass.data.storage.SettingsStorage(context)
+    override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
+        com.po4yka.trailglass.data.storage.SettingsStorage(context)
 }

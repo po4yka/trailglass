@@ -21,6 +21,7 @@ interface RouteSegmentRepository {
      * Get route segments within a time range.
      */
     suspend fun getRouteSegmentsInRange(
+        userId: String,
         startTime: Instant,
         endTime: Instant
     ): List<RouteSegment>

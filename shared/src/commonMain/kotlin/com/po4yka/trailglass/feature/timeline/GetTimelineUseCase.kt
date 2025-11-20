@@ -109,7 +109,7 @@ class GetTimelineUseCase(
         val visits = placeVisitRepository.getVisits(userId, dayStart, dayEnd)
             .filter { visit -> matchesFilter(visit, filter) }
 
-        val routes = routeSegmentRepository.getRouteSegmentsInRange(dayStart, dayEnd)
+        val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, dayStart, dayEnd)
             .filter { route -> matchesFilter(route, filter) }
 
         val items = mutableListOf<TimelineItemUI>()
@@ -163,7 +163,7 @@ class GetTimelineUseCase(
             val visits = placeVisitRepository.getVisits(userId, dayStart, dayEnd)
                 .filter { matchesFilter(it, filter) }
 
-            val routes = routeSegmentRepository.getRouteSegmentsInRange(dayStart, dayEnd)
+            val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, dayStart, dayEnd)
                 .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
@@ -211,7 +211,7 @@ class GetTimelineUseCase(
             val visits = placeVisitRepository.getVisits(userId, weekStart, weekEndTime)
                 .filter { matchesFilter(it, filter) }
 
-            val routes = routeSegmentRepository.getRouteSegmentsInRange(weekStart, weekEndTime)
+            val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, weekStart, weekEndTime)
                 .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
@@ -256,7 +256,7 @@ class GetTimelineUseCase(
             val visits = placeVisitRepository.getVisits(userId, monthStartTime, monthEndTime)
                 .filter { matchesFilter(it, filter) }
 
-            val routes = routeSegmentRepository.getRouteSegmentsInRange(monthStartTime, monthEndTime)
+            val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, monthStartTime, monthEndTime)
                 .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {

@@ -33,7 +33,7 @@ class PlaceStatisticsCalculator {
         // Group visits by place identifier (using coordinates as fallback)
         val placeGroups = visits.groupBy { visit ->
             visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-            ?: "${visit.location.latitude},${visit.location.longitude}"
+            ?: "${visit.centerLatitude},${visit.centerLongitude}"
         }
 
         val totalPlaces = placeGroups.size
@@ -51,7 +51,7 @@ class PlaceStatisticsCalculator {
                     },
                     category = representative.category,
                     city = representative.city,
-                    country = representative.country
+                    country = representative.countryCode
                 )
             }
             .sortedByDescending { it.visitCount }
@@ -125,7 +125,7 @@ class PlaceStatisticsCalculator {
     fun getTopPlacesByDuration(visits: List<PlaceVisit>, limit: Int = 5): List<PlaceVisitCount> {
         val placeGroups = visits.groupBy { visit ->
             visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-            ?: "${visit.location.latitude},${visit.location.longitude}"
+            ?: "${visit.centerLatitude},${visit.centerLongitude}"
         }
 
         return placeGroups
@@ -140,7 +140,7 @@ class PlaceStatisticsCalculator {
                     },
                     category = representative.category,
                     city = representative.city,
-                    country = representative.country
+                    country = representative.countryCode
                 )
             }
             .sortedByDescending { it.totalDuration }

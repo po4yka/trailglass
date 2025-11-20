@@ -11,6 +11,7 @@ data class LocationSample(
     val timestamp: Instant,
     val latitude: Double,
     val longitude: Double,
+    val altitude: Double? = null,
     val accuracy: Double,
     val speed: Double? = null,
     val bearing: Double? = null,

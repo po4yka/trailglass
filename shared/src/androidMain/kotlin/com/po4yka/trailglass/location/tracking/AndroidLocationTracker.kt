@@ -13,6 +13,7 @@ import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import java.util.UUID
 

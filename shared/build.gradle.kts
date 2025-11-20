@@ -15,7 +15,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -25,7 +25,7 @@ kotlin {
             isStatic = true
         }
     }
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.kotlinx.datetime)
@@ -60,6 +60,10 @@ kotlin {
 
             // Location services
             implementation(libs.play.services.location)
+            implementation(libs.kotlinx.coroutines.play.services)
+
+            implementation(libs.datastore.preferences)
+            implementation(libs.androidx.exifinterface)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)

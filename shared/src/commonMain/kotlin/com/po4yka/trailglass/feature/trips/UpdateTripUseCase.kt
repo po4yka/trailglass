@@ -5,6 +5,8 @@ import com.po4yka.trailglass.domain.model.Trip
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
+import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
+import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for updating trip information.
@@ -33,11 +35,11 @@ class UpdateTripUseCase(
         coverPhotoUri: String? = null,
         tags: List<String>? = null,
         isPublic: Boolean? = null
-    ): Result<Trip> {
+    ): TrailGlassResult<Trip> {
         return try {
             // Get existing trip
             val existing = tripRepository.getTripById(tripId)
-                ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
+                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
 
             // Update with new values
             val updated = existing.copy(
@@ -54,9 +56,9 @@ class UpdateTripUseCase(
             // Save updated trip
             tripRepository.upsertTrip(updated)
 
-            Result.success(updated)
+            TrailGlassResult.Success(updated)
         } catch (e: Exception) {
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 
@@ -70,16 +72,16 @@ class UpdateTripUseCase(
     suspend fun completeTrip(
         tripId: String,
         endTime: Instant = Clock.System.now()
-    ): Result<Trip> {
+    ): TrailGlassResult<Trip> {
         return try {
             tripRepository.completeTrip(tripId, endTime)
 
             val updated = tripRepository.getTripById(tripId)
-                ?: return Result.failure(IllegalStateException("Trip not found after update"))
+                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found after update"))
 
-            Result.success(updated)
+            TrailGlassResult.Success(updated)
         } catch (e: Exception) {
-            Result.failure(e)
+            TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
     }
 }

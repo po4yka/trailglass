@@ -129,7 +129,7 @@ class SyncMetadataRepositoryImpl(
         )
     }
 
-    override suspend fun deletemetadata(entityId: String, entityType: EntityType) = withContext(Dispatchers.IO) {
+    override suspend fun deleteMetadata(entityId: String, entityType: EntityType) = withContext(Dispatchers.IO) {
         logger.debug { "Deleting metadata: $entityType:$entityId" }
         queries.deleteMetadata(entityId, entityType.name)
     }

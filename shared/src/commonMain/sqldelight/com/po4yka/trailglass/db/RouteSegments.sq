@@ -49,7 +49,8 @@ CREATE TABLE route_path_points (
 CREATE INDEX route_path_points_segment ON route_path_points(route_segment_id, sequence_number);
 
 -- Queries
-insertSegment:
+-- Queries
+insertRouteSegment:
 INSERT INTO route_segments (
     id, start_time, end_time, from_place_visit_id, to_place_visit_id,
     transport_type, distance_meters, average_speed_mps,
@@ -57,15 +58,22 @@ INSERT INTO route_segments (
 )
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
-getSegmentById:
+getRouteSegmentById:
 SELECT * FROM route_segments
 WHERE id = ? AND deleted_at IS NULL;
 
-getSegmentsByTimeRange:
+getRouteSegmentsInRange:
 SELECT * FROM route_segments
 WHERE user_id = ?
   AND start_time <= ?
   AND end_time >= ?
+  AND deleted_at IS NULL
+ORDER BY start_time ASC;
+
+getRouteSegmentsForVisits:
+SELECT * FROM route_segments
+WHERE (:from_place_visit_id IS NULL OR from_place_visit_id = :from_place_visit_id)
+  AND (:to_place_visit_id IS NULL OR to_place_visit_id = :to_place_visit_id)
   AND deleted_at IS NULL
 ORDER BY start_time ASC;
 
@@ -74,34 +82,40 @@ SELECT * FROM route_segments
 WHERE trip_id = ? AND deleted_at IS NULL
 ORDER BY start_time ASC;
 
-linkSample:
+insertRouteSegmentSample:
 INSERT OR IGNORE INTO route_segment_samples (route_segment_id, location_sample_id, sequence_number)
 VALUES (?, ?, ?);
 
-getSamplesForSegment:
+getRouteSegmentSamples:
 SELECT ls.* FROM location_samples ls
 INNER JOIN route_segment_samples rss ON ls.id = rss.location_sample_id
 WHERE rss.route_segment_id = ?
   AND ls.deleted_at IS NULL
 ORDER BY rss.sequence_number ASC;
 
-insertPathPoint:
+insertSimplifiedPathPoint:
 INSERT INTO route_path_points (id, route_segment_id, latitude, longitude, sequence_number)
 VALUES (?, ?, ?, ?, ?);
 
-getPathPoints:
+getSimplifiedPathPoints:
 SELECT * FROM route_path_points
 WHERE route_segment_id = ?
 ORDER BY sequence_number ASC;
 
-softDelete:
-UPDATE route_segments
-SET deleted_at = ?, updated_at = ?
-WHERE id = ?;
+deleteSimplifiedPathPoints:
+DELETE FROM route_path_points
+WHERE route_segment_id = ?;
 
-deletePermanently:
+deleteRouteSegmentSamples:
+DELETE FROM route_segment_samples
+WHERE route_segment_id = ?;
+
+deleteRouteSegment:
 DELETE FROM route_segments
 WHERE id = ?;
+
+getRouteSegmentCount:
+SELECT count(*) FROM route_segments;
 
 deleteAll:
 DELETE FROM route_segments;
