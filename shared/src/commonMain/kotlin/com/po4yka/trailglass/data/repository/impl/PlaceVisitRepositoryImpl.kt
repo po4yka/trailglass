@@ -97,7 +97,8 @@ class PlaceVisitRepositoryImpl(
             }
     }
 
-    override suspend fun updateVisit(visit: PlaceVisit) = withContext(Dispatchers.IO) {
+    override suspend fun updateVisit(visit: PlaceVisit): Unit = withContext(Dispatchers.IO) {
+        logger.debug { "Updating visit: ${visit.id}" }
         visitQueries.updateVisit(
             start_time = visit.startTime.toEpochMilliseconds(),
             end_time = visit.endTime.toEpochMilliseconds(),
@@ -119,8 +120,9 @@ class PlaceVisitRepositoryImpl(
             }
         }
 
-    override suspend fun unlinkSample(visitId: String, sampleId: String) =
+    override suspend fun unlinkSample(visitId: String, sampleId: String): Unit =
         withContext(Dispatchers.IO) {
+            logger.debug { "Unlinking sample $sampleId from visit $visitId" }
             visitQueries.unlinkSample(visitId, sampleId)
         }
 
@@ -131,7 +133,8 @@ class PlaceVisitRepositoryImpl(
                 .map { it.toLocationSample() }
         }
 
-    override suspend fun deleteVisit(id: String) = withContext(Dispatchers.IO) {
+    override suspend fun deleteVisit(id: String): Unit = withContext(Dispatchers.IO) {
+        logger.debug { "Deleting visit: $id" }
         val now = Clock.System.now().toEpochMilliseconds()
         visitQueries.softDelete(deleted_at = now, updated_at = now, id = id)
     }

@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.repository
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.AppSettings
 import kotlinx.coroutines.flow.Flow
 

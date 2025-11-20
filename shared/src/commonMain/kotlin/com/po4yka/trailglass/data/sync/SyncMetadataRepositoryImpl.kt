@@ -24,7 +24,7 @@ class SyncMetadataRepositoryImpl(
     private val logger = logger()
     private val queries = database.syncMetadataQueries
 
-    override suspend fun upsertMetadata(metadata: SyncMetadata) = withContext(Dispatchers.IO) {
+    override suspend fun upsertMetadata(metadata: SyncMetadata): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Upserting sync metadata: ${metadata.entityType}:${metadata.entityId}" }
         queries.upsertMetadata(
             entity_id = metadata.entityId,
@@ -110,7 +110,7 @@ class SyncMetadataRepositoryImpl(
             }
     }
 
-    override suspend fun markAsSynced(entityId: String, entityType: EntityType, serverVersion: Long) = withContext(Dispatchers.IO) {
+    override suspend fun markAsSynced(entityId: String, entityType: EntityType, serverVersion: Long): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Marking as synced: $entityType:$entityId (version: $serverVersion)" }
         queries.markAsSynced(
             server_version = serverVersion,
@@ -120,7 +120,7 @@ class SyncMetadataRepositoryImpl(
         )
     }
 
-    override suspend fun markSyncFailed(entityId: String, entityType: EntityType, error: String) = withContext(Dispatchers.IO) {
+    override suspend fun markSyncFailed(entityId: String, entityType: EntityType, error: String): Unit = withContext(Dispatchers.IO) {
         logger.warn { "Marking sync failed: $entityType:$entityId - $error" }
         queries.markSyncFailed(
             last_sync_error = error,
@@ -129,7 +129,7 @@ class SyncMetadataRepositoryImpl(
         )
     }
 
-    override suspend fun deleteMetadata(entityId: String, entityType: EntityType) = withContext(Dispatchers.IO) {
+    override suspend fun deleteMetadata(entityId: String, entityType: EntityType): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Deleting metadata: $entityType:$entityId" }
         queries.deleteMetadata(entityId, entityType.name)
     }

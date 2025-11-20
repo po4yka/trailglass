@@ -90,12 +90,12 @@ class GeocodingCacheRepositoryImpl(
             logger.trace { "Successfully cached geocoded location at ($id)" }
         }
 
-    override suspend fun clearExpired() = withContext(Dispatchers.IO) {
+    override suspend fun clearExpired(): Unit = withContext(Dispatchers.IO) {
         val now = Clock.System.now().toEpochMilliseconds()
         queries.clearExpired(now)
     }
 
-    override suspend fun clear() = withContext(Dispatchers.IO) {
+    override suspend fun clear(): Unit = withContext(Dispatchers.IO) {
         queries.clearAll()
     }
 

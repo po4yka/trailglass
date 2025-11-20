@@ -21,7 +21,8 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class RouteSegmentRepositoryImpl(
-    private val database: Database
+    private val database: Database,
+    private val uuidGenerator: UuidGenerator
 ) : RouteSegmentRepository {
 
     private val logger = logger()
@@ -34,6 +35,7 @@ class RouteSegmentRepositoryImpl(
         }
         try {
             database.transaction {
+                val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
                 // Insert main route segment
                 queries.insertRouteSegment(
                     id = segment.id,
@@ -44,10 +46,10 @@ class RouteSegmentRepositoryImpl(
                     transport_type = segment.transportType.name,
                     distance_meters = segment.distanceMeters,
                     average_speed_mps = segment.averageSpeedMps,
-                    user_id = segment.userId,
-                    trip_id = segment.tripId,
-                    created_at = segment.createdAt?.toEpochMilliseconds() ?: kotlinx.datetime.Clock.System.now().toEpochMilliseconds(),
-                    updated_at = segment.updatedAt?.toEpochMilliseconds(),
+                    user_id = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous",
+                    trip_id = null,
+                    created_at = now,
+                    updated_at = now,
                     deleted_at = null
                 )
 

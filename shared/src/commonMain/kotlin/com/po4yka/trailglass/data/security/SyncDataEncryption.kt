@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.data.security
 
 import com.po4yka.trailglass.logging.logger
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -28,12 +29,13 @@ class SyncDataEncryption(
      * Encrypt sync payload for transmission to server.
      *
      * @param data The data object to encrypt
+     * @param serializer The serializer for the data type
      * @return Encrypted payload wrapper containing the encrypted data
      */
-    suspend fun <T> encryptSyncData(data: T): Result<EncryptedSyncPayload> {
+    suspend fun <T> encryptSyncData(data: T, serializer: KSerializer<T>): Result<EncryptedSyncPayload> {
         return try {
             // Serialize to JSON
-            val jsonString = json.encodeToString(data)
+            val jsonString = json.encodeToString(serializer, data)
 
             logger.debug { "Encrypting sync data (${jsonString.length} bytes)" }
 
@@ -56,9 +58,10 @@ class SyncDataEncryption(
      * Decrypt sync payload received from server.
      *
      * @param payload The encrypted payload wrapper
+     * @param deserializer The deserializer for the data type
      * @return Decrypted data object
      */
-    suspend inline fun <reified T> decryptSyncData(payload: EncryptedSyncPayload): Result<T> {
+    suspend fun <T> decryptSyncData(payload: EncryptedSyncPayload, deserializer: KSerializer<T>): Result<T> {
         return try {
             if (payload.encryptionVersion != ENCRYPTION_VERSION) {
                 throw EncryptionException(
@@ -76,7 +79,7 @@ class SyncDataEncryption(
             val jsonString = encryptionService.decrypt(encryptedData).getOrThrow()
 
             // Deserialize
-            val data = json.decodeFromString<T>(jsonString)
+            val data = json.decodeFromString(deserializer, jsonString)
 
             Result.success(data)
         } catch (e: Exception) {
