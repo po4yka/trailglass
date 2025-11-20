@@ -219,4 +219,7 @@ class SyncCoordinator(
 /**
  * Sync state repository implementation using local storage.
  */
-expect class SyncStateRepositoryImpl : SyncStateRepository
+expect class SyncStateRepositoryImpl : SyncStateRepository {
+    override suspend fun getSyncState(): SyncState
+    override suspend fun updateSyncState(state: SyncState)
+}

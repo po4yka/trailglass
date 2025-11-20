@@ -101,6 +101,7 @@ actual class EncryptionService actual constructor() {
 
             keyGenerator.init(keyGenParameterSpec)
             keyGenerator.generateKey()
+            Unit
         }.onFailure { e ->
             Result.failure<Unit>(EncryptionException("Key generation failed", e))
         }

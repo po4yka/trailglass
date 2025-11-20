@@ -3,12 +3,14 @@ package com.po4yka.trailglass.data.repository.impl
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
+import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.RouteSegment
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.first
@@ -21,8 +23,7 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class RouteSegmentRepositoryImpl(
-    private val database: Database,
-    private val uuidGenerator: UuidGenerator
+    private val database: Database
 ) : RouteSegmentRepository {
 
     private val logger = logger()
@@ -65,7 +66,7 @@ class RouteSegmentRepositoryImpl(
                 // Insert simplified path points
                 segment.simplifiedPath.forEachIndexed { index, coordinate ->
                     queries.insertSimplifiedPathPoint(
-                        id = uuidGenerator.randomUUID(),
+                        id = UuidGenerator.randomUUID(),
                         route_segment_id = segment.id,
                         sequence_number = index.toLong(),
                         latitude = coordinate.latitude,
@@ -170,7 +171,7 @@ class RouteSegmentRepositoryImpl(
             val segments = segmentRows.map { row ->
                 val sampleIds = queries.getRouteSegmentSamples(row.id)
                     .executeAsList()
-                    .map { it.location_sample_id }
+                    .map { it.id }
 
                 val pathPoints = queries.getSimplifiedPathPoints(row.id)
                     .executeAsList()

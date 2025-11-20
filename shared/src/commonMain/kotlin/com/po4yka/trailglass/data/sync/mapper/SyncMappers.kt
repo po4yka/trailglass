@@ -156,7 +156,7 @@ fun PhotoMetadataDto.toDomain(localPath: String): Photo {
         timestamp = Instant.parse(timestamp),
         latitude = location?.latitude,
         longitude = location?.longitude,
-        userId = deviceId,
+        userId = deviceId ?: "unknown",
         addedAt = lastModified?.let { Instant.parse(it) } ?: Instant.parse(timestamp)
     )
 }

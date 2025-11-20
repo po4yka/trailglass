@@ -97,12 +97,12 @@ class PathSimplifier(
 
         val R = 6371000.0 // Earth radius in meters
 
-        val lat1 = Math.toRadians(lineStart.latitude)
-        val lon1 = Math.toRadians(lineStart.longitude)
-        val lat2 = Math.toRadians(lineEnd.latitude)
-        val lon2 = Math.toRadians(lineEnd.longitude)
-        val lat3 = Math.toRadians(point.latitude)
-        val lon3 = Math.toRadians(point.longitude)
+        val lat1 = (lineStart.latitude * PI / 180.0)
+        val lon1 = (lineStart.longitude * PI / 180.0)
+        val lat2 = (lineEnd.latitude * PI / 180.0)
+        val lon2 = (lineEnd.longitude * PI / 180.0)
+        val lat3 = (point.latitude * PI / 180.0)
+        val lon3 = (point.longitude * PI / 180.0)
 
         // Distance from start to point
         val dist13 = haversineDistance(lineStart, point) / R
@@ -133,11 +133,11 @@ class PathSimplifier(
     private fun haversineDistance(c1: Coordinate, c2: Coordinate): Double {
         val earthRadiusMeters = 6371000.0
 
-        val dLat = Math.toRadians(c2.latitude - c1.latitude)
-        val dLon = Math.toRadians(c2.longitude - c1.longitude)
+        val dLat = (c2.latitude - c1.latitude * PI / 180.0)
+        val dLon = (c2.longitude - c1.longitude * PI / 180.0)
 
         val a = sin(dLat / 2).pow(2) +
-                cos(Math.toRadians(c1.latitude)) * cos(Math.toRadians(c2.latitude)) *
+                cos((c1.latitude * PI / 180.0)) * cos((c2.latitude * PI / 180.0)) *
                 sin(dLon / 2).pow(2)
 
         val c = 2 * asin(sqrt(a))

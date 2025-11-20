@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
+import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
@@ -119,11 +120,11 @@ class RouteReplayController(
                         }
                     )
                 }
-                .onFailure { error ->
-                    logger.error(error) { "Failed to load route for replay: $tripId" }
+                .onError { error ->
+                    logger.error { "Failed to load route for replay: $tripId - ${error.getTechnicalDetails()}" }
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load route"
+                        error = error.getUserFriendlyMessage()
                     )
                 }
         }
@@ -353,15 +354,15 @@ class RouteReplayController(
      * Returns bearing in degrees (0-360).
      */
     private fun calculateBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val lat1Rad = Math.toRadians(lat1)
-        val lat2Rad = Math.toRadians(lat2)
-        val dLon = Math.toRadians(lon2 - lon1)
+        val lat1Rad = (lat1 * PI / 180.0)
+        val lat2Rad = (lat2 * PI / 180.0)
+        val dLon = (lon2 - lon1 * PI / 180.0)
 
         val y = sin(dLon) * cos(lat2Rad)
         val x = cos(lat1Rad) * sin(lat2Rad) - sin(lat1Rad) * cos(lat2Rad) * cos(dLon)
 
         val bearingRad = atan2(y, x)
-        val bearingDeg = Math.toDegrees(bearingRad)
+        val bearingDeg = (bearingRad * 180.0 / PI)
 
         // Normalize to 0-360
         return (bearingDeg + 360) % 360

@@ -89,11 +89,11 @@ class RouteViewController(
                         shouldRecenterCamera = true // Trigger initial camera fit
                     )
                 }
-                .onFailure { error ->
-                    logger.error(error) { "Failed to load route for trip $tripId" }
+                .onError { error ->
+                    logger.error { "Failed to load route for trip $tripId - ${error.getTechnicalDetails()}" }
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load route"
+                        error = error.getUserFriendlyMessage()
                     )
                 }
         }

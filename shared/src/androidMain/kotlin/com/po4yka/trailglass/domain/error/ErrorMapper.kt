@@ -26,12 +26,6 @@ actual object ErrorMapper {
                 cause = exception
             )
 
-            // Database errors
-            is app.cash.sqldelight.db.SqlDriver.Schema.MigrationException -> TrailGlassError.DatabaseError.QueryFailed(
-                technicalMessage = "Database migration failed: ${exception.message}",
-                cause = exception
-            )
-
             // Validation errors
             is IllegalArgumentException -> TrailGlassError.ValidationError.InvalidInput(
                 fieldName = "input",

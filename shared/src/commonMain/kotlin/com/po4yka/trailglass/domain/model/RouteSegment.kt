@@ -49,11 +49,3 @@ data class RouteSegment(
     val distanceMeters: Double = 0.0,
     val averageSpeedMps: Double? = null
 )
-
-/**
- * Simple coordinate pair.
- */
-data class Coordinate(
-    val latitude: Double,
-    val longitude: Double
-)

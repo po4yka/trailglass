@@ -65,9 +65,10 @@ class GeocodingCache(
      */
     fun clearExpired() {
         val now = Clock.System.now()
-        cache.entries.removeIf { (_, entry) ->
-            (now - entry.cachedAt) >= cacheDuration
-        }
+        val keysToRemove = cache.entries
+            .filter { (now - it.value.cachedAt) >= cacheDuration }
+            .map { it.key }
+        keysToRemove.forEach { cache.remove(it) }
     }
 
     /**
@@ -88,11 +89,11 @@ class GeocodingCache(
     ): Double {
         val earthRadiusMeters = 6371000.0
 
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
+        val dLat = (lat2 - lat1) * PI / 180.0
+        val dLon = (lon2 - lon1) * PI / 180.0
 
         val a = sin(dLat / 2).pow(2) +
-                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 
         val c = 2 * asin(sqrt(a))

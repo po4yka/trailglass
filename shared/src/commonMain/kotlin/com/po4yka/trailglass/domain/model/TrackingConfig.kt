@@ -43,29 +43,6 @@ data class TrackingConfig(
 )
 
 /**
- * Tracking accuracy modes.
- */
-enum class TrackingAccuracy {
-    /**
-     * High accuracy - Uses GPS, battery intensive.
-     * Update interval: 10 seconds, Distance: 5 meters
-     */
-    HIGH,
-
-    /**
-     * Balanced accuracy - Uses GPS + Network, moderate battery.
-     * Update interval: 30 seconds, Distance: 10 meters
-     */
-    BALANCED,
-
-    /**
-     * Low accuracy - Uses Network, battery efficient.
-     * Update interval: 60 seconds, Distance: 50 meters
-     */
-    LOW
-}
-
-/**
  * Current tracking status.
  */
 sealed class TrackingStatus {

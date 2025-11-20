@@ -53,7 +53,7 @@ class GetTripRouteUseCase(
                 val cached = cacheMutex.withLock { cache[tripId] }
                 if (cached != null) {
                     logger.debug { "Returning cached route for trip $tripId" }
-                    return Result.success(cached.tripRoute)
+                    return TrailGlassResult.Success(cached.tripRoute)
                 }
             }
 
@@ -80,8 +80,8 @@ class GetTripRouteUseCase(
             // Edge case: No GPS data
             if (filteredSamples.isEmpty()) {
                 logger.warn { "No valid location samples for trip $tripId" }
-                return Result.failure(
-                    IllegalStateException("No GPS data available for this trip. Enable location tracking to see routes.")
+                return TrailGlassResult.Error(
+                    TrailGlassError.Unknown("No GPS data available for this trip. Enable location tracking to see routes.")
                 )
             }
 
@@ -187,10 +187,10 @@ class GetTripRouteUseCase(
      * @param memoryId Memory identifier
      * @return Result containing TripRoute or error
      */
-    suspend fun executeForMemory(memoryId: String): Result<TripRoute> {
+    suspend fun executeForMemory(memoryId: String): TrailGlassResult<TripRoute> {
         // TODO: Implement when Memory model is added
-        return Result.failure(
-            NotImplementedError("Memory route support not yet implemented")
+        return TrailGlassResult.Error(
+            TrailGlassError.Unknown("Memory route support not yet implemented")
         )
     }
 

@@ -32,8 +32,8 @@ class ClearDataUseCase(
             // Clear all database tables
             logger.debug { "Clearing database tables" }
             database.transaction {
-                database.locationSamplesQueries.deleteAll()
-                database.placeVisitsQueries.deleteAll()
+                database.locationSampleQueries.deleteAll()
+                database.placeVisitQueries.deleteAll()
                 database.routeSegmentsQueries.deleteAll()
                 database.tripsQueries.deleteAll()
                 database.photosQueries.deleteAll()

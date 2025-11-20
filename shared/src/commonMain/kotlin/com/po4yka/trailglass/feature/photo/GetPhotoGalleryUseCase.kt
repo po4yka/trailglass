@@ -103,10 +103,15 @@ class GetPhotoGalleryUseCase(
             )
         }
 
-        return photosWithMetadata.groupBy { photoWithMeta ->
+        val grouped = photosWithMetadata.groupBy { photoWithMeta ->
             val dateTime = photoWithMeta.photo.timestamp.toLocalDateTime(timeZone)
             YearMonth(dateTime.year, dateTime.month)
-        }.toSortedMap(compareByDescending { it })
+        }
+
+        // Sort by key (YearMonth) descending
+        return grouped.toList()
+            .sortedByDescending { it.first }
+            .toMap()
     }
 
     data class YearMonth(val year: Int, val month: Month) : Comparable<YearMonth> {

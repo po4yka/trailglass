@@ -127,7 +127,11 @@ class KmlExporter {
     private fun formatDistance(meters: Double): String {
         return when {
             meters < 1000 -> "${meters.toInt()} m"
-            else -> "${"%.1f".format(meters / 1000)} km"
+            else -> {
+                val km = meters / 1000
+                val rounded = (km * 10).toInt() / 10.0
+                "$rounded km"
+            }
         }
     }
 

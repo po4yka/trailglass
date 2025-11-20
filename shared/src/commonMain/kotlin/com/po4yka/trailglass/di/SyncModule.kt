@@ -7,7 +7,6 @@ import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.auth.TokenStorageProvider
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
-import com.po4yka.trailglass.data.repository.SyncableLocationRepository
 import com.po4yka.trailglass.data.sync.ConflictResolver
 import com.po4yka.trailglass.data.sync.DefaultConflictResolver
 import com.po4yka.trailglass.data.sync.SyncCoordinator
@@ -141,6 +140,9 @@ interface SyncModule {
         networkMonitor: com.po4yka.trailglass.data.network.NetworkConnectivityMonitor,
         placeVisitRepository: com.po4yka.trailglass.data.repository.PlaceVisitRepository,
         tripRepository: com.po4yka.trailglass.data.repository.TripRepository,
+        locationRepository: com.po4yka.trailglass.data.repository.LocationRepository,
+        photoRepository: com.po4yka.trailglass.data.repository.PhotoRepository,
+        settingsRepository: com.po4yka.trailglass.data.repository.SettingsRepository,
         apiClient: TrailGlassApiClient,
         deviceId: String,
         userId: String
@@ -152,6 +154,9 @@ interface SyncModule {
             networkMonitor = networkMonitor,
             placeVisitRepository = placeVisitRepository,
             tripRepository = tripRepository,
+            locationRepository = locationRepository,
+            photoRepository = photoRepository,
+            settingsRepository = settingsRepository,
             apiClient = apiClient,
             deviceId = deviceId,
             userId = userId

@@ -92,7 +92,7 @@ class PhotoDetailController(
 
                 // Extract metadata if not already available
                 val metadata = try {
-                    metadataExtractor.extractMetadata(photo.uri)
+                    metadataExtractor.extractMetadata(photo.uri, photoId)
                 } catch (e: Exception) {
                     logger.warn(e) { "Failed to extract metadata for photo $photoId" }
                     null

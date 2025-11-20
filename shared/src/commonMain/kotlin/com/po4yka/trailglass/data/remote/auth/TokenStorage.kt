@@ -4,6 +4,7 @@ import com.po4yka.trailglass.data.remote.TokenProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.datetime.Clock
 
 /**
  * Token data class.
@@ -38,7 +39,7 @@ class TokenStorageProvider(
         _authState.value = tokens
 
         // Check if token is expired
-        if (tokens != null && System.currentTimeMillis() >= tokens.expiresAt) {
+        if (tokens != null && Clock.System.now().toEpochMilliseconds() >= tokens.expiresAt) {
             return null // Token expired
         }
 
@@ -52,7 +53,7 @@ class TokenStorageProvider(
     }
 
     override suspend fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Long) {
-        val expiresAt = System.currentTimeMillis() + (expiresIn * 1000)
+        val expiresAt = Clock.System.now().toEpochMilliseconds() + (expiresIn * 1000)
         val tokens = AuthTokens(accessToken, refreshToken, expiresAt)
         secureStorage.saveTokens(tokens)
         _authState.value = tokens
@@ -65,6 +66,6 @@ class TokenStorageProvider(
 
     fun isAuthenticated(): Boolean {
         val tokens = _authState.value
-        return tokens != null && System.currentTimeMillis() < tokens.expiresAt
+        return tokens != null && Clock.System.now().toEpochMilliseconds() < tokens.expiresAt
     }
 }

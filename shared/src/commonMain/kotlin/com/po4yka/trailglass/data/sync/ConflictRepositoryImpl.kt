@@ -23,7 +23,7 @@ class ConflictRepositoryImpl(
     private val logger = logger()
     private val queries = database.syncConflictsQueries
 
-    override suspend fun storeConflict(conflict: StoredConflict) = withContext(Dispatchers.IO) {
+    override suspend fun storeConflict(conflict: StoredConflict): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Storing conflict: ${conflict.conflictId}" }
         queries.storeConflict(
             conflict_id = conflict.conflictId,
@@ -93,22 +93,22 @@ class ConflictRepositoryImpl(
             .toInt()
     }
 
-    override suspend fun markAsResolved(conflictId: String) = withContext(Dispatchers.IO) {
+    override suspend fun markAsResolved(conflictId: String): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Marking conflict as resolved: $conflictId" }
         queries.markAsResolved(conflictId)
     }
 
-    override suspend fun markAsIgnored(conflictId: String) = withContext(Dispatchers.IO) {
+    override suspend fun markAsIgnored(conflictId: String): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Marking conflict as ignored: $conflictId" }
         queries.markAsIgnored(conflictId)
     }
 
-    override suspend fun deleteConflict(conflictId: String) = withContext(Dispatchers.IO) {
+    override suspend fun deleteConflict(conflictId: String): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Deleting conflict: $conflictId" }
         queries.deleteConflict(conflictId)
     }
 
-    override suspend fun clearResolvedConflicts() = withContext(Dispatchers.IO) {
+    override suspend fun clearResolvedConflicts(): Unit = withContext(Dispatchers.IO) {
         logger.debug { "Clearing resolved conflicts" }
         queries.clearResolvedConflicts()
     }

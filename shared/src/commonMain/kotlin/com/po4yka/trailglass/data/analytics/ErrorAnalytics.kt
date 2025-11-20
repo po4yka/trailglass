@@ -102,8 +102,8 @@ class LoggingErrorAnalytics : ErrorAnalytics {
                 appendLine("Context: $context")
             }
 
-            if (error.cause != null) {
-                appendLine("Cause: ${error.cause.stackTraceToString()}")
+            error.cause?.let { cause ->
+                appendLine("Cause: ${cause.stackTraceToString()}")
             }
         }
     }

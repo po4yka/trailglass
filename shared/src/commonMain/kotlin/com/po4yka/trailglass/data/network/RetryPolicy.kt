@@ -129,10 +129,10 @@ data class RetryState(
  */
 suspend fun <T> retryWithPolicy(
     policy: RetryPolicy = RetryPolicy.DEFAULT,
-    onRetry: ((RetryState) -> Unit)? = null,
+    onRetry: (suspend (RetryState) -> Unit)? = null,
     block: suspend () -> Result<T>
 ): Result<T> {
-    val logger = logger()
+    val logger = logger("RetryPolicy")
     var currentAttempt = 0
     var lastError: TrailGlassError? = null
 
@@ -201,10 +201,10 @@ suspend fun <T> retryWithPolicy(
 suspend fun <T> retryWithNetwork(
     policy: RetryPolicy = RetryPolicy.NETWORK,
     networkConnectivity: NetworkConnectivity,
-    onRetry: ((RetryState) -> Unit)? = null,
+    onRetry: (suspend (RetryState) -> Unit)? = null,
     block: suspend () -> Result<T>
 ): Result<T> {
-    val logger = logger()
+    val logger = logger("RetryPolicy")
 
     return retryWithPolicy(
         policy = policy,

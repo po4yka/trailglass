@@ -47,9 +47,18 @@ interface ConflictRepository {
  * Extension to convert SyncConflictDto to StoredConflict.
  */
 fun SyncConflictDto.toStoredConflict(): StoredConflict {
+    // Convert remote EntityType to sync EntityType
+    val syncEntityType = when (entityType) {
+        com.po4yka.trailglass.data.remote.dto.EntityType.LOCATION -> EntityType.LOCATION_SAMPLE
+        com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
+        com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
+        com.po4yka.trailglass.data.remote.dto.EntityType.PHOTO -> EntityType.PHOTO
+        com.po4yka.trailglass.data.remote.dto.EntityType.SETTINGS -> EntityType.SETTINGS
+    }
+
     return StoredConflict(
         conflictId = "${entityType.name}_${entityId}_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
-        entityType = entityType,
+        entityType = syncEntityType,
         entityId = entityId,
         localVersion = localVersion["version"]?.toLongOrNull() ?: 0L,
         remoteVersion = remoteVersion["version"]?.toLongOrNull() ?: 0L,

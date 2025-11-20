@@ -17,6 +17,7 @@ import me.tatarka.inject.annotations.Inject
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Duration.Companion.days
 
 /**
  * SQLDelight implementation of PhotoRepository.
@@ -114,7 +115,7 @@ class PhotoRepositoryImpl(
         date: LocalDate
     ): List<Photo> = withContext(Dispatchers.IO) {
         val dayStart = date.atStartOfDayIn(timeZone)
-        val dayEnd = date.plus(1, kotlinx.datetime.DateTimeUnit.DAY).atStartOfDayIn(timeZone)
+        val dayEnd = dayStart + 1.days
 
         logger.debug { "Getting photos for user $userId on $date" }
         try {

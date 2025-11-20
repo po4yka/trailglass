@@ -63,11 +63,11 @@ class TripStatisticsController(
                         isLoading = false
                     )
                 }
-                .onFailure { error ->
-                    logger.error(error) { "Failed to load statistics for trip $tripId" }
+                .onError { error ->
+                    logger.error { "Failed to load statistics for trip $tripId - ${error.getTechnicalDetails()}" }
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load statistics"
+                        error = error.getUserFriendlyMessage()
                     )
                 }
         }

@@ -32,7 +32,7 @@ actual class SyncStateRepositoryImpl(private val context: Context) : SyncStateRe
         val ERROR = stringPreferencesKey("error")
     }
 
-    override suspend fun getSyncState(): SyncState {
+    actual override suspend fun getSyncState(): SyncState {
         return context.syncStateDataStore.data.map { preferences ->
             SyncState(
                 lastSyncTimestamp = preferences[Keys.LAST_SYNC_TIMESTAMP]?.let {
@@ -50,7 +50,7 @@ actual class SyncStateRepositoryImpl(private val context: Context) : SyncStateRe
         }.first()
     }
 
-    override suspend fun updateSyncState(state: SyncState) {
+    actual override suspend fun updateSyncState(state: SyncState) {
         context.syncStateDataStore.edit { preferences ->
             state.lastSyncTimestamp?.let {
                 preferences[Keys.LAST_SYNC_TIMESTAMP] = it.toString()

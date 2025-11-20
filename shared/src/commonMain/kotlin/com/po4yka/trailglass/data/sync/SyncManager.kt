@@ -105,7 +105,7 @@ class SyncManager(
     /**
      * Perform full synchronization of all entity types.
      */
-    suspend fun performFullSync(): Result<SyncResult> {
+    suspend fun performFullSync(): Result<SyncResultSummary> {
         // Check network connectivity
         if (!networkMonitor.networkState.value.allowsSync()) {
             logger.warn { "Cannot sync: network not available" }
@@ -150,7 +150,7 @@ class SyncManager(
                     val conflictsResolved = handleConflicts(response.conflicts)
 
                     _syncProgress.value = SyncProgress.Completed(
-                        SyncResult(
+                        SyncResultSummary(
                             uploaded = response.accepted.placeVisits.size + response.accepted.trips.size,
                             downloaded = response.remoteChanges.placeVisits.size + response.remoteChanges.trips.size,
                             conflicts = response.conflicts.size,
@@ -167,7 +167,7 @@ class SyncManager(
                     }
 
                     Result.success(
-                        SyncResult(
+                        SyncResultSummary(
                             uploaded = response.accepted.placeVisits.size + response.accepted.trips.size,
                             downloaded = response.remoteChanges.placeVisits.size + response.remoteChanges.trips.size,
                             conflicts = response.conflicts.size,
@@ -340,12 +340,12 @@ class SyncManager(
         // Handle deletions
         for (deletedId in remoteChanges.deletedIds.placeVisits) {
             placeVisitRepository.deleteVisit(deletedId)
-            syncMetadataRepository.deletemetadata(deletedId, EntityType.PLACE_VISIT)
+            syncMetadataRepository.deleteMetadata(deletedId, EntityType.PLACE_VISIT)
         }
 
         for (deletedId in remoteChanges.deletedIds.trips) {
             tripRepository.deleteTrip(deletedId)
-            syncMetadataRepository.deletemetadata(deletedId, EntityType.TRIP)
+            syncMetadataRepository.deleteMetadata(deletedId, EntityType.TRIP)
         }
     }
 
@@ -460,8 +460,8 @@ class SyncManager(
                 // Local wins - force upload local version
                 // Mark for re-sync
                 val entityType = when (conflict.entityType) {
-                    EntityType.PLACE_VISIT.name -> EntityType.PLACE_VISIT
-                    EntityType.TRIP.name -> EntityType.TRIP
+                    com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
+                    com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
                     else -> return
                 }
 
@@ -695,14 +695,14 @@ class SyncManager(
 sealed class SyncProgress {
     data object Idle : SyncProgress()
     data class InProgress(val percentage: Int, val message: String) : SyncProgress()
-    data class Completed(val result: SyncResult) : SyncProgress()
+    data class Completed(val result: SyncResultSummary) : SyncProgress()
     data class Failed(val error: String) : SyncProgress()
 }
 
 /**
  * Sync result summary.
  */
-data class SyncResult(
+data class SyncResultSummary(
     val uploaded: Int,
     val downloaded: Int,
     val conflicts: Int,

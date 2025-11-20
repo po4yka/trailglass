@@ -28,6 +28,7 @@ class TripRepositoryImpl(
     override suspend fun upsertTrip(trip: Trip) = withContext(Dispatchers.IO) {
         logger.debug { "Upserting trip: ${trip.id}" }
         try {
+            val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
             queries.upsertTrip(
                 id = trip.id,
                 name = trip.name,
@@ -35,7 +36,10 @@ class TripRepositoryImpl(
                 end_time = trip.endTime?.toEpochMilliseconds(),
                 primary_country = trip.primaryCountry,
                 is_ongoing = if (trip.isOngoing) 1L else 0L,
-                user_id = trip.userId
+                user_id = trip.userId,
+                created_at = now,
+                updated_at = now,
+                deleted_at = null
             )
             logger.trace { "Successfully upserted trip ${trip.id}" }
         } catch (e: Exception) {
@@ -127,8 +131,10 @@ class TripRepositoryImpl(
     override suspend fun completeTrip(tripId: String, endTime: Instant) = withContext(Dispatchers.IO) {
         logger.debug { "Marking trip $tripId as complete at $endTime" }
         try {
+            val now = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
             queries.completeTrip(
                 end_time = endTime.toEpochMilliseconds(),
+                updated_at = now,
                 id = tripId
             )
             logger.info { "Trip $tripId marked as complete" }

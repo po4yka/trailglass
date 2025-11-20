@@ -55,9 +55,8 @@ class DeviceManagementController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            when (val result = apiClient.getUserDevices()) {
-                is Result.Success -> {
-                    val devicesResponse = result.getOrThrow()
+            apiClient.getUserDevices()
+                .onSuccess { devicesResponse ->
                     logger.info { "Loaded ${devicesResponse.devices.size} devices" }
 
                     _state.update {
@@ -67,17 +66,16 @@ class DeviceManagementController(
                         )
                     }
                 }
-                is Result.Failure -> {
-                    val error = result.exceptionOrNull()?.message ?: "Failed to load devices"
-                    logger.error { "Failed to load devices: $error" }
+                .onFailure { error ->
+                    val errorMessage = error.message ?: "Failed to load devices"
+                    logger.error { "Failed to load devices: $errorMessage" }
                     _state.update {
                         it.copy(
-                            error = error,
+                            error = errorMessage,
                             isLoading = false
                         )
                     }
                 }
-            }
         }
     }
 
@@ -98,8 +96,8 @@ class DeviceManagementController(
         _state.update { it.copy(deletingDeviceId = deviceId, error = null) }
 
         controllerScope.launch {
-            when (val result = apiClient.deleteUserDevice(deviceId)) {
-                is Result.Success -> {
+            apiClient.deleteUserDevice(deviceId)
+                .onSuccess {
                     logger.info { "Deleted device: $deviceId" }
 
                     // Remove device from local list
@@ -113,17 +111,16 @@ class DeviceManagementController(
                     // Notify caller of successful deletion
                     onSuccess()
                 }
-                is Result.Failure -> {
-                    val error = result.exceptionOrNull()?.message ?: "Failed to delete device"
-                    logger.error { "Failed to delete device: $error" }
+                .onFailure { error ->
+                    val errorMessage = error.message ?: "Failed to delete device"
+                    logger.error { "Failed to delete device: $errorMessage" }
                     _state.update {
                         it.copy(
-                            error = error,
+                            error = errorMessage,
                             deletingDeviceId = null
                         )
                     }
                 }
-            }
         }
     }
 

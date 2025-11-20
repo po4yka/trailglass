@@ -61,24 +61,3 @@ data class PhotoCluster(
 ) {
     val duration: kotlin.time.Duration get() = endTime - startTime
 }
-
-/**
- * Photo with full metadata and associations.
- */
-data class PhotoWithMetadata(
-    val photo: Photo,
-    val metadata: PhotoMetadata?,
-    val attachments: List<PhotoAttachment>,
-    val clusterId: String? = null
-)
-
-/**
- * Photo grouped by date for gallery display.
- */
-data class PhotoGroup(
-    val date: kotlinx.datetime.LocalDate,
-    val photos: List<PhotoWithMetadata>,
-    val location: String? = null // City or location name
-) {
-    val photoCount: Int get() = photos.size
-}

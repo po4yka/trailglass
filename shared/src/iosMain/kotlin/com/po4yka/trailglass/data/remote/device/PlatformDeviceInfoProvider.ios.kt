@@ -13,7 +13,7 @@ import kotlin.uuid.Uuid
 @Inject
 actual class PlatformDeviceInfoProvider : DeviceInfoProvider {
 
-    private val deviceId: String by lazy {
+    private val cachedDeviceId: String by lazy {
         val userDefaults = NSUserDefaults.standardUserDefaults
         var id = userDefaults.stringForKey(KEY_DEVICE_ID)
 
@@ -27,23 +27,23 @@ actual class PlatformDeviceInfoProvider : DeviceInfoProvider {
         id!!
     }
 
-    override fun getDeviceId(): String {
-        return deviceId
+    actual override fun getDeviceId(): String {
+        return cachedDeviceId
     }
 
-    override fun getDeviceName(): String {
+    actual override fun getDeviceName(): String {
         return UIDevice.currentDevice.name
     }
 
-    override fun getPlatform(): String {
+    actual override fun getPlatform(): String {
         return "iOS"
     }
 
-    override fun getOsVersion(): String {
+    actual override fun getOsVersion(): String {
         return UIDevice.currentDevice.systemVersion
     }
 
-    override fun getAppVersion(): String {
+    actual override fun getAppVersion(): String {
         val bundle = NSBundle.mainBundle
         val version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
         return version ?: "1.0.0"

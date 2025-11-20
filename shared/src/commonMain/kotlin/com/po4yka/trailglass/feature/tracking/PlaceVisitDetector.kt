@@ -101,10 +101,10 @@ class PlaceVisitDetector {
     private fun calculateDistance(start: Coordinate, end: Coordinate): Double {
         val earthRadiusMeters = 6371000.0
 
-        val lat1 = Math.toRadians(start.latitude)
-        val lat2 = Math.toRadians(end.latitude)
-        val dLat = Math.toRadians(end.latitude - start.latitude)
-        val dLon = Math.toRadians(end.longitude - start.longitude)
+        val lat1 = (start.latitude * PI / 180.0)
+        val lat2 = (end.latitude * PI / 180.0)
+        val dLat = (end.latitude - start.latitude * PI / 180.0)
+        val dLon = (end.longitude - start.longitude * PI / 180.0)
 
         val a = sin(dLat / 2).pow(2) +
                 cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)

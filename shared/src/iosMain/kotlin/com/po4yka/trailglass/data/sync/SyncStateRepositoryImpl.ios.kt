@@ -20,7 +20,7 @@ actual class SyncStateRepositoryImpl : SyncStateRepository {
         const val ERROR = "sync_error"
     }
 
-    override suspend fun getSyncState(): SyncState {
+    actual override suspend fun getSyncState(): SyncState {
         return SyncState(
             lastSyncTimestamp = userDefaults.stringForKey(Keys.LAST_SYNC_TIMESTAMP)?.let {
                 try {
@@ -36,7 +36,7 @@ actual class SyncStateRepositoryImpl : SyncStateRepository {
         )
     }
 
-    override suspend fun updateSyncState(state: SyncState) {
+    actual override suspend fun updateSyncState(state: SyncState) {
         state.lastSyncTimestamp?.let {
             userDefaults.setObject(it.toString(), Keys.LAST_SYNC_TIMESTAMP)
         }

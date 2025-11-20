@@ -47,8 +47,8 @@ class AutoAssociatePhotosUseCase(
                 return AssociationResult.Success(0, 0)
             }
 
-            // Get all visits for user
-            val visits = placeVisitRepository.getAllVisitsForUser(userId)
+            // Get all visits for user (using pagination with high limit to get all)
+            val visits = placeVisitRepository.getVisitsByUser(userId, limit = Int.MAX_VALUE, offset = 0)
             logger.debug { "Found ${visits.size} total visits" }
 
             var associatedCount = 0

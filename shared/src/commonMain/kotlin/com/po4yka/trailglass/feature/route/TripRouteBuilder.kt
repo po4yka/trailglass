@@ -3,6 +3,7 @@ package com.po4yka.trailglass.feature.route
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
+import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sqrt
 
@@ -301,11 +302,11 @@ class TripRouteBuilder(
     ): Double {
         val earthRadiusMeters = 6371000.0
 
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
+        val dLat = (lat2 - lat1) * PI / 180.0
+        val dLon = (lon2 - lon1) * PI / 180.0
 
         val a = kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
-                kotlin.math.cos(Math.toRadians(lat1)) * kotlin.math.cos(Math.toRadians(lat2)) *
+                kotlin.math.cos(lat1 * PI / 180.0) * kotlin.math.cos(lat2 * PI / 180.0) *
                 kotlin.math.sin(dLon / 2) * kotlin.math.sin(dLon / 2)
 
         val c = 2 * kotlin.math.asin(kotlin.math.sqrt(a))

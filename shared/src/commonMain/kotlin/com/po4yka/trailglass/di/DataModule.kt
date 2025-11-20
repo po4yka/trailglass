@@ -19,7 +19,7 @@ interface DataModule {
     @AppScope
     @Provides
     fun provideDatabase(driverFactory: DatabaseDriverFactory): Database {
-        return Database(driverFactory.createDriver())
+        return Database(driverFactory)
     }
 
     /**

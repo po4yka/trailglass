@@ -38,7 +38,7 @@ class GetComprehensiveStatsUseCase(
         // Get all data in parallel (conceptually - would use async in real code)
         val trips = tripRepository.getTripsInRange(userId, startTime, endTime)
         val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
-        val routes = routeSegmentRepository.getRouteSegmentsInRange(startTime, endTime)
+        val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, startTime, endTime)
 
         logger.debug {
             "Loaded data: ${trips.size} trips, ${visits.size} visits, ${routes.size} routes"

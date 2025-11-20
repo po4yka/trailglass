@@ -54,7 +54,7 @@ data class FrequentPlace(
         get() = userLabel
             ?: name
             ?: address
-            ?: "${centerLatitude.format(4)}, ${centerLongitude.format(4)}"
+            ?: "${centerLatitude.roundToDecimals(4)}, ${centerLongitude.roundToDecimals(4)}"
 
     /**
      * Whether this place is significant (visited frequently).
@@ -63,5 +63,15 @@ data class FrequentPlace(
         get() = significance == PlaceSignificance.PRIMARY ||
                 significance == PlaceSignificance.FREQUENT
 
-    private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)
+    private fun Double.roundToDecimals(decimals: Int): String {
+        val multiplier = when (decimals) {
+            1 -> 10.0
+            2 -> 100.0
+            3 -> 1000.0
+            4 -> 10000.0
+            else -> 10000.0
+        }
+        val rounded = kotlin.math.round(this * multiplier) / multiplier
+        return rounded.toString()
+    }
 }

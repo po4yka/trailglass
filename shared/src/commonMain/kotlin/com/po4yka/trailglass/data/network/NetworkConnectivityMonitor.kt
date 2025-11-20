@@ -12,16 +12,6 @@ sealed class NetworkState {
 }
 
 /**
- * Network connectivity type.
- */
-enum class NetworkType {
-    WIFI,
-    CELLULAR,
-    ETHERNET,
-    NONE
-}
-
-/**
  * Network connectivity information.
  */
 data class NetworkInfo(

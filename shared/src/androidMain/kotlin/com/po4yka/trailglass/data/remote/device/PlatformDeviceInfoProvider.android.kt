@@ -13,7 +13,7 @@ import java.util.UUID
 @Inject
 actual class PlatformDeviceInfoProvider(private val context: Context) : DeviceInfoProvider {
 
-    private val deviceId: String by lazy {
+    private val cachedDeviceId: String by lazy {
         // Try to get existing device ID from SharedPreferences
         val prefs = context.getSharedPreferences("device_info", Context.MODE_PRIVATE)
         var id = prefs.getString(KEY_DEVICE_ID, null)
@@ -27,11 +27,11 @@ actual class PlatformDeviceInfoProvider(private val context: Context) : DeviceIn
         id
     }
 
-    override fun getDeviceId(): String {
-        return deviceId
+    actual override fun getDeviceId(): String {
+        return cachedDeviceId
     }
 
-    override fun getDeviceName(): String {
+    actual override fun getDeviceName(): String {
         val manufacturer = Build.MANUFACTURER
         val model = Build.MODEL
         return if (model.startsWith(manufacturer)) {
@@ -41,15 +41,15 @@ actual class PlatformDeviceInfoProvider(private val context: Context) : DeviceIn
         }
     }
 
-    override fun getPlatform(): String {
+    actual override fun getPlatform(): String {
         return "Android"
     }
 
-    override fun getOsVersion(): String {
+    actual override fun getOsVersion(): String {
         return Build.VERSION.RELEASE
     }
 
-    override fun getAppVersion(): String {
+    actual override fun getAppVersion(): String {
         return try {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             packageInfo.versionName ?: "1.0.0"

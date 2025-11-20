@@ -79,16 +79,16 @@ object ArcTrajectoryCalculator {
      * @return Distance in degrees
      */
     private fun calculateDistance(start: Coordinate, end: Coordinate): Double {
-        val lat1 = Math.toRadians(start.latitude)
-        val lat2 = Math.toRadians(end.latitude)
-        val dLat = Math.toRadians(end.latitude - start.latitude)
-        val dLon = Math.toRadians(end.longitude - start.longitude)
+        val lat1 = start.latitude * PI / 180.0
+        val lat2 = end.latitude * PI / 180.0
+        val dLat = (end.latitude - start.latitude) * PI / 180.0
+        val dLon = (end.longitude - start.longitude) * PI / 180.0
 
         val a = sin(dLat / 2).pow(2) +
                 cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
-        return Math.toDegrees(c)
+        return c * 180.0 / PI
     }
 
     /**
@@ -130,10 +130,10 @@ object ArcTrajectoryCalculator {
         end: Coordinate,
         fraction: Double
     ): Coordinate {
-        val lat1 = Math.toRadians(start.latitude)
-        val lon1 = Math.toRadians(start.longitude)
-        val lat2 = Math.toRadians(end.latitude)
-        val lon2 = Math.toRadians(end.longitude)
+        val lat1 = start.latitude * PI / 180.0
+        val lon1 = start.longitude * PI / 180.0
+        val lat2 = end.latitude * PI / 180.0
+        val lon2 = end.longitude * PI / 180.0
 
         // Calculate great circle distance
         val d = acos(
@@ -161,8 +161,8 @@ object ArcTrajectoryCalculator {
         val lonResult = atan2(y, x)
 
         return Coordinate(
-            latitude = Math.toDegrees(latResult),
-            longitude = Math.toDegrees(lonResult)
+            latitude = latResult * 180.0 / PI,
+            longitude = lonResult * 180.0 / PI
         )
     }
 

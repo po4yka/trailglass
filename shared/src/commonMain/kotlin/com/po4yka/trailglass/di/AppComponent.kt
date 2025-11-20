@@ -82,7 +82,7 @@ abstract class AppComponent(
     abstract val permissionFlowController: com.po4yka.trailglass.feature.permission.PermissionFlowController
 
     // Authentication (from AuthModule)
-    abstract val authController: AuthController
+    abstract override val authController: AuthController
 
     // Feature controllers
     abstract val statsController: StatsController

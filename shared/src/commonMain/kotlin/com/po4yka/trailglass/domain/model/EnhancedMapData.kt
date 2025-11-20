@@ -52,9 +52,9 @@ data class HeatmapGradient(
     companion object {
         val DEFAULT = HeatmapGradient(
             colors = listOf(
-                0x00000000, // Transparent
-                0x550000FF, // Blue
-                0xAA00FF00, // Green
+                0x00000000.toInt(), // Transparent
+                0x550000FF.toInt(), // Blue
+                0xAA00FF00.toInt(), // Green
                 0xFFFFFF00.toInt(), // Yellow
                 0xFFFF0000.toInt()  // Red
             ),
@@ -63,9 +63,9 @@ data class HeatmapGradient(
 
         val COOL = HeatmapGradient(
             colors = listOf(
-                0x00000000,
-                0x5500FFFF,
-                0xAA0099FF,
+                0x00000000.toInt(),
+                0x5500FFFF.toInt(),
+                0xAA0099FF.toInt(),
                 0xFF0066FF.toInt(),
                 0xFF0033FF.toInt()
             ),
@@ -74,9 +74,9 @@ data class HeatmapGradient(
 
         val WARM = HeatmapGradient(
             colors = listOf(
-                0x00000000,
-                0x55FFAA00,
-                0xAAFF6600,
+                0x00000000.toInt(),
+                0x55FFAA00.toInt(),
+                0xAAFF6600.toInt(),
                 0xFFFF3300.toInt(),
                 0xFFFF0000.toInt()
             ),
