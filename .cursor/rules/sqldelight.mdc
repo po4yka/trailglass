@@ -1,0 +1,217 @@
+---
+description: SQLDelight database schema and query guidelines
+globs:
+  - "**/*.sq"
+alwaysApply: false
+---
+
+# SQLDelight Guidelines
+
+## Database Schema
+
+Current tables:
+- `location_samples`: Raw GPS points with indices on timestamp and user_id
+- `place_visits`: Detected stationary periods with geocoding data
+- `route_segments`: Movement between places with transport type
+- `trips`: Multi-day journeys aggregating visits and routes
+- `photos`: Photo metadata from device gallery
+- `photo_attachments`: Many-to-many links between photos and visits
+- `geocoding_cache`: Persistent reverse geocoding cache (30-day TTL)
+
+## Query Writing Best Practices
+
+### Type-Safe Queries
+All queries are type-safe and generate Kotlin code:
+
+```sql
+-- Good: Named query with clear purpose
+getById:
+SELECT * FROM place_visits
+WHERE id = ? AND user_id = ?;
+
+-- Good: Specific columns for performance
+getBasicInfo:
+SELECT id, city, country_code, start_time, end_time
+FROM place_visits
+WHERE user_id = ?
+ORDER BY start_time DESC;
+```
+
+### Indexing Strategy
+Always consider indices for queries:
+
+```sql
+-- Create index for frequently queried columns
+CREATE INDEX IF NOT EXISTS idx_location_samples_timestamp
+ON location_samples(timestamp);
+
+CREATE INDEX IF NOT EXISTS idx_location_samples_user_trip
+ON location_samples(user_id, trip_id);
+```
+
+### Use Parameters Correctly
+```sql
+-- Good: Parameterized query
+getForTimeRange:
+SELECT * FROM place_visits
+WHERE user_id = ?
+  AND start_time >= ?
+  AND end_time <= ?
+ORDER BY start_time ASC;
+
+-- Bad: Avoid string concatenation in application code
+```
+
+### Soft Deletes
+Use soft deletes with deleted_at column:
+
+```sql
+-- Soft delete
+softDelete:
+UPDATE place_visits
+SET deleted_at = ?
+WHERE id = ? AND user_id = ?;
+
+-- Query excluding deleted
+getActive:
+SELECT * FROM place_visits
+WHERE user_id = ?
+  AND deleted_at IS NULL
+ORDER BY start_time DESC;
+```
+
+### Spatial Queries (Geocoding Cache)
+Use bounding box + Haversine for spatial queries:
+
+```sql
+-- Spatial proximity search
+getNearby:
+SELECT *
+FROM geocoding_cache
+WHERE latitude BETWEEN ? AND ?
+  AND longitude BETWEEN ? AND ?
+  AND expires_at > ?;
+```
+
+### Batch Operations
+Use batch inserts where possible:
+
+```sql
+insert:
+INSERT INTO location_samples(
+    id, timestamp, latitude, longitude, accuracy,
+    speed, bearing, source, user_id, device_id
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+```
+
+Then use in Kotlin:
+```kotlin
+database.transaction {
+    samples.forEach { sample ->
+        database.locationSamplesQueries.insert(
+            id = sample.id,
+            timestamp = sample.timestamp.toEpochMilliseconds(),
+            // ... other fields
+        )
+    }
+}
+```
+
+## Schema Changes
+
+### After Modifying Schema
+```bash
+# Regenerate SQLDelight code
+./gradlew :shared:generateCommonMainTrailGlassDatabaseInterface
+
+# Clean and rebuild
+./gradlew clean build
+```
+
+### Migration Pattern
+Create migration files in `shared/src/commonMain/sqldelight/migrations/`:
+
+```sql
+-- 2.sqm
+ALTER TABLE place_visits ADD COLUMN notes TEXT;
+CREATE INDEX idx_place_visits_notes ON place_visits(notes);
+```
+
+## Common Patterns
+
+### Time Range Queries
+```sql
+getForDateRange:
+SELECT * FROM place_visits
+WHERE user_id = :userId
+  AND start_time >= :startTime
+  AND end_time <= :endTime
+  AND deleted_at IS NULL
+ORDER BY start_time ASC;
+```
+
+### Many-to-Many Relationships
+```sql
+-- Link samples to visit
+linkSample:
+INSERT OR IGNORE INTO place_visit_samples(place_visit_id, location_sample_id)
+VALUES (?, ?);
+
+-- Query with join
+getSamplesForVisit:
+SELECT ls.*
+FROM location_samples ls
+JOIN place_visit_samples pvs ON ls.id = pvs.location_sample_id
+WHERE pvs.place_visit_id = ?;
+```
+
+### Aggregation Queries
+```sql
+-- Count visits by country
+countByCountry:
+SELECT country_code, COUNT(*) as visit_count
+FROM place_visits
+WHERE user_id = ?
+  AND deleted_at IS NULL
+GROUP BY country_code
+ORDER BY visit_count DESC;
+```
+
+## Performance Considerations
+
+1. **Always use indices** for columns in WHERE, ORDER BY, and JOIN clauses
+2. **SELECT specific columns** instead of SELECT * when possible
+3. **Use transactions** for multiple related operations
+4. **Batch operations** for bulk inserts/updates
+5. **Soft delete with index** on deleted_at for fast filtering
+
+## Testing
+
+Test repository methods after query changes:
+
+```kotlin
+@Test
+fun testQueryReturnsExpectedData() = runTest {
+    // Arrange
+    val visit = createTestVisit()
+    database.placeVisitsQueries.insert(/* ... */)
+
+    // Act
+    val result = database.placeVisitsQueries
+        .getById(visit.id, userId)
+        .executeAsOneOrNull()
+
+    // Assert
+    assertNotNull(result)
+    assertEquals(visit.id, result.id)
+}
+```
+
+## Verification Steps
+
+After modifying .sq files:
+1. Regenerate code: `./gradlew :shared:generateCommonMainTrailGlassDatabaseInterface`
+2. Check for compilation errors
+3. Run repository tests: `./gradlew :shared:test`
+4. Verify query performance with realistic data
+5. Update corresponding repository implementation if needed

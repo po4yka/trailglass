@@ -1,0 +1,356 @@
+---
+description: General project conventions and best practices
+alwaysApply: true
+---
+
+# Project Conventions
+
+## General Guidelines
+
+### Code Organization
+- Keep files under 500 lines
+- One class per file (unless tightly coupled)
+- Group related functionality in packages
+- Use meaningful package names that reflect purpose
+
+### Naming Conventions
+- Classes: PascalCase (e.g., `PlaceVisit`, `LocationRepository`)
+- Functions/properties: camelCase (e.g., `getUserId`, `isLoading`)
+- Constants: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`, `DEFAULT_TIMEOUT`)
+- Composables: PascalCase (e.g., `TimelineScreen`, `VisitCard`)
+- Test files: `*Test.kt` (e.g., `PlaceVisitRepositoryTest.kt`)
+
+### File Naming
+- Kotlin files match class name: `PlaceVisit.kt`
+- Multiple related classes: descriptive name (e.g., `Errors.kt`, `Extensions.kt`)
+- SQLDelight files: table name (e.g., `PlaceVisits.sq`)
+
+## Kotlin Best Practices
+
+### Immutability
+Prefer immutable data structures:
+
+```kotlin
+// Good: Immutable data class
+data class State(
+    val data: List<Item> = emptyList(),
+    val isLoading: Boolean = false
+)
+
+// Update immutably
+state = state.copy(isLoading = true)
+
+// Bad: Mutable properties
+var data: List<Item> = emptyList()
+var isLoading: Boolean = false
+```
+
+### Null Safety
+Avoid nullable types when possible:
+
+```kotlin
+// Good: Use default values
+data class User(
+    val name: String = "",
+    val email: String = ""
+)
+
+// Good: Use empty collections instead of null
+val items: List<Item> = emptyList()
+
+// Avoid when possible
+val items: List<Item>? = null
+```
+
+### Extension Functions
+Use extensions to enhance readability:
+
+```kotlin
+// Good: Extension function
+fun Instant.toLocalDate(timeZone: TimeZone): LocalDate =
+    this.toLocalDateTime(timeZone).date
+
+// Usage
+val date = timestamp.toLocalDate(TimeZone.UTC)
+
+// vs verbose
+val date = timestamp.toLocalDateTime(TimeZone.UTC).date
+```
+
+### Sealed Classes
+Use sealed classes for finite states:
+
+```kotlin
+sealed class LoadingState<out T> {
+    object Idle : LoadingState<Nothing>()
+    object Loading : LoadingState<Nothing>()
+    data class Success<T>(val data: T) : LoadingState<T>()
+    data class Error(val message: String) : LoadingState<Nothing>()
+}
+
+// Exhaustive when expressions
+when (state) {
+    is LoadingState.Idle -> { }
+    is LoadingState.Loading -> { }
+    is LoadingState.Success -> { }
+    is LoadingState.Error -> { }
+}
+```
+
+### Coroutines
+Use structured concurrency:
+
+```kotlin
+// Good: Structured concurrency with scope
+coroutineScope.launch {
+    val result = withContext(Dispatchers.IO) {
+        repository.getData()
+    }
+    _state.update { it.copy(data = result) }
+}
+
+// Bad: GlobalScope
+GlobalScope.launch { } // Never use this
+
+// Bad: Unstructured
+launch { } // Where does this run?
+```
+
+## Documentation
+
+### KDoc for Public APIs
+Document public classes and functions:
+
+```kotlin
+/**
+ * Detects place visits from location samples using DBSCAN clustering.
+ *
+ * @param samples Raw location samples to process
+ * @param minStayDuration Minimum time at location to qualify as a visit
+ * @return List of detected place visits
+ */
+suspend fun detectPlaceVisits(
+    samples: List<LocationSample>,
+    minStayDuration: Duration = 5.minutes
+): List<PlaceVisit>
+```
+
+### Inline Comments
+Use sparingly for complex logic:
+
+```kotlin
+// Calculate Haversine distance to find nearby cached locations
+// within 100m radius for geocoding cache hit
+val distance = haversineDistance(lat1, lon1, lat2, lon2)
+if (distance < 100.0) {
+    return cachedLocation
+}
+```
+
+Avoid obvious comments:
+
+```kotlin
+// Bad: Obvious comment
+// Set loading to true
+isLoading = true
+
+// Bad: Commented code (use git instead)
+// val oldImplementation = ...
+```
+
+## Error Messages
+
+### User-Facing Messages
+Clear, actionable, non-technical:
+
+```kotlin
+// Good
+"No internet connection. Please check your network settings."
+
+// Bad
+"IOException: Connection refused at socket.connect()"
+```
+
+### Technical Details
+Separate from user message:
+
+```kotlin
+data class AppError(
+    val message: String,  // User-friendly
+    val technicalDetails: String?  // For logging
+)
+
+logger.error { "User message: $message, Details: $technicalDetails" }
+```
+
+## Performance
+
+### Avoid Premature Optimization
+```kotlin
+// Start simple and clear
+val results = items.filter { it.isActive }
+                   .map { it.name }
+
+// Optimize only if needed (with benchmarks)
+val results = items.asSequence()
+                   .filter { it.isActive }
+                   .map { it.name }
+                   .toList()
+```
+
+### Database Queries
+- Use indices for filtered/sorted columns
+- SELECT specific columns, not *
+- Use LIMIT for pagination
+- Batch operations in transactions
+
+### Flow Collection
+```kotlin
+// Good: Collect in lifecycle-aware scope
+LaunchedEffect(Unit) {
+    flow.collect { value ->
+        // Process value
+    }
+}
+
+// Bad: Unconstrained collection
+flow.collect { } // Never completes
+```
+
+## Git Practices
+
+### Commit Messages
+Follow conventional commits:
+
+```
+feat: add photo attachment to place visits
+fix: correct timezone handling in trip detection
+refactor: extract location clustering to separate class
+test: add repository integration tests
+docs: update architecture documentation
+```
+
+### Branch Naming
+```
+feature/photo-attachments
+fix/timezone-bug
+refactor/repository-cleanup
+test/coverage-improvement
+```
+
+### What to Commit
+- Source code
+- Configuration files
+- Documentation
+- Test files
+- Build scripts
+
+### What NOT to Commit
+- `build/` directories
+- `.gradle/` cache
+- IDE-specific files (`.idea/`, except shared configs)
+- `local.properties` (API keys)
+- Generated code (SQLDelight, kotlin-inject)
+- Binary files (APKs, frameworks)
+
+## Security
+
+### API Keys
+Never commit API keys:
+
+```properties
+# local.properties (gitignored)
+MAPS_API_KEY=your_key_here
+
+# Use in build.gradle.kts
+secrets {
+    propertiesFileName = "local.properties"
+}
+```
+
+### Sensitive Data
+- Never log coordinates at INFO level (DEBUG/TRACE only)
+- Don't log user IDs in production
+- Use encrypted preferences for tokens
+- Validate all user input
+
+## Code Review Checklist
+
+Before requesting review:
+- [ ] Tests pass and coverage meets threshold
+- [ ] Code follows architecture layers
+- [ ] No hardcoded values (use constants)
+- [ ] Error handling is complete
+- [ ] Logging is appropriate
+- [ ] No commented-out code
+- [ ] Documentation is updated
+- [ ] Git commit messages are clear
+
+## Common Anti-Patterns to Avoid
+
+### God Objects
+```kotlin
+// Bad: Does too much
+class LocationManager {
+    fun trackLocation() { }
+    fun processLocations() { }
+    fun detectVisits() { }
+    fun geocode() { }
+    fun saveToDatabase() { }
+}
+
+// Good: Single responsibility
+class LocationTracker { }
+class LocationProcessor { }
+class PlaceVisitDetector { }
+class ReverseGeocoder { }
+class LocationRepository { }
+```
+
+### Feature Envy
+```kotlin
+// Bad: Accessing too much of another object
+fun calculatePrice(order: Order): Double {
+    return order.items.sumOf {
+        it.product.basePrice * it.quantity - it.product.discount
+    }
+}
+
+// Good: Behavior with data
+class Order {
+    fun calculateTotal(): Double {
+        return items.sumOf { it.calculatePrice() }
+    }
+}
+```
+
+### Primitive Obsession
+```kotlin
+// Bad: Using primitives for domain concepts
+fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double
+
+// Good: Use domain types
+data class Coordinate(val latitude: Double, val longitude: Double)
+fun calculateDistance(from: Coordinate, to: Coordinate): Double
+```
+
+## Resources
+
+### Documentation
+- Project: `docs/` directory
+- API: KDoc in source files
+- Architecture: `docs/ARCHITECTURE.md`
+
+### External References
+- Kotlin style guide: https://kotlinlang.org/docs/coding-conventions.html
+- Compose guidelines: https://developer.android.com/jetpack/compose/mental-model
+- SQLDelight docs: https://cashapp.github.io/sqldelight/
+
+## Questions?
+
+When in doubt:
+1. Check existing code for patterns
+2. Review documentation in `docs/`
+3. Look at similar implementations
+4. Ask for clarification in PR
+5. Prefer simple, clear solutions over clever ones

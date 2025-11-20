@@ -1,0 +1,483 @@
+---
+description: Testing guidelines and coverage requirements
+globs:
+  - "**/*Test.kt"
+  - "**/test/**/*.kt"
+alwaysApply: false
+---
+
+# Testing Guidelines
+
+## Coverage Requirements
+
+### Minimum Thresholds (Enforced by Kover)
+- Overall project: 75%+
+- Domain models: 90%+
+- Repositories: 85%+
+- Use cases: 80%+
+- Controllers: 75%+
+- UI components: 70%+
+
+### Running Tests
+```bash
+# All tests with coverage
+./scripts/run-tests.sh
+
+# Shared module only
+./gradlew :shared:test
+
+# Android unit tests
+./gradlew :composeApp:testDebugUnitTest
+
+# Android UI tests (requires emulator)
+./gradlew :composeApp:connectedAndroidTest
+
+# Generate coverage report
+./gradlew koverHtmlReport
+# View: shared/build/reports/kover/html/index.html
+
+# Verify coverage meets threshold
+./gradlew koverVerify
+```
+
+## Test Structure
+
+### AAA Pattern (Arrange-Act-Assert)
+Always structure tests with clear sections:
+
+```kotlin
+@Test
+fun testGetPlaceVisitById_returnsVisit() = runTest {
+    // Arrange (Given)
+    val visit = createTestVisit(id = "visit1")
+    repository.insertPlaceVisit(visit)
+
+    // Act (When)
+    val result = repository.getPlaceVisitById(visit.id, userId)
+
+    // Assert (Then)
+    assertNotNull(result)
+    assertEquals(visit.id, result.id)
+    assertEquals(visit.city, result.city)
+}
+```
+
+### Test Naming
+Use descriptive names that explain:
+- What is being tested
+- Under what conditions
+- What the expected outcome is
+
+```kotlin
+// Good
+@Test
+fun testGetPlaceVisitsForTimeRange_withMultipleVisits_returnsOnlyVisitsInRange()
+
+@Test
+fun testInsertPlaceVisit_withDuplicateId_throwsException()
+
+@Test
+fun testLocationSamples_whenUserDeleted_areAlsoCascadeDeleted()
+
+// Bad
+@Test
+fun testQuery()
+
+@Test
+fun testRepository()
+```
+
+## Unit Tests
+
+### Repository Tests
+Test all CRUD operations and edge cases:
+
+```kotlin
+class PlaceVisitRepositoryTest {
+    private lateinit var database: TrailGlassDatabase
+    private lateinit var repository: PlaceVisitRepository
+
+    @BeforeTest
+    fun setup() {
+        database = TestDatabaseHelper.createTestDatabase()
+        repository = PlaceVisitRepositoryImpl(database)
+    }
+
+    @AfterTest
+    fun teardown() {
+        database.close()
+    }
+
+    @Test
+    fun testInsertAndRetrieve() = runTest {
+        val visit = createTestVisit()
+        repository.insertPlaceVisit(visit)
+
+        val result = repository.getPlaceVisitById(visit.id, userId)
+
+        assertNotNull(result)
+        assertEquals(visit.id, result.id)
+    }
+
+    @Test
+    fun testGetById_nonexistent_returnsNull() = runTest {
+        val result = repository.getPlaceVisitById("nonexistent", userId)
+        assertNull(result)
+    }
+
+    @Test
+    fun testGetForTimeRange_emptyRange() = runTest {
+        val result = repository.getPlaceVisitsForTimeRange(
+            userId,
+            start = now,
+            end = now
+        ).first()
+
+        assertTrue(result.isEmpty())
+    }
+}
+```
+
+### Use Case Tests
+Test business logic with mocked dependencies if needed:
+
+```kotlin
+class GetMapDataUseCaseTest {
+    private lateinit var visitRepository: PlaceVisitRepository
+    private lateinit var routeRepository: RouteSegmentRepository
+    private lateinit var useCase: GetMapDataUseCase
+
+    @BeforeTest
+    fun setup() {
+        val database = TestDatabaseHelper.createTestDatabase()
+        visitRepository = PlaceVisitRepositoryImpl(database)
+        routeRepository = RouteSegmentRepositoryImpl(database)
+        useCase = GetMapDataUseCase(visitRepository, routeRepository)
+    }
+
+    @Test
+    fun testExecute_withVisitsAndRoutes_returnsMapData() = runTest {
+        // Arrange
+        val visit1 = createTestVisit(id = "v1", city = "Paris")
+        val visit2 = createTestVisit(id = "v2", city = "London")
+        visitRepository.insertPlaceVisit(visit1)
+        visitRepository.insertPlaceVisit(visit2)
+
+        val route = createTestRoute(id = "r1", type = TransportType.TRAIN)
+        routeRepository.insertRouteSegment(route)
+
+        // Act
+        val result = useCase.execute(userId, startTime, endTime)
+
+        // Assert
+        assertEquals(2, result.markers.size)
+        assertEquals(1, result.routes.size)
+        assertNotNull(result.region)
+    }
+}
+```
+
+### Controller Tests
+Test state management and flow:
+
+```kotlin
+class TimelineControllerTest {
+    private lateinit var controller: TimelineController
+    private lateinit var testScope: TestScope
+
+    @BeforeTest
+    fun setup() {
+        testScope = TestScope()
+        val useCase = GetTimelineForDayUseCase(/* ... */)
+        controller = TimelineController(useCase, testScope, userId)
+    }
+
+    @Test
+    fun testSelectDate_loadsData() = runTest {
+        // Arrange
+        val date = LocalDate(2024, 1, 1)
+
+        // Act
+        controller.selectDate(date)
+        testScope.advanceUntilIdle()
+
+        // Assert
+        val state = controller.state.value
+        assertEquals(date, state.selectedDate)
+        assertFalse(state.isLoading)
+        assertNotNull(state.items)
+    }
+
+    @Test
+    fun testSelectDate_error_setsErrorState() = runTest {
+        // Test error handling
+    }
+}
+```
+
+## Flow Testing with Turbine
+
+Test reactive flows:
+
+```kotlin
+@Test
+fun testPlaceVisitsFlow_emitsUpdates() = runTest {
+    repository.getPlaceVisitsForTimeRange(userId, start, end)
+        .test {
+            // Initial empty state
+            val initial = awaitItem()
+            assertTrue(initial.isEmpty())
+
+            // Insert visit
+            repository.insertPlaceVisit(createTestVisit())
+
+            // Should emit updated list
+            val updated = awaitItem()
+            assertEquals(1, updated.size)
+
+            awaitComplete()
+        }
+}
+```
+
+## Android UI Tests
+
+### Compose Testing
+```kotlin
+class TimelineScreenTest {
+    @get:Rule
+    val composeTestRule = createComposeRule()
+
+    private lateinit var testController: TimelineController
+
+    @Before
+    fun setup() {
+        testController = createTestController()
+    }
+
+    @Test
+    fun testTimelineScreen_displaysVisits() {
+        composeTestRule.setContent {
+            TimelineScreen(controller = testController)
+        }
+
+        composeTestRule.waitForIdle()
+
+        composeTestRule
+            .onNodeWithText("Paris")
+            .assertExists()
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun testTimelineScreen_clickVisit_navigates() {
+        var navigatedId: String? = null
+
+        composeTestRule.setContent {
+            TimelineScreen(
+                controller = testController,
+                onNavigateToVisit = { id -> navigatedId = id }
+            )
+        }
+
+        composeTestRule
+            .onNodeWithText("Paris")
+            .performClick()
+
+        assertNotNull(navigatedId)
+    }
+}
+```
+
+### Semantics for Testing
+Add semantics to make components testable:
+
+```kotlin
+@Composable
+fun VisitCard(visit: PlaceVisit) {
+    Card(
+        modifier = Modifier.semantics {
+            testTag = "visit_card_${visit.id}"
+        }
+    ) {
+        // Content
+    }
+}
+
+// In test
+composeTestRule
+    .onNodeWithTag("visit_card_visit1")
+    .assertExists()
+```
+
+## Test Helpers and Fixtures
+
+### Create Reusable Test Data
+```kotlin
+object TestFixtures {
+    fun createTestVisit(
+        id: String = "visit1",
+        userId: String = "test_user",
+        city: String = "Paris",
+        latitude: Double = 48.8566,
+        longitude: Double = 2.3522,
+        startTime: Instant = Clock.System.now(),
+        endTime: Instant = Clock.System.now().plus(2.hours)
+    ) = PlaceVisit(
+        id = id,
+        tripId = "trip1",
+        userId = userId,
+        startTime = startTime,
+        endTime = endTime,
+        centerLatitude = latitude,
+        centerLongitude = longitude,
+        radiusMeters = 100.0,
+        city = city,
+        country = "France",
+        approximateAddress = "123 Main St",
+        confidence = 0.95,
+        arrivalTransportType = TransportType.WALK,
+        departureTransportType = null,
+        userNotes = null
+    )
+}
+```
+
+### Database Test Helper
+```kotlin
+object TestDatabaseHelper {
+    fun createTestDatabase(): TrailGlassDatabase {
+        val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
+        TrailGlassDatabase.Schema.create(driver)
+        return TrailGlassDatabase(driver)
+    }
+
+    fun clearDatabase(database: TrailGlassDatabase) {
+        database.transaction {
+            database.locationSamplesQueries.deleteAll()
+            database.placeVisitsQueries.deleteAll()
+            database.routeSegmentsQueries.deleteAll()
+            database.tripsQueries.deleteAll()
+        }
+    }
+}
+```
+
+## Best Practices
+
+### Test Independence
+Each test should be independent:
+```kotlin
+@BeforeTest
+fun setup() {
+    database = TestDatabaseHelper.createTestDatabase()
+    repository = PlaceVisitRepositoryImpl(database)
+}
+
+@AfterTest
+fun teardown() {
+    TestDatabaseHelper.clearDatabase(database)
+    database.close()
+}
+```
+
+### Test Edge Cases
+Don't just test happy paths:
+```kotlin
+@Test
+fun testEmptyList() { }
+
+@Test
+fun testSingleItem() { }
+
+@Test
+fun testLargeList() { }
+
+@Test
+fun testNullValues() { }
+
+@Test
+fun testBoundaryValues() { }
+
+@Test
+fun testConcurrentModification() { }
+```
+
+### Use Assertions Library
+Use Kotest assertions for better error messages:
+
+```kotlin
+// Good: Clear failure messages
+result.shouldNotBeNull()
+result.id.shouldBe(expectedId)
+result.items.shouldHaveSize(3)
+
+// vs standard assertions
+assertNotNull(result)
+assertEquals(expectedId, result.id)
+assertEquals(3, result.items.size)
+```
+
+### Test Async Code Properly
+```kotlin
+@Test
+fun testAsyncOperation() = runTest {
+    // Use runTest for coroutines
+    val result = repository.suspendingFunction()
+    // Assertions
+}
+
+@Test
+fun testFlow() = runTest {
+    flow.test {
+        // Use turbine for flows
+        awaitItem()
+        awaitComplete()
+    }
+}
+```
+
+## Continuous Integration
+
+Tests run automatically on:
+- Every commit (via pre-commit hook)
+- Pull requests
+- CI/CD pipeline
+
+## Troubleshooting
+
+### Coverage Too Low
+```bash
+# Generate HTML report to see uncovered code
+./gradlew koverHtmlReport
+
+# Open: shared/build/reports/kover/html/index.html
+# Red = not covered, Yellow = partially covered, Green = covered
+```
+
+### Flaky Tests
+- Remove hard-coded delays
+- Use `waitForIdle()` or `waitForExistence()`
+- Ensure test independence
+- Check for race conditions
+- Use proper test scopes
+
+### Database Tests Fail
+```bash
+# Ensure sqlite driver is in dependencies
+# Check shared/build.gradle.kts:
+# commonTest.dependencies {
+#     implementation(libs.sqldelight.sqlite)
+# }
+```
+
+## Verification Checklist
+
+Before committing code:
+- [ ] All tests pass: `./gradlew :shared:test`
+- [ ] Coverage meets 75%: `./gradlew koverVerify`
+- [ ] No flaky tests (run 3x to verify)
+- [ ] UI tests pass (if applicable)
+- [ ] New code has corresponding tests
+- [ ] Tests follow AAA pattern
+- [ ] Test names are descriptive

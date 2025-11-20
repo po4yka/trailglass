@@ -1,0 +1,385 @@
+---
+description: Android Jetpack Compose UI development guidelines
+globs:
+  - "composeApp/**/*.kt"
+alwaysApply: false
+---
+
+# Android Jetpack Compose Guidelines
+
+## UI Architecture
+
+### Compose Screens
+Screens observe StateFlow from shared controllers:
+
+```kotlin
+@Composable
+fun TimelineScreen(
+    controller: TimelineController,
+    onNavigateToVisit: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val state by controller.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        controller.loadInitialData()
+    }
+
+    when {
+        state.isLoading -> LoadingIndicator()
+        state.error != null -> ErrorMessage(state.error!!)
+        else -> TimelineContent(state.items, onNavigateToVisit)
+    }
+}
+```
+
+### Material 3 Design
+Follow Material 3 Expressive guidelines:
+
+```kotlin
+@Composable
+fun MyScreen() {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Title") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        }
+    ) { paddingValues ->
+        // Content with padding
+        Content(modifier = Modifier.padding(paddingValues))
+    }
+}
+```
+
+### State Management
+- Observe StateFlow with `collectAsState()`
+- Use `LaunchedEffect` for one-time actions
+- Use `remember` for non-state values
+- Avoid ViewModel in this project - use shared controllers
+
+```kotlin
+@Composable
+fun MyComponent(controller: MyController) {
+    val state by controller.state.collectAsState()
+
+    // One-time effect
+    LaunchedEffect(Unit) {
+        controller.initialize()
+    }
+
+    // Remembered value
+    val scrollState = rememberScrollState()
+
+    // UI based on state
+    if (state.isLoading) {
+        CircularProgressIndicator()
+    } else {
+        Content(state.data)
+    }
+}
+```
+
+## Navigation with Decompose
+
+Use Decompose for navigation with type-safe routing:
+
+```kotlin
+@Serializable
+sealed class Screen {
+    @Serializable
+    data object Stats : Screen()
+
+    @Serializable
+    data object Timeline : Screen()
+
+    @Serializable
+    data class VisitDetail(val visitId: String) : Screen()
+}
+
+// In navigation setup
+val navigation = rememberNavigation(
+    initialStack = { listOf(Screen.Timeline) }
+)
+
+// Navigate
+navigation.push(Screen.VisitDetail(visitId = "123"))
+```
+
+## Compose Best Practices
+
+### Composable Function Naming
+```kotlin
+// Good: PascalCase for composables
+@Composable
+fun VisitCard(visit: PlaceVisit) { }
+
+@Composable
+fun TimelineList(items: List<TimelineItem>) { }
+
+// Bad: camelCase
+@Composable
+fun visitCard() { }  // Wrong
+```
+
+### Modifier Order
+Follow standard modifier order:
+
+```kotlin
+@Composable
+fun MyComponent() {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()           // Size
+            .padding(16.dp)           // Padding/offset
+            .background(Color.White)   // Drawing
+            .clickable { }            // Input
+            .semantics { }            // Semantics
+    )
+}
+```
+
+### Reusable Components
+Create reusable components in `composeApp/src/main/kotlin/ui/components/`:
+
+```kotlin
+@Composable
+fun LoadingIndicator(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun ErrorMessage(
+    message: String,
+    onRetry: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.error
+        )
+        if (onRetry != null) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onRetry) {
+                Text("Retry")
+            }
+        }
+    }
+}
+```
+
+### Performance
+
+#### Avoid Recomposition
+```kotlin
+// Good: Stable parameters
+@Composable
+fun VisitCard(
+    visit: PlaceVisit,  // Immutable data class
+    onClick: () -> Unit  // Stable lambda
+) { }
+
+// Good: Remember expensive computations
+@Composable
+fun ExpensiveComponent(items: List<Item>) {
+    val processedItems = remember(items) {
+        items.map { expensiveOperation(it) }
+    }
+}
+
+// Bad: Recreating lambda on every recomposition
+@Composable
+fun Parent(onEvent: (String) -> Unit) {
+    Child(onClick = { onEvent("clicked") })  // Creates new lambda
+}
+
+// Better: Stable reference
+@Composable
+fun Parent(onEvent: (String) -> Unit) {
+    val onClick = remember(onEvent) {
+        { onEvent("clicked") }
+    }
+    Child(onClick = onClick)
+}
+```
+
+#### LazyColumn Optimization
+```kotlin
+@Composable
+fun TimelineList(items: List<TimelineItem>) {
+    LazyColumn {
+        items(
+            items = items,
+            key = { it.id }  // Always provide key for stable items
+        ) { item ->
+            TimelineCard(item)
+        }
+    }
+}
+```
+
+## Testing
+
+### Compose UI Tests
+```kotlin
+@Test
+fun testStatsScreen_displaysData() {
+    composeTestRule.setContent {
+        StatsScreen(controller = testController)
+    }
+
+    // Wait for data to load
+    composeTestRule.waitForIdle()
+
+    // Assertions
+    composeTestRule
+        .onNodeWithText("Countries")
+        .assertExists()
+
+    composeTestRule
+        .onNodeWithText("5")
+        .assertExists()
+}
+```
+
+### Interaction Testing
+```kotlin
+@Test
+fun testClickNavigatesToDetail() {
+    var navigatedToId: String? = null
+
+    composeTestRule.setContent {
+        TimelineScreen(
+            controller = testController,
+            onNavigateToVisit = { id -> navigatedToId = id }
+        )
+    }
+
+    composeTestRule
+        .onNodeWithText("Visit 1")
+        .performClick()
+
+    assertEquals("visit1", navigatedToId)
+}
+```
+
+## Platform-Specific Features
+
+### Android Services
+Location tracking foreground service in `composeApp/src/main/kotlin/service/`:
+
+```kotlin
+class LocationTrackingService : Service() {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Create notification for foreground service
+        val notification = createNotification()
+        startForeground(NOTIFICATION_ID, notification)
+
+        // Start location tracking
+        return START_STICKY
+    }
+}
+```
+
+### WorkManager
+Background tasks in `composeApp/src/main/kotlin/worker/`:
+
+```kotlin
+class LocationProcessingWorker(
+    context: Context,
+    params: WorkerParameters
+) : CoroutineWorker(context, params) {
+
+    override suspend fun doWork(): Result {
+        return try {
+            // Process location data
+            Result.success()
+        } catch (e: Exception) {
+            Result.retry()
+        }
+    }
+}
+```
+
+## Image Loading with Coil
+
+```kotlin
+@Composable
+fun PhotoCard(photo: Photo) {
+    AsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(photo.uri)
+            .crossfade(true)
+            .build(),
+        contentDescription = photo.caption,
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(16f / 9f),
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(R.drawable.placeholder),
+        error = painterResource(R.drawable.error)
+    )
+}
+```
+
+## Google Maps Integration
+
+```kotlin
+@Composable
+fun MapScreen(controller: MapController) {
+    val state by controller.state.collectAsState()
+    val cameraPositionState = rememberCameraPositionState()
+
+    GoogleMap(
+        modifier = Modifier.fillMaxSize(),
+        cameraPositionState = cameraPositionState
+    ) {
+        // Markers for place visits
+        state.markers.forEach { marker ->
+            Marker(
+                state = rememberMarkerState(position = marker.position),
+                title = marker.title,
+                snippet = marker.snippet
+            )
+        }
+
+        // Polylines for routes
+        state.routes.forEach { route ->
+            Polyline(
+                points = route.points,
+                color = route.color,
+                width = 5f
+            )
+        }
+    }
+}
+```
+
+## Verification Steps
+
+Before committing Android UI code:
+1. Preview in Android Studio
+2. Test on emulator/device
+3. Run UI tests: `./gradlew :composeApp:connectedAndroidTest`
+4. Check for accessibility issues
+5. Verify Material 3 theme compliance
+6. Test dark mode if applicable

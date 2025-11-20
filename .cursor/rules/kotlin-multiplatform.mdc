@@ -1,0 +1,284 @@
+---
+description: Kotlin Multiplatform development guidelines for Trailglass
+globs:
+  - "**/*.kt"
+alwaysApply: true
+---
+
+# Kotlin Multiplatform Development Rules
+
+## Technology Stack
+
+- Kotlin 2.2.20 with Kotlin Multiplatform
+- SQLDelight 2.1.0 for type-safe database
+- kotlin-inject 0.7.2 for compile-time DI (KSP-based)
+- Decompose 3.2.0 for navigation
+- Ktor 3.3.2 for networking
+- kotlin-logging 7.0.0 for structured logging
+- Jetpack Compose for Android UI
+- SwiftUI for iOS UI
+
+## Architecture Principles
+
+### Layer Separation
+Follow strict layer separation:
+1. Platform UI (Compose/SwiftUI) - Platform-specific
+2. Controllers (StateFlow-based) - Shared in commonMain
+3. Use Cases (Business logic) - Shared in commonMain
+4. Repositories (Data access) - Shared in commonMain
+5. Database (SQLDelight) - Shared in commonMain
+6. Platform APIs (expect/actual) - Platform-specific
+
+### Code Organization
+- Domain models: `shared/src/commonMain/kotlin/com/po4yka/trailglass/domain/model/`
+- Repository interfaces: `shared/src/commonMain/kotlin/com/po4yka/trailglass/domain/repository/`
+- Repository implementations: `shared/src/commonMain/kotlin/com/po4yka/trailglass/data/repository/impl/`
+- Controllers: `shared/src/commonMain/kotlin/com/po4yka/trailglass/feature/*/`
+- Platform code: `shared/src/androidMain/` or `shared/src/iosMain/`
+
+### Platform-Specific Code (expect/actual)
+When creating platform-specific functionality:
+
+```kotlin
+// commonMain - Declare expectation
+expect class LocationTracker {
+    val locationUpdates: Flow<LocationSample>
+    suspend fun startTracking(mode: TrackingMode)
+    suspend fun stopTracking()
+}
+
+// androidMain - Android implementation
+actual class LocationTracker(private val context: Context) {
+    private val fusedLocationClient =
+        LocationServices.getFusedLocationProviderClient(context)
+
+    actual val locationUpdates: Flow<LocationSample> = /* ... */
+    actual suspend fun startTracking(mode: TrackingMode) { /* ... */ }
+    actual suspend fun stopTracking() { /* ... */ }
+}
+
+// iosMain - iOS implementation
+actual class LocationTracker {
+    private val locationManager = CLLocationManager()
+
+    actual val locationUpdates: Flow<LocationSample> = /* ... */
+    actual suspend fun startTracking(mode: TrackingMode) { /* ... */ }
+    actual suspend fun stopTracking() { /* ... */ }
+}
+```
+
+## State Management
+
+Use StateFlow for reactive state in controllers:
+
+```kotlin
+class TimelineController @Inject constructor(
+    private val getTimelineUseCase: GetTimelineForDayUseCase,
+    @AppScope private val coroutineScope: CoroutineScope,
+    private val userId: String
+) {
+    data class TimelineState(
+        val selectedDate: LocalDate?,
+        val items: List<TimelineItemUI>,
+        val isLoading: Boolean,
+        val error: String?
+    )
+
+    private val _state = MutableStateFlow(
+        TimelineState(
+            selectedDate = null,
+            items = emptyList(),
+            isLoading = false,
+            error = null
+        )
+    )
+    val state: StateFlow<TimelineState> = _state.asStateFlow()
+
+    fun selectDate(date: LocalDate) {
+        _state.update { it.copy(selectedDate = date, isLoading = true) }
+
+        coroutineScope.launch {
+            try {
+                val items = getTimelineUseCase.execute(userId, date)
+                _state.update { it.copy(items = items, isLoading = false) }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message, isLoading = false) }
+            }
+        }
+    }
+}
+```
+
+Key principles:
+- State is immutable - use `.update { it.copy(...) }`
+- One StateFlow per feature/screen
+- Loading/error/data states always included
+- Never mutate state directly
+
+## Dependency Injection with kotlin-inject
+
+Use kotlin-inject for compile-time DI:
+
+### Adding New Dependencies
+
+1. Add @Inject to constructor:
+```kotlin
+@Inject
+class MyRepository(
+    private val database: TrailGlassDatabase
+) {
+    // Implementation
+}
+```
+
+2. If class has interface, provide in module:
+```kotlin
+interface DataModule {
+    @AppScope
+    @Provides
+    fun provideMyRepository(impl: MyRepositoryImpl): MyRepository = impl
+}
+```
+
+3. After DI changes, rebuild KSP:
+```bash
+./gradlew clean kspCommonMainKotlinMetadata kspDebugKotlinAndroid
+```
+
+### DI Best Practices
+- Use constructor injection, not property injection
+- Only use @AppScope for true singletons
+- Keep modules focused (DataModule, LocationModule, etc.)
+- Platform-specific dependencies go in PlatformModule
+
+## Error Handling
+
+Use sealed class hierarchy for errors:
+
+```kotlin
+sealed class AppError {
+    abstract val message: String
+    abstract val technicalDetails: String?
+}
+
+sealed class NetworkError : AppError() {
+    data class NoConnection(
+        override val message: String = "No internet connection",
+        override val technicalDetails: String? = null
+    ) : NetworkError()
+
+    data class Timeout(
+        override val message: String = "Request timed out",
+        override val technicalDetails: String? = null
+    ) : NetworkError()
+}
+
+// Use Result<T> in use cases
+suspend fun execute(id: String): Result<PlaceVisit> {
+    return try {
+        val visit = repository.getVisit(id)
+        Result.success(visit)
+    } catch (e: Exception) {
+        Result.failure(DatabaseError.QueryFailed(technicalDetails = e.message))
+    }
+}
+```
+
+## Logging
+
+Use kotlin-logging for structured logging:
+
+```kotlin
+import com.po4yka.trailglass.logging.logger
+
+class MyService {
+    private val logger = logger()  // Automatically uses class name
+
+    fun doWork() {
+        logger.info { "Starting work" }
+        logger.debug { "Processing item: $item" }
+        logger.error(exception) { "Failed to process" }
+    }
+}
+```
+
+Best practices:
+- Always use lambdas for lazy evaluation: `logger.debug { "..." }`
+- TRACE: Fine-grained diagnostic
+- DEBUG: Detailed debugging information
+- INFO: Important business events
+- WARN: Potential issues
+- ERROR: Failures and exceptions
+
+## Testing Requirements
+
+### Coverage
+- Minimum 75% code coverage (enforced by Kover)
+- Domain models: 90%+
+- Repositories: 85%+
+- Use cases: 80%+
+- Controllers: 75%+
+
+### Test Structure
+Use AAA pattern (Arrange-Act-Assert):
+
+```kotlin
+@Test
+fun testGetPlaceVisitById_returnsVisit() = runTest {
+    // Arrange
+    val visit = createTestVisit(id = "visit1")
+    repository.insertPlaceVisit(visit)
+
+    // Act
+    val result = repository.getPlaceVisitById(visit.id, userId)
+
+    // Assert
+    assertNotNull(result)
+    assertEquals(visit.id, result.id)
+}
+```
+
+### Running Tests
+```bash
+# All tests with coverage
+./scripts/run-tests.sh
+
+# Specific tests
+./gradlew :shared:test --tests "PlaceVisitRepositoryTest"
+
+# Coverage report
+./gradlew koverHtmlReport
+# View: shared/build/reports/kover/html/index.html
+```
+
+## Code Style
+
+- Immutable data classes for domain models
+- Use `Flow` for reactive streams
+- Prefer `suspend` functions over callbacks
+- Use kotlinx.datetime for dates (not Java Date/Calendar)
+- Use sealed classes for state/result types
+- Never expose MutableStateFlow - use StateFlow
+- Repository interfaces in domain/, implementations in data/
+
+## Build Commands Reference
+
+After SQLDelight schema changes:
+```bash
+./gradlew :shared:generateCommonMainTrailGlassDatabaseInterface
+./gradlew clean build
+```
+
+After kotlin-inject changes:
+```bash
+./gradlew clean kspCommonMainKotlinMetadata kspDebugKotlinAndroid
+```
+
+## Verification Steps
+
+Before committing:
+1. Run tests: `./gradlew :shared:test`
+2. Verify coverage: `./gradlew koverVerify`
+3. Build Android: `./gradlew :composeApp:assembleDebug`
+4. Build iOS framework: `./gradlew :shared:embedAndSignAppleFrameworkForXcode`
+5. No compilation errors or warnings
