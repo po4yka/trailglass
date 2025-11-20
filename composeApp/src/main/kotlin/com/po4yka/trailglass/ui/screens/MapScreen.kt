@@ -98,9 +98,9 @@ private fun MarkerInfoCard(
                         style = MaterialTheme.typography.titleMedium
                     )
 
-                    if (marker.snippet != null) {
+                    marker.snippet?.let { snippetText ->
                         Text(
-                            text = marker.snippet,
+                            text = snippetText,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp)

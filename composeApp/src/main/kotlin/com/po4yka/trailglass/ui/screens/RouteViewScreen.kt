@@ -4,7 +4,22 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Satellite
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Terrain
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -145,7 +160,7 @@ fun RouteViewScreen(
                             text = { Text("Export GPX") },
                             onClick = {
                                 showMenu = false
-                                val tripName = state.tripRoute?.trip?.displayName ?: "route"
+                                val tripName = state.tripRoute?.tripId ?: "route"
                                 controller.exportRoute(tripName, ExportFormat.GPX)
                             },
                             leadingIcon = { Icon(Icons.Default.Download, null) },
@@ -155,7 +170,7 @@ fun RouteViewScreen(
                             text = { Text("Export KML") },
                             onClick = {
                                 showMenu = false
-                                val tripName = state.tripRoute?.trip?.displayName ?: "route"
+                                val tripName = state.tripRoute?.tripId ?: "route"
                                 controller.exportRoute(tripName, ExportFormat.KML)
                             },
                             leadingIcon = { Icon(Icons.Default.Download, null) },
@@ -226,16 +241,18 @@ fun RouteViewScreen(
 
                 state.tripRoute != null -> {
                     // Content state
-                    RouteViewContent(
-                        tripRoute = state.tripRoute,
-                        mapStyle = state.mapStyle,
-                        shouldRecenterCamera = state.shouldRecenterCamera,
-                        selectedPhotoMarker = state.selectedPhotoMarker,
-                        onPhotoMarkerClick = { marker -> controller.selectPhotoMarker(marker) },
-                        onCameraRecentered = { controller.acknowledgeRecenter() },
-                        onPlayClick = { onNavigateToReplay(tripId) },
-                        modifier = Modifier.fillMaxSize()
-                    )
+                    state.tripRoute?.let { tripRoute ->
+                        RouteViewContent(
+                            tripRoute = tripRoute,
+                            mapStyle = state.mapStyle,
+                            shouldRecenterCamera = state.shouldRecenterCamera,
+                            selectedPhotoMarker = state.selectedPhotoMarker,
+                            onPhotoMarkerClick = { marker -> controller.selectPhotoMarker(marker) },
+                            onCameraRecentered = { controller.acknowledgeRecenter() },
+                            onPlayClick = { onNavigateToReplay(tripId) },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
                 }
             }
 

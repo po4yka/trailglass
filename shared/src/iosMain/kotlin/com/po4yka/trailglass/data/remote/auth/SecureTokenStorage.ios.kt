@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.data.remote.auth
 
 import kotlinx.cinterop.*
+import platform.CoreFoundation.*
 import platform.Foundation.*
 import platform.Security.*
 import me.tatarka.inject.annotations.Inject
@@ -35,6 +36,7 @@ actual class SecureTokenStorage {
         deleteFromKeychain(KEY_EXPIRES_AT)
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun saveToKeychain(key: String, value: String) {
         val query = createKeychainQuery(key)
 
@@ -43,10 +45,11 @@ actual class SecureTokenStorage {
 
         // Add new item
         val addQuery = CFDictionaryCreateMutableCopy(null, 0, query as CFDictionaryRef)
+        val data = value.toNSData()
         CFDictionarySetValue(
             addQuery,
             kSecValueData,
-            value.toNSData()
+            CFBridgingRetain(data)
         )
 
         val status = SecItemAdd(addQuery as CFDictionaryRef, null)
@@ -55,6 +58,7 @@ actual class SecureTokenStorage {
         }
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun getFromKeychain(key: String): String? {
         val query = createKeychainQuery(key)
 
@@ -75,18 +79,20 @@ actual class SecureTokenStorage {
         }
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun deleteFromKeychain(key: String) {
         val query = createKeychainQuery(key)
         SecItemDelete(query as CFDictionaryRef)
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun createKeychainQuery(key: String): CFDictionaryRef {
         return CFDictionaryCreateMutable(
             null,
             4,
             null,
             null
-        ).apply {
+        )!!.apply {
             CFDictionarySetValue(this, kSecClass, kSecClassGenericPassword)
             CFDictionarySetValue(this, kSecAttrService, SERVICE_NAME.toCFString())
             CFDictionarySetValue(this, kSecAttrAccount, key.toCFString())
@@ -98,6 +104,7 @@ actual class SecureTokenStorage {
         return (this as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!
     }
 
+    @OptIn(ExperimentalForeignApi::class)
     private fun String.toCFString(): CFStringRef {
         return CFStringCreateWithCString(null, this, kCFStringEncodingUTF8)!!
     }

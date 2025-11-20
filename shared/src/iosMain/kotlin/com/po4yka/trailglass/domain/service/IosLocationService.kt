@@ -1,6 +1,9 @@
 package com.po4yka.trailglass.domain.service
 
 import com.po4yka.trailglass.domain.model.Coordinate
+import kotlin.concurrent.Volatile
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -15,6 +18,7 @@ import kotlin.coroutines.suspendCoroutine
  *
  * This service provides real-time location updates for follow mode and location tracking.
  */
+@OptIn(ExperimentalForeignApi::class)
 class IosLocationService : LocationService {
 
     private val locationManager = CLLocationManager()
@@ -31,10 +35,12 @@ class IosLocationService : LocationService {
                 @Suppress("UNCHECKED_CAST")
                 val locations = didUpdateLocations as List<CLLocation>
                 locations.lastOrNull()?.let { location ->
-                    val coordinate = Coordinate(
-                        latitude = location.coordinate.useContents { latitude },
-                        longitude = location.coordinate.useContents { longitude }
-                    )
+                    val coordinate = location.coordinate.useContents {
+                        Coordinate(
+                            latitude = latitude,
+                            longitude = longitude
+                        )
+                    }
                     trySend(coordinate)
                 }
             }
@@ -47,19 +53,19 @@ class IosLocationService : LocationService {
             }
 
             override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
-                val status = manager.authorizationStatus
+                val status = manager.authorizationStatus()
                 if (status == kCLAuthorizationStatusDenied ||
                     status == kCLAuthorizationStatusRestricted) {
-                    close(SecurityException("Location permission denied"))
+                    close(IllegalStateException("Location permission denied"))
                 }
             }
         }
 
         // Check authorization before starting
-        val authStatus = locationManager.authorizationStatus
+        val authStatus = locationManager.authorizationStatus()
         if (authStatus == kCLAuthorizationStatusDenied ||
             authStatus == kCLAuthorizationStatusRestricted) {
-            close(SecurityException("Location permission not granted"))
+            close(IllegalStateException("Location permission not granted"))
             return@callbackFlow
         }
 
@@ -92,20 +98,22 @@ class IosLocationService : LocationService {
 
     override suspend fun getLastKnownLocation(): Coordinate? = suspendCoroutine { continuation ->
         locationManager.location?.let { location ->
-            val coordinate = Coordinate(
-                latitude = location.coordinate.useContents { latitude },
-                longitude = location.coordinate.useContents { longitude }
-            )
+            val coordinate = location.coordinate.useContents {
+                Coordinate(
+                    latitude = latitude,
+                    longitude = longitude
+                )
+            }
             continuation.resume(coordinate)
         } ?: continuation.resume(null)
     }
 
     override suspend fun startTracking(intervalMs: Long, fastestIntervalMs: Long) {
         // Check authorization
-        val authStatus = locationManager.authorizationStatus
+        val authStatus = locationManager.authorizationStatus()
         if (authStatus == kCLAuthorizationStatusDenied ||
             authStatus == kCLAuthorizationStatusRestricted) {
-            throw SecurityException("Location permission not granted")
+            throw IllegalStateException("Location permission not granted")
         }
 
         if (authStatus == kCLAuthorizationStatusNotDetermined) {
@@ -123,7 +131,7 @@ class IosLocationService : LocationService {
     }
 
     override suspend fun hasLocationPermission(): Boolean {
-        return when (locationManager.authorizationStatus) {
+        return when (locationManager.authorizationStatus()) {
             kCLAuthorizationStatusAuthorizedAlways,
             kCLAuthorizationStatusAuthorizedWhenInUse -> true
             else -> false
@@ -132,7 +140,7 @@ class IosLocationService : LocationService {
 
     override suspend fun requestLocationPermission(background: Boolean): Boolean {
         // Check current authorization status
-        val currentStatus = locationManager.authorizationStatus
+        val currentStatus = locationManager.authorizationStatus()
 
         // If already authorized, return true
         if (currentStatus == kCLAuthorizationStatusAuthorizedAlways ||

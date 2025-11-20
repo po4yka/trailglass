@@ -2,6 +2,7 @@ package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.data.db.IosDatabaseDriverFactory
 import com.po4yka.trailglass.data.network.IOSNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
@@ -33,66 +34,56 @@ import platform.UIKit.UIDevice
 class IOSPlatformModule : PlatformModule {
 
     @Provides
-    override val databaseDriverFactory: DatabaseDriverFactory
-        get() = DatabaseDriverFactory()
+    override fun databaseDriverFactory(): DatabaseDriverFactory = IosDatabaseDriverFactory()
 
     @Provides
-    override val locationService: LocationService
-        get() = IosLocationService()
+    override fun locationService(): LocationService = IosLocationService()
 
     @Provides
-    override val applicationScope: CoroutineScope
-        get() = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
-    override val userId: String
-        get() = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
+    override fun userId(): String = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
 
     @Provides
-    override val deviceId: String
-        get() = UIDevice.currentDevice.identifierForVendor?.UUIDString ?: "unknown_device"
+    override fun deviceId(): String = UIDevice.currentDevice.identifierForVendor?.UUIDString ?: "unknown_device"
 
     /**
      * Provides iOS-specific permission manager.
      */
     @Provides
-    override val permissionManager: PermissionManager
-        get() = PermissionManager()
+    override fun permissionManager(): PermissionManager = PermissionManager()
 
     /**
      * Provides iOS-specific encryption service.
      */
     @Provides
-    override val encryptionService: com.po4yka.trailglass.data.security.EncryptionService
-        get() = com.po4yka.trailglass.data.security.EncryptionService()
+    override fun encryptionService(): com.po4yka.trailglass.data.security.EncryptionService =
+        com.po4yka.trailglass.data.security.EncryptionService()
 
     /**
      * Provides iOS-specific photo metadata extractor.
      */
     @Provides
-    override val photoMetadataExtractor: com.po4yka.trailglass.photo.PhotoMetadataExtractor
-        get() = com.po4yka.trailglass.photo.IOSPhotoMetadataExtractor()
+    override fun photoMetadataExtractor(): com.po4yka.trailglass.photo.PhotoMetadataExtractor =
+        com.po4yka.trailglass.photo.IosPhotoMetadataExtractor()
 
     /**
      * Provides iOS-specific settings storage.
      */
     @Provides
-    override val settingsStorage: com.po4yka.trailglass.data.storage.SettingsStorage
-        get() = com.po4yka.trailglass.data.storage.SettingsStorage()
+    override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
+        com.po4yka.trailglass.data.storage.SettingsStorage()
 
     @Provides
-    override val secureTokenStorage: SecureTokenStorage
-        get() = SecureTokenStorage()
+    override fun secureTokenStorage(): SecureTokenStorage = SecureTokenStorage()
 
     @Provides
-    override val platformDeviceInfoProvider: PlatformDeviceInfoProvider
-        get() = PlatformDeviceInfoProvider()
+    override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider = PlatformDeviceInfoProvider()
 
     @Provides
-    override val syncStateRepositoryImpl: SyncStateRepositoryImpl
-        get() = SyncStateRepositoryImpl()
+    override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl = SyncStateRepositoryImpl()
 
     @Provides
-    override val networkConnectivityMonitor: NetworkConnectivityMonitor
-        get() = IOSNetworkConnectivityMonitor()
+    override fun networkConnectivityMonitor(): NetworkConnectivityMonitor = IOSNetworkConnectivityMonitor()
 }

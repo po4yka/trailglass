@@ -12,7 +12,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.po4yka.trailglass.R
 import com.po4yka.trailglass.location.tracking.LocationTracker
-import com.po4yka.trailglass.domain.model.TrackingMode
+import com.po4yka.trailglass.location.tracking.TrackingMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -46,7 +46,7 @@ class LocationTrackingService : Service() {
          * @param context Android context
          * @param mode Tracking mode (CONTINUOUS or SMART)
          */
-        fun startService(context: Context, mode: TrackingMode = TrackingMode.SMART) {
+        fun startService(context: Context, mode: TrackingMode = TrackingMode.ACTIVE) {
             val intent = Intent(context, LocationTrackingService::class.java).apply {
                 action = ACTION_START_TRACKING
                 putExtra(EXTRA_TRACKING_MODE, mode.name)
@@ -99,7 +99,7 @@ class LocationTrackingService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
             ACTION_START_TRACKING -> {
-                val modeName = intent.getStringExtra(EXTRA_TRACKING_MODE) ?: TrackingMode.SMART.name
+                val modeName = intent.getStringExtra(EXTRA_TRACKING_MODE) ?: TrackingMode.ACTIVE.name
                 val mode = TrackingMode.valueOf(modeName)
                 startLocationTracking(mode)
             }

@@ -5,15 +5,20 @@ import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.datetime.Clock
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import platform.CoreLocation.*
 import platform.Foundation.NSNumber
 import platform.darwin.NSObject
-import java.util.UUID
 
 /**
  * iOS implementation of LocationTracker using CLLocationManager.
  */
+@OptIn(ExperimentalForeignApi::class, ExperimentalUuidApi::class)
 class IOSLocationTracker(
     private val repository: LocationRepository,
     private val configuration: TrackingConfiguration,
@@ -159,16 +164,18 @@ class IOSLocationTracker(
      * Process a location update from CLLocationManager.
      */
     internal fun processLocation(location: CLLocation) {
+        val lat = location.coordinate.useContents { latitude }
+        val lng = location.coordinate.useContents { longitude }
         logger.debug {
-            "Received location: (${location.coordinate.latitude}, ${location.coordinate.longitude}), " +
+            "Received location: ($lat, $lng), " +
             "accuracy: ${location.horizontalAccuracy}m"
         }
 
         val sample = LocationSample(
-            id = "sample_${UUID.randomUUID()}",
+            id = "sample_${Uuid.random()}",
             timestamp = Clock.System.now(),
-            latitude = location.coordinate.latitude,
-            longitude = location.coordinate.longitude,
+            latitude = location.coordinate.useContents { latitude },
+            longitude = location.coordinate.useContents { longitude },
             accuracy = location.horizontalAccuracy,
             speed = if (location.speed >= 0) location.speed else null,
             bearing = if (location.course >= 0) location.course else null,
@@ -204,17 +211,19 @@ class IOSLocationTracker(
      * Process a visit from CLLocationManager.
      */
     internal fun processVisit(visit: CLVisit) {
+        val lat = visit.coordinate.useContents { latitude }
+        val lng = visit.coordinate.useContents { longitude }
         logger.debug {
-            "Received visit: (${visit.coordinate.latitude}, ${visit.coordinate.longitude}), " +
+            "Received visit: ($lat, $lng), " +
             "arrival: ${visit.arrivalDate}, departure: ${visit.departureDate}"
         }
 
         // Create a location sample from the visit
         val sample = LocationSample(
-            id = "sample_visit_${UUID.randomUUID()}",
+            id = "sample_visit_${Uuid.random()}",
             timestamp = Clock.System.now(),
-            latitude = visit.coordinate.latitude,
-            longitude = visit.coordinate.longitude,
+            latitude = lat,
+            longitude = lng,
             accuracy = visit.horizontalAccuracy,
             speed = null,
             bearing = null,

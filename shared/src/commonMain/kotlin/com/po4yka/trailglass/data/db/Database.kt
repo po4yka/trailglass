@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.db
 
+import app.cash.sqldelight.db.SqlDriver
 import com.po4yka.trailglass.db.TrailGlassDatabase
 
 /**
@@ -10,6 +11,16 @@ class Database(driverFactory: DatabaseDriverFactory) {
 
     private val driver = driverFactory.createDriver()
     private val database = TrailGlassDatabase(driver)
+
+    /**
+     * Internal constructor for testing.
+     * Allows tests to provide a pre-configured driver directly.
+     */
+    internal constructor(driver: SqlDriver) : this(
+        driverFactory = object : DatabaseDriverFactory {
+            override fun createDriver(): SqlDriver = driver
+        }
+    )
 
     /**
      * Access to location samples queries.

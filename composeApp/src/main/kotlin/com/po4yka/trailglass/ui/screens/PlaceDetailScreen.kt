@@ -4,7 +4,32 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Church
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.RadioButtonChecked
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.Timelapse
+import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -121,9 +146,9 @@ private fun PlaceDetailContent(
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold
                         )
-                        if (place.city != null) {
+                        place.city?.let { city ->
                             Text(
-                                text = place.city,
+                                text = city,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -201,19 +226,19 @@ private fun PlaceDetailContent(
                     )
                 }
 
-                if (place.firstVisitTime != null) {
+                place.firstVisitTime?.let { firstVisit ->
                     StatRow(
                         icon = Icons.Default.CalendarToday,
                         label = "First Visit",
-                        value = formatDate(place.firstVisitTime)
+                        value = formatDate(firstVisit)
                     )
                 }
 
-                if (place.lastVisitTime != null) {
+                place.lastVisitTime?.let { lastVisit ->
                     StatRow(
                         icon = Icons.Default.Update,
                         label = "Last Visit",
-                        value = formatDate(place.lastVisitTime)
+                        value = formatDate(lastVisit)
                     )
                 }
             }
@@ -231,11 +256,11 @@ private fun PlaceDetailContent(
                     fontWeight = FontWeight.Bold
                 )
 
-                if (place.address != null) {
+                place.address?.let { address ->
                     StatRow(
                         icon = Icons.Default.Place,
                         label = "Address",
-                        value = place.address
+                        value = address
                     )
                 }
 
@@ -266,15 +291,15 @@ private fun PlaceDetailContent(
                         fontWeight = FontWeight.Bold
                     )
 
-                    if (place.userLabel != null) {
+                    place.userLabel?.let { label ->
                         StatRow(
                             icon = Icons.Default.Label,
                             label = "Custom Label",
-                            value = place.userLabel
+                            value = label
                         )
                     }
 
-                    if (place.userNotes != null) {
+                    place.userNotes?.let { notes ->
                         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -293,7 +318,7 @@ private fun PlaceDetailContent(
                                 )
                             }
                             Text(
-                                text = place.userNotes,
+                                text = notes,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.padding(start = 28.dp)
                             )

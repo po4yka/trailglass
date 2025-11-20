@@ -2,7 +2,13 @@ package com.po4yka.trailglass.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CardTravel
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ViewTimeline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -177,7 +183,7 @@ fun MainScaffold(
                         // Trip creation dialog
                         if (showCreateTripDialog) {
                             CreateTripDialog(
-                                userId = rootComponent.appComponent.authRepository.getCurrentUserId() ?: "",
+                                userId = rootComponent.appComponent.userSession.getCurrentUserId() ?: "",
                                 onDismiss = { showCreateTripDialog = false },
                                 onConfirm = { trip ->
                                     instance.component.tripsController.createTrip(trip)

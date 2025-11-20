@@ -216,11 +216,9 @@ private fun GoogleMapContent(
             }
 
             // Determine route color based on transport type if not specified
-            val routeColor = if (route.color != null) {
-                Color(route.color)
-            } else {
-                getRouteColor(route.transportType)
-            }
+            val routeColor = route.color?.let { colorValue ->
+                Color(colorValue)
+            } ?: getRouteColor(route.transportType)
 
             // Draw outline for better visibility
             Polyline(

@@ -3,14 +3,16 @@ package com.po4yka.trailglass.photo
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import platform.Foundation.NSDate
 import platform.Photos.*
-import java.util.UUID
 import kotlin.coroutines.resume
 
 /**
@@ -18,6 +20,7 @@ import kotlin.coroutines.resume
  * Note: This class handles metadata extraction. UI-based photo selection
  * must be handled by the iOS app layer using PHPickerViewController.
  */
+@OptIn(ExperimentalUuidApi::class)
 class IOSPhotoPicker(
     private val userId: String
 ) : PhotoPicker {
@@ -66,14 +69,14 @@ class IOSPhotoPicker(
      * Extract photo metadata from a PHAsset.
      * This is called after the user has selected photos via PHPickerViewController.
      */
-    suspend fun extractPhotoFromAsset(asset: PHAsset): Photo? = withContext(Dispatchers.IO) {
+    suspend fun extractPhotoFromAsset(asset: PHAsset): Photo? = withContext(Dispatchers.Default) {
         logger.debug { "Extracting photo metadata from PHAsset: ${asset.localIdentifier}" }
 
         try {
             val metadata = extractMetadataFromAsset(asset)
 
             Photo(
-                id = "photo_${UUID.randomUUID()}",
+                id = "photo_${Uuid.random()}",
                 uri = asset.localIdentifier,
                 timestamp = metadata.timestamp,
                 latitude = metadata.latitude,
@@ -94,7 +97,7 @@ class IOSPhotoPicker(
     /**
      * Extract multiple photos from PHAssets.
      */
-    suspend fun extractPhotosFromAssets(assets: List<PHAsset>): List<Photo> = withContext(Dispatchers.IO) {
+    suspend fun extractPhotosFromAssets(assets: List<PHAsset>): List<Photo> = withContext(Dispatchers.Default) {
         logger.debug { "Extracting ${assets.size} photos from PHAssets" }
 
         assets.mapNotNull { asset ->
@@ -110,28 +113,27 @@ class IOSPhotoPicker(
         // Extract timestamp
         val creationDate = asset.creationDate as? NSDate
         val timestamp = if (creationDate != null) {
-            Instant.fromEpochMilliseconds((creationDate.timeIntervalSince1970 * 1000).toLong())
+            // Convert NSDate to Instant using reference date calculation
+            // NSDate.timeIntervalSinceReferenceDate is seconds since Jan 1, 2001
+            // Unix epoch is Jan 1, 1970, so we need to add the offset
+            val referenceDate = creationDate.timeIntervalSinceReferenceDate
+            val epochSeconds = referenceDate + 978307200.0 // Seconds from 1970 to 2001
+            Instant.fromEpochSeconds(epochSeconds.toLong())
         } else {
             Clock.System.now()
         }
 
         // Extract location
         val location = asset.location
-        val latitude = location?.coordinate?.latitude
-        val longitude = location?.coordinate?.longitude
+        val latitude = location?.coordinate?.useContents { latitude }
+        val longitude = location?.coordinate?.useContents { longitude }
 
         // Extract dimensions
         val width = asset.pixelWidth.toInt()
         val height = asset.pixelHeight.toInt()
 
-        // Determine MIME type from media subtype
-        val mimeType = when (asset.mediaSubtypes) {
-            PHAssetMediaSubtypePanorama -> "image/jpeg"
-            PHAssetMediaSubtypeHDR -> "image/jpeg"
-            PHAssetMediaSubtypeScreenshot -> "image/png"
-            PHAssetMediaSubtypeLivePhoto -> "image/heic"
-            else -> "image/jpeg"
-        }
+        // Determine MIME type based on media type and subtypes
+        val mimeType = determineMimeType(asset)
 
         // Extract file size using PHImageManager
         val sizeBytes = extractFileSizeFromAsset(asset)
@@ -192,6 +194,46 @@ class IOSPhotoPicker(
                     }
                 }
             )
+        }
+    }
+
+    /**
+     * Determine MIME type from PHAsset.
+     * Uses media type and format information to determine the most appropriate MIME type.
+     */
+    private fun determineMimeType(asset: PHAsset): String {
+        // Check media type first
+        return when (asset.mediaType) {
+            PHAssetMediaTypeImage -> {
+                // For images, try to determine specific format
+                // Check for specific image subtypes
+                val mediaSubtypes = asset.mediaSubtypes
+
+                when {
+                    // Live Photos are HEIC by default on modern iOS
+                    (mediaSubtypes and PHAssetMediaSubtypePhotoLive.toULong()) != 0uL -> "image/heic"
+
+                    // Screenshots are typically PNG
+                    (mediaSubtypes and PHAssetMediaSubtypePhotoScreenshot.toULong()) != 0uL -> "image/png"
+
+                    // Panoramas are typically JPEG
+                    (mediaSubtypes and PHAssetMediaSubtypePhotoPanorama.toULong()) != 0uL -> "image/jpeg"
+
+                    // HDR photos are typically JPEG
+                    (mediaSubtypes and PHAssetMediaSubtypePhotoHDR.toULong()) != 0uL -> "image/jpeg"
+
+                    // Depth effect/portrait photos
+                    (mediaSubtypes and PHAssetMediaSubtypePhotoDepthEffect.toULong()) != 0uL -> "image/heic"
+
+                    // Default to JPEG for standard photos
+                    else -> "image/jpeg"
+                }
+            }
+
+            PHAssetMediaTypeVideo -> "video/mp4"
+            PHAssetMediaTypeAudio -> "audio/mp4"
+
+            else -> "application/octet-stream"
         }
     }
 

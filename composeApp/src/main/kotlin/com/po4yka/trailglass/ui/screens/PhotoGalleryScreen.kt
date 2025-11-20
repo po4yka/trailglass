@@ -136,9 +136,9 @@ private fun PhotoGroupSection(
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                if (group.location != null) {
+                group.location?.let { locationText ->
                     Text(
-                        text = group.location,
+                        text = locationText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

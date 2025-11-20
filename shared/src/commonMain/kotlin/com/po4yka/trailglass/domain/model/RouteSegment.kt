@@ -47,5 +47,6 @@ data class RouteSegment(
     val simplifiedPath: List<Coordinate> = emptyList(),
     val transportType: TransportType = TransportType.UNKNOWN,
     val distanceMeters: Double = 0.0,
-    val averageSpeedMps: Double? = null
+    val averageSpeedMps: Double? = null,
+    val confidence: Float = 1.0f // Confidence in transport type classification (0.0 to 1.0)
 )

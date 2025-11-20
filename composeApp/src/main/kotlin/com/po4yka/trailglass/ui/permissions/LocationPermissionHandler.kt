@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat
 /**
  * Location permission state holder.
  */
-class LocationPermissionState(
+open class LocationPermissionState(
     private val context: Context,
     private val onPermissionResult: (Boolean) -> Unit
 ) {
@@ -169,7 +169,7 @@ fun rememberLocationPermissionState(
 
     // Update state when composition is active
     LaunchedEffect(Unit) {
-        state.permissionsGranted = state.checkPermissions()
+        state.refresh()
     }
 
     // Show rationale dialog if needed

@@ -4,6 +4,7 @@ CREATE TABLE location_samples (
     timestamp INTEGER NOT NULL,
     latitude REAL NOT NULL,
     longitude REAL NOT NULL,
+    altitude REAL,
     accuracy REAL NOT NULL,
     speed REAL,
     bearing REAL,
@@ -26,10 +27,10 @@ CREATE INDEX location_samples_deleted ON location_samples(deleted_at) WHERE dele
 -- Queries
 insertSample:
 INSERT INTO location_samples (
-    id, timestamp, latitude, longitude, accuracy, speed, bearing,
+    id, timestamp, latitude, longitude, altitude, accuracy, speed, bearing,
     source, trip_id, uploaded_at, device_id, user_id, created_at, updated_at, deleted_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getSampleById:
 SELECT * FROM location_samples
@@ -73,7 +74,7 @@ deleteOldSamples:
 DELETE FROM location_samples
 WHERE user_id = ?
   AND timestamp < ?
-  AND deleted_at IS NOT NULL;
+  AND deleted_at IS NULL;
 
 deleteAll:
 DELETE FROM location_samples;

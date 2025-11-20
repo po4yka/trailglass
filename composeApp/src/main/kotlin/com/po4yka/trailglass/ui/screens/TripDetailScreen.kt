@@ -4,7 +4,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,8 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Trip
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 
 /**
@@ -240,12 +254,10 @@ private fun TripHeaderCard(trip: Trip) {
 
                     // Date range
                     val startDate = trip.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
-                    val dateText = if (trip.endTime != null) {
-                        val endDate = trip.endTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                    val dateText = trip.endTime?.let { endTime ->
+                        val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
                         "${startDate.date} to ${endDate.date}"
-                    } else {
-                        "Started ${startDate.date}"
-                    }
+                    } ?: "Started ${startDate.date}"
 
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),

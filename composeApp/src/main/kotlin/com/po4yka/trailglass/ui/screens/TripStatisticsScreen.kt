@@ -106,16 +106,18 @@ fun TripStatisticsScreen(
 
             state.tripRoute != null -> {
                 // Content state
-                TripStatisticsContent(
-                    tripRoute = state.tripRoute,
-                    tripName = tripName,
-                    primaryCountry = primaryCountry,
-                    showTransportBreakdown = state.showTransportBreakdown,
-                    onToggleTransportBreakdown = { controller.toggleTransportBreakdown() },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
+                state.tripRoute?.let { tripRoute ->
+                    TripStatisticsContent(
+                        tripRoute = tripRoute,
+                        tripName = tripName,
+                        primaryCountry = primaryCountry,
+                        showTransportBreakdown = state.showTransportBreakdown,
+                        onToggleTransportBreakdown = { controller.toggleTransportBreakdown() },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    )
+                }
             }
         }
     }
@@ -286,17 +288,17 @@ private fun SpeedMetricsCard(statistics: com.po4yka.trailglass.domain.model.Rout
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                if (statistics.averageSpeedMps != null) {
+                statistics.averageSpeedMps?.let { averageSpeed ->
                     SpeedMetricItem(
                         label = "Average Speed",
-                        speedMps = statistics.averageSpeedMps
+                        speedMps = averageSpeed
                     )
                 }
 
-                if (statistics.maxSpeedMps != null) {
+                statistics.maxSpeedMps?.let { maxSpeed ->
                     SpeedMetricItem(
                         label = "Max Speed",
-                        speedMps = statistics.maxSpeedMps
+                        speedMps = maxSpeed
                     )
                 }
             }

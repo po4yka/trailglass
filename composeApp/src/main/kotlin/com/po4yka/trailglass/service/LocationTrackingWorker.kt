@@ -3,13 +3,8 @@ package com.po4yka.trailglass.service
 import android.content.Context
 import androidx.work.*
 import com.po4yka.trailglass.location.tracking.LocationTracker
-import com.po4yka.trailglass.domain.model.TrackingMode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import com.po4yka.trailglass.location.tracking.TrackingMode
 import kotlinx.coroutines.delay
-import me.tatarka.inject.annotations.Inject
 import java.util.concurrent.TimeUnit
 
 /**

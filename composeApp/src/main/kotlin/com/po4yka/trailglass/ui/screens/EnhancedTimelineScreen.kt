@@ -6,7 +6,44 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Church
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.DirectionsBoat
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.EventNote
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.NightsStay
+import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StickyNote2
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.Today
+import androidx.compose.material.icons.filled.Train
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -558,9 +595,9 @@ private fun EnhancedVisitCard(
                         }
                     }
 
-                    if (visit.city != null || visit.country != null) {
+                    if (visit.city != null || visit.countryCode != null) {
                         Text(
-                            text = listOfNotNull(visit.city, visit.country).joinToString(", "),
+                            text = listOfNotNull(visit.city, visit.countryCode).joinToString(", "),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
                         )
@@ -882,32 +919,42 @@ private fun MonthSummaryCard(
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Text(
-                    "Top Categories",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    summary.topCategories.take(3).forEach { category ->
-                        AssistChip(
-                            onClick = { },
-                            label = {
-                                Text(
-                                    category.name.lowercase().replaceFirstChar { it.uppercase() },
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    getCategoryIcon(category),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(14.dp)
-                                )
-                            }
+                TopCategoriesSection(categories = summary.topCategories)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TopCategoriesSection(
+    categories: List<PlaceCategory>,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        Text(
+            "Top Categories",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onTertiaryContainer
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            categories.take(3).forEach { category ->
+                AssistChip(
+                    onClick = { },
+                    label = {
+                        Text(
+                            category.name.lowercase().replaceFirstChar { it.uppercase() },
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    },
+                    leadingIcon = {
+                        Icon(
+                            getCategoryIcon(category),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp)
                         )
                     }
-                }
+                )
             }
         }
     }

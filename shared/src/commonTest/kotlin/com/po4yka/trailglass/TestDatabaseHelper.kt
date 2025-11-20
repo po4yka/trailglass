@@ -1,34 +1,40 @@
 package com.po4yka.trailglass
 
 import app.cash.sqldelight.db.SqlDriver
-import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
+import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.db.TrailGlassDatabase
 
 /**
  * Helper for creating in-memory test databases.
+ * Uses expect/actual pattern for platform-specific drivers.
  */
 object TestDatabaseHelper {
 
     /**
-     * Creates an in-memory SQLDelight database for testing.
+     * Creates an in-memory Database for testing.
+     * Uses platform-specific driver (JDBC for JVM, Native for iOS).
      */
-    fun createTestDatabase(): TrailGlassDatabase {
-        val driver: SqlDriver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        TrailGlassDatabase.Schema.create(driver)
-        return TrailGlassDatabase(driver)
+    fun createTestDatabase(): Database {
+        return createTestDatabaseImpl()
     }
 
     /**
-     * Clears all tables in the database.
+     * Clears all tables in the database that have deleteAll methods.
      */
-    fun clearDatabase(database: TrailGlassDatabase) {
+    fun clearDatabase(database: Database) {
         database.transaction {
-            database.photoAttachmentsQueries.deleteAll()
             database.photosQueries.deleteAll()
+            database.photosQueries.deleteAllAttachments()
             database.routeSegmentsQueries.deleteAll()
-            database.placeVisitsQueries.deleteAll()
-            database.locationSamplesQueries.deleteAll()
-            database.tripsQueries.deleteAll()
+            database.placeVisitQueries.deleteAll()
+            database.locationSampleQueries.deleteAll()
+            database.geocodingCacheQueries.clearAll()
+            database.syncConflictsQueries.deleteAll()
         }
     }
 }
+
+/**
+ * Platform-specific implementation to create test database.
+ */
+expect fun createTestDatabaseImpl(): Database

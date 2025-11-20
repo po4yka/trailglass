@@ -79,7 +79,7 @@ class IOSNetworkConnectivityMonitor : NetworkConnectivityMonitor {
         val state = when (status) {
             nw_path_status_satisfied -> NetworkState.Connected
             nw_path_status_unsatisfied -> NetworkState.Disconnected
-            nw_path_status_requiresConnection -> NetworkState.Disconnected
+            nw_path_status_satisfiable -> NetworkState.Disconnected
             else -> NetworkState.Disconnected
         }
 

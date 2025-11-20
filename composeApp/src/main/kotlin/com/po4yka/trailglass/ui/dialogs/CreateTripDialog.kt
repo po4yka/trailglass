@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.ui.dialogs
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -200,11 +201,4 @@ fun CreateTripDialog(
             }
         }
     }
-}
-
-@Composable
-private fun Modifier.clickable(onClick: () -> Unit): Modifier {
-    return this.then(
-        androidx.compose.foundation.clickable.clickable(onClick = onClick)
-    )
 }

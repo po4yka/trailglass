@@ -6,7 +6,12 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.material.icons.filled.SettingsEthernet
+import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -123,6 +128,7 @@ fun NetworkStatusIndicatorCompact(
                 NetworkType.CELLULAR -> Icons.Default.SignalCellularAlt
                 NetworkType.ETHERNET -> Icons.Default.SettingsEthernet
                 NetworkType.NONE -> Icons.Default.CloudDone
+                else -> Icons.Default.CloudDone
             }
             networkIcon to MaterialTheme.colorScheme.primary
         }

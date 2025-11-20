@@ -64,6 +64,7 @@ abstract class AppComponent(
 
     // Location processing (from LocationModule)
     abstract val locationProcessor: LocationProcessor
+    abstract val locationTracker: com.po4yka.trailglass.location.tracking.LocationTracker
 
     // Location service (from PlatformModule)
     abstract val locationService: com.po4yka.trailglass.domain.service.LocationService
@@ -83,6 +84,7 @@ abstract class AppComponent(
 
     // Authentication (from AuthModule)
     abstract override val authController: AuthController
+    abstract val userSession: com.po4yka.trailglass.data.auth.UserSession
 
     // Feature controllers
     abstract val statsController: StatsController

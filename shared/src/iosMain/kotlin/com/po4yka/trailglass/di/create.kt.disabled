@@ -16,5 +16,5 @@ package com.po4yka.trailglass.di
  */
 fun createIOSAppComponent(): AppComponent {
     val platformModule = IOSPlatformModule()
-    return AppComponent::class.create(platformModule)
+    return InjectAppComponent(platformModule)
 }

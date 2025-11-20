@@ -3,7 +3,13 @@ package com.po4yka.trailglass.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.TransportType
+import com.po4yka.trailglass.feature.stats.EnhancedStatsController
 import com.po4yka.trailglass.feature.stats.GetStatsUseCase
 import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
 import com.po4yka.trailglass.ui.components.ErrorView
@@ -628,20 +635,3 @@ private fun EmptyStatsView(modifier: Modifier = Modifier) {
         )
     }
 }
-
-/**
- * Controller interface for enhanced stats screen.
- * This would be implemented similarly to the existing StatsController.
- */
-interface EnhancedStatsController {
-    val state: kotlinx.coroutines.flow.StateFlow<EnhancedStatsState>
-    fun loadPeriod(period: GetStatsUseCase.Period)
-    fun refresh()
-}
-
-data class EnhancedStatsState(
-    val period: GetStatsUseCase.Period? = null,
-    val stats: ComprehensiveStatistics? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null
-)

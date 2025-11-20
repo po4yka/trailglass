@@ -202,8 +202,8 @@ private fun MetadataSection(photoWithMetadata: PhotoWithMetadata) {
                 )
             }
 
-            if (photoWithMetadata.photo.sizeBytes != null) {
-                val sizeMb = photoWithMetadata.photo.sizeBytes / (1024.0 * 1024.0)
+            photoWithMetadata.photo.sizeBytes?.let { sizeBytes ->
+                val sizeMb = sizeBytes / (1024.0 * 1024.0)
                 InfoRow("Size", "%.2f MB".format(sizeMb))
             }
         }

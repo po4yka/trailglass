@@ -4,7 +4,31 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Church
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.LocationOff
+import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SearchOff
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.Work
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -188,31 +212,41 @@ private fun PlacesContent(
 
         // Rare places section (collapsed by default)
         if (rarePlaces.isNotEmpty()) {
-            var isExpanded by remember { mutableStateOf(false) }
-
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SectionHeader("Other Places (${rarePlaces.size})")
-                    IconButton(onClick = { isExpanded = !isExpanded }) {
-                        Icon(
-                            if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                            contentDescription = if (isExpanded) "Collapse" else "Expand"
-                        )
-                    }
-                }
+                RarePlacesSection(rarePlaces, onPlaceClick)
             }
+        }
+    }
+}
 
-            if (isExpanded) {
-                items(rarePlaces) { place ->
-                    FrequentPlaceCard(
-                        place = place,
-                        onClick = { onPlaceClick(place) }
-                    )
-                }
+@Composable
+private fun RarePlacesSection(
+    rarePlaces: List<FrequentPlace>,
+    onPlaceClick: (FrequentPlace) -> Unit
+) {
+    var isExpanded by remember { mutableStateOf(false) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            SectionHeader("Other Places (${rarePlaces.size})")
+            IconButton(onClick = { isExpanded = !isExpanded }) {
+                Icon(
+                    if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
+                    contentDescription = if (isExpanded) "Collapse" else "Expand"
+                )
+            }
+        }
+
+        if (isExpanded) {
+            rarePlaces.forEach { place ->
+                FrequentPlaceCard(
+                    place = place,
+                    onClick = { onPlaceClick(place) }
+                )
             }
         }
     }
@@ -262,9 +296,9 @@ private fun FrequentPlaceCard(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    if (place.city != null) {
+                    place.city?.let { city ->
                         Text(
-                            text = place.city!!,
+                            text = city,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

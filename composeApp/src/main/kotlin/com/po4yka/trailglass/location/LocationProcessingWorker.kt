@@ -76,7 +76,7 @@ class LocationProcessingWorker(
 
             val request = PeriodicWorkRequestBuilder<LocationProcessingWorker>(
                 intervalHours, TimeUnit.HOURS,
-                flexTimeMillis = TimeUnit.HOURS.toMillis(1) // Flex window of 1 hour
+                1, TimeUnit.HOURS // Flex window of 1 hour
             )
                 .setConstraints(constraints)
                 .setBackoffCriteria(

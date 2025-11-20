@@ -4,7 +4,18 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Stars
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -41,19 +53,10 @@ fun PlaceVisitDetailScreen(
             error = null
             val result = apiClient.getPlaceVisit(placeVisitId)
             result.onSuccess { dto ->
-                // Convert DTO to domain model (simplified - you may need proper mapping)
-                placeVisit = PlaceVisit(
-                    id = dto.id,
-                    startTime = dto.startTime,
-                    endTime = dto.endTime,
-                    centerLatitude = dto.centerLatitude,
-                    centerLongitude = dto.centerLongitude,
-                    approximateAddress = dto.approximateAddress,
-                    poiName = dto.poiName,
-                    city = dto.city,
-                    countryCode = dto.countryCode,
-                    userId = dto.userId
-                )
+                // TODO: Implement proper DTO to domain model mapping
+                // The PlaceVisitDto structure doesn't match PlaceVisit domain model
+                // Need to create a proper mapper function
+                error = "Mapping not implemented"
                 isLoading = false
             }.onFailure { e ->
                 error = e.message ?: "Failed to load place visit"
@@ -116,18 +119,8 @@ fun PlaceVisitDetailScreen(
                                 error = null
                                 val result = apiClient.getPlaceVisit(placeVisitId)
                                 result.onSuccess { dto ->
-                                    placeVisit = PlaceVisit(
-                                        id = dto.id,
-                                        startTime = dto.startTime,
-                                        endTime = dto.endTime,
-                                        centerLatitude = dto.centerLatitude,
-                                        centerLongitude = dto.centerLongitude,
-                                        approximateAddress = dto.approximateAddress,
-                                        poiName = dto.poiName,
-                                        city = dto.city,
-                                        countryCode = dto.countryCode,
-                                        userId = dto.userId
-                                    )
+                                    // TODO: Implement proper DTO to domain model mapping
+                                    error = "Mapping not implemented"
                                     isLoading = false
                                 }.onFailure { e ->
                                     error = e.message ?: "Failed to load place visit"
@@ -172,7 +165,7 @@ private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) 
                         fontWeight = FontWeight.Bold
                     )
 
-                    if (visit.approximateAddress != null) {
+                    visit.approximateAddress?.let { address ->
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.Place,
@@ -181,7 +174,7 @@ private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) 
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = visit.approximateAddress,
+                                text = address,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -286,11 +279,11 @@ private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) 
                         value = visit.significance.name
                     )
 
-                    if (visit.userLabel != null) {
+                    visit.userLabel?.let { label ->
                         DetailRow(
                             icon = Icons.Default.Label,
                             label = "Label",
-                            value = visit.userLabel
+                            value = label
                         )
                     }
 
@@ -317,7 +310,7 @@ private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) 
         }
 
         // Notes
-        if (visit.userNotes != null) {
+        visit.userNotes?.let { notes ->
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Column(
@@ -330,7 +323,7 @@ private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) 
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = visit.userNotes,
+                            text = notes,
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
@@ -372,7 +365,7 @@ private fun DetailRow(
     }
 }
 
-private fun formatInstant(instant: kotlinx.datetime.Instant): String {
+private fun formatInstant(instant: Instant): String {
     val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
     return "${localDateTime.date} ${localDateTime.time.hour.toString().padStart(2, '0')}:${localDateTime.time.minute.toString().padStart(2, '0')}"
 }

@@ -29,7 +29,7 @@ actual class SyncStateRepositoryImpl : SyncStateRepository {
                     null
                 }
             },
-            lastSyncVersion = userDefaults.longLongForKey(Keys.LAST_SYNC_VERSION),
+            lastSyncVersion = userDefaults.integerForKey(Keys.LAST_SYNC_VERSION),
             isSyncing = userDefaults.boolForKey(Keys.IS_SYNCING),
             pendingChanges = userDefaults.integerForKey(Keys.PENDING_CHANGES).toInt(),
             error = userDefaults.stringForKey(Keys.ERROR)
@@ -40,7 +40,7 @@ actual class SyncStateRepositoryImpl : SyncStateRepository {
         state.lastSyncTimestamp?.let {
             userDefaults.setObject(it.toString(), Keys.LAST_SYNC_TIMESTAMP)
         }
-        userDefaults.setLongLong(state.lastSyncVersion, Keys.LAST_SYNC_VERSION)
+        userDefaults.setInteger(state.lastSyncVersion, Keys.LAST_SYNC_VERSION)
         userDefaults.setBool(state.isSyncing, Keys.IS_SYNCING)
         userDefaults.setInteger(state.pendingChanges.toLong(), Keys.PENDING_CHANGES)
         state.error?.let {

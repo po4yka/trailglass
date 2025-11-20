@@ -2,6 +2,7 @@ package com.po4yka.trailglass.di
 
 import android.content.Context
 import com.po4yka.trailglass.data.auth.DefaultUserSession
+import com.po4yka.trailglass.data.db.AndroidDatabaseDriverFactory
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
 import com.po4yka.trailglass.data.network.AndroidNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
@@ -39,7 +40,7 @@ class AndroidPlatformModule(
 
     @Provides
     override fun databaseDriverFactory(): DatabaseDriverFactory =
-        DatabaseDriverFactory(context)
+        AndroidDatabaseDriverFactory(context)
 
     @Provides
     override fun locationService(): LocationService =

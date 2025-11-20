@@ -1,11 +1,11 @@
 package com.po4yka.trailglass.data.network
 
+import kotlin.concurrent.Volatile
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import platform.Network.*
 import platform.darwin.dispatch_queue_create
-import platform.posix.DISPATCH_QUEUE_SERIAL
 
 /**
  * iOS implementation of NetworkConnectivity using Network framework.
@@ -13,14 +13,19 @@ import platform.posix.DISPATCH_QUEUE_SERIAL
 class IOSNetworkConnectivity : NetworkConnectivity {
 
     private val monitor = nw_path_monitor_create()
-    private val queue = dispatch_queue_create("com.po4yka.trailglass.network", DISPATCH_QUEUE_SERIAL)
+    private val queue = dispatch_queue_create("com.po4yka.trailglass.network", null)
+
+    @Volatile
+    private var currentPath: nw_path_t? = null
 
     override val isConnected: Flow<Boolean> = callbackFlow {
         nw_path_monitor_set_update_handler(monitor) { path ->
+            currentPath = path
             val status = nw_path_get_status(path)
             trySend(status == nw_path_status_satisfied || status == nw_path_status_satisfiable)
         }
 
+        nw_path_monitor_set_queue(monitor, queue)
         nw_path_monitor_start(monitor)
 
         awaitClose {
@@ -29,13 +34,13 @@ class IOSNetworkConnectivity : NetworkConnectivity {
     }
 
     override suspend fun isNetworkAvailable(): Boolean {
-        val path = nw_path_monitor_copy_current_path(monitor)
+        val path = currentPath ?: return false
         val status = nw_path_get_status(path)
         return status == nw_path_status_satisfied || status == nw_path_status_satisfiable
     }
 
     override suspend fun getNetworkType(): NetworkType {
-        val path = nw_path_monitor_copy_current_path(monitor)
+        val path = currentPath ?: return NetworkType.NONE
 
         return when {
             nw_path_uses_interface_type(path, nw_interface_type_wifi) -> NetworkType.WIFI

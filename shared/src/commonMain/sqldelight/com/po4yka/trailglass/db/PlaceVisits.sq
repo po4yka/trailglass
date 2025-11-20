@@ -9,6 +9,13 @@ CREATE TABLE place_visits (
     poi_name TEXT,
     city TEXT,
     country_code TEXT,
+    category TEXT NOT NULL DEFAULT 'OTHER',
+    category_confidence TEXT NOT NULL DEFAULT 'LOW',
+    significance TEXT NOT NULL DEFAULT 'RARE',
+    user_label TEXT,
+    user_notes TEXT,
+    is_favorite INTEGER NOT NULL DEFAULT 0,
+    frequent_place_id TEXT,
     user_id TEXT NOT NULL,
     created_at INTEGER NOT NULL,
     updated_at INTEGER NOT NULL,
@@ -38,9 +45,11 @@ insertVisit:
 INSERT INTO place_visits (
     id, start_time, end_time, center_latitude, center_longitude,
     approximate_address, poi_name, city, country_code,
+    category, category_confidence, significance,
+    user_label, user_notes, is_favorite, frequent_place_id,
     user_id, created_at, updated_at, deleted_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
 
 getVisitById:
 SELECT * FROM place_visits
@@ -49,10 +58,10 @@ WHERE id = ? AND deleted_at IS NULL;
 getVisitsByTimeRange:
 SELECT * FROM place_visits
 WHERE user_id = ?
-  AND start_time <= ?
-  AND end_time >= ?
+  AND start_time >= :query_start_time
+  AND end_time <= :query_end_time
   AND deleted_at IS NULL
-ORDER BY start_time ASC;
+ORDER BY start_time DESC;
 
 getVisitsByUser:
 SELECT * FROM place_visits
@@ -70,6 +79,13 @@ SET start_time = ?,
     poi_name = ?,
     city = ?,
     country_code = ?,
+    category = ?,
+    category_confidence = ?,
+    significance = ?,
+    user_label = ?,
+    user_notes = ?,
+    is_favorite = ?,
+    frequent_place_id = ?,
     updated_at = ?
 WHERE id = ?;
 

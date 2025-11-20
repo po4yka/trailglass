@@ -46,7 +46,7 @@ fun RouteReplayMapView(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
         properties = MapProperties(
-            mapType = com.google.android.gms.maps.model.MapType.NORMAL
+            mapType = MapType.NORMAL
         ),
         uiSettings = MapUiSettings(
             zoomControlsEnabled = false,
@@ -55,8 +55,8 @@ fun RouteReplayMapView(
             mapToolbarEnabled = false,
             zoomGesturesEnabled = false,  // Disable user gestures during replay
             scrollGesturesEnabled = false,
-            tiltGesturesEnabled = false,
-            rotateGesturesEnabled = false
+            tiltGesturesEnabled = false
+            // Note: rotateGesturesEnabled not available in maps-compose 6.2.0
         )
     ) {
         // Draw route polyline

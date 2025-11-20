@@ -57,10 +57,10 @@ fun RouteMapView(
     val mapProperties = remember(mapStyle) {
         MapProperties(
             mapType = when (mapStyle) {
-                MapStyle.STANDARD -> com.google.android.gms.maps.model.MapType.NORMAL
-                MapStyle.SATELLITE -> com.google.android.gms.maps.model.MapType.SATELLITE
-                MapStyle.TERRAIN -> com.google.android.gms.maps.model.MapType.TERRAIN
-                MapStyle.DARK -> com.google.android.gms.maps.model.MapType.NORMAL // Apply dark style separately
+                MapStyle.STANDARD -> MapType.NORMAL
+                MapStyle.SATELLITE -> MapType.SATELLITE
+                MapStyle.TERRAIN -> MapType.TERRAIN
+                MapStyle.DARK -> MapType.NORMAL // Apply dark style separately
             }
         )
     }

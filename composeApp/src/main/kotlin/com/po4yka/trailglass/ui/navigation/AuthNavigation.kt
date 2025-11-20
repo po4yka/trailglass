@@ -2,6 +2,7 @@ package com.po4yka.trailglass.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.Children
@@ -25,7 +26,7 @@ fun AuthNavigation(
         ?: (childStack.active.instance as? AuthRootComponent.Child.ForgotPassword)?.component?.authController
 
     // Watch for authentication success and trigger navigation
-    val authState by authController!!.state.subscribeAsState()
+    val authState by authController!!.state.collectAsState()
     LaunchedEffect(authState) {
         if (authState is AuthController.AuthState.Authenticated) {
             authRootComponent.onAuthenticated()

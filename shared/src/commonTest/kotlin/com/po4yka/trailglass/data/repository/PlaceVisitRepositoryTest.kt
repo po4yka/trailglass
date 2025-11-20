@@ -1,26 +1,33 @@
 package com.po4yka.trailglass.data.repository
 
 import com.po4yka.trailglass.TestDatabaseHelper
-import com.po4yka.trailglass.domain.model.PlaceVisit
-import com.po4yka.trailglass.domain.model.TransportType
-import kotlinx.coroutines.flow.first
+import com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl
+import com.po4yka.trailglass.data.repository.impl.PlaceVisitRepositoryImpl
+import com.po4yka.trailglass.domain.model.*
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldNotContain
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.test.*
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
-/**
- * Integration tests for PlaceVisitRepository.
- */
 class PlaceVisitRepositoryTest {
 
-    private lateinit var repository: PlaceVisitRepository
+    private lateinit var visitRepository: PlaceVisitRepository
+    private lateinit var locationRepository: LocationRepository
     private val database = TestDatabaseHelper.createTestDatabase()
-    private val userId = "test_user"
+    private val userId = "test_user_123"
+    private val deviceId = "test_device_456"
 
     @BeforeTest
     fun setup() {
         TestDatabaseHelper.clearDatabase(database)
-        repository = PlaceVisitRepositoryImpl(database)
+        visitRepository = PlaceVisitRepositoryImpl(database)
+        locationRepository = LocationRepositoryImpl(database)
     }
 
     @AfterTest
@@ -29,218 +36,344 @@ class PlaceVisitRepositoryTest {
     }
 
     @Test
-    fun testInsertAndGetPlaceVisit() = runTest {
+    fun `insertVisit should store place visit successfully`() = runTest {
         // Given
         val visit = createTestVisit(id = "visit1")
 
         // When
-        repository.insertPlaceVisit(visit)
-        val result = repository.getPlaceVisitById(visit.id, userId)
+        visitRepository.insertVisit(visit)
 
         // Then
-        assertNotNull(result)
-        assertEquals(visit.id, result.id)
-        assertEquals(visit.city, result.city)
-        assertEquals(visit.country, result.country)
-        assertEquals(visit.centerLatitude, result.centerLatitude)
-        assertEquals(visit.centerLongitude, result.centerLongitude)
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved shouldNotBe null
+        retrieved?.id shouldBe "visit1"
     }
 
     @Test
-    fun testGetPlaceVisitsForTimeRange() = runTest {
+    fun `getVisitById should return inserted visit`() = runTest {
         // Given
-        val start = Instant.parse("2024-01-01T00:00:00Z")
-        val end = Instant.parse("2024-01-31T23:59:59Z")
+        val visit = createTestVisit(
+            id = "visit1",
+            centerLatitude = 37.7749,
+            centerLongitude = -122.4194,
+            poiName = "Golden Gate Park",
+            city = "San Francisco"
+        )
+        visitRepository.insertVisit(visit)
 
+        // When
+        val retrieved = visitRepository.getVisitById("visit1")
+
+        // Then
+        retrieved shouldNotBe null
+        retrieved?.id shouldBe "visit1"
+        retrieved?.centerLatitude shouldBe 37.7749
+        retrieved?.centerLongitude shouldBe -122.4194
+        retrieved?.poiName shouldBe "Golden Gate Park"
+        retrieved?.city shouldBe "San Francisco"
+    }
+
+    @Test
+    fun `getVisitById should return null for non-existent visit`() = runTest {
+        // When
+        val result = visitRepository.getVisitById("non_existent")
+
+        // Then
+        result shouldBe null
+    }
+
+    @Test
+    fun `getVisits should return visits within time range`() = runTest {
+        // Given
+        val baseTime = Clock.System.now()
         val visit1 = createTestVisit(
             id = "visit1",
-            startTime = Instant.parse("2024-01-05T10:00:00Z"),
-            endTime = Instant.parse("2024-01-05T12:00:00Z")
+            startTime = baseTime,
+            endTime = baseTime + 30.minutes
         )
         val visit2 = createTestVisit(
             id = "visit2",
-            startTime = Instant.parse("2024-01-10T14:00:00Z"),
-            endTime = Instant.parse("2024-01-10T16:00:00Z")
+            startTime = baseTime + 1.hours,
+            endTime = baseTime + 2.hours
         )
         val visit3 = createTestVisit(
             id = "visit3",
-            startTime = Instant.parse("2024-02-15T10:00:00Z"),
-            endTime = Instant.parse("2024-02-15T12:00:00Z")
+            startTime = baseTime + 5.hours,
+            endTime = baseTime + 6.hours
         )
 
-        repository.insertPlaceVisit(visit1)
-        repository.insertPlaceVisit(visit2)
-        repository.insertPlaceVisit(visit3)
+        visitRepository.insertVisit(visit1)
+        visitRepository.insertVisit(visit2)
+        visitRepository.insertVisit(visit3)
 
         // When
-        val results = repository.getPlaceVisitsForTimeRange(userId, start, end).first()
+        val visits = visitRepository.getVisits(
+            userId = userId,
+            startTime = baseTime,
+            endTime = baseTime + 3.hours
+        )
 
         // Then
-        assertEquals(2, results.size)
-        assertTrue(results.any { it.id == "visit1" })
-        assertTrue(results.any { it.id == "visit2" })
-        assertFalse(results.any { it.id == "visit3" })
+        visits.size shouldBe 2
+        visits.map { it.id } shouldContain "visit1"
+        visits.map { it.id } shouldContain "visit2"
+        visits.map { it.id } shouldNotContain "visit3"
     }
 
     @Test
-    fun testUpdatePlaceVisit() = runTest {
+    fun `getVisitsByUser should return paginated visits`() = runTest {
         // Given
-        val original = createTestVisit(id = "visit1", city = "Paris")
-        repository.insertPlaceVisit(original)
+        repeat(10) { index ->
+            val visit = createTestVisit(
+                id = "visit_$index",
+                startTime = Clock.System.now() + (index * 10).minutes
+            )
+            visitRepository.insertVisit(visit)
+        }
 
-        // When
-        val updated = original.copy(city = "Lyon", country = "France")
-        repository.updatePlaceVisit(updated)
-        val result = repository.getPlaceVisitById(original.id, userId)
+        // When - Get first page
+        val firstPage = visitRepository.getVisitsByUser(userId, limit = 5, offset = 0)
 
         // Then
-        assertNotNull(result)
-        assertEquals("Lyon", result.city)
-        assertEquals("France", result.country)
+        firstPage.size shouldBe 5
+
+        // When - Get second page
+        val secondPage = visitRepository.getVisitsByUser(userId, limit = 5, offset = 5)
+
+        // Then
+        secondPage.size shouldBe 5
+
+        // No overlap between pages
+        val firstPageIds = firstPage.map { it.id }.toSet()
+        val secondPageIds = secondPage.map { it.id }.toSet()
+        firstPageIds.intersect(secondPageIds).isEmpty() shouldBe true
     }
 
     @Test
-    fun testDeletePlaceVisit() = runTest {
+    fun `updateVisit should modify existing visit`() = runTest {
+        // Given
+        val originalVisit = createTestVisit(
+            id = "visit1",
+            poiName = "Original Name",
+            userLabel = null
+        )
+        visitRepository.insertVisit(originalVisit)
+
+        // When
+        val updatedVisit = originalVisit.copy(
+            poiName = "Updated Name",
+            userLabel = "My Favorite Place"
+        )
+        visitRepository.updateVisit(updatedVisit)
+
+        // Then
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved?.poiName shouldBe "Updated Name"
+        retrieved?.userLabel shouldBe "My Favorite Place"
+    }
+
+    @Test
+    fun `linkSamples should associate location samples with visit`() = runTest {
         // Given
         val visit = createTestVisit(id = "visit1")
-        repository.insertPlaceVisit(visit)
+        visitRepository.insertVisit(visit)
+
+        // Insert location samples
+        val sample1 = createTestLocationSample(id = "sample1")
+        val sample2 = createTestLocationSample(id = "sample2")
+        locationRepository.insertSample(sample1)
+        locationRepository.insertSample(sample2)
 
         // When
-        repository.deletePlaceVisit(visit.id, userId)
-        val result = repository.getPlaceVisitById(visit.id, userId)
+        visitRepository.linkSamples("visit1", listOf("sample1", "sample2"))
 
         // Then
-        assertNull(result)
+        val linkedSamples = visitRepository.getSamplesForVisit("visit1")
+        linkedSamples.size shouldBe 2
+        linkedSamples.map { it.id } shouldContain "sample1"
+        linkedSamples.map { it.id } shouldContain "sample2"
     }
 
     @Test
-    fun testGetPlaceVisitsForTrip() = runTest {
+    fun `unlinkSample should remove association between sample and visit`() = runTest {
         // Given
-        val tripId = "trip1"
-        val visit1 = createTestVisit(id = "visit1", tripId = tripId)
-        val visit2 = createTestVisit(id = "visit2", tripId = tripId)
-        val visit3 = createTestVisit(id = "visit3", tripId = "trip2")
+        val visit = createTestVisit(id = "visit1")
+        visitRepository.insertVisit(visit)
 
-        repository.insertPlaceVisit(visit1)
-        repository.insertPlaceVisit(visit2)
-        repository.insertPlaceVisit(visit3)
+        val sample1 = createTestLocationSample(id = "sample1")
+        val sample2 = createTestLocationSample(id = "sample2")
+        locationRepository.insertSample(sample1)
+        locationRepository.insertSample(sample2)
+
+        visitRepository.linkSamples("visit1", listOf("sample1", "sample2"))
 
         // When
-        val results = repository.getPlaceVisitsForTrip(tripId, userId).first()
+        visitRepository.unlinkSample("visit1", "sample1")
 
         // Then
-        assertEquals(2, results.size)
-        assertTrue(results.all { it.tripId == tripId })
+        val linkedSamples = visitRepository.getSamplesForVisit("visit1")
+        linkedSamples.size shouldBe 1
+        linkedSamples.map { it.id } shouldNotContain "sample1"
+        linkedSamples.map { it.id } shouldContain "sample2"
     }
 
     @Test
-    fun testGetPlaceVisitsNearLocation() = runTest {
+    fun `getSamplesForVisit should return empty list for visit with no samples`() = runTest {
         // Given
-        val centerLat = 48.8566
-        val centerLon = 2.3522
-        val radiusMeters = 1000.0
+        val visit = createTestVisit(id = "visit1")
+        visitRepository.insertVisit(visit)
 
-        // Paris center
-        val visit1 = createTestVisit(
+        // When
+        val samples = visitRepository.getSamplesForVisit("visit1")
+
+        // Then
+        samples.isEmpty() shouldBe true
+    }
+
+    @Test
+    fun `deleteVisit should soft delete visit`() = runTest {
+        // Given
+        val visit = createTestVisit(id = "visit1")
+        visitRepository.insertVisit(visit)
+
+        // When
+        visitRepository.deleteVisit("visit1")
+
+        // Then
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved shouldBe null
+    }
+
+    @Test
+    fun `should handle place categorization fields`() = runTest {
+        // Given
+        val visit = createTestVisit(
             id = "visit1",
-            centerLatitude = 48.8566,
-            centerLongitude = 2.3522
+            category = PlaceCategory.HOME,
+            categoryConfidence = CategoryConfidence.HIGH,
+            significance = PlaceSignificance.PRIMARY
         )
-        // Nearby
-        val visit2 = createTestVisit(
-            id = "visit2",
-            centerLatitude = 48.8606,
-            centerLongitude = 2.3376
-        )
-        // Far away (London)
-        val visit3 = createTestVisit(
-            id = "visit3",
-            centerLatitude = 51.5074,
-            centerLongitude = -0.1278
-        )
-
-        repository.insertPlaceVisit(visit1)
-        repository.insertPlaceVisit(visit2)
-        repository.insertPlaceVisit(visit3)
 
         // When
-        val results = repository.getPlaceVisitsNearLocation(
-            userId,
-            centerLat,
-            centerLon,
-            radiusMeters
-        ).first()
+        visitRepository.insertVisit(visit)
 
         // Then
-        assertTrue(results.size >= 1) // At least the exact match
-        assertTrue(results.any { it.id == "visit1" })
-        assertFalse(results.any { it.id == "visit3" }) // London should not be included
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved?.category shouldBe PlaceCategory.HOME
+        retrieved?.categoryConfidence shouldBe CategoryConfidence.HIGH
+        retrieved?.significance shouldBe PlaceSignificance.PRIMARY
     }
 
     @Test
-    fun testGetAllCountries() = runTest {
+    fun `should handle user customization fields`() = runTest {
         // Given
-        val visit1 = createTestVisit(id = "visit1", country = "France")
-        val visit2 = createTestVisit(id = "visit2", country = "Spain")
-        val visit3 = createTestVisit(id = "visit3", country = "France")
-
-        repository.insertPlaceVisit(visit1)
-        repository.insertPlaceVisit(visit2)
-        repository.insertPlaceVisit(visit3)
+        val visit = createTestVisit(
+            id = "visit1",
+            userLabel = "My Office",
+            userNotes = "Where I spend most of my weekdays",
+            isFavorite = true
+        )
 
         // When
-        val results = repository.getAllCountries(userId).first()
+        visitRepository.insertVisit(visit)
 
         // Then
-        assertEquals(2, results.size)
-        assertTrue(results.contains("France"))
-        assertTrue(results.contains("Spain"))
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved?.userLabel shouldBe "My Office"
+        retrieved?.userNotes shouldBe "Where I spend most of my weekdays"
+        retrieved?.isFavorite shouldBe true
     }
 
     @Test
-    fun testGetAllCities() = runTest {
+    fun `should handle frequent place association`() = runTest {
         // Given
-        val visit1 = createTestVisit(id = "visit1", city = "Paris", country = "France")
-        val visit2 = createTestVisit(id = "visit2", city = "Lyon", country = "France")
-        val visit3 = createTestVisit(id = "visit3", city = "Paris", country = "France")
-
-        repository.insertPlaceVisit(visit1)
-        repository.insertPlaceVisit(visit2)
-        repository.insertPlaceVisit(visit3)
+        val visit = createTestVisit(
+            id = "visit1",
+            frequentPlaceId = "frequent_place_123"
+        )
 
         // When
-        val results = repository.getAllCities(userId).first()
+        visitRepository.insertVisit(visit)
 
         // Then
-        assertEquals(2, results.size)
-        assertTrue(results.contains("Paris"))
-        assertTrue(results.contains("Lyon"))
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved?.frequentPlaceId shouldBe "frequent_place_123"
     }
 
+    @Test
+    fun `should store geocoding information correctly`() = runTest {
+        // Given
+        val visit = createTestVisit(
+            id = "visit1",
+            approximateAddress = "123 Main St",
+            poiName = "Coffee Shop",
+            city = "Portland",
+            countryCode = "US"
+        )
+
+        // When
+        visitRepository.insertVisit(visit)
+
+        // Then
+        val retrieved = visitRepository.getVisitById("visit1")
+        retrieved?.approximateAddress shouldBe "123 Main St"
+        retrieved?.poiName shouldBe "Coffee Shop"
+        retrieved?.city shouldBe "Portland"
+        retrieved?.countryCode shouldBe "US"
+    }
+
+    // Helper functions
     private fun createTestVisit(
         id: String,
-        tripId: String = "trip1",
-        city: String = "Paris",
-        country: String = "France",
-        startTime: Instant = Instant.parse("2024-01-01T10:00:00Z"),
-        endTime: Instant = Instant.parse("2024-01-01T12:00:00Z"),
-        centerLatitude: Double = 48.8566,
-        centerLongitude: Double = 2.3522
+        startTime: Instant = Clock.System.now(),
+        endTime: Instant = Clock.System.now() + 1.hours,
+        centerLatitude: Double = 37.7749,
+        centerLongitude: Double = -122.4194,
+        approximateAddress: String? = null,
+        poiName: String? = null,
+        city: String? = null,
+        countryCode: String? = null,
+        category: PlaceCategory = PlaceCategory.OTHER,
+        categoryConfidence: CategoryConfidence = CategoryConfidence.LOW,
+        significance: PlaceSignificance = PlaceSignificance.RARE,
+        userLabel: String? = null,
+        userNotes: String? = null,
+        isFavorite: Boolean = false,
+        frequentPlaceId: String? = null
     ) = PlaceVisit(
         id = id,
-        tripId = tripId,
-        userId = userId,
         startTime = startTime,
         endTime = endTime,
         centerLatitude = centerLatitude,
         centerLongitude = centerLongitude,
-        radiusMeters = 100.0,
+        approximateAddress = approximateAddress,
+        poiName = poiName,
         city = city,
-        country = country,
-        approximateAddress = "123 Main St",
-        confidence = 0.95,
-        arrivalTransportType = TransportType.WALK,
-        departureTransportType = TransportType.CAR,
-        userNotes = null
+        countryCode = countryCode,
+        locationSampleIds = emptyList(),
+        category = category,
+        categoryConfidence = categoryConfidence,
+        significance = significance,
+        userLabel = userLabel,
+        userNotes = userNotes,
+        isFavorite = isFavorite,
+        frequentPlaceId = frequentPlaceId,
+        userId = userId,
+        createdAt = Clock.System.now(),
+        updatedAt = Clock.System.now()
+    )
+
+    private fun createTestLocationSample(
+        id: String,
+        timestamp: Instant = Clock.System.now()
+    ) = LocationSample(
+        id = id,
+        timestamp = timestamp,
+        latitude = 37.7749,
+        longitude = -122.4194,
+        accuracy = 10.0,
+        source = LocationSource.GPS,
+        deviceId = deviceId,
+        userId = userId
     )
 }

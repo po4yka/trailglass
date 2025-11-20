@@ -9,9 +9,15 @@ import com.po4yka.trailglass.db.TrailGlassDatabase
  * Android implementation of DatabaseDriverFactory.
  * Uses AndroidSqliteDriver for database access.
  */
-actual class DatabaseDriverFactory(private val context: Context) {
+actual interface DatabaseDriverFactory {
+    actual fun createDriver(): SqlDriver
+}
 
-    actual fun createDriver(): SqlDriver {
+/**
+ * Android implementation that requires Context.
+ */
+class AndroidDatabaseDriverFactory(private val context: Context) : DatabaseDriverFactory {
+    override fun createDriver(): SqlDriver {
         return AndroidSqliteDriver(
             schema = TrailGlassDatabase.Schema,
             context = context,

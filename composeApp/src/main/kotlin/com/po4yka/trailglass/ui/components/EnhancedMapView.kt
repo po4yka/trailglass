@@ -5,7 +5,13 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.GroupWork
+import androidx.compose.material.icons.filled.Whatshot
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -118,9 +124,11 @@ private fun EnhancedGoogleMapContent(
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = mapData.region?.let {
+            // Calculate appropriate zoom level based on region deltas
+            val zoom = calculateZoomLevel(it.latitudeDelta, it.longitudeDelta)
             CameraPosition.fromLatLngZoom(
                 LatLng(it.center.latitude, it.center.longitude),
-                it.zoom
+                zoom
             )
         } ?: CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
     }
@@ -140,8 +148,9 @@ private fun EnhancedGoogleMapContent(
         )
     ) {
         // Draw heatmap if enabled
-        if (mapData.heatmapEnabled && mapData.heatmapData != null) {
-            RenderHeatmap(heatmapData = mapData.heatmapData)
+        val heatmapData = mapData.heatmapData
+        if (mapData.heatmapEnabled && heatmapData is HeatmapData) {
+            RenderHeatmap(heatmapData = heatmapData)
         }
 
         // Draw routes
@@ -263,9 +272,23 @@ private fun RenderHeatmap(heatmapData: HeatmapData) {
         }
     }
 
+    // Track the current overlay reference to enable proper cleanup
+    var currentOverlay by remember { mutableStateOf<TileOverlay?>(null) }
+
+    // Use DisposableEffect for proper lifecycle management
+    // This ensures cleanup when the composable leaves composition or when heatmapPoints change
+    DisposableEffect(heatmapPoints) {
+        onDispose {
+            // Remove the overlay when the effect is disposed or keys change
+            currentOverlay?.remove()
+            currentOverlay = null
+        }
+    }
+
     // Render heatmap using MapEffect
     MapEffect(heatmapPoints) { map ->
-        var tileOverlay: TileOverlay? = null
+        // Remove previous overlay before adding a new one
+        currentOverlay?.remove()
 
         // Create heatmap tile provider with custom gradient colors
         val heatmapProvider = HeatmapTileProvider.Builder()
@@ -274,15 +297,10 @@ private fun RenderHeatmap(heatmapData: HeatmapData) {
             .opacity(0.6) // Transparency of heatmap layer
             .build()
 
-        // Add tile overlay to the map
-        tileOverlay = map.addTileOverlay(
+        // Add tile overlay to the map and store the reference
+        currentOverlay = map.addTileOverlay(
             TileOverlayOptions().tileProvider(heatmapProvider)
         )
-
-        // Cleanup function: remove overlay when effect is disposed
-        onDispose {
-            tileOverlay?.remove()
-        }
     }
 }
 
@@ -508,4 +526,27 @@ private fun getModeLabel(mode: MapVisualizationMode) = when (mode) {
     MapVisualizationMode.CLUSTERS -> "Clusters"
     MapVisualizationMode.HEATMAP -> "Heatmap"
     MapVisualizationMode.HYBRID -> "Hybrid"
+}
+
+/**
+ * Calculate appropriate zoom level based on region deltas.
+ * Uses the larger delta (latitude or longitude) to determine zoom.
+ */
+private fun calculateZoomLevel(latitudeDelta: Double, longitudeDelta: Double): Float {
+    val maxDelta = maxOf(latitudeDelta, longitudeDelta)
+    return when {
+        maxDelta >= 40.0 -> 3f
+        maxDelta >= 20.0 -> 4f
+        maxDelta >= 10.0 -> 5f
+        maxDelta >= 5.0 -> 6f
+        maxDelta >= 2.0 -> 7f
+        maxDelta >= 1.0 -> 8f
+        maxDelta >= 0.5 -> 9f
+        maxDelta >= 0.25 -> 10f
+        maxDelta >= 0.1 -> 11f
+        maxDelta >= 0.05 -> 12f
+        maxDelta >= 0.025 -> 13f
+        maxDelta >= 0.01 -> 14f
+        else -> 15f
+    }
 }

@@ -1,9 +1,9 @@
 package com.po4yka.trailglass.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.work.*
 import com.po4yka.trailglass.TrailGlassApplication
-import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
@@ -16,16 +16,14 @@ class SyncWorker(
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
 
-    private val logger = logger()
-
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        logger.info { "SyncWorker started (attempt ${runAttemptCount + 1}/$MAX_RETRIES)" }
+        Log.i(TAG, "SyncWorker started (attempt ${runAttemptCount + 1}/$MAX_RETRIES)")
 
         try {
             // Get app component from Application class
             val application = applicationContext as? TrailGlassApplication
             if (application == null) {
-                logger.error { "Cannot access TrailGlassApplication" }
+                Log.e(TAG, "Cannot access TrailGlassApplication")
                 return@withContext Result.failure()
             }
 
@@ -36,16 +34,14 @@ class SyncWorker(
 
             result.fold(
                 onSuccess = { syncResult ->
-                    logger.info {
-                        "Background sync completed: " +
+                    Log.i(TAG, "Background sync completed: " +
                         "${syncResult.uploaded} uploaded, " +
                         "${syncResult.downloaded} downloaded, " +
-                        "${syncResult.conflicts} conflicts"
-                    }
+                        "${syncResult.conflicts} conflicts")
                     Result.success()
                 },
                 onFailure = { error ->
-                    logger.error(error) { "Background sync failed" }
+                    Log.e(TAG, "Background sync failed", error)
                     if (runAttemptCount < MAX_RETRIES) {
                         Result.retry()
                     } else {
@@ -54,7 +50,7 @@ class SyncWorker(
                 }
             )
         } catch (e: Exception) {
-            logger.error(e) { "Sync worker error" }
+            Log.e(TAG, "Sync worker error", e)
 
             if (runAttemptCount < MAX_RETRIES) {
                 Result.retry()
@@ -65,6 +61,7 @@ class SyncWorker(
     }
 
     companion object {
+        private const val TAG = "SyncWorker"
         private const val MAX_RETRIES = 3
         const val WORK_NAME = "trailglass_sync"
         const val TAG_SYNC = "sync"
@@ -77,7 +74,7 @@ class SyncWorker(
  */
 object SyncScheduler {
 
-    private val logger = logger()
+    private const val TAG = "SyncScheduler"
 
     /**
      * Schedule periodic background sync.
@@ -86,7 +83,7 @@ object SyncScheduler {
         context: Context,
         intervalMinutes: Long = 60
     ) {
-        logger.info { "Scheduling periodic sync every $intervalMinutes minutes" }
+        Log.i(TAG, "Scheduling periodic sync every $intervalMinutes minutes")
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -118,7 +115,7 @@ object SyncScheduler {
      * Trigger immediate one-time sync.
      */
     fun triggerImmediateSync(context: Context) {
-        logger.info { "Triggering immediate sync" }
+        Log.i(TAG, "Triggering immediate sync")
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -137,7 +134,7 @@ object SyncScheduler {
      * Cancel all scheduled sync work.
      */
     fun cancelAllSync(context: Context) {
-        logger.info { "Cancelling all scheduled sync work" }
+        Log.i(TAG, "Cancelling all scheduled sync work")
         WorkManager.getInstance(context).cancelUniqueWork(SyncWorker.WORK_NAME)
     }
 

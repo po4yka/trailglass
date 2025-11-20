@@ -4,8 +4,11 @@ import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.utils.io.*
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
@@ -17,7 +20,7 @@ class ApiClientHttpTest {
     fun `should handle successful HTTP response`() = runTest {
         val mockEngine = MockEngine { request ->
             respond(
-                content = """{"status": "success"}""",
+                content = ByteReadChannel("""{"status": "success"}"""),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -29,7 +32,7 @@ class ApiClientHttpTest {
             }
         }
 
-        val response = client.get("https://test.api.com/status")
+        val response: HttpResponse = client.get("https://test.api.com/status")
         response.status shouldBe HttpStatusCode.OK
         client.close()
     }
@@ -38,7 +41,7 @@ class ApiClientHttpTest {
     fun `should handle 401 Unauthorized response`() = runTest {
         val mockEngine = MockEngine { request ->
             respond(
-                content = """{"error": "Unauthorized"}""",
+                content = ByteReadChannel("""{"error": "Unauthorized"}"""),
                 status = HttpStatusCode.Unauthorized,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -50,7 +53,7 @@ class ApiClientHttpTest {
             }
         }
 
-        val response = client.get("https://test.api.com/protected")
+        val response: HttpResponse = client.get("https://test.api.com/protected")
         response.status shouldBe HttpStatusCode.Unauthorized
         client.close()
     }
@@ -59,7 +62,7 @@ class ApiClientHttpTest {
     fun `should handle 500 server error response`() = runTest {
         val mockEngine = MockEngine { request ->
             respond(
-                content = """{"error": "Internal Server Error"}""",
+                content = ByteReadChannel("""{"error": "Internal Server Error"}"""),
                 status = HttpStatusCode.InternalServerError,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -71,7 +74,7 @@ class ApiClientHttpTest {
             }
         }
 
-        val response = client.get("https://test.api.com/error")
+        val response: HttpResponse = client.get("https://test.api.com/error")
         response.status shouldBe HttpStatusCode.InternalServerError
         client.close()
     }
@@ -81,7 +84,7 @@ class ApiClientHttpTest {
         var timeoutOccurred = false
 
         val mockEngine = MockEngine { request ->
-            throw io.ktor.client.network.sockets.ConnectTimeoutException("Connection timeout")
+            throw io.ktor.client.network.sockets.ConnectTimeoutException("Connection timeout", null)
         }
 
         val client = HttpClient(mockEngine) {
@@ -108,7 +111,7 @@ class ApiClientHttpTest {
         val mockEngine = MockEngine { request ->
             receivedHeaders = request.headers
             respond(
-                content = """{"status": "ok"}""",
+                content = ByteReadChannel("""{"status": "ok"}"""),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -121,8 +124,10 @@ class ApiClientHttpTest {
         }
 
         client.get("https://test.api.com/test") {
-            header("Authorization", "Bearer test_token")
-            header("X-Device-Id", "test_device")
+            headers {
+                append("Authorization", "Bearer test_token")
+                append("X-Device-Id", "test_device")
+            }
         }
 
         receivedHeaders?.get("Authorization") shouldBe "Bearer test_token"
@@ -133,14 +138,12 @@ class ApiClientHttpTest {
     @Test
     fun `should send POST request with body`() = runTest {
         var receivedMethod: HttpMethod? = null
-        var receivedBody: String? = null
 
         val mockEngine = MockEngine { request ->
             receivedMethod = request.method
-            receivedBody = request.body.toString()
 
             respond(
-                content = """{"id": "123", "status": "created"}""",
+                content = ByteReadChannel("""{"id": "123", "status": "created"}"""),
                 status = HttpStatusCode.Created,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -171,7 +174,7 @@ class ApiClientHttpTest {
                 throw io.ktor.client.network.sockets.SocketTimeoutException("Timeout")
             }
             respond(
-                content = """{"status": "success"}""",
+                content = ByteReadChannel("""{"status": "success"}"""),
                 status = HttpStatusCode.OK,
                 headers = headersOf(HttpHeaders.ContentType, "application/json")
             )
@@ -184,7 +187,7 @@ class ApiClientHttpTest {
         }
 
         // Simulate retry logic
-        var response: io.ktor.client.statement.HttpResponse? = null
+        var response: HttpResponse? = null
         for (i in 1..3) {
             try {
                 response = client.get("https://test.api.com/retry")

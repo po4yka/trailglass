@@ -25,6 +25,16 @@ class GetTimelineUseCase(
         abstract val timestamp: Instant
         abstract val id: String
 
+        data class DayStartUI(
+            override val id: String,
+            override val timestamp: Instant
+        ) : TimelineItemUI()
+
+        data class DayEndUI(
+            override val id: String,
+            override val timestamp: Instant
+        ) : TimelineItemUI()
+
         data class VisitUI(
             override val id: String,
             override val timestamp: Instant,
@@ -45,7 +55,11 @@ class GetTimelineUseCase(
             val routeCount: Int,
             val totalDistance: Double,
             val primaryCountry: String?
-        ) : TimelineItemUI()
+        ) : TimelineItemUI() {
+            val totalVisits: Int get() = visitCount
+            val totalDistanceMeters: Double get() = totalDistance
+            val totalRoutes: Int get() = routeCount
+        }
 
         data class WeekSummaryUI(
             override val id: String,
@@ -55,8 +69,13 @@ class GetTimelineUseCase(
             val visitCount: Int,
             val routeCount: Int,
             val totalDistance: Double,
-            val countriesVisited: List<String>
-        ) : TimelineItemUI()
+            val countriesVisited: List<String>,
+            val activeDates: Set<LocalDate> = emptySet()
+        ) : TimelineItemUI() {
+            val totalVisits: Int get() = visitCount
+            val totalDistanceMeters: Double get() = totalDistance
+            val activeDays: Int get() = activeDates.size
+        }
 
         data class MonthSummaryUI(
             override val id: String,
@@ -66,8 +85,14 @@ class GetTimelineUseCase(
             val visitCount: Int,
             val routeCount: Int,
             val totalDistance: Double,
-            val countriesVisited: List<String>
-        ) : TimelineItemUI()
+            val countriesVisited: List<String>,
+            val topCategories: List<PlaceCategory> = emptyList(),
+            val activeWeekStarts: Set<LocalDate> = emptySet()
+        ) : TimelineItemUI() {
+            val totalVisits: Int get() = visitCount
+            val totalDistanceMeters: Double get() = totalDistance
+            val activeWeeks: Int get() = activeWeekStarts.size
+        }
     }
 
     /**
@@ -215,6 +240,19 @@ class GetTimelineUseCase(
                 .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
+                // Calculate active dates
+                val activeDates = mutableSetOf<LocalDate>()
+
+                // Add dates from visits
+                visits.forEach { visit ->
+                    activeDates.add(visit.startTime.toLocalDateTime(timeZone).date)
+                }
+
+                // Add dates from routes
+                routes.forEach { route ->
+                    activeDates.add(route.startTime.toLocalDateTime(timeZone).date)
+                }
+
                 items.add(
                     TimelineItemUI.WeekSummaryUI(
                         id = "week_summary_$currentWeekStart",
@@ -224,7 +262,8 @@ class GetTimelineUseCase(
                         visitCount = visits.size,
                         routeCount = routes.size,
                         totalDistance = routes.sumOf { it.distanceMeters },
-                        countriesVisited = visits.mapNotNull { it.countryCode }.distinct()
+                        countriesVisited = visits.mapNotNull { it.countryCode }.distinct(),
+                        activeDates = activeDates
                     )
                 )
             }
@@ -260,6 +299,21 @@ class GetTimelineUseCase(
                 .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
+                // Calculate active weeks (unique Monday dates that had activity)
+                val activeWeekStarts = mutableSetOf<LocalDate>()
+
+                // Add week starts from visits
+                visits.forEach { visit ->
+                    val date = visit.startTime.toLocalDateTime(timeZone).date
+                    activeWeekStarts.add(getWeekStart(date))
+                }
+
+                // Add week starts from routes
+                routes.forEach { route ->
+                    val date = route.startTime.toLocalDateTime(timeZone).date
+                    activeWeekStarts.add(getWeekStart(date))
+                }
+
                 items.add(
                     TimelineItemUI.MonthSummaryUI(
                         id = "month_summary_${monthStart.year}_${monthStart.monthNumber}",
@@ -269,13 +323,23 @@ class GetTimelineUseCase(
                         visitCount = visits.size,
                         routeCount = routes.size,
                         totalDistance = routes.sumOf { it.distanceMeters },
-                        countriesVisited = visits.mapNotNull { it.countryCode }.distinct()
+                        countriesVisited = visits.mapNotNull { it.countryCode }.distinct(),
+                        activeWeekStarts = activeWeekStarts
                     )
                 )
             }
         }
 
         return items.sortedBy { it.timestamp }
+    }
+
+    /**
+     * Get the start of the week (Monday) for a given date.
+     * Uses ISO 8601 week definition where Monday is the first day of the week.
+     */
+    private fun getWeekStart(date: LocalDate): LocalDate {
+        val dayOfWeek = date.dayOfWeek.ordinal // Monday = 0, Sunday = 6
+        return date.minus(dayOfWeek, DateTimeUnit.DAY)
     }
 
     /**

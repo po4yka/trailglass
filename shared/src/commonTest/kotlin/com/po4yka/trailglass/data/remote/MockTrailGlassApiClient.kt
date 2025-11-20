@@ -3,13 +3,11 @@ package com.po4yka.trailglass.data.remote
 import com.po4yka.trailglass.data.remote.dto.*
 
 /**
- * Mock implementation of TrailGlassApiClient for testing.
+ * Mock implementation for testing sync operations.
+ * Note: This doesn't extend TrailGlassApiClient since it's a final class.
+ * Instead, this provides a standalone mock for testing sync logic.
  */
-class MockTrailGlassApiClient : TrailGlassApiClient(
-    config = ApiConfig(baseUrl = "https://mock.api.com", timeout = 30000, enableLogging = false),
-    tokenProvider = MockTokenProvider(),
-    deviceInfoProvider = MockDeviceInfoProvider()
-) {
+class MockTrailGlassApiClient {
     var shouldFailSync = false
     var shouldFailLogin = false
     var syncDelayMs = 0L
@@ -19,7 +17,6 @@ class MockTrailGlassApiClient : TrailGlassApiClient(
         placeVisits = emptyList(),
         trips = emptyList(),
         photos = emptyList(),
-        settings = null,
         deletedIds = DeletedIds(
             locations = emptyList(),
             placeVisits = emptyList(),
@@ -30,7 +27,7 @@ class MockTrailGlassApiClient : TrailGlassApiClient(
 
     private val syncHistory = mutableListOf<DeltaSyncRequest>()
 
-    override suspend fun performDeltaSync(request: DeltaSyncRequest): Result<DeltaSyncResponse> {
+    suspend fun performDeltaSync(request: DeltaSyncRequest): Result<DeltaSyncResponse> {
         syncHistory.add(request)
 
         if (syncDelayMs > 0) {
@@ -43,43 +40,39 @@ class MockTrailGlassApiClient : TrailGlassApiClient(
             Result.success(
                 DeltaSyncResponse(
                     syncVersion = 42L,
-                    serverTime = kotlinx.datetime.Clock.System.now(),
+                    syncTimestamp = kotlinx.datetime.Clock.System.now().toString(),
+                    conflicts = mockConflicts,
                     remoteChanges = mockRemoteChanges,
-                    accepted = AcceptedChanges(
+                    accepted = AcceptedEntities(
                         locations = request.localChanges.locations.map { it.id },
                         placeVisits = request.localChanges.placeVisits.map { it.id },
                         trips = request.localChanges.trips.map { it.id },
                         photos = request.localChanges.photos.map { it.id }
                     ),
-                    rejected = RejectedChanges(
+                    rejected = RejectedEntities(
                         locations = emptyList(),
                         placeVisits = emptyList(),
                         trips = emptyList(),
                         photos = emptyList()
-                    ),
-                    conflicts = mockConflicts
+                    )
                 )
             )
         }
     }
 
-    override suspend fun login(email: String, password: String): Result<LoginResponse> {
+    suspend fun login(email: String, password: String): Result<LoginResponse> {
         return if (shouldFailLogin) {
             Result.failure(Exception("Mock login failure"))
         } else {
             Result.success(
                 LoginResponse(
+                    userId = "test_user_id",
+                    email = email,
+                    displayName = "Test User",
                     accessToken = "mock_access_token",
                     refreshToken = "mock_refresh_token",
                     expiresIn = 3600,
-                    userId = "test_user_id",
-                    userProfile = UserProfileDto(
-                        id = "test_user_id",
-                        email = email,
-                        displayName = "Test User",
-                        createdAt = kotlinx.datetime.Clock.System.now(),
-                        lastLoginAt = kotlinx.datetime.Clock.System.now()
-                    )
+                    lastSyncTimestamp = kotlinx.datetime.Clock.System.now().toString()
                 )
             )
         }
@@ -92,14 +85,6 @@ class MockTrailGlassApiClient : TrailGlassApiClient(
 
     fun clearHistory() {
         syncHistory.clear()
-    }
-
-    fun setMockConflicts(conflicts: List<SyncConflictDto>) {
-        mockConflicts = conflicts
-    }
-
-    fun setMockRemoteChanges(changes: RemoteChanges) {
-        mockRemoteChanges = changes
     }
 }
 
@@ -125,7 +110,9 @@ class MockTokenProvider : TokenProvider {
 class MockDeviceInfoProvider : DeviceInfoProvider {
     override fun getDeviceId(): String = "mock_device_id"
 
-    override fun getDeviceModel(): String = "Mock Device"
+    override fun getDeviceName(): String = "Mock Device"
+
+    override fun getPlatform(): String = "MockOS"
 
     override fun getOsVersion(): String = "Mock OS 1.0"
 

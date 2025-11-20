@@ -3,8 +3,11 @@ package com.po4yka.trailglass.data.repository.impl
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.domain.model.CategoryConfidence
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
+import com.po4yka.trailglass.domain.model.PlaceCategory
+import com.po4yka.trailglass.domain.model.PlaceSignificance
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
@@ -39,9 +42,16 @@ class PlaceVisitRepositoryImpl(
             poi_name = visit.poiName,
             city = visit.city,
             country_code = visit.countryCode,
-            user_id = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous",
-            created_at = Clock.System.now().toEpochMilliseconds(),
-            updated_at = Clock.System.now().toEpochMilliseconds(),
+            category = visit.category.name,
+            category_confidence = visit.categoryConfidence.name,
+            significance = visit.significance.name,
+            user_label = visit.userLabel,
+            user_notes = visit.userNotes,
+            is_favorite = if (visit.isFavorite) 1L else 0L,
+            frequent_place_id = visit.frequentPlaceId,
+            user_id = visit.userId ?: DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous",
+            created_at = visit.createdAt?.toEpochMilliseconds() ?: Clock.System.now().toEpochMilliseconds(),
+            updated_at = visit.updatedAt?.toEpochMilliseconds() ?: Clock.System.now().toEpochMilliseconds(),
             deleted_at = null
         )
 
@@ -72,8 +82,8 @@ class PlaceVisitRepositoryImpl(
     ): List<PlaceVisit> = withContext(Dispatchers.IO) {
         visitQueries.getVisitsByTimeRange(
             user_id = userId,
-            start_time = endTime.toEpochMilliseconds(),
-            end_time = startTime.toEpochMilliseconds()
+            query_end_time = endTime.toEpochMilliseconds(),
+            query_start_time = startTime.toEpochMilliseconds()
         ).executeAsList().map { visit ->
             val sampleIds = visitQueries.getSamplesForVisit(visit.id)
                 .executeAsList()
@@ -108,6 +118,13 @@ class PlaceVisitRepositoryImpl(
             poi_name = visit.poiName,
             city = visit.city,
             country_code = visit.countryCode,
+            category = visit.category.name,
+            category_confidence = visit.categoryConfidence.name,
+            significance = visit.significance.name,
+            user_label = visit.userLabel,
+            user_notes = visit.userNotes,
+            is_favorite = if (visit.isFavorite) 1L else 0L,
+            frequent_place_id = visit.frequentPlaceId,
             updated_at = Clock.System.now().toEpochMilliseconds(),
             id = visit.id
         )
@@ -150,7 +167,17 @@ class PlaceVisitRepositoryImpl(
             poiName = poi_name,
             city = city,
             countryCode = country_code,
-            locationSampleIds = sampleIds
+            locationSampleIds = sampleIds,
+            category = PlaceCategory.valueOf(category),
+            categoryConfidence = CategoryConfidence.valueOf(category_confidence),
+            significance = PlaceSignificance.valueOf(significance),
+            userLabel = user_label,
+            userNotes = user_notes,
+            isFavorite = is_favorite != 0L,
+            frequentPlaceId = frequent_place_id,
+            userId = user_id,
+            createdAt = Instant.fromEpochMilliseconds(created_at),
+            updatedAt = Instant.fromEpochMilliseconds(updated_at)
         )
 
     private fun com.po4yka.trailglass.db.Location_samples.toLocationSample() = LocationSample(

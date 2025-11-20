@@ -184,14 +184,14 @@ class DefaultRootComponent(
         is RootComponent.Config.Stats -> RootComponent.Child.Stats(
             component = DefaultStatsComponent(
                 componentContext = componentContext,
-                statsController = appComponent.statsController
+                enhancedStatsController = appComponent.enhancedStatsController
             )
         )
 
         is RootComponent.Config.Timeline -> RootComponent.Child.Timeline(
             component = DefaultTimelineComponent(
                 componentContext = componentContext,
-                timelineController = appComponent.timelineController
+                enhancedTimelineController = appComponent.enhancedTimelineController
             )
         )
 

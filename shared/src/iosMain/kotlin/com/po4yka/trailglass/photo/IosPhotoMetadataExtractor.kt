@@ -1,13 +1,16 @@
 package com.po4yka.trailglass.photo
 
+import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
+import platform.CoreFoundation.CFDataRef
 import platform.CoreLocation.CLLocation
 import platform.Foundation.*
 import platform.ImageIO.*
@@ -48,8 +51,8 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
     private suspend fun extractFromAsset(asset: PHAsset, photoId: String): PhotoMetadata {
         // Extract basic info from PHAsset
         val location = asset.location as? CLLocation
-        val latitude = location?.coordinate?.latitude
-        val longitude = location?.coordinate?.longitude
+        val latitude = location?.coordinate?.useContents { latitude }
+        val longitude = location?.coordinate?.useContents { longitude }
         val altitude = location?.altitude?.takeIf { latitude != null && longitude != null }
 
         // Extract date/time
@@ -68,7 +71,7 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
 
         // Computed location
         val computedLocation = if (latitude != null && longitude != null) {
-            Location(latitude, longitude, altitude)
+            Location(Coordinate(latitude!!, longitude!!), altitude = altitude, timestamp = exifTimestamp ?: Clock.System.now())
         } else null
 
         val locationSource = when {
@@ -100,10 +103,10 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
 
     private suspend fun extractFullExifData(asset: PHAsset): ExifData = suspendCoroutine { continuation ->
         val options = PHImageRequestOptions().apply {
-            version = PHImageRequestOptionsVersion.PHImageRequestOptionsVersionCurrent
-            deliveryMode = PHImageRequestOptionsDeliveryMode.PHImageRequestOptionsDeliveryModeHighQualityFormat
-            isSynchronous = false
-            isNetworkAccessAllowed = true
+            version = PHImageRequestOptionsVersionCurrent
+            deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat
+            synchronous = false
+            networkAccessAllowed = true
         }
 
         PHImageManager.defaultManager().requestImageDataForAsset(
@@ -123,7 +126,7 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
     private fun parseExifFromImageData(imageData: NSData): ExifData {
         return try {
             // Create image source from data
-            val imageSource = CGImageSourceCreateWithData(imageData, null)
+            val imageSource = CGImageSourceCreateWithData(imageData as CFDataRef, null)
                 ?: return ExifData()
 
             // Get metadata dictionary at index 0

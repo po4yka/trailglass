@@ -27,7 +27,7 @@ class GetPlaceVisitsUseCase(
     ): Result<List<PlaceVisit>> {
         return try {
             val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
-            Result.success(visits.sortedByDescending { it.startTime })
+            Result.success(visits)
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -48,7 +48,7 @@ class GetPlaceVisitsUseCase(
     ): Result<List<PlaceVisit>> {
         return try {
             val visits = placeVisitRepository.getVisitsByUser(userId, limit, offset)
-            Result.success(visits.sortedByDescending { it.startTime })
+            Result.success(visits)
         } catch (e: Exception) {
             Result.failure(e)
         }
