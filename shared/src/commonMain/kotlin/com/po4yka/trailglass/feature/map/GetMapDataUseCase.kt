@@ -34,11 +34,12 @@ class GetMapDataUseCase(
         logger.debug { "Getting map data for $userId from $startTime to $endTime" }
 
         // Get place visits
-        val visits = placeVisitRepository.getVisitsInRange(userId, startTime, endTime)
+        // Get place visits
+        val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
         logger.debug { "Found ${visits.size} visits" }
 
         // Get route segments
-        val routes = routeSegmentRepository.getRouteSegmentsInRange(startTime, endTime)
+        val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, startTime, endTime)
         logger.debug { "Found ${routes.size} routes" }
 
         // Convert to map markers

@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.domain.model.PhotoMetadata
+import com.po4yka.trailglass.domain.model.PhotoMetadata.LocationSource
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
@@ -76,12 +77,12 @@ class AndroidPhotoMetadataExtractor(
 
         // Computed location
         val computedLocation = if (latitude != null && longitude != null) {
-            Location(latitude, longitude, altitude)
+            Location(latitude, longitude, null, altitude)
         } else null
 
         val locationSource = when {
-            latitude != null && longitude != null -> PhotoMetadata.LocationSource.EXIF
-            else -> PhotoMetadata.LocationSource.NONE
+            latitude != null && longitude != null -> LocationSource.EXIF
+            else -> LocationSource.NONE
         }
 
         return PhotoMetadata(

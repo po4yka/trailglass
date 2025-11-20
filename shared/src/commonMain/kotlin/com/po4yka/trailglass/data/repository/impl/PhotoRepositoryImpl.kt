@@ -316,10 +316,26 @@ class PhotoRepositoryImpl(
         )
     }
 
+    private fun mapToPhoto(row: com.po4yka.trailglass.db.GetPhotosNearLocation): Photo {
+        return Photo(
+            id = row.id,
+            uri = row.uri,
+            timestamp = Instant.fromEpochMilliseconds(row.timestamp),
+            latitude = row.latitude,
+            longitude = row.longitude,
+            width = row.width?.toInt(),
+            height = row.height?.toInt(),
+            sizeBytes = row.size_bytes,
+            mimeType = row.mime_type,
+            userId = row.user_id,
+            addedAt = Instant.fromEpochMilliseconds(row.added_at)
+        )
+    }
+
     /**
      * Map database row to PhotoAttachment domain object.
      */
-    private fun mapToPhotoAttachment(row: com.po4yka.trailglass.db.Photo_attachment): PhotoAttachment {
+    private fun mapToPhotoAttachment(row: com.po4yka.trailglass.db.Photo_attachments): PhotoAttachment {
         return PhotoAttachment(
             id = row.id,
             photoId = row.photo_id,

@@ -318,7 +318,7 @@ class SyncManager(
         for (tripDto in remoteChanges.trips) {
             try {
                 val trip = tripDto.toDomain()
-                tripRepository.insertTrip(trip)
+                tripRepository.upsertTrip(trip)
 
                 // Update sync metadata
                 syncMetadataRepository.upsertMetadata(
@@ -401,11 +401,12 @@ class SyncManager(
         for (conflict in conflicts) {
             try {
                 // Check if suggested resolution is automatic
-                if (conflict.suggestedResolution == "MERGE" || conflict.suggestedResolution == "KEEP_REMOTE") {
+                if (conflict.suggestedResolution == com.po4yka.trailglass.data.remote.dto.ConflictResolution.MERGE ||
+                    conflict.suggestedResolution == com.po4yka.trailglass.data.remote.dto.ConflictResolution.KEEP_REMOTE) {
                     // Apply automatic resolution
                     val resolution = when (conflict.suggestedResolution) {
-                        "KEEP_REMOTE" -> ConflictResolutionChoice.KEEP_REMOTE
-                        "MERGE" -> ConflictResolutionChoice.MERGE
+                        com.po4yka.trailglass.data.remote.dto.ConflictResolution.KEEP_REMOTE -> ConflictResolutionChoice.KEEP_REMOTE
+                        com.po4yka.trailglass.data.remote.dto.ConflictResolution.MERGE -> ConflictResolutionChoice.MERGE
                         else -> ConflictResolutionChoice.KEEP_REMOTE
                     }
 
@@ -444,23 +445,23 @@ class SyncManager(
                 // Remote wins - data will be applied in applyRemoteChanges
                 // Just mark local as synced with remote version
                 val entityType = when (conflict.entityType) {
-                    "PLACE_VISIT" -> EntityType.PLACE_VISIT
-                    "TRIP" -> EntityType.TRIP
+                    com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
+                    com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
                     else -> return
                 }
 
                 syncMetadataRepository.markAsSynced(
                     entityId = conflict.entityId,
                     entityType = entityType,
-                    serverVersion = conflict.remoteVersion
+                    serverVersion = conflict.remoteVersion["version"]?.toLongOrNull() ?: 0L
                 )
             }
             ConflictResolutionChoice.KEEP_LOCAL -> {
                 // Local wins - force upload local version
                 // Mark for re-sync
                 val entityType = when (conflict.entityType) {
-                    "PLACE_VISIT" -> EntityType.PLACE_VISIT
-                    "TRIP" -> EntityType.TRIP
+                    EntityType.PLACE_VISIT.name -> EntityType.PLACE_VISIT
+                    EntityType.TRIP.name -> EntityType.TRIP
                     else -> return
                 }
 
@@ -474,7 +475,9 @@ class SyncManager(
             ConflictResolutionChoice.MERGE -> {
                 // Merge resolution - use last-write-wins strategy
                 // In a more sophisticated implementation, this would merge fields
-                if (conflict.remoteVersion > conflict.localVersion) {
+                val remoteVer = conflict.remoteVersion["version"]?.toLongOrNull() ?: 0L
+                val localVer = conflict.localVersion["version"]?.toLongOrNull() ?: 0L
+                if (remoteVer > localVer) {
                     resolveConflictAutomatically(conflict, ConflictResolutionChoice.KEEP_REMOTE)
                 } else {
                     resolveConflictAutomatically(conflict, ConflictResolutionChoice.KEEP_LOCAL)
@@ -558,7 +561,7 @@ class SyncManager(
         // Get entity name based on type
         val entityName = when (conflict.entityType) {
             EntityType.PLACE_VISIT -> {
-                placeVisitRepository.getVisitById(conflict.entityId)?.place?.name ?: conflict.entityId
+                placeVisitRepository.getVisitById(conflict.entityId)?.displayName ?: conflict.entityId
             }
             EntityType.TRIP -> {
                 tripRepository.getTripById(conflict.entityId)?.name ?: conflict.entityId
