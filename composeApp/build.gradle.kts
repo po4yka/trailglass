@@ -70,6 +70,9 @@ dependencies {
     // Background work
     implementation(libs.androidx.work.runtime)
 
+    // Input motion prediction for low-latency touch/stylus input
+    implementation(libs.androidx.input.motionprediction)
+
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.decompose)

@@ -105,6 +105,7 @@ Platform APIs (expect/actual pattern)
 - **Decompose 3.2.0**: Navigation with lifecycle and state preservation
 - **Ktor 3.3.2**: HTTP client for sync
 - **kotlin-logging 7.0.0**: Multiplatform structured logging
+- **AndroidX Input Motion Prediction 1.0.0**: Low-latency touch/stylus input for drawing (Android only)
 - **Kover**: Code coverage (75%+ enforced)
 
 ### Database Schema
@@ -194,6 +195,8 @@ UI observes state via `collectAsState()` (Compose) or Combine/SwiftUI patterns (
 - Controllers: `shared/src/commonMain/kotlin/com/po4yka/trailglass/feature/*/`
 - SQLDelight schema: `shared/src/commonMain/sqldelight/com/po4yka/trailglass/db/`
 - DI components: `shared/src/commonMain/kotlin/com/po4yka/trailglass/di/`
+- Android UI utilities: `composeApp/src/main/kotlin/com/po4yka/trailglass/ui/util/`
+- Android UI components: `composeApp/src/main/kotlin/com/po4yka/trailglass/ui/components/`
 
 ## Code Style
 
