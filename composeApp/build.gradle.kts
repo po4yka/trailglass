@@ -25,6 +25,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
@@ -53,6 +56,7 @@ dependencies {
 
     // Image loading
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 
     // Maps
     implementation(libs.maps.compose)

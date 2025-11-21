@@ -39,11 +39,11 @@ class AndroidPhotoMetadataExtractor(
     }
 
     private fun extractFromExif(exif: ExifInterface, photoId: String): PhotoMetadata {
-        // Extract location
-        val latLong = FloatArray(2)
-        val hasLocation = exif.getLatLong(latLong)
-        val latitude = if (hasLocation) latLong[0].toDouble() else null
-        val longitude = if (hasLocation) latLong[1].toDouble() else null
+        // Extract location using the non-deprecated latLong property
+        val latLongPair = exif.latLong
+        val latitude = latLongPair?.get(0)
+        val longitude = latLongPair?.get(1)
+        val hasLocation = latitude != null && longitude != null
         val altitude = exif.getAttributeDouble(ExifInterface.TAG_GPS_ALTITUDE, 0.0)
             .takeIf { hasLocation && it != 0.0 }
 

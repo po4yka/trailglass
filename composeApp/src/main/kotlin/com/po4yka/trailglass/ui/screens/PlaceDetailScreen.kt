@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Church
@@ -12,10 +12,10 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Label
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Park
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Place
@@ -62,7 +62,7 @@ fun PlaceDetailScreen(
                 title = { Text("Place Details") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -293,7 +293,7 @@ private fun PlaceDetailContent(
 
                     place.userLabel?.let { label ->
                         StatRow(
-                            icon = Icons.Default.Label,
+                            icon = Icons.AutoMirrored.Filled.Label,
                             label = "Custom Label",
                             value = label
                         )
@@ -306,7 +306,7 @@ private fun PlaceDetailContent(
                                 verticalAlignment = Alignment.Top
                             ) {
                                 Icon(
-                                    Icons.Default.Notes,
+                                    Icons.AutoMirrored.Filled.Notes,
                                     contentDescription = null,
                                     modifier = Modifier.size(20.dp),
                                     tint = MaterialTheme.colorScheme.primary

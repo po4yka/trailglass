@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.ui.navigation
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.DelicateDecomposeApi
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -84,14 +85,17 @@ class DefaultAuthRootComponent(
         childFactory = ::createChild
     )
 
+    @OptIn(DelicateDecomposeApi::class)
     override fun navigateToRegister() {
         navigation.push(AuthRootComponent.Config.Register)
     }
 
+    @OptIn(DelicateDecomposeApi::class)
     override fun navigateToForgotPassword() {
         navigation.push(AuthRootComponent.Config.ForgotPassword)
     }
 
+    @OptIn(DelicateDecomposeApi::class)
     override fun navigateBack() {
         navigation.pop()
     }

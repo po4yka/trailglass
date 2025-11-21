@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.po4yka.trailglass.data.remote.auth
 
 import android.content.Context
@@ -11,6 +13,7 @@ import me.tatarka.inject.annotations.Inject
 /**
  * Android implementation using EncryptedSharedPreferences.
  */
+@Suppress("DEPRECATION")
 @Inject
 actual class SecureTokenStorage(private val context: Context) {
 

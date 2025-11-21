@@ -32,7 +32,7 @@ fun CreateTripDialog(
     var tagInput by remember { mutableStateOf("") }
     var tags by remember { mutableStateOf(listOf<String>()) }
 
-    AlertDialog(
+    BasicAlertDialog(
         onDismissRequest = onDismiss,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -160,7 +160,7 @@ fun CreateTripDialog(
                     }
                 }
 
-                Divider()
+                HorizontalDivider()
 
                 // Action buttons
                 Row(

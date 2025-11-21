@@ -8,9 +8,9 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MergeType
-import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.material.icons.filled.NavigateNext
+import androidx.compose.material.icons.automirrored.filled.MergeType
+import androidx.compose.material.icons.automirrored.filled.NavigateBefore
+import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -133,7 +133,7 @@ private fun ConflictView(
     ) {
         // Progress indicator
         LinearProgressIndicator(
-            progress = (state.currentConflictIndex + 1).toFloat() / state.conflicts.size.toFloat(),
+            progress = { (state.currentConflictIndex + 1).toFloat() / state.conflicts.size.toFloat() },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -227,7 +227,7 @@ private fun ConflictView(
                 enabled = !state.isResolving,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Icon(Icons.Default.MergeType, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.MergeType, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
                 Text("Merge Both")
             }
@@ -244,7 +244,7 @@ private fun ConflictView(
                 modifier = Modifier.weight(1f)
             ) {
                 Text("Skip")
-                Icon(Icons.Default.NavigateNext, contentDescription = null)
+                Icon(Icons.AutoMirrored.Filled.NavigateNext, contentDescription = null)
             }
 
             if (state.currentConflictIndex > 0) {
@@ -253,7 +253,7 @@ private fun ConflictView(
                     enabled = !state.isResolving,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.NavigateBefore, contentDescription = null)
+                    Icon(Icons.AutoMirrored.Filled.NavigateBefore, contentDescription = null)
                     Text("Previous")
                 }
             }
@@ -283,7 +283,7 @@ private fun VersionCard(
                 )
             }
 
-            Divider()
+            HorizontalDivider()
 
             data.forEach { (key, value) ->
                 Row(modifier = Modifier.fillMaxWidth()) {

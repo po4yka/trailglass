@@ -258,7 +258,7 @@ private fun TrackingPreferencesCard(
             // Accuracy
             ListItem(
                 headlineContent = { Text("Tracking Accuracy") },
-                supportingContent = { Text(preferences.accuracy.name.lowercase().capitalize()) },
+                supportingContent = { Text(preferences.accuracy.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
                 leadingContent = { Icon(Icons.Default.MyLocation, contentDescription = null) },
                 modifier = Modifier.clickable { showAccuracyDialog = true }
             )
@@ -268,7 +268,7 @@ private fun TrackingPreferencesCard(
             // Update Interval
             ListItem(
                 headlineContent = { Text("Update Interval") },
-                supportingContent = { Text(preferences.updateInterval.name.lowercase().capitalize()) },
+                supportingContent = { Text(preferences.updateInterval.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
                 leadingContent = { Icon(Icons.Default.Update, contentDescription = null) },
                 modifier = Modifier.clickable { showIntervalDialog = true }
             )
@@ -335,7 +335,7 @@ private fun TrackingPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(accuracy.name.lowercase().capitalize())
+                            Text(accuracy.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
                         }
                     }
                 }
@@ -374,7 +374,7 @@ private fun TrackingPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(interval.name.lowercase().capitalize())
+                            Text(interval.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
                         }
                     }
                 }
@@ -489,7 +489,7 @@ private fun UnitPreferencesCard(
         Column(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 headlineContent = { Text("Distance Units") },
-                supportingContent = { Text(units.distanceUnit.name.lowercase().capitalize()) },
+                supportingContent = { Text(units.distanceUnit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
                 leadingContent = { Icon(Icons.Default.Straighten, contentDescription = null) },
                 modifier = Modifier.clickable { showDistanceDialog = true }
             )
@@ -498,7 +498,7 @@ private fun UnitPreferencesCard(
 
             ListItem(
                 headlineContent = { Text("Temperature Units") },
-                supportingContent = { Text(units.temperatureUnit.name.lowercase().capitalize()) },
+                supportingContent = { Text(units.temperatureUnit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
                 leadingContent = { Icon(Icons.Default.Thermostat, contentDescription = null) },
                 modifier = Modifier.clickable { showTempDialog = true }
             )
@@ -540,7 +540,7 @@ private fun UnitPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(unit.name.lowercase().capitalize())
+                            Text(unit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
                         }
                     }
                 }
@@ -579,7 +579,7 @@ private fun UnitPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(unit.name.lowercase().capitalize())
+                            Text(unit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
                         }
                     }
                 }
@@ -643,7 +643,7 @@ private fun AppearanceSettingsCard(
         Column(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 headlineContent = { Text("Theme") },
-                supportingContent = { Text(appearance.theme.name.lowercase().capitalize()) },
+                supportingContent = { Text(appearance.theme.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
                 leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
                 modifier = Modifier.clickable { showThemeDialog = true }
             )
@@ -708,7 +708,7 @@ private fun AppearanceSettingsCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(theme.name.lowercase().capitalize())
+                            Text(theme.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
                         }
                     }
                 }

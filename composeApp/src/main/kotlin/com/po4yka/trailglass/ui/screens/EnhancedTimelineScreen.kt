@@ -15,15 +15,15 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Church
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.DirectionsWalk
-import androidx.compose.material.icons.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Flight
-import androidx.compose.material.icons.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.NightsStay
@@ -37,7 +37,7 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.StickyNote2
+import androidx.compose.material.icons.automirrored.filled.StickyNote2
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material.icons.filled.Today
@@ -629,7 +629,7 @@ private fun EnhancedVisitCard(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Icon(
-                            Icons.Default.StickyNote2,
+                            Icons.AutoMirrored.Filled.StickyNote2,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
@@ -735,7 +735,7 @@ private fun EnhancedRouteCard(
             // Confidence indicator
             if (route.confidence < 0.7f) {
                 Icon(
-                    Icons.Default.HelpOutline,
+                    Icons.AutoMirrored.Filled.HelpOutline,
                     contentDescription = "Low confidence",
                     tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.5f),
                     modifier = Modifier.size(20.dp)
@@ -791,7 +791,7 @@ private fun DaySummaryCard(
                     value = "${(summary.totalDistanceMeters / 1000).toInt()} km"
                 )
                 SummaryStatItem(
-                    icon = Icons.Default.DirectionsWalk,
+                    icon = Icons.AutoMirrored.Filled.DirectionsWalk,
                     label = "Routes",
                     value = "${summary.totalRoutes}"
                 )
@@ -1008,13 +1008,13 @@ private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphi
 
 private fun getTransportIcon(transportType: TransportType) =
     when (transportType) {
-        TransportType.WALK -> Icons.Default.DirectionsWalk
-        TransportType.BIKE -> Icons.Default.DirectionsBike
+        TransportType.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
+        TransportType.BIKE -> Icons.AutoMirrored.Filled.DirectionsBike
         TransportType.CAR -> Icons.Default.DirectionsCar
         TransportType.TRAIN -> Icons.Default.Train
         TransportType.PLANE -> Icons.Default.Flight
         TransportType.BOAT -> Icons.Default.DirectionsBoat
-        TransportType.UNKNOWN -> Icons.Default.HelpOutline
+        TransportType.UNKNOWN -> Icons.AutoMirrored.Filled.HelpOutline
     }
 
 private fun formatDuration(duration: kotlin.time.Duration): String {
@@ -1036,7 +1036,7 @@ private fun EmptyTimelineView(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            imageVector = Icons.Default.EventNote,
+            imageVector = Icons.AutoMirrored.Filled.EventNote,
             contentDescription = null,
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant

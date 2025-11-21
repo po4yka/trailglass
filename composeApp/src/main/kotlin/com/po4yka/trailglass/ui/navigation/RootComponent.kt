@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.ui.navigation
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.DelicateDecomposeApi
 import com.arkivanov.decompose.router.stack.ChildStack
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
@@ -134,6 +135,7 @@ class DefaultRootComponent(
         childFactory = ::createChild
     )
 
+    @OptIn(DelicateDecomposeApi::class)
     override fun navigateToScreen(config: RootComponent.Config) {
         when (config) {
             // Main screens - replace the stack

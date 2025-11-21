@@ -106,12 +106,12 @@ class AndroidPhotoPicker(
 
     /**
      * Extract metadata from a content URI using MediaStore.
+     * Note: Location data should be extracted from EXIF using AndroidPhotoMetadataExtractor
+     * as MediaStore location fields are deprecated since API 29.
      */
     private fun extractMetadataFromUri(uri: Uri): PhotoMetadata? {
         val projection = arrayOf(
             MediaStore.Images.Media.DATE_TAKEN,
-            MediaStore.Images.Media.LATITUDE,
-            MediaStore.Images.Media.LONGITUDE,
             MediaStore.Images.Media.WIDTH,
             MediaStore.Images.Media.HEIGHT,
             MediaStore.Images.Media.SIZE,
@@ -121,22 +121,12 @@ class AndroidPhotoPicker(
         contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
             if (cursor.moveToFirst()) {
                 val dateTakenIndex = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN)
-                val latIndex = cursor.getColumnIndex(MediaStore.Images.Media.LATITUDE)
-                val lonIndex = cursor.getColumnIndex(MediaStore.Images.Media.LONGITUDE)
                 val widthIndex = cursor.getColumnIndex(MediaStore.Images.Media.WIDTH)
                 val heightIndex = cursor.getColumnIndex(MediaStore.Images.Media.HEIGHT)
                 val sizeIndex = cursor.getColumnIndex(MediaStore.Images.Media.SIZE)
                 val mimeTypeIndex = cursor.getColumnIndex(MediaStore.Images.Media.MIME_TYPE)
 
                 val dateTaken = if (dateTakenIndex >= 0) cursor.getLong(dateTakenIndex) else null
-                val latitude = if (latIndex >= 0) {
-                    val lat = cursor.getDouble(latIndex)
-                    if (lat != 0.0) lat else null
-                } else null
-                val longitude = if (lonIndex >= 0) {
-                    val lon = cursor.getDouble(lonIndex)
-                    if (lon != 0.0) lon else null
-                } else null
                 val width = if (widthIndex >= 0) cursor.getInt(widthIndex) else null
                 val height = if (heightIndex >= 0) cursor.getInt(heightIndex) else null
                 val size = if (sizeIndex >= 0) cursor.getLong(sizeIndex) else null
@@ -151,8 +141,8 @@ class AndroidPhotoPicker(
                 return PhotoMetadata(
                     uri = uri.toString(),
                     timestamp = timestamp,
-                    latitude = latitude,
-                    longitude = longitude,
+                    latitude = null,
+                    longitude = null,
                     width = width,
                     height = height,
                     sizeBytes = size,

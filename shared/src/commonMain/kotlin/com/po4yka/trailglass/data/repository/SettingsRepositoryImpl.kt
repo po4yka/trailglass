@@ -44,9 +44,9 @@ class SettingsRepositoryImpl(
         return json.encodeToString(settings)
     }
 
-    override suspend fun importSettings(jsonString: String): Result<Unit> {
+    override suspend fun importSettings(json: String): Result<Unit> {
         return try {
-            val settings = json.decodeFromString<AppSettings>(jsonString)
+            val settings = this.json.decodeFromString<AppSettings>(json)
             storage.saveSettings(settings)
             Result.Success(Unit)
         } catch (e: Exception) {

@@ -3,10 +3,10 @@ package com.po4yka.trailglass.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Commute
-import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Photo
@@ -210,8 +210,8 @@ private fun TransportChip(
         leadingIcon = {
             Icon(
                 imageVector = when (transportType.uppercase()) {
-                    "WALK" -> Icons.Default.DirectionsWalk
-                    "BIKE" -> Icons.Default.DirectionsBike
+                    "WALK" -> Icons.AutoMirrored.Filled.DirectionsWalk
+                    "BIKE" -> Icons.AutoMirrored.Filled.DirectionsBike
                     "CAR" -> Icons.Default.DirectionsCar
                     "TRAIN" -> Icons.Default.Train
                     "PLANE" -> Icons.Default.Flight

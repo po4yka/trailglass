@@ -6,10 +6,10 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Commute
-import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Flight
@@ -157,8 +157,8 @@ private fun TransportBreakdownItem(
  */
 private fun getTransportIcon(type: TransportType): ImageVector {
     return when (type) {
-        TransportType.WALK -> Icons.Default.DirectionsWalk
-        TransportType.BIKE -> Icons.Default.DirectionsBike
+        TransportType.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
+        TransportType.BIKE -> Icons.AutoMirrored.Filled.DirectionsBike
         TransportType.CAR -> Icons.Default.DirectionsCar
         TransportType.TRAIN -> Icons.Default.Train
         TransportType.PLANE -> Icons.Default.Flight

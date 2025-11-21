@@ -97,9 +97,9 @@ fun MainScaffold(
     Scaffold(
         modifier = modifier,
         topBar = {
-            if (showBottomNav && currentScreen != null) {
+            if (showBottomNav) {
                 TopAppBar(
-                    title = { Text(currentScreen.title) },
+                    title = { Text(currentScreen!!.title) },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -108,7 +108,7 @@ fun MainScaffold(
             }
         },
         bottomBar = {
-            if (showBottomNav && currentScreen != null) {
+            if (showBottomNav) {
                 NavigationBar {
                     val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Photos, Screen.Trips, Screen.Places, Screen.Settings)
 

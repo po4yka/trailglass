@@ -260,6 +260,7 @@ private fun RenderRoute(
     )
 }
 
+@OptIn(MapsComposeExperimentalApi::class)
 @Composable
 private fun RenderHeatmap(heatmapData: HeatmapData) {
     // Convert heatmap points to WeightedLatLng

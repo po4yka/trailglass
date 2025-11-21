@@ -48,8 +48,12 @@ class LocationTrackingService : Service() {
     }
 
     private fun startTracking(intent: Intent) {
-        val mode = intent.getSerializableExtra(EXTRA_TRACKING_MODE) as? TrackingMode
-            ?: TrackingMode.ACTIVE
+        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra(EXTRA_TRACKING_MODE, TrackingMode::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra(EXTRA_TRACKING_MODE) as? TrackingMode
+        } ?: TrackingMode.ACTIVE
 
         // Start foreground service with notification
         val notification = createNotification()

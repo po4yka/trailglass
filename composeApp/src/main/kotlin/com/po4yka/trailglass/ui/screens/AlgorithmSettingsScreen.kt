@@ -4,9 +4,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.GraphicEq
-import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -51,7 +51,7 @@ fun AlgorithmSettingsScreen(
                 title = { Text("Algorithm Settings") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -106,7 +106,7 @@ fun AlgorithmSettingsScreen(
                 AlgorithmCard(
                     icon = Icons.Default.Straighten,
                     title = "Distance Algorithm",
-                    currentValue = settings.algorithmPreferences.distanceAlgorithm.name.lowercase().capitalize(),
+                    currentValue = settings.algorithmPreferences.distanceAlgorithm.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
                     description = getDistanceAlgorithmDescription(settings.algorithmPreferences.distanceAlgorithm),
                     onClick = { showDistanceDialog = true }
                 )
@@ -123,9 +123,9 @@ fun AlgorithmSettingsScreen(
 
             item {
                 AlgorithmCard(
-                    icon = Icons.Default.ShowChart,
+                    icon = Icons.AutoMirrored.Filled.ShowChart,
                     title = "Bearing Algorithm",
-                    currentValue = settings.algorithmPreferences.bearingAlgorithm.name.replace('_', ' ').lowercase().capitalize(),
+                    currentValue = settings.algorithmPreferences.bearingAlgorithm.name.replace('_', ' ').lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
                     description = getBearingAlgorithmDescription(settings.algorithmPreferences.bearingAlgorithm),
                     onClick = { showBearingDialog = true }
                 )
@@ -144,7 +144,7 @@ fun AlgorithmSettingsScreen(
                 AlgorithmCard(
                     icon = Icons.Default.GraphicEq,
                     title = "Interpolation Algorithm",
-                    currentValue = settings.algorithmPreferences.interpolationAlgorithm.name.lowercase().capitalize(),
+                    currentValue = settings.algorithmPreferences.interpolationAlgorithm.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() },
                     description = getInterpolationAlgorithmDescription(settings.algorithmPreferences.interpolationAlgorithm),
                     onClick = { showInterpolationDialog = true }
                 )
@@ -158,7 +158,7 @@ fun AlgorithmSettingsScreen(
             title = "Distance Algorithm",
             options = DistanceAlgorithmType.values().toList(),
             selectedOption = settings.algorithmPreferences.distanceAlgorithm,
-            getOptionLabel = { it.name.lowercase().capitalize() },
+            getOptionLabel = { it.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } },
             getOptionDescription = { getDistanceAlgorithmDescription(it) },
             onDismiss = { showDistanceDialog = false },
             onSelect = { selected ->
@@ -176,7 +176,7 @@ fun AlgorithmSettingsScreen(
             title = "Bearing Algorithm",
             options = BearingAlgorithmType.values().toList(),
             selectedOption = settings.algorithmPreferences.bearingAlgorithm,
-            getOptionLabel = { it.name.replace('_', ' ').lowercase().capitalize() },
+            getOptionLabel = { it.name.replace('_', ' ').lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } },
             getOptionDescription = { getBearingAlgorithmDescription(it) },
             onDismiss = { showBearingDialog = false },
             onSelect = { selected ->
@@ -194,7 +194,7 @@ fun AlgorithmSettingsScreen(
             title = "Interpolation Algorithm",
             options = InterpolationAlgorithmType.values().toList(),
             selectedOption = settings.algorithmPreferences.interpolationAlgorithm,
-            getOptionLabel = { it.name.lowercase().capitalize() },
+            getOptionLabel = { it.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() } },
             getOptionDescription = { getInterpolationAlgorithmDescription(it) },
             onDismiss = { showInterpolationDialog = false },
             onSelect = { selected ->
@@ -362,9 +362,4 @@ private fun getInterpolationAlgorithmDescription(algorithm: InterpolationAlgorit
         InterpolationAlgorithmType.CUBIC ->
             "Smooth curved path with easing. Aesthetically pleasing for animated transitions."
     }
-}
-
-// Extension function to capitalize first letter (simple implementation)
-private fun String.capitalize(): String {
-    return this.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
 }
