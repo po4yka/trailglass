@@ -1,7 +1,13 @@
 package com.po4yka.trailglass.feature.settings
 
 import com.po4yka.trailglass.data.security.SyncDataEncryption
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.AccountSettings
+import com.po4yka.trailglass.domain.model.AlgorithmPreferences
+import com.po4yka.trailglass.domain.model.AppearanceSettings
+import com.po4yka.trailglass.domain.model.AppSettings
+import com.po4yka.trailglass.domain.model.PrivacySettings
+import com.po4yka.trailglass.domain.model.TrackingPreferences
+import com.po4yka.trailglass.domain.model.UnitPreferences
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
@@ -105,6 +111,14 @@ class SettingsController(
         controllerScope.launch {
             val currentSettings = _state.value.settings ?: return@launch
             val updated = currentSettings.copy(accountSettings = account)
+            updateSettingsUseCase.execute(updated)
+        }
+    }
+
+    fun updateAlgorithmPreferences(preferences: AlgorithmPreferences) {
+        controllerScope.launch {
+            val currentSettings = _state.value.settings ?: return@launch
+            val updated = currentSettings.copy(algorithmPreferences = preferences)
             updateSettingsUseCase.execute(updated)
         }
     }

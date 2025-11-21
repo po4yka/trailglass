@@ -4,6 +4,7 @@ import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
 import com.po4yka.trailglass.data.repository.*
 import com.po4yka.trailglass.data.repository.impl.*
+import com.po4yka.trailglass.domain.service.AlgorithmProvider
 import me.tatarka.inject.annotations.Provides
 
 /**
@@ -79,4 +80,13 @@ interface DataModule {
     @AppScope
     @Provides
     fun provideSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository = impl
+
+    /**
+     * Provides AlgorithmProvider for dynamic algorithm selection.
+     */
+    @AppScope
+    @Provides
+    fun provideAlgorithmProvider(settingsRepository: SettingsRepository): AlgorithmProvider {
+        return AlgorithmProvider(settingsRepository)
+    }
 }

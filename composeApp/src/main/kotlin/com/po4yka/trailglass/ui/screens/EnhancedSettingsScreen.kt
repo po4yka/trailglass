@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Map
@@ -42,6 +43,7 @@ fun EnhancedSettingsScreen(
     controller: SettingsController,
     onNavigateToAccount: () -> Unit = {},
     onNavigateToDataManagement: () -> Unit = {},
+    onNavigateToAlgorithmSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
@@ -121,6 +123,21 @@ fun EnhancedSettingsScreen(
             AppearanceSettingsCard(
                 appearance = settings.appearanceSettings,
                 onUpdate = { controller.updateAppearanceSettings(it) }
+            )
+        }
+
+        // Algorithm section
+        item {
+            Text(
+                text = "Advanced",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        item {
+            AlgorithmSettingsNavigationCard(
+                onClick = onNavigateToAlgorithmSettings
             )
         }
 
@@ -771,6 +788,47 @@ private fun DataManagementCard(
                 supportingContent = { Text("Delete all trips, locations, photos, and settings") },
                 leadingContent = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                 modifier = Modifier.clickable(onClick = onClearData)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AlgorithmSettingsNavigationCard(
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.GraphicEq,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Algorithm Settings",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = "Configure distance, bearing, and interpolation algorithms",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Icon(
+                imageVector = Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

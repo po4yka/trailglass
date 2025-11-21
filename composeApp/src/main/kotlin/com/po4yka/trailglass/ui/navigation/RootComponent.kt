@@ -89,6 +89,9 @@ interface RootComponent {
 
         @Serializable
         data object DeviceManagement : Config
+
+        @Serializable
+        data object AlgorithmSettings : Config
     }
 
     /**
@@ -109,6 +112,7 @@ interface RootComponent {
         data class PlaceVisitDetail(val component: PlaceVisitDetailComponent) : Child()
         data class PlaceDetail(val component: PlaceDetailComponent) : Child()
         data class DeviceManagement(val component: DeviceManagementComponent) : Child()
+        data class AlgorithmSettings(val component: AlgorithmSettingsComponent) : Child()
     }
 }
 
@@ -148,7 +152,8 @@ class DefaultRootComponent(
             is RootComponent.Config.PhotoDetail,
             is RootComponent.Config.PlaceVisitDetail,
             is RootComponent.Config.PlaceDetail,
-            is RootComponent.Config.DeviceManagement -> navigation.push(config)
+            is RootComponent.Config.DeviceManagement,
+            is RootComponent.Config.AlgorithmSettings -> navigation.push(config)
         }
     }
 
@@ -289,6 +294,14 @@ class DefaultRootComponent(
             component = DefaultDeviceManagementComponent(
                 componentContext = componentContext,
                 deviceManagementController = appComponent.deviceManagementController,
+                onBack = { navigation.pop() }
+            )
+        )
+
+        is RootComponent.Config.AlgorithmSettings -> RootComponent.Child.AlgorithmSettings(
+            component = DefaultAlgorithmSettingsComponent(
+                componentContext = componentContext,
+                settingsController = appComponent.settingsController,
                 onBack = { navigation.pop() }
             )
         )

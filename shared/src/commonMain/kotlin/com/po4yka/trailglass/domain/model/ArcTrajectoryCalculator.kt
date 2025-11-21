@@ -1,5 +1,7 @@
 package com.po4yka.trailglass.domain.model
 
+import com.po4yka.trailglass.domain.algorithm.InterpolationAlgorithm
+import com.po4yka.trailglass.domain.algorithm.SphericalInterpolation
 import kotlin.math.*
 
 /**
@@ -15,18 +17,20 @@ object ArcTrajectoryCalculator {
      *
      * Creates a smooth arc that:
      * 1. Zooms out to see both start and end points
-     * 2. Follows a curved path (great circle)
+     * 2. Follows a curved path (configurable interpolation)
      * 3. Zooms back in to the target position
      *
      * @param start Starting camera position
      * @param end Ending camera position
      * @param steps Number of intermediate steps (default: 20 for smooth animation)
+     * @param interpolationAlgorithm Algorithm to use for coordinate interpolation (default: SLERP)
      * @return List of camera positions forming an arc trajectory
      */
     fun calculateArcTrajectory(
         start: CameraPosition,
         end: CameraPosition,
-        steps: Int = 20
+        steps: Int = 20,
+        interpolationAlgorithm: InterpolationAlgorithm = SphericalInterpolation()
     ): List<CameraPosition> {
         if (steps < 2) return listOf(start, end)
 
@@ -42,8 +46,8 @@ object ArcTrajectoryCalculator {
         for (i in 0..steps) {
             val fraction = i.toDouble() / steps
 
-            // Calculate interpolated coordinate along great circle
-            val coordinate = interpolateCoordinate(start.target, end.target, fraction)
+            // Calculate interpolated coordinate using configured algorithm
+            val coordinate = interpolationAlgorithm.interpolate(start.target, end.target, fraction)
 
             // Calculate zoom along parabolic curve (zoom out in middle)
             val zoom = calculateParabolicZoom(
@@ -113,57 +117,6 @@ object ArcTrajectoryCalculator {
             distance > 0.1 -> 1.5f  // Neighborhood
             else -> 1f              // Street level
         }
-    }
-
-    /**
-     * Interpolate coordinate along great circle path.
-     *
-     * Uses spherical linear interpolation (slerp) for smooth great circle path.
-     *
-     * @param start Starting coordinate
-     * @param end Ending coordinate
-     * @param fraction Progress from 0.0 to 1.0
-     * @return Interpolated coordinate
-     */
-    private fun interpolateCoordinate(
-        start: Coordinate,
-        end: Coordinate,
-        fraction: Double
-    ): Coordinate {
-        val lat1 = start.latitude * PI / 180.0
-        val lon1 = start.longitude * PI / 180.0
-        val lat2 = end.latitude * PI / 180.0
-        val lon2 = end.longitude * PI / 180.0
-
-        // Calculate great circle distance
-        val d = acos(
-            sin(lat1) * sin(lat2) +
-            cos(lat1) * cos(lat2) * cos(lon2 - lon1)
-        )
-
-        if (d < 0.001) {
-            // Points are very close, use linear interpolation
-            return Coordinate(
-                latitude = start.latitude + (end.latitude - start.latitude) * fraction,
-                longitude = start.longitude + (end.longitude - start.longitude) * fraction
-            )
-        }
-
-        // Spherical interpolation
-        val a = sin((1 - fraction) * d) / sin(d)
-        val b = sin(fraction * d) / sin(d)
-
-        val x = a * cos(lat1) * cos(lon1) + b * cos(lat2) * cos(lon2)
-        val y = a * cos(lat1) * sin(lon1) + b * cos(lat2) * sin(lon2)
-        val z = a * sin(lat1) + b * sin(lat2)
-
-        val latResult = atan2(z, sqrt(x * x + y * y))
-        val lonResult = atan2(y, x)
-
-        return Coordinate(
-            latitude = latResult * 180.0 / PI,
-            longitude = lonResult * 180.0 / PI
-        )
     }
 
     /**

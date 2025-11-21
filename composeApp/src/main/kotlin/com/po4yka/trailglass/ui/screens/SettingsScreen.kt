@@ -25,6 +25,7 @@ import com.po4yka.trailglass.ui.permissions.rememberLocationPermissionState
 fun SettingsScreen(
     trackingController: LocationTrackingController,
     onNavigateToDeviceManagement: () -> Unit = {},
+    onNavigateToAlgorithmSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by trackingController.uiState.collectAsState()
@@ -102,6 +103,52 @@ fun SettingsScreen(
                     permissionState.requestBackgroundPermission()
                 }
             )
+        }
+
+        // Advanced section
+        item {
+            Text(
+                text = "Advanced",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+        }
+
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onNavigateToAlgorithmSettings
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Algorithm Settings",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = "Configure distance, bearing, and interpolation",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         }
 
         // Account section

@@ -84,7 +84,8 @@ fun MainScaffold(
         is RootComponent.Child.PhotoDetail,
         is RootComponent.Child.PlaceVisitDetail,
         is RootComponent.Child.PlaceDetail,
-        is RootComponent.Child.DeviceManagement -> null // No bottom nav for detail screens
+        is RootComponent.Child.DeviceManagement,
+        is RootComponent.Child.AlgorithmSettings -> null // No bottom nav for detail screens
     }
 
     // Show bottom nav and top bar only for main screens
@@ -219,6 +220,9 @@ fun MainScaffold(
                             onNavigateToDeviceManagement = {
                                 rootComponent.navigateToScreen(RootComponent.Config.DeviceManagement)
                             },
+                            onNavigateToAlgorithmSettings = {
+                                rootComponent.navigateToScreen(RootComponent.Config.AlgorithmSettings)
+                            },
                             modifier = Modifier
                         )
                     }
@@ -291,6 +295,14 @@ fun MainScaffold(
                     is RootComponent.Child.DeviceManagement -> {
                         DeviceManagementScreen(
                             controller = instance.component.deviceManagementController,
+                            onBack = instance.component.onBack,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.AlgorithmSettings -> {
+                        AlgorithmSettingsScreen(
+                            controller = instance.component.settingsController,
                             onBack = instance.component.onBack,
                             modifier = Modifier
                         )

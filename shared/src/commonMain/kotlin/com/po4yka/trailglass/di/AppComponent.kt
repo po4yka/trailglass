@@ -62,6 +62,9 @@ abstract class AppComponent(
     abstract val photoRepository: PhotoRepository
     abstract val geocodingCacheRepository: GeocodingCacheRepository
 
+    // Services (from DataModule)
+    abstract val algorithmProvider: com.po4yka.trailglass.domain.service.AlgorithmProvider
+
     // Location processing (from LocationModule)
     abstract val locationProcessor: LocationProcessor
     abstract val locationTracker: com.po4yka.trailglass.location.tracking.LocationTracker
