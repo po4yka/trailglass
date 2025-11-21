@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.sqldelight)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.moko.resources)
     id("org.jetbrains.kotlinx.kover") version "0.9.3"
 }
 
@@ -47,6 +48,15 @@ kotlin {
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.ktor.client.logging)
+
+            // Compass - Location toolkit
+            implementation(libs.compass.core)
+            implementation(libs.compass.geocoder)
+            implementation(libs.compass.geolocation)
+
+            // Moko Resources - Multiplatform resource management
+            api(libs.moko.resources)
+            api(libs.moko.resources.compose)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.android)
@@ -113,6 +123,12 @@ sqldelight {
             srcDirs.setFrom("src/commonMain/sqldelight")
         }
     }
+}
+
+// Moko Resources configuration
+multiplatformResources {
+    resourcesPackage.set("com.po4yka.trailglass.resources")
+    resourcesClassName.set("SharedRes")
 }
 
 // KSP configuration for kotlin-inject

@@ -105,6 +105,8 @@ Platform APIs (expect/actual pattern)
 - **Decompose 3.2.0**: Navigation with lifecycle and state preservation
 - **Ktor 3.3.2**: HTTP client for sync
 - **kotlin-logging 7.0.0**: Multiplatform structured logging
+- **Compass 2.4.1**: Location toolkit for geocoding and geolocation (KMP)
+- **Moko-Resources 0.25.1**: Multiplatform resource management (KMP)
 - **AndroidX Input Motion Prediction 1.0.0**: Low-latency touch/stylus input for drawing (Android only)
 - **Kover**: Code coverage (75%+ enforced)
 
@@ -188,6 +190,8 @@ UI observes state via `collectAsState()` (Compose) or Combine/SwiftUI patterns (
 - Error Handling: `docs/ERROR_HANDLING.md`
 - Location Tracking: `docs/LOCATION_TRACKING.md`
 - DI: `docs/dependency-injection.md`
+- Motion Prediction: `docs/MOTION_PREDICTION.md`
+- Compass & Moko-Resources: `docs/COMPASS_MOKO_INTEGRATION.md`
 
 ### Code
 - Domain models: `shared/src/commonMain/kotlin/com/po4yka/trailglass/domain/model/`

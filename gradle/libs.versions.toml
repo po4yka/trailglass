@@ -39,6 +39,9 @@ security-crypto = "1.1.0"
 androidx-compose-bom = "2025.01.00"
 androidx-exifinterface = "1.4.1"
 androidx-input-motionprediction = "1.0.0"
+compass = "2.4.1"
+moko-resources = "0.25.1"
+moko-resources-generator = "0.25.2"
 gradle-versions = "0.53.0"
 
 [libraries]
@@ -102,6 +105,13 @@ androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref
 androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "security-crypto" }
 androidx-exifinterface = { module = "androidx.exifinterface:exifinterface", version.ref = "androidx-exifinterface" }
 androidx-input-motionprediction = { module = "androidx.input:input-motionprediction", version.ref = "androidx-input-motionprediction" }
+compass-core = { module = "dev.jordond.compass:geocoder", version.ref = "compass" }
+compass-geocoder = { module = "dev.jordond.compass:geocoder-mobile", version.ref = "compass" }
+compass-geolocation = { module = "dev.jordond.compass:geolocation", version.ref = "compass" }
+compass-autocomplete = { module = "dev.jordond.compass:autocomplete", version.ref = "compass" }
+moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko-resources" }
+moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko-resources" }
+moko-resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko-resources-generator" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
 
 [plugins]
@@ -115,4 +125,5 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+moko-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "moko-resources-generator" }
 gradle-versions = { id = "com.github.ben-manes.versions", version.ref = "gradle-versions" }
