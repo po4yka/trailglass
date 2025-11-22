@@ -22,8 +22,8 @@ object MotionConfig {
      * Use for: Most UI transitions, state changes, and general animations.
      * Characteristics: Balanced damping, medium stiffness, smooth feel.
      */
-    val standardSpring =
-        spring<Float>(
+    inline fun <reified T> standardSpring() =
+        spring<T>(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
         )
@@ -34,8 +34,8 @@ object MotionConfig {
      * Use for: Hero transitions, important state changes, attention-grabbing animations.
      * Characteristics: Lower damping for more bounce, creates playful, expressive feel.
      */
-    val expressiveSpring =
-        spring<Float>(
+    inline fun <reified T> expressiveSpring() =
+        spring<T>(
             dampingRatio = Spring.DampingRatioLowBouncy,
             stiffness = Spring.StiffnessMediumLow
         )
@@ -46,8 +46,8 @@ object MotionConfig {
      * Use for: User input feedback, quick toggle animations, immediate responses.
      * Characteristics: High stiffness, quick response, minimal overshoot.
      */
-    val quickSpring =
-        spring<Float>(
+    inline fun <reified T> quickSpring() =
+        spring<T>(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessHigh
         )
@@ -58,8 +58,8 @@ object MotionConfig {
      * Use for: Large layout changes, screen transitions, modal presentations.
      * Characteristics: Low stiffness, slower motion, emphasizes the transition.
      */
-    val slowSpring =
-        spring<Float>(
+    inline fun <reified T> slowSpring() =
+        spring<T>(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessLow
         )
@@ -70,8 +70,8 @@ object MotionConfig {
      * Use for: Fade animations, size changes, professional/formal contexts.
      * Characteristics: No bounce (high damping), smooth easing-like motion.
      */
-    val smoothSpring =
-        spring<Float>(
+    inline fun <reified T> smoothSpring() =
+        spring<T>(
             dampingRatio = Spring.DampingRatioNoBouncy,
             stiffness = Spring.StiffnessMedium
         )
@@ -82,8 +82,8 @@ object MotionConfig {
      * Use for: Celebration animations, success states, gamification elements.
      * Characteristics: Very low damping, prominent bounce, playful feel.
      */
-    val bouncySpring =
-        spring<Float>(
+    inline fun <reified T> bouncySpring() =
+        spring<T>(
             dampingRatio = 0.5f, // Custom value for high bounce
             stiffness = Spring.StiffnessMedium
         )

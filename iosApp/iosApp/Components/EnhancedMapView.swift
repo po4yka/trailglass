@@ -126,6 +126,11 @@ struct EnhancedMapView: View {
         if viewModel.heatmapEnabled, let heatmapData = viewModel.heatmapData {
             // Custom heatmap overlay would go here
             // This would require a custom MapKit overlay renderer
+            // Heatmap gradient using Silent Waters palette:
+            // Low intensity: lightCyan (E0FBFC)
+            // Low-medium: lightBlue (C2DFE3)
+            // Medium: coastalPath (7A9CAF)
+            // High intensity: blueSlate (5C6B73)
             EmptyView()
         }
     }
@@ -298,13 +303,19 @@ struct EnhancedMarkerView: View {
     let marker: EnhancedMapMarker
     let isSelected: Bool
 
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
                 Circle()
                     .fill(markerColor)
                     .frame(width: isSelected ? 44 : 36, height: isSelected ? 44 : 36)
-                    .shadow(radius: isSelected ? 4 : 2)
+                    .shadow(
+                        color: markerColor.opacity(0.5),
+                        radius: isSelected ? 4 : 2
+                    )
+                    .glassEffect(variant: .ultraThin)
 
                 Image(systemName: markerIcon)
                     .foregroundColor(.white)
@@ -317,23 +328,35 @@ struct EnhancedMarkerView: View {
                 .font(.system(size: 12))
                 .offset(y: -8)
         }
-        .animation(.spring(response: 0.3), value: isSelected)
+        .animation(MotionConfig.standardSpring, value: isSelected)
     }
 
     private var markerIcon: String {
-        let iconInfo = MarkerIconProvider.shared.getIcon(
-            category: marker.category,
-            isFavorite: marker.isFavorite
-        )
-        return iconInfo.iconName
+        switch marker.category {
+        case .home: return "house.fill"
+        case .work: return "briefcase.fill"
+        case .food: return "fork.knife"
+        case .transport: return "car.fill"
+        case .accommodation: return "bed.double.fill"
+        case .entertainment: return "theatermasks.fill"
+        case .shopping: return "cart.fill"
+        case .other: return "mappin.circle.fill"
+        default: return "mappin.circle.fill"
+        }
     }
 
     private var markerColor: Color {
-        let iconInfo = MarkerIconProvider.shared.getIcon(
-            category: marker.category,
-            isFavorite: marker.isFavorite
-        )
-        return Color(uiColor: UIColor(rgb: Int(iconInfo.color)))
+        switch marker.category {
+        case .home: return .coolSteel
+        case .work: return .blueSlate
+        case .food: return .seaGlass
+        case .transport: return .coastalPath
+        case .accommodation: return .lightBlue
+        case .entertainment: return .mistyLavender
+        case .shopping: return .weatheredBrass
+        case .other: return .coolSteel
+        default: return .coolSteel
+        }
     }
 }
 
@@ -342,23 +365,41 @@ struct ClusterMarkerView: View {
     let cluster: MarkerCluster
     let isSelected: Bool
 
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         ZStack {
             Circle()
-                .fill(clusterColor)
+                .fill(
+                    LinearGradient(
+                        colors: clusterColors,
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
                 .frame(width: isSelected ? 56 : 48, height: isSelected ? 56 : 48)
-                .shadow(radius: isSelected ? 4 : 2)
+                .shadow(
+                    color: .black.opacity(DarkModeConfig.shadowOpacity(for: colorScheme)),
+                    radius: isSelected ? 4 : 2
+                )
+                .glassEffect(variant: .regular)
 
             Text("\(cluster.count)")
                 .font(.system(size: isSelected ? 20 : 16, weight: .bold))
                 .foregroundColor(.white)
         }
-        .animation(.spring(response: 0.3), value: isSelected)
+        .animation(MotionConfig.standardSpring, value: isSelected)
     }
 
-    private var clusterColor: Color {
-        let colorInt = MarkerIconProvider.shared.getClusterColor(count: Int32(cluster.count))
-        return Color(uiColor: UIColor(rgb: Int(colorInt)))
+    private var clusterColors: [Color] {
+        switch cluster.count {
+        case 2...10:
+            return [Color.lightBlue, Color.coolSteel]
+        case 11...50:
+            return [Color.coolSteel, Color.blueSlate]
+        default:
+            return [Color.blueSlate, Color.jetBlack]
+        }
     }
 }
 

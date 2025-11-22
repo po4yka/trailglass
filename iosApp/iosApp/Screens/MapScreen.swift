@@ -6,13 +6,15 @@ import shared
 struct MapScreen: View {
     @StateObject private var viewModel: MapViewModel
     @State private var showLocationPermissionDialog = false
+    @State private var scrollOffset: CGFloat = 0
 
     init(mapController: MapController) {
         _viewModel = StateObject(wrappedValue: MapViewModel(controller: mapController))
     }
 
     var body: some View {
-        NavigationView {
+        ZStack(alignment: .top) {
+            // Map content
             ZStack {
                 // Main map view with routes and markers
                 EnhancedMapView(viewModel: viewModel)
@@ -46,40 +48,45 @@ struct MapScreen: View {
                     }
                 }
             }
-            .navigationTitle("Map")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(action: { viewModel.centerOnUserLocation() }) {
-                            Label("Center on Location", systemImage: "location.fill")
-                        }
+            .ignoresSafeArea()
 
-                        Button(action: { viewModel.fitAllMarkers() }) {
-                            Label("Fit All Markers", systemImage: "rectangle.expand.vertical")
-                        }
-
-                        Divider()
-
-                        Button(action: { viewModel.refreshData() }) {
-                            Label("Refresh", systemImage: "arrow.clockwise")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
-            }
-            .sheet(isPresented: $showLocationPermissionDialog) {
-                PermissionDialogs.locationPermissionSheet(
-                    onRequestPermission: {
-                        viewModel.requestLocationPermission()
-                        showLocationPermissionDialog = false
+            // Flexible navigation bar
+            LargeFlexibleNavigationBar(
+                title: "Map",
+                scrollOffset: scrollOffset,
+                actions: [
+                    NavigationAction(icon: "location.fill") {
+                        viewModel.centerOnUserLocation()
                     },
-                    onCancel: {
-                        showLocationPermissionDialog = false
+                    NavigationAction(icon: "rectangle.expand.vertical") {
+                        viewModel.fitAllMarkers()
+                    },
+                    NavigationAction(icon: "arrow.clockwise") {
+                        viewModel.refreshData()
                     }
-                )
-            }
+                ],
+                subtitle: {
+                    Text("\(viewModel.markers.count) places • \(viewModel.routes.count) routes")
+                },
+                backgroundContent: {
+                    LinearGradient(
+                        colors: [Color.lightCyan, Color.coastalPath],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
+            )
+        }
+        .sheet(isPresented: $showLocationPermissionDialog) {
+            PermissionDialogs.locationPermissionSheet(
+                onRequestPermission: {
+                    viewModel.requestLocationPermission()
+                    showLocationPermissionDialog = false
+                },
+                onCancel: {
+                    showLocationPermissionDialog = false
+                }
+            )
         }
         .onAppear {
             viewModel.refreshData()
@@ -111,7 +118,7 @@ struct EnhancedMapView: UIViewRepresentable {
         updateAnnotations(mapView)
 
         // Update routes (overlays)
-        updateOverlays(mapView)
+        updateOverlays(mapView, context: context)
     }
 
     private func updateAnnotations(_ mapView: MKMapView) {
@@ -129,10 +136,31 @@ struct EnhancedMapView: UIViewRepresentable {
         mapView.addAnnotations(newAnnotations)
     }
 
-    private func updateOverlays(_ mapView: MKMapView) {
+    private func updateOverlays(_ mapView: MKMapView, context: Context) {
         let existingRoutes = mapView.overlays.compactMap { $0 as? RoutePolyline }
         let newRouteIds = Set(viewModel.routes.map { $0.id })
         let existingRouteIds = Set(existingRoutes.map { $0.id })
+
+        // Check if selection changed to trigger re-rendering
+        let selectionChanged = context.coordinator.lastSelectedRouteId != viewModel.selectedRouteId
+        if selectionChanged {
+            context.coordinator.lastSelectedRouteId = viewModel.selectedRouteId
+            // Force re-render of all overlays by removing and re-adding them
+            if !existingRoutes.isEmpty {
+                mapView.removeOverlays(existingRoutes)
+                for route in viewModel.routes {
+                    let coordinates = route.coordinates.map {
+                        CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                    }
+                    let polyline = RoutePolyline(coordinates: coordinates, count: coordinates.count)
+                    polyline.id = route.id
+                    polyline.transportType = route.transportType.name
+                    polyline.colorInt = route.color?.int32Value
+                    mapView.addOverlay(polyline)
+                }
+                return
+            }
+        }
 
         // Remove routes that no longer exist
         let routesToRemove = existingRoutes.filter { !newRouteIds.contains($0.id) }
@@ -158,6 +186,7 @@ struct EnhancedMapView: UIViewRepresentable {
 
     class Coordinator: NSObject, MKMapViewDelegate {
         var parent: EnhancedMapView
+        var lastSelectedRouteId: String?
 
         init(_ parent: EnhancedMapView) {
             self.parent = parent
@@ -190,10 +219,21 @@ struct EnhancedMapView: UIViewRepresentable {
             }
 
             let renderer = MKPolylineRenderer(polyline: polyline)
-            renderer.strokeColor = colorForPolyline(polyline)
-            renderer.lineWidth = 4.0
+
+            // Determine if selected
+            let isSelected = isRouteSelected(polyline)
+
+            // Set color with Silent Waters palette
+            renderer.strokeColor = colorForPolyline(polyline, isSelected: isSelected)
+
+            // Set width based on transport type and selection
+            let baseWidth = lineWidthForTransportType(polyline.transportType ?? "UNKNOWN")
+            renderer.lineWidth = isSelected ? baseWidth * 1.5 : baseWidth
+
+            // Line styling
             renderer.lineCap = .round
             renderer.lineJoin = .round
+
             return renderer
         }
 
@@ -203,19 +243,46 @@ struct EnhancedMapView: UIViewRepresentable {
             }
         }
 
-        private func colorForPolyline(_ polyline: RoutePolyline) -> UIColor {
+        private func isRouteSelected(_ polyline: RoutePolyline) -> Bool {
+            guard let routeId = polyline.id,
+                  let selectedRouteId = parent.viewModel.selectedRouteId else {
+                return false
+            }
+            return routeId == selectedRouteId
+        }
+
+        private func lineWidthForTransportType(_ type: String) -> CGFloat {
+            switch type.uppercased() {
+            case "WALK": return 3.0
+            case "BIKE": return 4.0
+            case "CAR": return 5.0
+            case "TRAIN": return 6.0
+            case "PLANE": return 7.0
+            case "BOAT": return 5.0
+            default: return 3.0
+            }
+        }
+
+        private func colorForPolyline(_ polyline: RoutePolyline, isSelected: Bool) -> UIColor {
+            // Base color - use Silent Waters palette
+            let baseColor: UIColor
+
             if let colorInt = polyline.colorInt {
+                // If color is provided by the controller, use it
                 // Convert Android color int (ARGB) to UIColor
                 let alpha = CGFloat((colorInt >> 24) & 0xFF) / 255.0
                 let red = CGFloat((colorInt >> 16) & 0xFF) / 255.0
                 let green = CGFloat((colorInt >> 8) & 0xFF) / 255.0
                 let blue = CGFloat(colorInt & 0xFF) / 255.0
-                return UIColor(red: red, green: green, blue: blue, alpha: alpha)
+                baseColor = UIColor(red: red, green: green, blue: blue, alpha: 1.0)
+            } else {
+                // Default: use historical route color (harborBlue) from Silent Waters palette
+                baseColor = UIColor(Color.harborBlue)
             }
 
-            // Use historical route color (Harbor Blue) from Silent Waters palette as default
-            // Active routes should be set via route.color parameter from controller
-            return UIColor(Color.historicalRoute)
+            // Apply opacity based on selection
+            let alpha: CGFloat = isSelected ? 1.0 : 0.7
+            return baseColor.withAlphaComponent(alpha)
         }
     }
 }
@@ -315,6 +382,7 @@ class MapViewModel: ObservableObject {
     @Published var markers: [shared.MapMarker] = []
     @Published var routes: [shared.MapRoute] = []
     @Published var selectedMarkerId: String?
+    @Published var selectedRouteId: String?
     @Published var regionUpdate: MKCoordinateRegion?
     @Published var isLoading: Bool = false
     @Published var error: String?
@@ -339,6 +407,7 @@ class MapViewModel: ObservableObject {
                 self.markers = state.mapData.markers
                 self.routes = state.mapData.routes
                 self.selectedMarkerId = state.selectedMarker?.id
+                self.selectedRouteId = state.selectedRoute?.id
                 self.needsLocationPermission = !state.hasLocationPermission
 
                 // Update region if changed

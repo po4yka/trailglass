@@ -10,7 +10,7 @@ import com.po4yka.trailglass.db.TrailGlassDatabase
 class Database(driverFactory: DatabaseDriverFactory) {
 
     private val driver = driverFactory.createDriver()
-    private val database = TrailGlassDatabase(driver)
+    val database = TrailGlassDatabase(driver)
 
     /**
      * Internal constructor for testing.

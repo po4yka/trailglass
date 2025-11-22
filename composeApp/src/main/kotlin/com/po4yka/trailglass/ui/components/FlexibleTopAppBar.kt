@@ -107,7 +107,7 @@ fun LargeFlexibleTopAppBar(
     // Animate collapse progress with expressive spring
     val animatedProgress by animateFloatAsState(
         targetValue = collapseProgress,
-        animationSpec = MotionConfig.expressiveSpring,
+        animationSpec = MotionConfig.expressiveSpring(),
         label = "topAppBarCollapse"
     )
 
@@ -352,7 +352,7 @@ fun MediumFlexibleTopAppBar(
     // Animate with expressive spring
     val animatedProgress by animateFloatAsState(
         targetValue = collapseProgress,
-        animationSpec = MotionConfig.expressiveSpring,
+        animationSpec = MotionConfig.expressiveSpring(),
         label = "mediumAppBarCollapse"
     )
 

@@ -59,6 +59,9 @@ kotlin {
             // Moko Resources - Multiplatform resource management
             api(libs.moko.resources)
             api(libs.moko.resources.compose)
+
+            // Kotlinx IO - File operations
+            implementation(libs.kotlinx.io.core)
         }
         androidMain.dependencies {
             implementation(libs.sqldelight.android)
@@ -80,6 +83,9 @@ kotlin {
 
             implementation(libs.datastore.preferences)
             implementation(libs.androidx.exifinterface)
+
+            // Paging 3 - Pagination support (Android only)
+            api(libs.androidx.paging.common)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
