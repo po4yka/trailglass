@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: shared-test-results
           path: |
@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload coverage report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: coverage-report
           path: |
@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android-test-results
           path: |
@@ -124,7 +124,7 @@ jobs:
         run: ./gradlew :composeApp:assembleDebug
 
       - name: Upload APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: debug-apk
           path: composeApp/build/outputs/apk/debug/*.apk
