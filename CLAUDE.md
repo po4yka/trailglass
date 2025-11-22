@@ -69,6 +69,28 @@ xcodebuild -scheme iosApp -destination 'platform=iOS Simulator,name=iPhone 15' b
 ./gradlew clean :shared:build
 ```
 
+### Linting & Code Quality
+
+```bash
+# Run all linters (Kotlin, Android, Swift)
+./scripts/lint-all.sh
+
+# Auto-format all code
+./scripts/format-all.sh
+
+# Individual linters
+./gradlew ktlintCheck          # Check Kotlin formatting
+./gradlew ktlintFormat         # Auto-format Kotlin
+./gradlew detekt               # Static analysis
+./gradlew :composeApp:lint     # Android Lint
+
+# iOS (requires SwiftLint: brew install swiftlint)
+cd iosApp && swiftlint         # Lint Swift code
+cd iosApp && swiftlint --fix   # Auto-fix Swift issues
+```
+
+See `docs/LINTING.md` for detailed documentation.
+
 ## Architecture
 
 ### Module Structure
@@ -176,15 +198,48 @@ UI observes state via `collectAsState()` (Compose) or Combine/SwiftUI patterns (
 - **"Unsatisfied dependencies" (kotlin-inject)**: Rebuild KSP: `./gradlew clean kspCommonMainKotlinMetadata kspDebugKotlinAndroid`
 - **Coverage verification failed**: Run `./gradlew koverHtmlReport` to see uncovered code
 
+## Documentation Policy
+
+**IMPORTANT: Do NOT create report files or documentation files in markdown format unless explicitly requested by the user.**
+
+This includes but is not limited to:
+
+- Summary reports (SUMMARY.md, IMPLEMENTATION_SUMMARY.md, etc.)
+- Migration guides (MIGRATION.md, etc.)
+- Proposal documents (PROPOSAL.md, etc.)
+- Phase reports (PHASE_*.md, etc.)
+- Guide documents (GUIDE.md, COLOR_GUIDE.md, etc.)
+- Any other .md files except README.md when necessary
+
+### What TO Do Instead
+
+- Focus on implementing code changes
+- Provide brief summaries in chat responses
+- Update existing README.md only when explicitly requested
+- Answer user questions directly in conversation
+
+### Exceptions
+
+You may create markdown files ONLY when:
+
+- The user explicitly asks for a specific markdown file by name
+- The user requests written documentation
+- It's a critical project file like README.md and the user approves
+
 ## Important Locations
 
 ### Configuration
 - Version catalog: `gradle/libs.versions.toml`
 - Android manifest: `composeApp/src/main/AndroidManifest.xml`
 - Local properties (Git-ignored): `local.properties`
+- Editor config: `.editorconfig`
+- Detekt config: `config/detekt/detekt.yml`
+- Android Lint config: `config/android-lint.xml`
+- SwiftLint config: `iosApp/.swiftlint.yml`
 
 ### Documentation
 - Architecture: `docs/ARCHITECTURE.md`
+- Linting & Code Quality: `docs/LINTING.md`
 - Development: `docs/DEVELOPMENT.md`
 - Testing: `docs/TESTING.md`
 - Error Handling: `docs/ERROR_HANDLING.md`
