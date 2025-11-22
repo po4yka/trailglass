@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.network.NetworkState
 import com.po4yka.trailglass.data.network.NetworkType
+import com.po4yka.trailglass.ui.theme.extended
 
 /**
  * Banner showing network connectivity status.
@@ -65,8 +66,8 @@ private fun NetworkBannerContent(
             Tuple4(
                 Icons.Default.Warning,
                 "Limited connectivity: ${networkState.reason}",
-                MaterialTheme.colorScheme.tertiaryContainer,
-                MaterialTheme.colorScheme.onTertiaryContainer
+                MaterialTheme.colorScheme.extended.warning,
+                MaterialTheme.colorScheme.extended.onWarning
             )
         }
         is NetworkState.Connected -> {
@@ -136,7 +137,7 @@ fun NetworkStatusIndicatorCompact(
             Icons.Default.CloudOff to MaterialTheme.colorScheme.error
         }
         is NetworkState.Limited -> {
-            Icons.Default.Warning to MaterialTheme.colorScheme.tertiary
+            Icons.Default.Warning to MaterialTheme.colorScheme.extended.warningEmphasis
         }
     }
 

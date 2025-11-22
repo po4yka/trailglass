@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.ui.components
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,6 +12,7 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.feature.route.VehicleState
+import com.po4yka.trailglass.ui.theme.extended
 
 /**
  * Map view for route replay with animated vehicle and camera following.
@@ -74,15 +76,19 @@ fun RouteReplayMapView(
 
 /**
  * Route polyline for replay (draws the entire route).
+ * Uses Silent Waters palette: Coastal Path for active/replaying routes.
  */
 @Composable
 private fun RoutePolylineReplay(
     routePoints: List<com.po4yka.trailglass.domain.model.RoutePoint>
 ) {
+    // Use Coastal Path color for active route being replayed
+    val routeColor = MaterialTheme.colorScheme.extended.activeRoute
+
     // Draw single polyline for the entire route
     Polyline(
         points = routePoints.map { LatLng(it.latitude, it.longitude) },
-        color = Color(0xFF2196F3), // Blue
+        color = routeColor,
         width = 8f,
         zIndex = 1f
     )

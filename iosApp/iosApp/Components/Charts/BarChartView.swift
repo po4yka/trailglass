@@ -59,7 +59,7 @@ private struct BarItem: View {
 
             // Bar
             Rectangle()
-                .fill(barData.color ?? Color.blue)
+                .fill(barData.color ?? Color.adaptivePrimary)
                 .frame(width: 32, height: barHeight)
                 .cornerRadius(4)
 

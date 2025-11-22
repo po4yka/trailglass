@@ -68,26 +68,26 @@ struct NetworkStatusBanner: View {
     private var backgroundColor: Color {
         switch networkState {
         case is NetworkState.Disconnected:
-            return Color.red.opacity(0.2)
+            return Color.adaptiveWarning.opacity(0.2)
         case is NetworkState.Limited:
-            return Color.orange.opacity(0.2)
+            return Color.adaptiveWarning.opacity(0.15)
         case is NetworkState.Connected:
-            return Color.green.opacity(0.2)
+            return Color.adaptiveSuccess.opacity(0.2)
         default:
-            return Color.gray.opacity(0.2)
+            return Color.adaptiveDisabled.opacity(0.2)
         }
     }
 
     private var contentColor: Color {
         switch networkState {
         case is NetworkState.Disconnected:
-            return .red
+            return .adaptiveWarning
         case is NetworkState.Limited:
-            return .orange
+            return .warning
         case is NetworkState.Connected:
-            return .green
+            return .adaptiveSuccess
         default:
-            return .gray
+            return .adaptiveDisabled
         }
     }
 }
@@ -134,13 +134,13 @@ struct NetworkStatusIndicatorCompact: View {
     private var iconColor: Color {
         switch networkState {
         case is NetworkState.Connected:
-            return .green
+            return .adaptiveSuccess
         case is NetworkState.Disconnected:
-            return .red
+            return .adaptiveWarning
         case is NetworkState.Limited:
-            return .orange
+            return .warning
         default:
-            return .gray
+            return .adaptiveDisabled
         }
     }
 }

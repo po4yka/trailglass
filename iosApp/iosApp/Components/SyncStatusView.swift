@@ -27,7 +27,7 @@ struct SyncStatusIndicator: View {
                 if syncStatus.pendingCount > 0 && !isActive {
                     ZStack {
                         Circle()
-                            .fill(Color.red)
+                            .fill(Color.adaptiveWarning)
                             .frame(width: 16, height: 16)
 
                         Text(syncStatus.pendingCount > 9 ? "9+" : "\(syncStatus.pendingCount)")
@@ -41,7 +41,7 @@ struct SyncStatusIndicator: View {
                 if syncStatus.conflictCount > 0 {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 10))
-                        .foregroundColor(.orange)
+                        .foregroundColor(.adaptiveWarning)
                         .offset(x: 8, y: 8)
                 }
             }
@@ -70,15 +70,15 @@ struct SyncStatusIndicator: View {
     private var iconColor: Color {
         switch syncStatus.progress {
         case is SyncProgress.Idle:
-            return .gray
+            return .adaptiveDisabled
         case is SyncProgress.InProgress:
-            return .blue
+            return .adaptivePrimary
         case is SyncProgress.Completed:
-            return .green
+            return .adaptiveSuccess
         case is SyncProgress.Failed:
-            return .red
+            return .adaptiveWarning
         default:
-            return .gray
+            return .adaptiveDisabled
         }
     }
 }
@@ -127,7 +127,7 @@ struct SyncStatusCard: View {
                             Text("\(syncStatus.conflictCount) Conflicts")
                         }
                         .font(.caption)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.adaptiveWarning)
                     }
                 }
             }
@@ -172,7 +172,7 @@ struct SyncStatusCard: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Last sync completed")
                     .font(.body)
-                    .foregroundColor(.green)
+                    .foregroundColor(.adaptiveSuccess)
 
                 Text("↑ \(completed.result.uploaded) uploaded, ↓ \(completed.result.downloaded) downloaded")
                     .font(.caption)
@@ -181,14 +181,14 @@ struct SyncStatusCard: View {
                 if completed.result.conflicts > 0 {
                     Text("⚠ \(completed.result.conflicts) conflicts")
                         .font(.caption)
-                        .foregroundColor(.red)
+                        .foregroundColor(.adaptiveWarning)
                 }
             }
 
         case let failed as SyncProgress.Failed:
             Text("Sync failed: \(failed.error)")
                 .font(.body)
-                .foregroundColor(.red)
+                .foregroundColor(.adaptiveWarning)
 
         default:
             Text("Unknown status")
@@ -200,7 +200,7 @@ struct SyncStatusCard: View {
     private var backgroundColor: Color {
         switch syncStatus.progress {
         case is SyncProgress.Failed:
-            return Color.red.opacity(0.1)
+            return Color.adaptiveWarning.opacity(0.1)
         default:
             return Color(uiColor: .secondarySystemGroupedBackground)
         }

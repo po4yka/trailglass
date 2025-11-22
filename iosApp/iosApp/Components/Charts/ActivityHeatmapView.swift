@@ -9,7 +9,7 @@ struct ActivityHeatmapView: View {
     let lowColor: Color
     let highColor: Color
 
-    init(data: [String: [Int: Int]], lowColor: Color = Color(.systemGray5), highColor: Color = .blue) {
+    init(data: [String: [Int: Int]], lowColor: Color = Color.gradientStart, highColor: Color = Color.gradientEnd) {
         self.data = data
         self.lowColor = lowColor
         self.highColor = highColor

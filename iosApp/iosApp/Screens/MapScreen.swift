@@ -178,7 +178,7 @@ struct EnhancedMapView: UIViewRepresentable {
                 annotationView?.annotation = annotation
             }
 
-            annotationView?.markerTintColor = .blue
+            annotationView?.markerTintColor = UIColor(Color.adaptivePrimary)
             annotationView?.glyphImage = UIImage(systemName: "mappin.circle.fill")
 
             return annotationView
@@ -213,23 +213,9 @@ struct EnhancedMapView: UIViewRepresentable {
                 return UIColor(red: red, green: green, blue: blue, alpha: alpha)
             }
 
-            // Fallback color based on transport type
-            switch polyline.transportType?.uppercased() {
-            case "WALK":
-                return UIColor(red: 0.3, green: 0.69, blue: 0.31, alpha: 1.0) // Green
-            case "BIKE":
-                return UIColor(red: 0.13, green: 0.59, blue: 0.95, alpha: 1.0) // Blue
-            case "CAR":
-                return UIColor(red: 0.96, green: 0.26, blue: 0.21, alpha: 1.0) // Red
-            case "TRAIN":
-                return UIColor(red: 0.61, green: 0.15, blue: 0.69, alpha: 1.0) // Purple
-            case "PLANE":
-                return UIColor(red: 1.0, green: 0.6, blue: 0.0, alpha: 1.0) // Orange
-            case "BOAT":
-                return UIColor(red: 0.0, green: 0.74, blue: 0.83, alpha: 1.0) // Cyan
-            default:
-                return .gray
-            }
+            // Use historical route color (Harbor Blue) from Silent Waters palette as default
+            // Active routes should be set via route.color parameter from controller
+            return UIColor(Color.historicalRoute)
         }
     }
 }
@@ -284,7 +270,7 @@ struct ErrorBanner: View {
             }
         }
         .padding()
-        .background(Color.red)
+        .background(Color.adaptiveWarning)
         .cornerRadius(8)
     }
 }
@@ -297,7 +283,7 @@ struct LocationPermissionPrompt: View {
         VStack(spacing: 12) {
             Image(systemName: "location.slash.fill")
                 .font(.largeTitle)
-                .foregroundColor(.orange)
+                .foregroundColor(.adaptiveWarning)
 
             Text("Location Permission Required")
                 .font(.headline)

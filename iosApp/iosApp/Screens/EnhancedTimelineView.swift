@@ -83,7 +83,7 @@ struct EnhancedTimelineView: View {
                                     Image(systemName: "line.3.horizontal.decrease.circle")
                                     if viewModel.filter.activeFilterCount > 0 {
                                         Circle()
-                                            .fill(Color.blue)
+                                            .fill(Color.adaptivePrimary)
                                             .frame(width: 16, height: 16)
                                             .overlay(
                                                 Text("\(viewModel.filter.activeFilterCount)")
@@ -137,7 +137,7 @@ private struct ZoomLevelSelector: View {
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(currentZoom == zoom ? Color.blue : Color(.systemGray5))
+                    .background(currentZoom == zoom ? Color.adaptivePrimary : Color(.systemGray5))
                     .foregroundColor(currentZoom == zoom ? .white : .primary)
                     .cornerRadius(8)
                 }
@@ -294,7 +294,7 @@ private struct DayMarkerCard: View {
     var body: some View {
         HStack(spacing: 8) {
             Image(systemName: icon)
-                .foregroundColor(.blue)
+                .foregroundColor(.adaptivePrimary)
             Text(text)
                 .font(.body)
                 .fontWeight(.medium)

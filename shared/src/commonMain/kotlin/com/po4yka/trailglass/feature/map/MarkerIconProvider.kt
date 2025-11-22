@@ -124,16 +124,12 @@ object MarkerIconProvider {
 
     /**
      * Get route color based on transport type.
+     * Uses Silent Waters palette: Harbor Blue for historical routes.
+     * Active routes should be set via explicit color parameter using Coastal Path.
      */
     fun getRouteColor(transportType: String): Int {
-        return when (transportType.uppercase()) {
-            "WALK" -> 0xFF4CAF50.toInt()    // Green
-            "BIKE" -> 0xFF2196F3.toInt()    // Blue
-            "CAR" -> 0xFFF44336.toInt()     // Red
-            "TRAIN" -> 0xFF9C27B0.toInt()   // Purple
-            "PLANE" -> 0xFFFF9800.toInt()   // Orange
-            "BOAT" -> 0xFF00BCD4.toInt()    // Cyan
-            else -> 0xFF9E9E9E.toInt()      // Grey
-        }
+        // Use Harbor Blue (0xFF5C8AA8) from Silent Waters palette for all routes
+        // This provides a consistent, serene color that matches the app's aesthetic
+        return 0xFF5C8AA8.toInt() // Harbor Blue - historical route color
     }
 }

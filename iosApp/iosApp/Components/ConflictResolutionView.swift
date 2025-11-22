@@ -14,7 +14,7 @@ struct ConflictListView: View {
                     VStack(spacing: 16) {
                         Image(systemName: "checkmark.circle")
                             .font(.system(size: 64))
-                            .foregroundColor(.green)
+                            .foregroundColor(.adaptiveSuccess)
 
                         Text("No Conflicts")
                             .font(.title)
@@ -58,7 +58,7 @@ struct ConflictCard: View {
             HStack {
                 HStack(spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.red)
+                        .foregroundColor(.adaptiveWarning)
 
                     Text(conflict.entityName)
                         .font(.headline)
@@ -105,11 +105,11 @@ struct ConflictCard: View {
 
                 Button("Resolve") {}
                     .buttonStyle(.borderedProminent)
-                    .tint(.red)
+                    .tint(.adaptiveWarning)
             }
         }
         .padding()
-        .background(Color.red.opacity(0.1))
+        .background(Color.adaptiveWarning.opacity(0.1))
         .cornerRadius(12)
     }
 
@@ -136,7 +136,7 @@ struct ConflictResolutionSheet: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.red)
+                                .foregroundColor(.adaptiveWarning)
 
                             Text("Conflict Details")
                                 .font(.headline)
@@ -151,7 +151,7 @@ struct ConflictResolutionSheet: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Your Local Version")
                             .font(.headline)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.adaptivePrimary)
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Modified: \(formatDateTime(conflict.localModified))")
@@ -162,7 +162,7 @@ struct ConflictResolutionSheet: View {
                                 .font(.body)
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.blue.opacity(0.1))
+                                .background(Color.adaptivePrimary.opacity(0.1))
                                 .cornerRadius(8)
                         }
 
@@ -171,17 +171,17 @@ struct ConflictResolutionSheet: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.blue)
+                        .tint(.adaptivePrimary)
                     }
                     .padding()
-                    .background(Color.blue.opacity(0.05))
+                    .background(Color.adaptivePrimary.opacity(0.05))
                     .cornerRadius(12)
 
                     // Remote version
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Server Version")
                             .font(.headline)
-                            .foregroundColor(.green)
+                            .foregroundColor(.adaptiveSuccess)
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Modified: \(formatDateTime(conflict.remoteModified))")
@@ -192,7 +192,7 @@ struct ConflictResolutionSheet: View {
                                 .font(.body)
                                 .padding()
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(Color.green.opacity(0.1))
+                                .background(Color.adaptiveSuccess.opacity(0.1))
                                 .cornerRadius(8)
                         }
 
@@ -201,10 +201,10 @@ struct ConflictResolutionSheet: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.green)
+                        .tint(.adaptiveSuccess)
                     }
                     .padding()
-                    .background(Color.green.opacity(0.05))
+                    .background(Color.adaptiveSuccess.opacity(0.05))
                     .cornerRadius(12)
 
                     // Merge option
@@ -246,8 +246,8 @@ struct EntityTypeChip: View {
             .font(.caption)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .background(Color.blue.opacity(0.2))
-            .foregroundColor(.blue)
+            .background(Color.adaptivePrimary.opacity(0.2))
+            .foregroundColor(.adaptivePrimary)
             .cornerRadius(4)
     }
 }

@@ -17,7 +17,7 @@ struct PermissionRationaleView: View {
                     HStack(spacing: 16) {
                         Image(systemName: permissionIcon)
                             .font(.system(size: 40))
-                            .foregroundColor(.blue)
+                            .foregroundColor(.adaptivePrimary)
 
                         Text(requestState.rationale.title)
                             .font(.title2)
@@ -38,7 +38,7 @@ struct PermissionRationaleView: View {
                             ForEach(requestState.rationale.features, id: \.self) { feature in
                                 HStack(alignment: .top, spacing: 12) {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
+                                        .foregroundColor(.adaptiveSuccess)
                                         .font(.system(size: 20))
 
                                     Text(feature)
@@ -53,7 +53,7 @@ struct PermissionRationaleView: View {
                     if requestState.rationale.isRequired {
                         HStack(spacing: 12) {
                             Image(systemName: "exclamationmark.triangle.fill")
-                                .foregroundColor(.orange)
+                                .foregroundColor(.adaptiveWarning)
 
                             Text("Required for core functionality")
                                 .font(.caption)
@@ -61,7 +61,7 @@ struct PermissionRationaleView: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.orange.opacity(0.1))
+                        .background(Color.adaptiveWarning.opacity(0.1))
                         .cornerRadius(8)
                     }
 
@@ -74,7 +74,7 @@ struct PermissionRationaleView: View {
                                 .fontWeight(.semibold)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(Color.blue)
+                                .background(Color.adaptivePrimary)
                                 .foregroundColor(.white)
                                 .cornerRadius(12)
                         }
@@ -131,7 +131,7 @@ struct PermissionDeniedAlert: View {
         VStack(spacing: 20) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 50))
-                .foregroundColor(.orange)
+                .foregroundColor(.adaptiveWarning)
 
             Text("Permission Denied")
                 .font(.title2)
@@ -146,7 +146,7 @@ struct PermissionDeniedAlert: View {
                 ForEach(Array(requestState.rationale.features.prefix(3)), id: \.self) { feature in
                     HStack(alignment: .top, spacing: 8) {
                         Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.red)
+                            .foregroundColor(.adaptiveWarning)
                         Text(feature)
                             .font(.caption)
                             .fixedSize(horizontal: false, vertical: true)
@@ -161,7 +161,7 @@ struct PermissionDeniedAlert: View {
                 Text("This permission is required for TrailGlass to function properly.")
                     .font(.caption)
                     .fontWeight(.semibold)
-                    .foregroundColor(.red)
+                    .foregroundColor(.adaptiveWarning)
                     .multilineTextAlignment(.center)
             }
 
@@ -171,7 +171,7 @@ struct PermissionDeniedAlert: View {
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color.adaptivePrimary)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                 }
@@ -205,7 +205,7 @@ struct PermissionSettingsInstructionsView: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Image(systemName: "gear.circle.fill")
                             .font(.system(size: 50))
-                            .foregroundColor(.blue)
+                            .foregroundColor(.adaptivePrimary)
 
                         Text("Permission Required")
                             .font(.title)
@@ -226,7 +226,7 @@ struct PermissionSettingsInstructionsView: View {
                                 HStack(alignment: .top, spacing: 16) {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.blue)
+                                            .fill(Color.adaptivePrimary)
                                             .frame(width: 28, height: 28)
 
                                         Text("\(index + 1)")
@@ -258,7 +258,7 @@ struct PermissionSettingsInstructionsView: View {
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue)
+                            .background(Color.adaptivePrimary)
                             .foregroundColor(.white)
                             .cornerRadius(12)
                         }
@@ -304,7 +304,7 @@ struct PermissionRequestBanner: View {
         HStack(spacing: 12) {
             Image(systemName: permissionIcon)
                 .font(.system(size: 24))
-                .foregroundColor(.blue)
+                .foregroundColor(.adaptivePrimary)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(requestState.rationale.title)
@@ -325,7 +325,7 @@ struct PermissionRequestBanner: View {
                     .fontWeight(.semibold)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.blue)
+                    .background(Color.adaptivePrimary)
                     .foregroundColor(.white)
                     .cornerRadius(8)
             }
@@ -336,7 +336,7 @@ struct PermissionRequestBanner: View {
             }
         }
         .padding()
-        .background(Color.blue.opacity(0.1))
+        .background(Color.adaptivePrimary.opacity(0.1))
         .cornerRadius(12)
         .padding(.horizontal)
     }

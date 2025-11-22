@@ -100,11 +100,11 @@ struct EnhancedMapView: View {
                 VStack {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.largeTitle)
-                        .foregroundColor(.red)
+                        .foregroundColor(.adaptiveWarning)
 
                     Text(error)
                         .font(.body)
-                        .foregroundColor(.red)
+                        .foregroundColor(.adaptiveWarning)
                         .multilineTextAlignment(.center)
                         .padding()
 

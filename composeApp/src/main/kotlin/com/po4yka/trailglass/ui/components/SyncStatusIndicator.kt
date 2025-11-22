@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.sync.SyncProgress
 import com.po4yka.trailglass.data.sync.SyncStatusUiModel
+import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -42,9 +43,9 @@ fun SyncStatusIndicator(
     }
 
     val tint = when (syncStatus.progress) {
-        is SyncProgress.Idle -> MaterialTheme.colorScheme.onSurfaceVariant
+        is SyncProgress.Idle -> MaterialTheme.colorScheme.extended.disabled
         is SyncProgress.InProgress -> MaterialTheme.colorScheme.primary
-        is SyncProgress.Completed -> MaterialTheme.colorScheme.primary
+        is SyncProgress.Completed -> MaterialTheme.colorScheme.extended.success
         is SyncProgress.Failed -> MaterialTheme.colorScheme.error
     }
 
@@ -100,13 +101,13 @@ fun SyncStatusIndicator(
                     .align(Alignment.BottomEnd)
                     .size(12.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.tertiary),
+                    .background(MaterialTheme.colorScheme.extended.warning),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = "Conflicts",
-                    tint = MaterialTheme.colorScheme.onTertiary,
+                    tint = MaterialTheme.colorScheme.extended.onWarning,
                     modifier = Modifier.size(8.dp)
                 )
             }
@@ -182,7 +183,7 @@ fun SyncStatusCard(
                         Text(
                             text = "Last sync completed",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.extended.success
                         )
                         Text(
                             text = "↑ ${progress.result.uploaded} uploaded, " +

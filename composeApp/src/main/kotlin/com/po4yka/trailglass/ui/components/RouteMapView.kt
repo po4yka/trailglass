@@ -21,6 +21,7 @@ import com.po4yka.trailglass.domain.model.RoutePoint
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.route.MapStyle
+import com.po4yka.trailglass.ui.theme.extended
 
 /**
  * Map view component for displaying trip routes.
@@ -133,12 +134,15 @@ private fun RoutePolyline(routePoints: List<RoutePoint>) {
         groupByTransportType(routePoints)
     }
 
+    // Get route color from theme
+    val routeColor = getTransportColor(TransportType.UNKNOWN) // Same color for all
+
     // Draw each segment with appropriate color
     segments.forEach { (transportType, points) ->
         if (points.size >= 2) {
             Polyline(
                 points = points.map { LatLng(it.latitude, it.longitude) },
-                color = getTransportColor(transportType),
+                color = routeColor,
                 width = getTransportWidth(transportType)
             )
         }
@@ -204,17 +208,13 @@ private fun groupByTransportType(
 
 /**
  * Get polyline color based on transport type.
+ * Uses Silent Waters palette: Harbor Blue for historical routes.
  */
+@Composable
 private fun getTransportColor(type: TransportType): Color {
-    return when (type) {
-        TransportType.WALK -> Color(0xFF4CAF50)      // Green
-        TransportType.BIKE -> Color(0xFF2196F3)      // Blue
-        TransportType.CAR -> Color(0xFFFF9800)       // Orange
-        TransportType.TRAIN -> Color(0xFF9C27B0)     // Purple
-        TransportType.PLANE -> Color(0xFFF44336)     // Red
-        TransportType.BOAT -> Color(0xFF00BCD4)      // Cyan
-        TransportType.UNKNOWN -> Color(0xFF757575)   // Gray
-    }
+    // Use Harbor Blue from Silent Waters palette for all route types
+    // This provides a consistent, serene color that matches the app's aesthetic
+    return MaterialTheme.colorScheme.extended.historicalRoute
 }
 
 /**

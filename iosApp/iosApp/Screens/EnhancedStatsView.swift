@@ -130,7 +130,7 @@ private struct PeriodSelector: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(selectedPeriod == .year ? Color.blue : Color(.systemGray5))
+                .background(selectedPeriod == .year ? Color.adaptivePrimary : Color(.systemGray5))
                 .foregroundColor(selectedPeriod == .year ? .white : .primary)
                 .cornerRadius(8)
             }
@@ -144,7 +144,7 @@ private struct PeriodSelector: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(selectedPeriod == .month ? Color.blue : Color(.systemGray5))
+                .background(selectedPeriod == .month ? Color.adaptivePrimary : Color(.systemGray5))
                 .foregroundColor(selectedPeriod == .month ? .white : .primary)
                 .cornerRadius(8)
             }
@@ -219,7 +219,7 @@ private struct StatCard: View {
         VStack(spacing: 8) {
             Image(systemName: icon)
                 .font(.system(size: 32))
-                .foregroundColor(.blue)
+                .foregroundColor(.adaptivePrimary)
 
             Text(value)
                 .font(.system(size: 28, weight: .bold))
@@ -371,7 +371,7 @@ private struct MostVisitedPlaceCard: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: "mappin.circle.fill")
-                .foregroundColor(.blue)
+                .foregroundColor(.adaptivePrimary)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(place.placeName)
@@ -576,7 +576,7 @@ private struct ErrorView: View {
         VStack(spacing: 16) {
             Image(systemName: "exclamationmark.triangle")
                 .font(.system(size: 64))
-                .foregroundColor(.red)
+                .foregroundColor(.adaptiveWarning)
 
             Text(error)
                 .font(.body)
@@ -651,13 +651,13 @@ private func transportTypeName(_ type: TransportType) -> String {
 
 private func transportColor(_ type: TransportType) -> Color {
     switch type.name {
-    case "WALK": return Color(red: 0.3, green: 0.69, blue: 0.31)
-    case "BIKE": return Color(red: 0.13, green: 0.59, blue: 0.95)
-    case "CAR": return Color(red: 0.96, green: 0.26, blue: 0.21)
-    case "TRAIN": return Color(red: 0.61, green: 0.15, blue: 0.69)
-    case "PLANE": return Color(red: 1.0, green: 0.6, blue: 0.0)
-    case "BOAT": return Color(red: 0.0, green: 0.74, blue: 0.83)
-    default: return .gray
+    case "WALK": return Color.adaptiveSuccess
+    case "BIKE": return Color.adaptivePrimary
+    case "CAR": return Color.adaptiveWarning
+    case "TRAIN": return Color.eveningCategory
+    case "PLANE": return Color.morningCategory
+    case "BOAT": return Color.waterCategory
+    default: return Color.neutralCategory
     }
 }
 
@@ -667,20 +667,20 @@ private func categoryName(_ category: PlaceCategory) -> String {
 
 private func categoryColor(_ category: PlaceCategory) -> Color {
     switch category.name {
-    case "HOME": return Color(red: 0.3, green: 0.69, blue: 0.31)
-    case "WORK": return Color(red: 0.13, green: 0.59, blue: 0.95)
-    case "FOOD": return Color(red: 1.0, green: 0.6, blue: 0.0)
-    case "SHOPPING": return Color(red: 0.91, green: 0.12, blue: 0.39)
-    case "FITNESS": return Color(red: 0.61, green: 0.15, blue: 0.69)
-    case "ENTERTAINMENT": return Color(red: 1.0, green: 0.34, blue: 0.13)
-    case "TRAVEL": return Color(red: 0.0, green: 0.74, blue: 0.83)
-    case "HEALTHCARE": return Color(red: 0.96, green: 0.26, blue: 0.21)
-    case "EDUCATION": return Color(red: 0.25, green: 0.32, blue: 0.71)
-    case "RELIGIOUS": return Color(red: 0.47, green: 0.33, blue: 0.28)
-    case "SOCIAL": return Color(red: 0.8, green: 0.86, blue: 0.22)
-    case "OUTDOOR": return Color(red: 0.55, green: 0.76, blue: 0.29)
-    case "SERVICE": return Color(red: 0.38, green: 0.49, blue: 0.55)
-    default: return .gray
+    case "HOME": return Color.adaptiveSuccess
+    case "WORK": return Color.adaptivePrimary
+    case "FOOD": return Color.morningCategory
+    case "SHOPPING": return Color.adaptiveWarning
+    case "FITNESS": return Color.eveningCategory
+    case "ENTERTAINMENT": return Color.morningCategory
+    case "TRAVEL": return Color.waterCategory
+    case "HEALTHCARE": return Color.adaptiveWarning
+    case "EDUCATION": return Color.adaptivePrimary
+    case "RELIGIOUS": return Color.neutralCategory
+    case "SOCIAL": return Color.morningCategory
+    case "OUTDOOR": return Color.adaptiveSuccess
+    case "SERVICE": return Color.neutralCategory
+    default: return Color.neutralCategory
     }
 }
 

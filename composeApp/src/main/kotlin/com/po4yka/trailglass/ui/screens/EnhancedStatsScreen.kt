@@ -24,6 +24,7 @@ import com.po4yka.trailglass.feature.stats.GetStatsUseCase
 import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
 import com.po4yka.trailglass.ui.components.ErrorView
 import com.po4yka.trailglass.ui.components.charts.*
+import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
@@ -364,15 +365,11 @@ private fun TransportDistributionCard(stats: ComprehensiveStatistics) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            val transportColors = mapOf(
-                TransportType.WALK to Color(0xFF4CAF50),
-                TransportType.BIKE to Color(0xFF2196F3),
-                TransportType.CAR to Color(0xFFF44336),
-                TransportType.TRAIN to Color(0xFF9C27B0),
-                TransportType.PLANE to Color(0xFFFF9800),
-                TransportType.BOAT to Color(0xFF00BCD4),
-                TransportType.UNKNOWN to Color(0xFF9E9E9E)
-            )
+            // Use gradient colors from Silent Waters palette for transport types
+            val gradientColors = MaterialTheme.colorScheme.extended.gradientColors
+            val transportColors = TransportType.entries.associateWith { type ->
+                gradientColors[type.ordinal % gradientColors.size]
+            }
 
             val barData = stats.distanceStats.byTransportType.map { (type, meters) ->
                 BarData(
@@ -423,21 +420,22 @@ private fun CategoryDistributionCard(stats: ComprehensiveStatistics) {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
+            // Use semantic and gradient colors from Silent Waters palette
             val categoryColors = mapOf(
-                PlaceCategory.HOME to Color(0xFF4CAF50),
-                PlaceCategory.WORK to Color(0xFF2196F3),
-                PlaceCategory.FOOD to Color(0xFFFF9800),
-                PlaceCategory.SHOPPING to Color(0xFFE91E63),
-                PlaceCategory.FITNESS to Color(0xFF9C27B0),
-                PlaceCategory.ENTERTAINMENT to Color(0xFFFF5722),
-                PlaceCategory.TRAVEL to Color(0xFF00BCD4),
-                PlaceCategory.HEALTHCARE to Color(0xFFF44336),
-                PlaceCategory.EDUCATION to Color(0xFF3F51B5),
-                PlaceCategory.RELIGIOUS to Color(0xFF795548),
-                PlaceCategory.SOCIAL to Color(0xFFCDDC39),
-                PlaceCategory.OUTDOOR to Color(0xFF8BC34A),
-                PlaceCategory.SERVICE to Color(0xFF607D8B),
-                PlaceCategory.OTHER to Color(0xFF9E9E9E)
+                PlaceCategory.HOME to MaterialTheme.colorScheme.extended.neutralCategory,
+                PlaceCategory.WORK to MaterialTheme.colorScheme.primary,
+                PlaceCategory.FOOD to MaterialTheme.colorScheme.extended.morningCategory,
+                PlaceCategory.SHOPPING to MaterialTheme.colorScheme.extended.waterCategory,
+                PlaceCategory.FITNESS to MaterialTheme.colorScheme.extended.success,
+                PlaceCategory.ENTERTAINMENT to MaterialTheme.colorScheme.extended.eveningCategory,
+                PlaceCategory.TRAVEL to MaterialTheme.colorScheme.extended.activeRoute,
+                PlaceCategory.HEALTHCARE to MaterialTheme.colorScheme.extended.warning,
+                PlaceCategory.EDUCATION to MaterialTheme.colorScheme.secondary,
+                PlaceCategory.RELIGIOUS to MaterialTheme.colorScheme.tertiary,
+                PlaceCategory.SOCIAL to MaterialTheme.colorScheme.extended.waterCategory,
+                PlaceCategory.OUTDOOR to MaterialTheme.colorScheme.extended.success,
+                PlaceCategory.SERVICE to MaterialTheme.colorScheme.extended.neutralCategory,
+                PlaceCategory.OTHER to MaterialTheme.colorScheme.extended.disabled
             )
 
             val pieData = stats.placeStats.visitsByCategory

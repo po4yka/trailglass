@@ -42,7 +42,7 @@ struct DeviceManagementView: View {
                             .foregroundColor(.white)
                         }
                         .padding()
-                        .background(Color.red)
+                        .background(Color.adaptiveWarning)
                         .cornerRadius(8)
                         .padding()
                     }
@@ -94,7 +94,7 @@ struct DeviceManagementView: View {
         VStack(spacing: 24) {
             Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 64))
-                .foregroundColor(.red)
+                .foregroundColor(.adaptiveWarning)
 
             Text(message)
                 .font(.body)
@@ -113,7 +113,7 @@ struct DeviceManagementView: View {
         VStack(spacing: 24) {
             Image(systemName: "externaldrive.badge.xmark")
                 .font(.system(size: 64))
-                .foregroundColor(.blue)
+                .foregroundColor(.adaptivePrimary)
 
             Text("No devices found")
                 .font(.title2)

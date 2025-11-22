@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.DayOfWeek
 
 /**
@@ -24,8 +25,9 @@ fun ActivityHeatmap(
     modifier: Modifier = Modifier
 ) {
     val maxActivity = data.values.flatMap { it.values }.maxOrNull() ?: 1
-    val lowColor = MaterialTheme.colorScheme.surfaceVariant
-    val highColor = MaterialTheme.colorScheme.primary
+    val gradientColors = MaterialTheme.colorScheme.extended.gradientColors
+    val lowColor = gradientColors.first()
+    val highColor = gradientColors.last()
 
     Column(
         modifier = modifier,

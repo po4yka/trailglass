@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.sync.ConflictResolutionChoice
 import com.po4yka.trailglass.data.sync.ConflictUiModel
+import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -56,7 +57,7 @@ fun ConflictListScreen(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = null,
                         modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = MaterialTheme.colorScheme.extended.success
                     )
                     Text(
                         text = "No conflicts",
@@ -101,7 +102,7 @@ fun ConflictCard(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
+            containerColor = MaterialTheme.colorScheme.extended.warning
         )
     ) {
         Column(
@@ -120,13 +121,13 @@ fun ConflictCard(
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = MaterialTheme.colorScheme.extended.warningEmphasis,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = conflict.entityName,
                         style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        color = MaterialTheme.colorScheme.extended.onWarning
                     )
                 }
 
@@ -136,7 +137,7 @@ fun ConflictCard(
             Text(
                 text = conflict.conflictDescription,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onErrorContainer
+                color = MaterialTheme.colorScheme.extended.onWarning
             )
 
             Row(
@@ -147,12 +148,12 @@ fun ConflictCard(
                     Text(
                         text = "Local (v${conflict.localVersion})",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        color = MaterialTheme.colorScheme.extended.onWarning
                     )
                     Text(
                         text = formatDateTime(conflict.localModified),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.extended.onWarning.copy(alpha = 0.7f)
                     )
                 }
 
@@ -160,12 +161,12 @@ fun ConflictCard(
                     Text(
                         text = "Remote (v${conflict.remoteVersion})",
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        color = MaterialTheme.colorScheme.extended.onWarning
                     )
                     Text(
                         text = formatDateTime(conflict.remoteModified),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.7f)
+                        color = MaterialTheme.colorScheme.extended.onWarning.copy(alpha = 0.7f)
                     )
                 }
             }
@@ -174,7 +175,7 @@ fun ConflictCard(
                 onClick = onClick,
                 modifier = Modifier.align(Alignment.End),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
+                    containerColor = MaterialTheme.colorScheme.extended.warningEmphasis
                 )
             ) {
                 Text("Resolve")
@@ -203,7 +204,7 @@ fun ConflictResolutionDialog(
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error
+                    tint = MaterialTheme.colorScheme.extended.warningEmphasis
                 )
                 Text("Resolve Conflict")
             }

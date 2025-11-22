@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.feature.map.MapController
+import com.po4yka.trailglass.ui.theme.extended
 
 /**
  * Google Maps view with markers and routes.
@@ -215,10 +216,10 @@ private fun GoogleMapContent(
                 LatLng(coord.latitude, coord.longitude)
             }
 
-            // Determine route color based on transport type if not specified
+            // Determine route color: use explicit color if set, otherwise use historical route color
             val routeColor = route.color?.let { colorValue ->
                 Color(colorValue)
-            } ?: getRouteColor(route.transportType)
+            } ?: MaterialTheme.colorScheme.extended.historicalRoute
 
             // Draw outline for better visibility
             Polyline(
@@ -298,21 +299,6 @@ private fun getRouteWidth(transportType: TransportType): Float {
         TransportType.PLANE -> 16f
         TransportType.BOAT -> 12f
         TransportType.UNKNOWN -> 8f
-    }
-}
-
-/**
- * Get route color based on transport type.
- */
-private fun getRouteColor(transportType: TransportType): Color {
-    return when (transportType) {
-        TransportType.WALK -> Color(0xFF4CAF50)    // Green
-        TransportType.BIKE -> Color(0xFF2196F3)    // Blue
-        TransportType.CAR -> Color(0xFFF44336)     // Red
-        TransportType.TRAIN -> Color(0xFF9C27B0)   // Purple
-        TransportType.PLANE -> Color(0xFFFF9800)   // Orange
-        TransportType.BOAT -> Color(0xFF00BCD4)    // Cyan
-        TransportType.UNKNOWN -> Color(0xFF9E9E9E) // Grey
     }
 }
 
