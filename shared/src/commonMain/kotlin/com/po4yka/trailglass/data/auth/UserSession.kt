@@ -4,8 +4,10 @@ package com.po4yka.trailglass.data.auth
  * Manages the current user session.
  *
  * This interface provides access to the authenticated user's information.
- * In the current implementation, it provides a default user ID, but it's
- * designed to be extensible for future authentication systems (OAuth, JWT, etc.).
+ * Supports three modes:
+ * - Authenticated user (with account)
+ * - Guest user (no account, local-only data)
+ * - No user (not authenticated, not guest)
  */
 interface UserSession {
     /**
@@ -20,9 +22,27 @@ interface UserSession {
     fun isAuthenticated(): Boolean
 
     /**
+     * Checks if the current user is in guest mode.
+     */
+    fun isGuest(): Boolean = getCurrentUserId() == GUEST_USER_ID
+
+    /**
      * Sets the current user ID (for future auth integration).
      */
     fun setUserId(userId: String?)
+
+    companion object {
+        /**
+         * Special user ID for guest mode.
+         * When a user continues without an account, this ID is used.
+         */
+        const val GUEST_USER_ID = "guest_user"
+
+        /**
+         * Default user ID for single-user scenarios (legacy).
+         */
+        const val DEFAULT_USER_ID = "default_user"
+    }
 }
 
 /**

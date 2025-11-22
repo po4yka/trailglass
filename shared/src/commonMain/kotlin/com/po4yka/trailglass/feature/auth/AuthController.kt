@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.feature.auth
 
+import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.remote.dto.LoginResponse
 import com.po4yka.trailglass.data.remote.dto.RegisterResponse
 import com.po4yka.trailglass.feature.common.Lifecycle
@@ -26,6 +27,7 @@ class AuthController(
     private val registerUseCase: RegisterUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val checkAuthStatusUseCase: CheckAuthStatusUseCase,
+    private val userSession: UserSession,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
 
@@ -51,7 +53,13 @@ class AuthController(
         object Unauthenticated : AuthState()
 
         /**
-         * User is authenticated.
+         * User is using the app in guest mode (no account required).
+         * All data is stored locally only, no sync functionality.
+         */
+        object Guest : AuthState()
+
+        /**
+         * User is authenticated with an account.
          */
         data class Authenticated(
             val userId: String,
@@ -86,6 +94,13 @@ class AuthController(
 
         controllerScope.launch {
             try {
+                // Check if user is in guest mode
+                if (userSession.isGuest()) {
+                    logger.debug { "User is in guest mode" }
+                    _state.value = AuthState.Guest
+                    return@launch
+                }
+
                 val isAuthenticated = checkAuthStatusUseCase.execute()
                 if (isAuthenticated) {
                     // User is already authenticated, but we need user info
@@ -209,6 +224,38 @@ class AuthController(
                 logger.error(e) { "Logout exception (session cleared anyway)" }
             }
         }
+    }
+
+    /**
+     * Continue using the app as a guest (without creating an account).
+     * All data will be stored locally only, with no cloud sync.
+     */
+    fun continueAsGuest() {
+        logger.info { "User continuing as guest" }
+
+        controllerScope.launch {
+            try {
+                // Set a special guest user ID in the session
+                // This allows the app to function normally but skip sync operations
+                userSession.setUserId(UserSession.GUEST_USER_ID)
+                _state.value = AuthState.Guest
+                logger.info { "Guest mode activated" }
+            } catch (e: Exception) {
+                _state.value = AuthState.Error(
+                    "Failed to enter guest mode: ${e.message}",
+                    AuthState.Unauthenticated
+                )
+                logger.error(e) { "Failed to activate guest mode" }
+            }
+        }
+    }
+
+    /**
+     * Check if user is currently in guest mode.
+     */
+    fun isGuest(): Boolean {
+        return _state.value is AuthState.Guest ||
+                userSession.getCurrentUserId() == UserSession.GUEST_USER_ID
     }
 
     /**

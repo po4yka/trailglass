@@ -28,8 +28,14 @@ fun AuthNavigation(
     // Watch for authentication success and trigger navigation
     val authState by authController!!.state.collectAsState()
     LaunchedEffect(authState) {
-        if (authState is AuthController.AuthState.Authenticated) {
-            authRootComponent.onAuthenticated()
+        when (authState) {
+            is AuthController.AuthState.Authenticated,
+            is AuthController.AuthState.Guest -> {
+                authRootComponent.onAuthenticated()
+            }
+            else -> {
+                // Stay on auth screens
+            }
         }
     }
 

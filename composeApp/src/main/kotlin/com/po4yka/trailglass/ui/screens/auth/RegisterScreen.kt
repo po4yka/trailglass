@@ -287,6 +287,33 @@ fun RegisterScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Continue as Guest
+        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+        TextButton(
+            onClick = { authController.continueAsGuest() },
+            enabled = !isLoading,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Continue as Guest")
+        }
+
+        Text(
+            text = "No account needed. All data stored locally only.",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+
         Spacer(modifier = Modifier.height(32.dp))
     }
 

@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.sync
 
+import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkState
 import com.po4yka.trailglass.data.network.allowsSync
@@ -106,6 +107,21 @@ class SyncManager(
      * Perform full synchronization of all entity types.
      */
     suspend fun performFullSync(): Result<SyncResultSummary> {
+        // Skip sync for guest users (no account, local-only mode)
+        if (userId == UserSession.GUEST_USER_ID) {
+            logger.debug { "Skipping sync: user is in guest mode (local-only)" }
+            _syncProgress.value = SyncProgress.Idle
+            return Result.success(
+                SyncResultSummary(
+                    uploaded = 0,
+                    downloaded = 0,
+                    conflicts = 0,
+                    conflictsResolved = 0,
+                    errors = 0
+                )
+            )
+        }
+
         // Check network connectivity
         if (!networkMonitor.networkState.value.allowsSync()) {
             logger.warn { "Cannot sync: network not available" }
