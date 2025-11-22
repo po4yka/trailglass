@@ -3,6 +3,10 @@ package com.po4yka.trailglass.domain.algorithm
 import com.po4yka.trailglass.domain.model.Coordinate
 import kotlin.math.*
 
+// Extension functions for degrees/radians conversion
+private fun Double.toRadians(): Double = this * PI / 180.0
+private fun Double.toDegrees(): Double = this * 180.0 / PI
+
 /**
  * Algorithm for interpolating between two geographic coordinates.
  */
@@ -86,10 +90,10 @@ class SphericalInterpolation : InterpolationAlgorithm {
         val clampedFraction = fraction.coerceIn(0.0, 1.0)
 
         // Convert to radians
-        val lat1 = Math.toRadians(from.latitude)
-        val lon1 = Math.toRadians(from.longitude)
-        val lat2 = Math.toRadians(to.latitude)
-        val lon2 = Math.toRadians(to.longitude)
+        val lat1 = (from.latitude).toRadians()
+        val lon1 = (from.longitude).toRadians()
+        val lat2 = (to.latitude).toRadians()
+        val lon2 = (to.longitude).toRadians()
 
         // Convert to Cartesian coordinates
         val x1 = cos(lat1) * cos(lon1)
@@ -124,8 +128,8 @@ class SphericalInterpolation : InterpolationAlgorithm {
         val lon = atan2(y, x)
 
         return Coordinate(
-            latitude = Math.toDegrees(lat),
-            longitude = Math.toDegrees(lon)
+            latitude = (lat).toDegrees(),
+            longitude = (lon).toDegrees()
         )
     }
 }

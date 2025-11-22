@@ -3,6 +3,10 @@ package com.po4yka.trailglass.domain.algorithm
 import com.po4yka.trailglass.domain.model.Coordinate
 import kotlin.math.*
 
+// Extension functions for degrees/radians conversion
+private fun Double.toRadians(): Double = this * PI / 180.0
+private fun Double.toDegrees(): Double = this * 180.0 / PI
+
 /**
  * Algorithm for calculating bearing (direction) between two geographic coordinates.
  */
@@ -53,16 +57,16 @@ class InitialBearing : BearingAlgorithm {
     }
 
     override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val phi1 = Math.toRadians(lat1)
-        val phi2 = Math.toRadians(lat2)
-        val deltaLambda = Math.toRadians(lon2 - lon1)
+        val phi1 = lat1.toRadians()
+        val phi2 = lat2.toRadians()
+        val deltaLambda = (lon2 - lon1).toRadians()
 
         val y = sin(deltaLambda) * cos(phi2)
         val x = cos(phi1) * sin(phi2) -
                 sin(phi1) * cos(phi2) * cos(deltaLambda)
 
         val theta = atan2(y, x)
-        return (Math.toDegrees(theta) + 360) % 360
+        return (theta.toDegrees() + 360) % 360
     }
 }
 
@@ -93,9 +97,9 @@ class RhumbLineBearing : BearingAlgorithm {
     }
 
     override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val phi1 = Math.toRadians(lat1)
-        val phi2 = Math.toRadians(lat2)
-        var deltaLambda = Math.toRadians(lon2 - lon1)
+        val phi1 = (lat1).toRadians()
+        val phi2 = (lat2).toRadians()
+        var deltaLambda = (lon2 - lon1).toRadians()
 
         // Normalize longitude difference
         if (abs(deltaLambda) > PI) {
@@ -109,7 +113,7 @@ class RhumbLineBearing : BearingAlgorithm {
         val deltaPsi = ln(tan(phi2 / 2 + PI / 4) / tan(phi1 / 2 + PI / 4))
         val theta = atan2(deltaLambda, deltaPsi)
 
-        return (Math.toDegrees(theta) + 360) % 360
+        return ((theta).toDegrees() + 360) % 360
     }
 }
 

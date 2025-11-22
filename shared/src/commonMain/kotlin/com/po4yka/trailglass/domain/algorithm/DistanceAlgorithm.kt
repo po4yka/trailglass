@@ -3,6 +3,10 @@ package com.po4yka.trailglass.domain.algorithm
 import com.po4yka.trailglass.domain.model.Coordinate
 import kotlin.math.*
 
+// Extension functions for degrees/radians conversion
+private fun Double.toRadians(): Double = this * PI / 180.0
+private fun Double.toDegrees(): Double = this * 180.0 / PI
+
 /**
  * Algorithm for calculating distance between two geographic coordinates.
  */
@@ -56,11 +60,11 @@ class HaversineDistance : DistanceAlgorithm {
     }
 
     override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
+        val dLat = (lat2 - lat1).toRadians()
+        val dLon = (lon2 - lon1).toRadians()
 
         val a = sin(dLat / 2).pow(2) +
-                cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
+                cos((lat1).toRadians()) * cos((lat2).toRadians()) *
                 sin(dLon / 2).pow(2)
 
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
@@ -91,10 +95,10 @@ class VincentyDistance : DistanceAlgorithm {
         // Handle identical points
         if (lat1 == lat2 && lon1 == lon2) return 0.0
 
-        val phi1 = Math.toRadians(lat1)
-        val phi2 = Math.toRadians(lat2)
-        val lambda1 = Math.toRadians(lon1)
-        val lambda2 = Math.toRadians(lon2)
+        val phi1 = (lat1).toRadians()
+        val phi2 = (lat2).toRadians()
+        val lambda1 = (lon1).toRadians()
+        val lambda2 = (lon2).toRadians()
 
         val U1 = atan((1 - FLATTENING) * tan(phi1))
         val U2 = atan((1 - FLATTENING) * tan(phi2))
@@ -178,7 +182,7 @@ class SimpleDistance : DistanceAlgorithm {
 
     override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
         val avgLat = (lat1 + lat2) / 2.0
-        val metersPerDegreeLon = METERS_PER_DEGREE_LAT * cos(Math.toRadians(avgLat))
+        val metersPerDegreeLon = METERS_PER_DEGREE_LAT * cos((avgLat).toRadians())
 
         val dLat = (lat2 - lat1) * METERS_PER_DEGREE_LAT
         val dLon = (lon2 - lon1) * metersPerDegreeLon

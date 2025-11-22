@@ -99,8 +99,8 @@ Platform APIs (expect/actual pattern)
 
 ### Key Technologies
 
-- **Kotlin 2.2.20** with Kotlin Multiplatform
-- **SQLDelight 2.1.0**: Type-safe database with cross-platform support
+- **Kotlin 2.2.21** with Kotlin Multiplatform
+- **SQLDelight 2.2.1**: Type-safe database with cross-platform support
 - **kotlin-inject 0.7.2**: Compile-time dependency injection via KSP
 - **Decompose 3.2.0**: Navigation with lifecycle and state preservation
 - **Ktor 3.3.2**: HTTP client for sync
@@ -192,6 +192,7 @@ UI observes state via `collectAsState()` (Compose) or Combine/SwiftUI patterns (
 - DI: `docs/dependency-injection.md`
 - Motion Prediction: `docs/MOTION_PREDICTION.md`
 - Compass & Moko-Resources: `docs/COMPASS_MOKO_INTEGRATION.md`
+- Kotlin 2.2.21 Migration: `docs/KOTLIN_2_2_21_MIGRATION.md`
 
 ### Code
 - Domain models: `shared/src/commonMain/kotlin/com/po4yka/trailglass/domain/model/`
