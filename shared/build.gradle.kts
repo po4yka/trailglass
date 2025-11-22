@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.moko.resources)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
     id("org.jetbrains.kotlinx.kover") version "0.9.3"
 }
 
@@ -137,6 +139,9 @@ dependencies {
     add("kspAndroid", libs.kotlin.inject.compiler)
     add("kspIosArm64", libs.kotlin.inject.compiler)
     add("kspIosSimulatorArm64", libs.kotlin.inject.compiler)
+
+    // Detekt formatting plugin
+    detektPlugins(libs.detekt.formatting)
 }
 
 // Code coverage configuration
@@ -158,5 +163,44 @@ kover {
                 minBound(75) // Target: 75%+ coverage
             }
         }
+    }
+}
+
+// ktlint configuration
+ktlint {
+    version.set("1.5.0")
+    android.set(true)
+    outputToConsole.set(true)
+    coloredOutput.set(true)
+    ignoreFailures.set(false)
+
+    filter {
+        exclude("**/generated/**")
+        exclude("**/build/**")
+        exclude("**/db/**") // Exclude SQLDelight generated code
+        exclude("**/*_Factory.kt") // Exclude kotlin-inject generated code
+    }
+}
+
+// detekt configuration
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("$rootDir/config/detekt/detekt.yml")
+    baseline = file("$rootDir/config/detekt/baseline.xml")
+
+    source.setFrom(
+        "src/commonMain/kotlin",
+        "src/androidMain/kotlin",
+        "src/iosMain/kotlin"
+    )
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+        txt.required.set(false)
+        sarif.required.set(true)
     }
 }

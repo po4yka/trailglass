@@ -91,6 +91,34 @@ cd iosApp && swiftlint --fix   # Auto-fix Swift issues
 
 See `docs/LINTING.md` for detailed documentation.
 
+### CI/CD
+
+GitHub Actions workflows run automatically on pull requests and pushes:
+
+**Workflows:**
+- **lint.yml** - Code quality checks (ktlint, detekt, Android Lint, SwiftLint)
+- **ci.yml** - Build and test (shared tests, Android tests, APK build, iOS framework build)
+
+**Viewing Results:**
+- Check the "Actions" tab on GitHub
+- PR checks show workflow status
+- Failed workflows upload reports as artifacts
+
+**Local Testing:**
+```bash
+# Run the same checks locally before pushing
+./scripts/lint-all.sh       # All linters
+./scripts/run-tests.sh      # All tests
+./gradlew :composeApp:assembleDebug  # Android build
+./gradlew :shared:linkDebugFrameworkIosSimulatorArm64  # iOS framework
+```
+
+**CI Requirements:**
+- All lint checks must pass
+- Test coverage must be 75%+
+- All tests must pass
+- Builds must succeed for Android and iOS
+
 ## Architecture
 
 ### Module Structure

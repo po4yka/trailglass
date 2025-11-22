@@ -1,0 +1,275 @@
+# Trailglass iOS SwiftLint Configuration
+
+# Rules to disable
+disabled_rules:
+  - trailing_whitespace
+
+# Rules to enable (opt-in)
+opt_in_rules:
+  - empty_count
+  - empty_string
+  - explicit_init
+  - first_where
+  - force_unwrapping
+  - fatal_error_message
+  - closure_spacing
+  - modifier_order
+  - sorted_imports
+  - vertical_whitespace_closing_braces
+  - vertical_whitespace_opening_braces
+  - contains_over_filter_count
+  - contains_over_filter_is_empty
+  - empty_collection_literal
+  - implicit_return
+  - joined_default_parameter
+  - multiline_function_chains
+  - multiline_parameters
+  - optional_enum_case_matching
+  - prefer_self_in_static_references
+  - prefer_zero_over_explicit_init
+  - redundant_nil_coalescing
+  - strict_fileprivate
+  - toggle_bool
+  - unneeded_parentheses_in_closure_argument
+  - vertical_whitespace_between_cases
+  - yoda_condition
+
+# Paths to exclude from linting
+excluded:
+  - Pods
+  - build
+  - DerivedData
+  - .build
+  - Generated
+
+# Analyzer rules
+analyzer_rules:
+  - unused_declaration
+  - unused_import
+
+# Line length
+line_length:
+  warning: 120
+  error: 150
+  ignores_comments: true
+  ignores_urls: true
+  ignores_function_declarations: false
+  ignores_interpolated_strings: true
+
+# File length
+file_length:
+  warning: 500
+  error: 1000
+  ignore_comment_only_lines: true
+
+# Function body length
+function_body_length:
+  warning: 50
+  error: 100
+
+# Function parameter count
+function_parameter_count:
+  warning: 5
+  error: 8
+
+# Type body length
+type_body_length:
+  warning: 300
+  error: 500
+
+# Type name
+type_name:
+  min_length:
+    warning: 3
+    error: 1
+  max_length:
+    warning: 40
+    error: 50
+  excluded:
+    - id
+    - ID
+    - db
+    - DB
+
+# Identifier name
+identifier_name:
+  min_length:
+    warning: 2
+  max_length:
+    warning: 40
+    error: 50
+  excluded:
+    - id
+    - ID
+    - db
+    - DB
+    - x
+    - y
+    - z
+    - r
+    - g
+    - b
+    - a
+
+# Nesting
+nesting:
+  type_level:
+    warning: 2
+  statement_level:
+    warning: 5
+
+# Force cast
+force_cast: error
+
+# Force try
+force_try: error
+
+# Force unwrapping
+force_unwrapping: warning
+
+# Cyclomatic complexity
+cyclomatic_complexity:
+  warning: 15
+  error: 25
+  ignores_case_statements: false
+
+# Large tuple
+large_tuple:
+  warning: 3
+  error: 4
+
+# Trailing comma
+trailing_comma:
+  mandatory_comma: false
+
+# Vertical whitespace
+vertical_whitespace:
+  max_empty_lines: 1
+
+# Number separator
+number_separator:
+  minimum_length: 5
+  minimum_fraction_length: 5
+
+# Closure parameter position
+closure_parameter_position:
+  severity: warning
+
+# Colon spacing
+colon:
+  flexible_right_spacing: false
+  apply_to_dictionaries: true
+
+# Comma spacing
+comma: warning
+
+# Control statement
+control_statement: warning
+
+# Duplicate imports
+duplicate_imports: error
+
+# Empty parameters
+empty_parameters: warning
+
+# Empty parentheses with trailing closure
+empty_parentheses_with_trailing_closure: warning
+
+# Legacy constant
+legacy_constant: warning
+
+# Legacy constructor
+legacy_constructor: warning
+
+# Mark
+mark: warning
+
+# Multiple closures with trailing closure
+multiple_closures_with_trailing_closure: warning
+
+# Operator whitespace
+operator_whitespace: warning
+
+# Private over fileprivate
+private_over_fileprivate:
+  validate_extensions: true
+
+# Protocol property accessors order
+protocol_property_accessors_order: warning
+
+# Redundant discardable let
+redundant_discardable_let: warning
+
+# Redundant optional initialization
+redundant_optional_initialization: warning
+
+# Redundant set access control
+redundant_set_access_control: warning
+
+# Redundant string enum value
+redundant_string_enum_value: warning
+
+# Redundant void return
+redundant_void_return: warning
+
+# Return arrow whitespace
+return_arrow_whitespace: warning
+
+# Shorthand operator
+shorthand_operator: warning
+
+# Statement position
+statement_position:
+  severity: warning
+
+# Syntactic sugar
+syntactic_sugar: warning
+
+# Todo
+todo: warning
+
+# Trailing newline
+trailing_newline: error
+
+# Trailing semicolon
+trailing_semicolon: error
+
+# Unneeded break in switch
+unneeded_break_in_switch: warning
+
+# Unused closure parameter
+unused_closure_parameter: warning
+
+# Unused enumerated
+unused_enumerated: warning
+
+# Unused optional binding
+unused_optional_binding:
+  ignore_optional_try: true
+
+# Valid IBInspectable
+valid_ibinspectable: warning
+
+# Vertical parameter alignment
+vertical_parameter_alignment: warning
+
+# Void return
+void_return: warning
+
+# Custom rules
+custom_rules:
+  no_print:
+    name: "No Print Statements"
+    regex: '\bprint\('
+    match_kinds:
+      - identifier
+    message: "Use proper logging instead of print()"
+    severity: warning
+
+  no_nslog:
+    name: "No NSLog Statements"
+    regex: '\bNSLog\('
+    match_kinds:
+      - identifier
+    message: "Use proper logging instead of NSLog()"
+    severity: warning

@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.secrets)
+    alias(libs.plugins.ktlint)
+    alias(libs.plugins.detekt)
 }
 
 android {
@@ -36,6 +38,21 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    lint {
+        lintConfig = file("$rootDir/config/android-lint.xml")
+        abortOnError = false
+        checkAllWarnings = true
+        warningsAsErrors = false
+        baseline = file("lint-baseline.xml")
+
+        disable.addAll(
+            listOf(
+                "MissingTranslation",
+                "ExtraTranslation"
+            )
+        )
     }
 }
 
@@ -110,4 +127,37 @@ secrets {
 
     // Ignore missing secrets in builds (useful for CI/CD)
     ignoreList.add("sdk.*")
+}
+
+// ktlint configuration
+ktlint {
+    version.set("1.5.0")
+    android.set(true)
+    outputToConsole.set(true)
+    coloredOutput.set(true)
+    ignoreFailures.set(false)
+
+    filter {
+        exclude("**/generated/**")
+        exclude("**/build/**")
+    }
+}
+
+// detekt configuration
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    config.setFrom("$rootDir/config/detekt/detekt.yml")
+    baseline = file("$rootDir/config/detekt/baseline.xml")
+
+    source.setFrom("src/main/kotlin")
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    reports {
+        html.required.set(true)
+        xml.required.set(false)
+        txt.required.set(false)
+        sarif.required.set(true)
+    }
 }

@@ -44,6 +44,8 @@ compass = "2.4.1"
 moko-resources = "0.25.1"
 moko-resources-generator = "0.25.2"
 gradle-versions = "0.53.0"
+ktlint-gradle = "12.1.2"
+detekt = "1.23.7"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
@@ -114,6 +116,7 @@ moko-resources = { module = "dev.icerock.moko:resources", version.ref = "moko-re
 moko-resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "moko-resources" }
 moko-resources-generator = { module = "dev.icerock.moko:resources-generator", version.ref = "moko-resources-generator" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinx-coroutines" }
+detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -128,3 +131,5 @@ secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugi
 kotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 moko-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "moko-resources-generator" }
 gradle-versions = { id = "com.github.ben-manes.versions", version.ref = "gradle-versions" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

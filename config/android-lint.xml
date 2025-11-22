@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Compose-specific checks -->
+    <issue id="UnusedMaterial3ScaffoldPaddingParameter" severity="error">
+        <description>Material 3 Scaffold padding parameter should be used</description>
+    </issue>
+    <issue id="UnrememberedMutableState" severity="error">
+        <description>MutableState should be remembered in Composables</description>
+    </issue>
+    <issue id="ComposableNaming" severity="warning">
+        <description>Composable functions should be PascalCase</description>
+    </issue>
+    <issue id="ComposableLambdaParameterNaming" severity="warning">
+        <description>Composable lambda parameters should follow naming conventions</description>
+    </issue>
+
+    <!-- Performance -->
+    <issue id="UnusedResources" severity="warning">
+        <description>Unused resources should be removed</description>
+    </issue>
+    <issue id="ViewHolder" severity="warning">
+        <description>ViewHolder pattern should be used for RecyclerView</description>
+    </issue>
+    <issue id="Overdraw" severity="warning">
+        <description>Avoid overdraw issues</description>
+    </issue>
+    <issue id="DrawAllocation" severity="warning">
+        <description>Avoid allocations in draw/layout methods</description>
+    </issue>
+    <issue id="Wakelock" severity="warning">
+        <description>Wakelocks should be properly released</description>
+    </issue>
+
+    <!-- Accessibility -->
+    <issue id="ContentDescription" severity="warning">
+        <description>Images should have contentDescription for accessibility</description>
+    </issue>
+    <issue id="ClickableViewAccessibility" severity="warning">
+        <description>Clickable views should be accessible</description>
+    </issue>
+    <issue id="LabelFor" severity="warning">
+        <description>EditText should have labelFor attribute</description>
+    </issue>
+
+    <!-- Security -->
+    <issue id="HardcodedText" severity="informational">
+        <description>Hardcoded text should be externalized</description>
+    </issue>
+    <issue id="SetJavaScriptEnabled" severity="warning">
+        <description>JavaScript should only be enabled when necessary</description>
+    </issue>
+    <issue id="ExportedReceiver" severity="error">
+        <description>Exported receivers should be properly secured</description>
+    </issue>
+    <issue id="ExportedService" severity="error">
+        <description>Exported services should be properly secured</description>
+    </issue>
+    <issue id="ExportedActivity" severity="error">
+        <description>Exported activities should be properly secured</description>
+    </issue>
+    <issue id="AllowBackup" severity="warning">
+        <description>Backup should be configured properly</description>
+    </issue>
+    <issue id="HardcodedDebugMode" severity="error">
+        <description>Debug mode should not be hardcoded</description>
+    </issue>
+
+    <!-- Code quality -->
+    <issue id="ObsoleteSdkInt" severity="error">
+        <description>Unnecessary SDK version checks should be removed</description>
+    </issue>
+    <issue id="NewApi" severity="error">
+        <description>API level requirements should be met</description>
+    </issue>
+    <issue id="Recycle" severity="error">
+        <description>Resources should be properly recycled</description>
+    </issue>
+    <issue id="DefaultLocale" severity="warning">
+        <description>Locale should be specified explicitly</description>
+    </issue>
+    <issue id="SimpleDateFormat" severity="warning">
+        <description>SimpleDateFormat should specify locale</description>
+    </issue>
+
+    <!-- Correctness -->
+    <issue id="InvalidPackage" severity="error">
+        <description>Package structure should be correct</description>
+    </issue>
+    <issue id="MissingPermission" severity="error">
+        <description>Required permissions should be declared</description>
+    </issue>
+    <issue id="ProtectedPermissions" severity="error">
+        <description>Protected permissions should not be used without justification</description>
+    </issue>
+    <issue id="UnusedAttribute" severity="warning">
+        <description>Unused attributes should be removed</description>
+    </issue>
+
+    <!-- Kotlin -->
+    <issue id="UnsafeCallOnNullableType" severity="error">
+        <description>Unsafe calls on nullable types should be avoided</description>
+    </issue>
+    <issue id="KotlinPropertyAccess" severity="warning">
+        <description>Use Kotlin property access syntax</description>
+    </issue>
+
+    <!-- Ignore for now -->
+    <issue id="MissingTranslation" severity="ignore">
+        <description>Translation files are not required yet</description>
+    </issue>
+    <issue id="ExtraTranslation" severity="ignore">
+        <description>Extra translations are acceptable</description>
+    </issue>
+    <issue id="GoogleAppIndexingWarning" severity="ignore">
+        <description>App indexing is not required for this app</description>
+    </issue>
+</lint>
