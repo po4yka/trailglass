@@ -14,7 +14,6 @@ private val logger = KotlinLogging.logger {}
 class ExportManager(
     private val fileOperations: FileOperations
 ) {
-
     /**
      * Export trips to CSV format.
      *
@@ -25,23 +24,24 @@ class ExportManager(
     suspend fun exportTripsToCSV(
         trips: List<Trip>,
         outputPath: String
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> =
+        try {
             logger.info { "Exporting ${trips.size} trips to CSV: $outputPath" }
 
-            val csv = buildString {
-                appendLine("id,name,start_time,end_time,primary_country,is_ongoing,user_id")
-                trips.forEach { trip ->
-                    appendLine(
-                        "${trip.id}," +
-                            "\"${trip.name ?: ""}\",${trip.startTime.toEpochMilliseconds()}," +
-                            "${trip.endTime?.toEpochMilliseconds() ?: ""}," +
-                            "\"${trip.primaryCountry ?: ""}\"," +
-                            "${trip.isOngoing}," +
-                            "${trip.userId}"
-                    )
+            val csv =
+                buildString {
+                    appendLine("id,name,start_time,end_time,primary_country,is_ongoing,user_id")
+                    trips.forEach { trip ->
+                        appendLine(
+                            "${trip.id}," +
+                                "\"${trip.name ?: ""}\",${trip.startTime.toEpochMilliseconds()}," +
+                                "${trip.endTime?.toEpochMilliseconds() ?: ""}," +
+                                "\"${trip.primaryCountry ?: ""}\"," +
+                                "${trip.isOngoing}," +
+                                "${trip.userId}"
+                        )
+                    }
                 }
-            }
 
             fileOperations.writeFileText(outputPath, csv)
             logger.info { "Successfully exported trips to $outputPath" }
@@ -50,7 +50,6 @@ class ExportManager(
             logger.error(e) { "Failed to export trips to CSV" }
             Result.failure(e)
         }
-    }
 
     /**
      * Export place visits to CSV format.
@@ -62,31 +61,32 @@ class ExportManager(
     suspend fun exportVisitsToCSV(
         visits: List<PlaceVisit>,
         outputPath: String
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> =
+        try {
             logger.info { "Exporting ${visits.size} visits to CSV: $outputPath" }
 
-            val csv = buildString {
-                appendLine(
-                    "id,start_time,end_time,latitude,longitude,address," +
-                        "poi_name,city,country,category,is_favorite"
-                )
-                visits.forEach { visit ->
+            val csv =
+                buildString {
                     appendLine(
-                        "${visit.id}," +
-                            "${visit.startTime.toEpochMilliseconds()}," +
-                            "${visit.endTime.toEpochMilliseconds()}," +
-                            "${visit.centerLatitude}," +
-                            "${visit.centerLongitude}," +
-                            "\"${visit.approximateAddress ?: ""}\"," +
-                            "\"${visit.poiName ?: ""}\"," +
-                            "\"${visit.city ?: ""}\"," +
-                            "\"${visit.countryCode ?: ""}\"," +
-                            "${visit.category}," +
-                            "${visit.isFavorite}"
+                        "id,start_time,end_time,latitude,longitude,address," +
+                            "poi_name,city,country,category,is_favorite"
                     )
+                    visits.forEach { visit ->
+                        appendLine(
+                            "${visit.id}," +
+                                "${visit.startTime.toEpochMilliseconds()}," +
+                                "${visit.endTime.toEpochMilliseconds()}," +
+                                "${visit.centerLatitude}," +
+                                "${visit.centerLongitude}," +
+                                "\"${visit.approximateAddress ?: ""}\"," +
+                                "\"${visit.poiName ?: ""}\"," +
+                                "\"${visit.city ?: ""}\"," +
+                                "\"${visit.countryCode ?: ""}\"," +
+                                "${visit.category}," +
+                                "${visit.isFavorite}"
+                        )
+                    }
                 }
-            }
 
             fileOperations.writeFileText(outputPath, csv)
             logger.info { "Successfully exported visits to $outputPath" }
@@ -95,7 +95,6 @@ class ExportManager(
             logger.error(e) { "Failed to export visits to CSV" }
             Result.failure(e)
         }
-    }
 
     /**
      * Export place visits to GPX format for GPS applications.
@@ -107,32 +106,39 @@ class ExportManager(
     suspend fun exportVisitsToGPX(
         visits: List<PlaceVisit>,
         outputPath: String
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> =
+        try {
             logger.info { "Exporting ${visits.size} visits to GPX: $outputPath" }
 
-            val gpx = buildString {
-                appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-                appendLine(
-                    "<gpx version=\"1.1\" creator=\"Trailglass\" " +
-                        "xmlns=\"http://www.topografix.com/GPX/1/1\">"
-                )
-                appendLine("  <metadata>")
-                appendLine("    <name>Trailglass Export</name>")
-                appendLine("    <time>${Instant.fromEpochMilliseconds(kotlinx.datetime.Clock.System.now().toEpochMilliseconds())}</time>")
-                appendLine("  </metadata>")
+            val gpx =
+                buildString {
+                    appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+                    appendLine(
+                        "<gpx version=\"1.1\" creator=\"Trailglass\" " +
+                            "xmlns=\"http://www.topografix.com/GPX/1/1\">"
+                    )
+                    appendLine("  <metadata>")
+                    appendLine("    <name>Trailglass Export</name>")
+                    appendLine(
+                        "    <time>${Instant.fromEpochMilliseconds(
+                            kotlinx.datetime.Clock.System
+                                .now()
+                                .toEpochMilliseconds()
+                        )}</time>"
+                    )
+                    appendLine("  </metadata>")
 
-                visits.forEach { visit ->
-                    appendLine("  <wpt lat=\"${visit.centerLatitude}\" lon=\"${visit.centerLongitude}\">")
-                    appendLine("    <time>${visit.startTime}</time>")
-                    visit.poiName?.let { appendLine("    <name>$it</name>") }
-                    visit.approximateAddress?.let { appendLine("    <desc>$it</desc>") }
-                    visit.category.let { appendLine("    <type>${it.name}</type>") }
-                    appendLine("  </wpt>")
+                    visits.forEach { visit ->
+                        appendLine("  <wpt lat=\"${visit.centerLatitude}\" lon=\"${visit.centerLongitude}\">")
+                        appendLine("    <time>${visit.startTime}</time>")
+                        visit.poiName?.let { appendLine("    <name>$it</name>") }
+                        visit.approximateAddress?.let { appendLine("    <desc>$it</desc>") }
+                        visit.category.let { appendLine("    <type>${it.name}</type>") }
+                        appendLine("  </wpt>")
+                    }
+
+                    appendLine("</gpx>")
                 }
-
-                appendLine("</gpx>")
-            }
 
             fileOperations.writeFileText(outputPath, gpx)
             logger.info { "Successfully exported visits to GPX: $outputPath" }
@@ -141,7 +147,6 @@ class ExportManager(
             logger.error(e) { "Failed to export visits to GPX" }
             Result.failure(e)
         }
-    }
 
     /**
      * Export trip data to JSON format.
@@ -153,21 +158,22 @@ class ExportManager(
     suspend fun exportTripToJSON(
         trip: Trip,
         outputPath: String
-    ): Result<Unit> {
-        return try {
+    ): Result<Unit> =
+        try {
             logger.info { "Exporting trip ${trip.id} to JSON: $outputPath" }
 
-            val json = buildString {
-                appendLine("{")
-                appendLine("  \"id\": \"${trip.id}\",")
-                appendLine("  \"name\": \"${trip.name ?: ""}\",")
-                appendLine("  \"startTime\": ${trip.startTime.toEpochMilliseconds()},")
-                appendLine("  \"endTime\": ${trip.endTime?.toEpochMilliseconds() ?: "null"},")
-                appendLine("  \"primaryCountry\": \"${trip.primaryCountry ?: ""}\",")
-                appendLine("  \"isOngoing\": ${trip.isOngoing},")
-                appendLine("  \"userId\": \"${trip.userId}\"")
-                appendLine("}")
-            }
+            val json =
+                buildString {
+                    appendLine("{")
+                    appendLine("  \"id\": \"${trip.id}\",")
+                    appendLine("  \"name\": \"${trip.name ?: ""}\",")
+                    appendLine("  \"startTime\": ${trip.startTime.toEpochMilliseconds()},")
+                    appendLine("  \"endTime\": ${trip.endTime?.toEpochMilliseconds() ?: "null"},")
+                    appendLine("  \"primaryCountry\": \"${trip.primaryCountry ?: ""}\",")
+                    appendLine("  \"isOngoing\": ${trip.isOngoing},")
+                    appendLine("  \"userId\": \"${trip.userId}\"")
+                    appendLine("}")
+                }
 
             fileOperations.writeFileText(outputPath, json)
             logger.info { "Successfully exported trip to JSON: $outputPath" }
@@ -176,7 +182,6 @@ class ExportManager(
             logger.error(e) { "Failed to export trip to JSON" }
             Result.failure(e)
         }
-    }
 
     /**
      * Create a backup of all data in a compressed format.
@@ -184,12 +189,15 @@ class ExportManager(
      * @param backupPath Path to the backup directory
      * @return Result indicating success or failure
      */
-    suspend fun createBackup(backupPath: String): Result<String> {
-        return try {
+    suspend fun createBackup(backupPath: String): Result<String> =
+        try {
             logger.info { "Creating backup at: $backupPath" }
             fileOperations.createDirectories(backupPath)
 
-            val timestamp = kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
+            val timestamp =
+                kotlinx.datetime.Clock.System
+                    .now()
+                    .toEpochMilliseconds()
             val backupFile = "$backupPath/trailglass_backup_$timestamp.txt"
 
             fileOperations.writeFileText(
@@ -203,5 +211,4 @@ class ExportManager(
             logger.error(e) { "Failed to create backup" }
             Result.failure(e)
         }
-    }
 }

@@ -18,36 +18,36 @@ class PlaceVisitPagingSource(
     private val database: TrailGlassDatabase,
     private val userId: String
 ) : PagingSource<Int, PlaceVisit>() {
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PlaceVisit> {
-        return try {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, PlaceVisit> =
+        try {
             val page = params.key ?: 0
             val offset = page * params.loadSize
             val limit = params.loadSize.toLong()
 
             logger.debug { "Loading place visits: page=$page, offset=$offset, limit=$limit" }
 
-            val visits = database.placeVisitsQueries
-                .getVisitsByUser(userId, limit, offset.toLong())
-                .executeAsList()
-                .map { it.toPlaceVisit() }
+            val visits =
+                database.placeVisitsQueries
+                    .getVisitsByUser(userId, limit, offset.toLong())
+                    .executeAsList()
+                    .map { it.toPlaceVisit() }
 
             logger.debug { "Loaded ${visits.size} place visits" }
 
             LoadResult.Page(
                 data = visits,
                 prevKey = if (page == 0) null else page - 1,
-                nextKey = if (visits.isEmpty() || visits.size < params.loadSize) {
-                    null
-                } else {
-                    page + 1
-                }
+                nextKey =
+                    if (visits.isEmpty() || visits.size < params.loadSize) {
+                        null
+                    } else {
+                        page + 1
+                    }
             )
         } catch (e: Exception) {
             logger.error(e) { "Failed to load place visits" }
             LoadResult.Error(e)
         }
-    }
 
     override fun getRefreshKey(state: PagingState<Int, PlaceVisit>): Int? {
         // Return the page closest to the most recently accessed index
@@ -61,8 +61,8 @@ class PlaceVisitPagingSource(
 /**
  * Extension function to convert database entity to domain model.
  */
-private fun com.po4yka.trailglass.db.Place_visits.toPlaceVisit(): PlaceVisit {
-    return PlaceVisit(
+private fun com.po4yka.trailglass.db.Place_visits.toPlaceVisit(): PlaceVisit =
+    PlaceVisit(
         id = id,
         startTime = kotlinx.datetime.Instant.fromEpochMilliseconds(start_time),
         endTime = kotlinx.datetime.Instant.fromEpochMilliseconds(end_time),
@@ -72,9 +72,15 @@ private fun com.po4yka.trailglass.db.Place_visits.toPlaceVisit(): PlaceVisit {
         poiName = poi_name,
         city = city,
         countryCode = country_code,
-        category = com.po4yka.trailglass.domain.model.PlaceCategory.valueOf(category),
-        categoryConfidence = com.po4yka.trailglass.domain.model.CategoryConfidence.valueOf(category_confidence),
-        significance = com.po4yka.trailglass.domain.model.PlaceSignificance.valueOf(significance),
+        category =
+            com.po4yka.trailglass.domain.model.PlaceCategory
+                .valueOf(category),
+        categoryConfidence =
+            com.po4yka.trailglass.domain.model.CategoryConfidence
+                .valueOf(category_confidence),
+        significance =
+            com.po4yka.trailglass.domain.model.PlaceSignificance
+                .valueOf(significance),
         userLabel = user_label,
         userNotes = user_notes,
         isFavorite = is_favorite != 0L,
@@ -83,4 +89,3 @@ private fun com.po4yka.trailglass.db.Place_visits.toPlaceVisit(): PlaceVisit {
         createdAt = kotlinx.datetime.Instant.fromEpochMilliseconds(created_at),
         updatedAt = kotlinx.datetime.Instant.fromEpochMilliseconds(updated_at)
     )
-}

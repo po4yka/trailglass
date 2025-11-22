@@ -15,22 +15,25 @@ import kotlinx.coroutines.launch
 
 /**
  * Photo attachment dialog for attaching photos to place visits.
- * Uses Android photo picker to select images.
+ * Allows importing a new photo and immediately attaching it to a visit.
  */
 @Composable
 fun PhotoAttachmentHandler(
     placeVisitId: String,
     attachPhotoUseCase: AttachPhotoToVisitUseCase,
+    importPhotoUseCase: com.po4yka.trailglass.feature.photo.ImportPhotoUseCase,
+    userId: String,
     onDismiss: () -> Unit,
     onPhotoAttached: () -> Unit
 ) {
     var showCaptionDialog by remember { mutableStateOf(false) }
-    var selectedPhotoUri by remember { mutableStateOf<String?>(null) }
+    var selectedPhotoUri by remember { mutableStateOf<android.net.Uri?>(null) }
     var caption by remember { mutableStateOf("") }
     var isAttaching by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     // Photo picker launcher
     val photoPicker =
@@ -38,7 +41,7 @@ fun PhotoAttachmentHandler(
             contract = ActivityResultContracts.PickVisualMedia()
         ) { uri ->
             if (uri != null) {
-                selectedPhotoUri = uri.toString()
+                selectedPhotoUri = uri
                 showCaptionDialog = true
             } else {
                 onDismiss()
@@ -90,31 +93,55 @@ fun PhotoAttachmentHandler(
                             isAttaching = true
                             error = null
 
-                            // TODO: First need to import/upload the photo to get photoId
-                            // For now, this is a placeholder - the actual flow would be:
-                            // 1. Upload photo to server -> get photoId
-                            // 2. Attach photoId to placeVisitId with caption
+                            try {
+                                val uri = selectedPhotoUri!!
+                                val photoData =
+                                    context.contentResolver.openInputStream(uri)?.use {
+                                        it.readBytes()
+                                    }
 
-                            // Placeholder implementation showing the intended flow:
-                            // val uploadResult = photoRepository.uploadPhoto(selectedPhotoUri!!)
-                            // if (uploadResult is Success) {
-                            //     val photoId = uploadResult.photoId
-                            //     when (val result = attachPhotoUseCase.execute(photoId, placeVisitId, caption.ifBlank { null })) {
-                            //         is AttachPhotoToVisitUseCase.Result.Success -> {
-                            //             onPhotoAttached()
-                            //             showCaptionDialog = false
-                            //             onDismiss()
-                            //         }
-                            //         else -> {
-                            //             error = "Failed to attach photo"
-                            //         }
-                            //     }
-                            // }
+                                if (photoData == null) {
+                                    error = "Failed to read photo data"
+                                    isAttaching = false
+                                    return@launch
+                                }
 
-                            // For now, show error explaining this needs photo upload implementation
-                            error =
-                                "Photo upload not yet implemented. Please use the Photos tab to import photos first."
-                            isAttaching = false
+                                val importResult =
+                                    importPhotoUseCase.execute(
+                                        uri = uri.toString(),
+                                        photoData = photoData,
+                                        userId = userId
+                                    )
+
+                                when (importResult) {
+                                    is com.po4yka.trailglass.feature.photo.ImportPhotoUseCase.ImportResult.Success -> {
+                                        val photoId = importResult.photo.id
+
+                                        when (val result = attachPhotoUseCase.execute(photoId, placeVisitId, caption.ifBlank { null })) {
+                                            is AttachPhotoToVisitUseCase.Result.Success -> {
+                                                onPhotoAttached()
+                                                showCaptionDialog = false
+                                                onDismiss()
+                                            }
+                                            is AttachPhotoToVisitUseCase.Result.AlreadyAttached -> {
+                                                error = "Photo already attached to this visit"
+                                                isAttaching = false
+                                            }
+                                            is AttachPhotoToVisitUseCase.Result.Error -> {
+                                                error = result.message
+                                                isAttaching = false
+                                            }
+                                        }
+                                    }
+                                    is com.po4yka.trailglass.feature.photo.ImportPhotoUseCase.ImportResult.Error -> {
+                                        error = importResult.message
+                                        isAttaching = false
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                error = e.message ?: "Unknown error"
+                                isAttaching = false
+                            }
                         }
                     },
                     enabled = !isAttaching

@@ -76,4 +76,9 @@ interface PlatformModule {
      * Platform-specific settings storage.
      */
     fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage
+
+    /**
+     * Platform-specific photo directory provider.
+     */
+    fun photoDirectoryProvider(): com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 }

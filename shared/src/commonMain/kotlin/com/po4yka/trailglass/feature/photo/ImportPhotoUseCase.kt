@@ -1,5 +1,7 @@
 package com.po4yka.trailglass.feature.photo
 
+import com.po4yka.trailglass.data.file.PhotoDirectoryProvider
+import com.po4yka.trailglass.data.file.PhotoStorageManager
 import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.logging.logger
@@ -11,30 +13,35 @@ import me.tatarka.inject.annotations.Inject
 
 /**
  * Use case for importing a photo into TrailGlass.
- * Extracts metadata, stores photo record, and returns the created photo.
+ * Extracts metadata, copies photo to app storage, and stores photo record.
  */
 @Inject
 class ImportPhotoUseCase(
     private val photoRepository: PhotoRepository,
+    private val photoStorageManager: PhotoStorageManager,
+    private val photoDirectoryProvider: PhotoDirectoryProvider,
     private val metadataExtractor: PhotoMetadataExtractor
 ) {
     private val logger = logger()
 
     /**
      * Import a photo from a platform-specific URI.
+     * This copies the photo to app storage and creates a database entry.
      *
      * @param uri Platform-specific photo URI (content:// on Android, PHAsset ID on iOS)
+     * @param photoData Raw photo bytes (must be provided)
      * @param userId User ID who owns this photo
      * @param timestamp Photo timestamp (will try to extract from EXIF if not provided)
      * @return Imported photo with metadata
      */
     suspend fun execute(
         uri: String,
+        photoData: ByteArray,
         userId: String,
         timestamp: Instant? = null
-    ): ImportResult =
-        try {
-            logger.info { "Importing photo from URI: $uri" }
+    ): ImportResult {
+        return try {
+            logger.info { "Importing photo from URI: $uri (${photoData.size} bytes)" }
 
             val photoId = UuidGenerator.randomUUID()
 
@@ -52,7 +59,10 @@ class ImportPhotoUseCase(
             val latitude = metadata?.exifLatitude
             val longitude = metadata?.exifLongitude
 
-            // Create photo record
+            // Get photos directory
+            val photosDirectory = photoDirectoryProvider.getPhotosDirectory()
+
+            // Create photo record (URI will be updated after save)
             val photo =
                 Photo(
                     id = photoId,
@@ -60,16 +70,27 @@ class ImportPhotoUseCase(
                     timestamp = photoTimestamp,
                     latitude = latitude,
                     longitude = longitude,
-                    width = null, // Would need platform-specific extraction
+                    width = null,
                     height = null,
-                    sizeBytes = null,
-                    mimeType = null, // Would need platform-specific extraction
+                    sizeBytes = photoData.size.toLong(),
+                    mimeType = "image/jpeg",
                     userId = userId,
                     addedAt = Clock.System.now()
                 )
 
-            // Store photo
-            photoRepository.insertPhoto(photo)
+            // Save photo to storage (this also inserts into database with updated URI)
+            val saveResult =
+                photoStorageManager.savePhoto(
+                    photo = photo,
+                    photoData = photoData,
+                    photosDirectory = photosDirectory
+                )
+
+            if (saveResult.isFailure) {
+                logger.error { "Failed to save photo: ${saveResult.exceptionOrNull()?.message}" }
+                val errorMessage = saveResult.exceptionOrNull()?.message ?: "Failed to save photo"
+                return ImportResult.Error(errorMessage)
+            }
 
             logger.info { "Successfully imported photo ${photo.id}" }
 
@@ -78,6 +99,7 @@ class ImportPhotoUseCase(
             logger.error(e) { "Failed to import photo from $uri" }
             ImportResult.Error(e.message ?: "Unknown error")
         }
+    }
 
     sealed class ImportResult {
         data class Success(

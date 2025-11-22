@@ -1,7 +1,6 @@
 package com.po4yka.trailglass.data.file
 
 import kotlinx.io.Buffer
-import kotlinx.io.Source
 import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
@@ -13,7 +12,6 @@ import kotlinx.io.readString
  * Provides a unified API for file I/O across Android and iOS.
  */
 class FileOperations {
-
     /**
      * Read file contents as a ByteArray.
      *

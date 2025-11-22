@@ -3,6 +3,8 @@ package com.po4yka.trailglass.di
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
 import com.po4yka.trailglass.data.db.IosDatabaseDriverFactory
+import com.po4yka.trailglass.data.file.IOSPhotoDirectoryProvider
+import com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 import com.po4yka.trailglass.data.network.IOSNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
@@ -88,4 +90,10 @@ class IOSPlatformModule : PlatformModule {
 
     @Provides
     override fun networkConnectivityMonitor(): NetworkConnectivityMonitor = IOSNetworkConnectivityMonitor()
+
+    /**
+     * Provides iOS-specific photo directory provider.
+     */
+    @Provides
+    override fun photoDirectoryProvider(): PhotoDirectoryProvider = IOSPhotoDirectoryProvider()
 }

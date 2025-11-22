@@ -2,7 +2,6 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -15,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.MapMarker
 import com.po4yka.trailglass.domain.model.PlaceCategory
@@ -44,37 +42,45 @@ fun MarkerInfoCard(
     AnimatedVisibility(
         visible = visible,
         modifier = modifier,
-        enter = slideInVertically(
-            animationSpec = MotionConfig.expressiveSpring(),
-            initialOffsetY = { it / 2 }
-        ) + scaleIn(
-            animationSpec = MotionConfig.expressiveSpring(),
-            initialScale = 0.8f
-        ) + fadeIn(
-            animationSpec = MotionConfig.expressiveSpring()
-        ),
-        exit = slideOutVertically(
-            animationSpec = MotionConfig.expressiveSpring(),
-            targetOffsetY = { it / 2 }
-        ) + scaleOut(
-            animationSpec = MotionConfig.expressiveSpring(),
-            targetScale = 0.8f
-        ) + fadeOut(
-            animationSpec = MotionConfig.expressiveSpring()
-        )
+        enter =
+            slideInVertically(
+                animationSpec = MotionConfig.expressiveSpring(),
+                initialOffsetY = { it / 2 }
+            ) +
+                scaleIn(
+                    animationSpec = MotionConfig.expressiveSpring(),
+                    initialScale = 0.8f
+                ) +
+                fadeIn(
+                    animationSpec = MotionConfig.expressiveSpring()
+                ),
+        exit =
+            slideOutVertically(
+                animationSpec = MotionConfig.expressiveSpring(),
+                targetOffsetY = { it / 2 }
+            ) +
+                scaleOut(
+                    animationSpec = MotionConfig.expressiveSpring(),
+                    targetScale = 0.8f
+                ) +
+                fadeOut(
+                    animationSpec = MotionConfig.expressiveSpring()
+                )
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             shape = MaterialTheme.shapes.large
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Header with title, category badge, and close button
@@ -150,10 +156,11 @@ private fun CategoryBadge(
     val (color, icon) = getCategoryColorAndIcon(category)
 
     Box(
-        modifier = modifier
-            .size(48.dp)
-            .clip(CircleShape)
-            .background(color),
+        modifier =
+            modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(color),
         contentAlignment = Alignment.Center
     ) {
         Icon(
@@ -190,15 +197,18 @@ private fun AnimatedActionButton(
             isPressed = false
         },
         modifier = modifier.scale(scale),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.extended.activeRoute
-        ),
-        border = ButtonDefaults.outlinedButtonBorder.copy(
-            brush = androidx.compose.ui.graphics.SolidColor(
-                MaterialTheme.colorScheme.extended.activeRoute
+        colors =
+            ButtonDefaults.outlinedButtonColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.extended.activeRoute
+            ),
+        border =
+            ButtonDefaults.outlinedButtonBorder.copy(
+                brush =
+                    androidx.compose.ui.graphics.SolidColor(
+                        MaterialTheme.colorScheme.extended.activeRoute
+                    )
             )
-        )
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -220,63 +230,90 @@ private fun AnimatedActionButton(
 /**
  * Get category color and icon from Silent Waters palette.
  */
-private fun getCategoryColorAndIcon(category: PlaceCategory): Pair<androidx.compose.ui.graphics.Color, ImageVector> {
-    return when (category) {
-        PlaceCategory.HOME -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF9DB4C0), // coolSteel
-            Icons.Default.Home
-        )
-        PlaceCategory.WORK -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF5C6B73), // blueSlate
-            Icons.Default.Work
-        )
-        PlaceCategory.FOOD -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF8BB5A1), // seaGlass
-            Icons.Default.Restaurant
-        )
-        PlaceCategory.SHOPPING -> Pair(
-            androidx.compose.ui.graphics.Color(0xFFA89968), // weatheredBrass
-            Icons.Default.ShoppingBag
-        )
-        PlaceCategory.FITNESS -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF8BB5A1), // seaGlass
-            Icons.Default.FitnessCenter
-        )
-        PlaceCategory.ENTERTAINMENT -> Pair(
-            androidx.compose.ui.graphics.Color(0xFFA8B5C7), // mistyLavender
-            Icons.Default.Theaters
-        )
-        PlaceCategory.TRAVEL -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF7A9CAF), // coastalPath
-            Icons.Default.Flight
-        )
-        PlaceCategory.HEALTHCARE -> Pair(
-            androidx.compose.ui.graphics.Color(0xFFC2DFE3), // lightBlue
-            Icons.Default.LocalHospital
-        )
-        PlaceCategory.EDUCATION -> Pair(
-            androidx.compose.ui.graphics.Color(0xFFA8B5C7), // mistyLavender
-            Icons.Default.School
-        )
-        PlaceCategory.RELIGIOUS -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF9DB4C0), // coolSteel
-            Icons.Default.Place
-        )
-        PlaceCategory.SOCIAL -> Pair(
-            androidx.compose.ui.graphics.Color(0xFFA89968), // weatheredBrass
-            Icons.Default.People
-        )
-        PlaceCategory.OUTDOOR -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF8BB5A1), // seaGlass
-            Icons.Default.Park
-        )
-        PlaceCategory.SERVICE -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF7A9CAF), // coastalPath
-            Icons.Default.Store
-        )
-        PlaceCategory.OTHER -> Pair(
-            androidx.compose.ui.graphics.Color(0xFF9DB4C0), // coolSteel
-            Icons.Default.Place
-        )
+private fun getCategoryColorAndIcon(category: PlaceCategory): Pair<androidx.compose.ui.graphics.Color, ImageVector> =
+    when (category) {
+        PlaceCategory.HOME ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF9DB4C0), // coolSteel
+                Icons.Default.Home
+            )
+        PlaceCategory.WORK ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF5C6B73), // blueSlate
+                Icons.Default.Work
+            )
+        PlaceCategory.FOOD ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF8BB5A1), // seaGlass
+                Icons.Default.Restaurant
+            )
+        PlaceCategory.SHOPPING ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFFA89968), // weatheredBrass
+                Icons.Default.ShoppingBag
+            )
+        PlaceCategory.FITNESS ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF8BB5A1), // seaGlass
+                Icons.Default.FitnessCenter
+            )
+        PlaceCategory.ENTERTAINMENT ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFFA8B5C7), // mistyLavender
+                Icons.Default.Theaters
+            )
+        PlaceCategory.TRAVEL ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF7A9CAF), // coastalPath
+                Icons.Default.Flight
+            )
+        PlaceCategory.HEALTHCARE ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFFC2DFE3), // lightBlue
+                Icons.Default.LocalHospital
+            )
+        PlaceCategory.EDUCATION ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFFA8B5C7), // mistyLavender
+                Icons.Default.School
+            )
+        PlaceCategory.RELIGIOUS ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF9DB4C0), // coolSteel
+                Icons.Default.Place
+            )
+        PlaceCategory.SOCIAL ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFFA89968), // weatheredBrass
+                Icons.Default.People
+            )
+        PlaceCategory.OUTDOOR ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF8BB5A1), // seaGlass
+                Icons.Default.Park
+            )
+        PlaceCategory.SERVICE ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF7A9CAF), // coastalPath
+                Icons.Default.Store
+            )
+        PlaceCategory.OTHER ->
+            Pair(
+                androidx.compose.ui.graphics
+                    .Color(0xFF9DB4C0), // coolSteel
+                Icons.Default.Place
+            )
     }
-}

@@ -169,6 +169,9 @@ private struct TripsContent: View {
         .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
             scrollOffset = value
         }
+        .refreshable {
+            onRefresh()
+        }
     }
 }
 

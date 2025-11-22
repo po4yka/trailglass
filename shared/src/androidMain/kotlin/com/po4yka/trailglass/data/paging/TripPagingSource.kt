@@ -18,36 +18,36 @@ class TripPagingSource(
     private val database: TrailGlassDatabase,
     private val userId: String
 ) : PagingSource<Int, Trip>() {
-
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Trip> {
-        return try {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Trip> =
+        try {
             val page = params.key ?: 0
             val offset = page * params.loadSize
             val limit = params.loadSize.toLong()
 
             logger.debug { "Loading trips: page=$page, offset=$offset, limit=$limit" }
 
-            val trips = database.tripsQueries
-                .getTripsWithPagination(userId, limit, offset.toLong())
-                .executeAsList()
-                .map { it.toTrip() }
+            val trips =
+                database.tripsQueries
+                    .getTripsWithPagination(userId, limit, offset.toLong())
+                    .executeAsList()
+                    .map { it.toTrip() }
 
             logger.debug { "Loaded ${trips.size} trips" }
 
             LoadResult.Page(
                 data = trips,
                 prevKey = if (page == 0) null else page - 1,
-                nextKey = if (trips.isEmpty() || trips.size < params.loadSize) {
-                    null
-                } else {
-                    page + 1
-                }
+                nextKey =
+                    if (trips.isEmpty() || trips.size < params.loadSize) {
+                        null
+                    } else {
+                        page + 1
+                    }
             )
         } catch (e: Exception) {
             logger.error(e) { "Failed to load trips" }
             LoadResult.Error(e)
         }
-    }
 
     override fun getRefreshKey(state: PagingState<Int, Trip>): Int? {
         // Return the page closest to the most recently accessed index
@@ -61,8 +61,8 @@ class TripPagingSource(
 /**
  * Extension function to convert database entity to domain model.
  */
-private fun com.po4yka.trailglass.db.Trips.toTrip(): Trip {
-    return Trip(
+private fun com.po4yka.trailglass.db.Trips.toTrip(): Trip =
+    Trip(
         id = id,
         name = name,
         startTime = kotlinx.datetime.Instant.fromEpochMilliseconds(start_time),
@@ -73,4 +73,3 @@ private fun com.po4yka.trailglass.db.Trips.toTrip(): Trip {
         createdAt = kotlinx.datetime.Instant.fromEpochMilliseconds(created_at),
         updatedAt = kotlinx.datetime.Instant.fromEpochMilliseconds(updated_at)
     )
-}

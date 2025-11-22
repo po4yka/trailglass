@@ -5,8 +5,6 @@ import androidx.paging.PagingConfig
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.paging.PlaceVisitPagingSource
 import com.po4yka.trailglass.data.paging.TripPagingSource
-import com.po4yka.trailglass.data.repository.impl.PlaceVisitRepositoryImpl
-import com.po4yka.trailglass.data.repository.impl.TripRepositoryImpl
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.Trip
 
@@ -25,13 +23,14 @@ import com.po4yka.trailglass.domain.model.Trip
 fun PlaceVisitRepository.getVisitsPager(
     userId: String,
     database: Database
-): Pager<Int, PlaceVisit> {
-    return Pager(
-        config = PagingConfig(
-            pageSize = 20,
-            enablePlaceholders = false,
-            prefetchDistance = 5
-        ),
+): Pager<Int, PlaceVisit> =
+    Pager(
+        config =
+            PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false,
+                prefetchDistance = 5
+            ),
         pagingSourceFactory = {
             PlaceVisitPagingSource(
                 database = database.database,
@@ -39,7 +38,6 @@ fun PlaceVisitRepository.getVisitsPager(
             )
         }
     )
-}
 
 /**
  * Get a Pager for paginated trips (Android only).
@@ -51,13 +49,14 @@ fun PlaceVisitRepository.getVisitsPager(
 fun TripRepository.getTripsPager(
     userId: String,
     database: Database
-): Pager<Int, Trip> {
-    return Pager(
-        config = PagingConfig(
-            pageSize = 20,
-            enablePlaceholders = false,
-            prefetchDistance = 5
-        ),
+): Pager<Int, Trip> =
+    Pager(
+        config =
+            PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = false,
+                prefetchDistance = 5
+            ),
         pagingSourceFactory = {
             TripPagingSource(
                 database = database.database,
@@ -65,4 +64,3 @@ fun TripRepository.getTripsPager(
             )
         }
     )
-}

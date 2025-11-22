@@ -2,6 +2,9 @@ package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.data.file.FileOperations
+import com.po4yka.trailglass.data.file.PhotoFileManager
+import com.po4yka.trailglass.data.file.PhotoStorageManager
 import com.po4yka.trailglass.data.repository.*
 import com.po4yka.trailglass.data.repository.impl.*
 import com.po4yka.trailglass.domain.service.AlgorithmProvider
@@ -82,4 +85,37 @@ interface DataModule {
     @AppScope
     @Provides
     fun provideAlgorithmProvider(settingsRepository: SettingsRepository): AlgorithmProvider = AlgorithmProvider(settingsRepository)
+
+    /**
+     * Provides FileOperations for cross-platform file I/O.
+     */
+    @AppScope
+    @Provides
+    fun provideFileOperations(): FileOperations = FileOperations()
+
+    /**
+     * Provides PhotoFileManager for managing photo file storage.
+     */
+    @AppScope
+    @Provides
+    fun providePhotoFileManager(fileOperations: FileOperations): PhotoFileManager = PhotoFileManager(fileOperations)
+
+    /**
+     * Provides ExportManager for exporting data to various formats.
+     */
+    @AppScope
+    @Provides
+    fun provideExportManager(fileOperations: FileOperations): com.po4yka.trailglass.data.file.ExportManager =
+        com.po4yka.trailglass.data.file
+            .ExportManager(fileOperations)
+
+    /**
+     * Provides PhotoStorageManager for coordinating photo file and database operations.
+     */
+    @AppScope
+    @Provides
+    fun providePhotoStorageManager(
+        photoFileManager: PhotoFileManager,
+        photoRepository: PhotoRepository
+    ): PhotoStorageManager = PhotoStorageManager(photoFileManager, photoRepository)
 }

@@ -2,7 +2,6 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -117,10 +116,11 @@ fun MapFABMenu(
         // Scrim overlay when expanded - positioned absolutely to fill parent
         if (expanded) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
-                    .clickable { expanded = false }
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
+                        .clickable { expanded = false }
             )
         }
     }

@@ -14,7 +14,6 @@ data class TrackingConfig(
      * Minimum time interval between location updates in milliseconds.
      */
     val updateIntervalMs: Long = 30000, // 30 seconds default
-
     /**
      * Minimum distance between location updates in meters.
      */

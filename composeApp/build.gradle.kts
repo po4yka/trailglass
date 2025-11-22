@@ -103,6 +103,9 @@ dependencies {
     // Input motion prediction for low-latency touch/stylus input
     implementation(libs.androidx.input.motionprediction)
 
+    // Paging 3 for pagination support
+    implementation(libs.androidx.paging.compose)
+
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.decompose)

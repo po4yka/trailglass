@@ -2,7 +2,6 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -15,7 +14,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.MapVisualizationMode
 import com.po4yka.trailglass.ui.theme.MotionConfig
-import com.po4yka.trailglass.ui.theme.emphasized
 import com.po4yka.trailglass.ui.theme.extended
 
 /**
@@ -57,21 +55,23 @@ private fun ModeButton(
     onClick: () -> Unit
 ) {
     val containerColor by animateColorAsState(
-        targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.extended.activeRoute
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
+        targetValue =
+            if (isSelected) {
+                MaterialTheme.colorScheme.extended.activeRoute
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
         animationSpec = MotionConfig.expressiveSpring(),
         label = "mode_button_color"
     )
 
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onSurface
-        },
+        targetValue =
+            if (isSelected) {
+                MaterialTheme.colorScheme.onPrimary
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
         animationSpec = MotionConfig.expressiveSpring(),
         label = "mode_button_content_color"
     )
@@ -84,13 +84,15 @@ private fun ModeButton(
 
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .size(56.dp)
-            .scale(scale),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor
-        ),
+        modifier =
+            Modifier
+                .size(56.dp)
+                .scale(scale),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = containerColor,
+                contentColor = contentColor
+            ),
         contentPadding = PaddingValues(0.dp),
         shape = MaterialTheme.shapes.small
     ) {
@@ -161,21 +163,23 @@ private fun MapOptionToggle(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
-            tint = if (checked) {
-                MaterialTheme.colorScheme.extended.activeRoute
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            }
+            tint =
+                if (checked) {
+                    MaterialTheme.colorScheme.extended.activeRoute
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
         )
 
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = if (checked) {
-                MaterialTheme.colorScheme.onSurface
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            },
+            color =
+                if (checked) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                },
             modifier = Modifier.weight(1f)
         )
 
@@ -183,10 +187,13 @@ private fun MapOptionToggle(
             checked = checked,
             onCheckedChange = onCheckedChange,
             modifier = Modifier.height(24.dp),
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colorScheme.extended.activeRoute,
-                checkedTrackColor = MaterialTheme.colorScheme.extended.activeRoute.copy(alpha = 0.5f)
-            )
+            colors =
+                SwitchDefaults.colors(
+                    checkedThumbColor = MaterialTheme.colorScheme.extended.activeRoute,
+                    checkedTrackColor =
+                        MaterialTheme.colorScheme.extended.activeRoute
+                            .copy(alpha = 0.5f)
+                )
         )
     }
 }
@@ -194,19 +201,21 @@ private fun MapOptionToggle(
 /**
  * Get icon for visualization mode.
  */
-private fun getModeIcon(mode: MapVisualizationMode): ImageVector = when (mode) {
-    MapVisualizationMode.MARKERS -> Icons.Default.Place
-    MapVisualizationMode.CLUSTERS -> Icons.Default.GroupWork
-    MapVisualizationMode.HEATMAP -> Icons.Default.Whatshot
-    MapVisualizationMode.HYBRID -> Icons.Default.Layers
-}
+private fun getModeIcon(mode: MapVisualizationMode): ImageVector =
+    when (mode) {
+        MapVisualizationMode.MARKERS -> Icons.Default.Place
+        MapVisualizationMode.CLUSTERS -> Icons.Default.GroupWork
+        MapVisualizationMode.HEATMAP -> Icons.Default.Whatshot
+        MapVisualizationMode.HYBRID -> Icons.Default.Layers
+    }
 
 /**
  * Get label for visualization mode.
  */
-private fun getModeLabel(mode: MapVisualizationMode): String = when (mode) {
-    MapVisualizationMode.MARKERS -> "Markers"
-    MapVisualizationMode.CLUSTERS -> "Clusters"
-    MapVisualizationMode.HEATMAP -> "Heatmap"
-    MapVisualizationMode.HYBRID -> "Hybrid"
-}
+private fun getModeLabel(mode: MapVisualizationMode): String =
+    when (mode) {
+        MapVisualizationMode.MARKERS -> "Markers"
+        MapVisualizationMode.CLUSTERS -> "Clusters"
+        MapVisualizationMode.HEATMAP -> "Heatmap"
+        MapVisualizationMode.HYBRID -> "Hybrid"
+    }

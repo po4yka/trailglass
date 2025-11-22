@@ -13,7 +13,6 @@ private val logger = KotlinLogging.logger {}
 class PhotoFileManager(
     private val fileOperations: FileOperations
 ) {
-
     /**
      * Save photo data to storage.
      *
@@ -26,8 +25,8 @@ class PhotoFileManager(
         photoId: String,
         photoData: ByteArray,
         photosDirectory: String
-    ): Result<String> {
-        return try {
+    ): Result<String> =
+        try {
             logger.info { "Saving photo: $photoId (${photoData.size} bytes)" }
 
             fileOperations.createDirectories(photosDirectory)
@@ -41,7 +40,6 @@ class PhotoFileManager(
             logger.error(e) { "Failed to save photo $photoId" }
             Result.failure(e)
         }
-    }
 
     /**
      * Load photo data from storage.
@@ -130,9 +128,7 @@ class PhotoFileManager(
      * @param photoPath Path to the photo file
      * @return File size in bytes, or -1 if file doesn't exist
      */
-    fun getPhotoSize(photoPath: String): Long {
-        return fileOperations.getFileSize(photoPath)
-    }
+    fun getPhotoSize(photoPath: String): Long = fileOperations.getFileSize(photoPath)
 
     /**
      * Check if a photo exists.
@@ -140,9 +136,7 @@ class PhotoFileManager(
      * @param photoPath Path to the photo file
      * @return true if photo exists, false otherwise
      */
-    fun photoExists(photoPath: String): Boolean {
-        return fileOperations.fileExists(photoPath)
-    }
+    fun photoExists(photoPath: String): Boolean = fileOperations.fileExists(photoPath)
 
     /**
      * Clean up orphaned photo files (photos not referenced in the database).

@@ -4,6 +4,8 @@ import android.content.Context
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.db.AndroidDatabaseDriverFactory
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
+import com.po4yka.trailglass.data.file.AndroidPhotoDirectoryProvider
+import com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 import com.po4yka.trailglass.data.network.AndroidNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
@@ -105,4 +107,10 @@ class AndroidPlatformModule(
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
         com.po4yka.trailglass.data.storage
             .SettingsStorage(context)
+
+    /**
+     * Provides Android-specific photo directory provider.
+     */
+    @Provides
+    override fun photoDirectoryProvider(): PhotoDirectoryProvider = AndroidPhotoDirectoryProvider(context)
 }
