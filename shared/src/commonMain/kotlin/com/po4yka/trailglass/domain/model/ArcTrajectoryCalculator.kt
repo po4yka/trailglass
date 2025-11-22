@@ -11,7 +11,6 @@ import kotlin.math.*
  * follow a curved path, and zoom back in - similar to Google Maps' fly-to animation.
  */
 object ArcTrajectoryCalculator {
-
     /**
      * Calculate intermediate camera positions for an arc trajectory.
      *
@@ -50,12 +49,13 @@ object ArcTrajectoryCalculator {
             val coordinate = interpolationAlgorithm.interpolate(start.target, end.target, fraction)
 
             // Calculate zoom along parabolic curve (zoom out in middle)
-            val zoom = calculateParabolicZoom(
-                startZoom = start.zoom,
-                endZoom = end.zoom,
-                apexZoom = apexZoom,
-                fraction = fraction
-            )
+            val zoom =
+                calculateParabolicZoom(
+                    startZoom = start.zoom,
+                    endZoom = end.zoom,
+                    apexZoom = apexZoom,
+                    fraction = fraction
+                )
 
             // Interpolate tilt and bearing
             val tilt = interpolateLinear(start.tilt, end.tilt, fraction)
@@ -82,13 +82,17 @@ object ArcTrajectoryCalculator {
      * @param end Ending coordinate
      * @return Distance in degrees
      */
-    private fun calculateDistance(start: Coordinate, end: Coordinate): Double {
+    private fun calculateDistance(
+        start: Coordinate,
+        end: Coordinate
+    ): Double {
         val lat1 = start.latitude * PI / 180.0
         val lat2 = end.latitude * PI / 180.0
         val dLat = (end.latitude - start.latitude) * PI / 180.0
         val dLon = (end.longitude - start.longitude) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
@@ -110,12 +114,12 @@ object ArcTrajectoryCalculator {
     ): Float {
         // More zoom out for larger distances
         return when {
-            distance > 10.0 -> 5f   // Continental distance
-            distance > 5.0 -> 4f    // Large region
-            distance > 1.0 -> 3f    // City-to-city
-            distance > 0.5 -> 2f    // District-to-district
-            distance > 0.1 -> 1.5f  // Neighborhood
-            else -> 1f              // Street level
+            distance > 10.0 -> 5f // Continental distance
+            distance > 5.0 -> 4f // Large region
+            distance > 1.0 -> 3f // City-to-city
+            distance > 0.5 -> 2f // District-to-district
+            distance > 0.1 -> 1.5f // Neighborhood
+            else -> 1f // Street level
         }
     }
 
@@ -159,9 +163,11 @@ object ArcTrajectoryCalculator {
      * @param fraction Progress from 0.0 to 1.0
      * @return Interpolated value
      */
-    private fun interpolateLinear(start: Float, end: Float, fraction: Double): Float {
-        return start + (end - start) * fraction.toFloat()
-    }
+    private fun interpolateLinear(
+        start: Float,
+        end: Float,
+        fraction: Double
+    ): Float = start + (end - start) * fraction.toFloat()
 
     /**
      * Angular interpolation (handles wrapping at 0/360 degrees).
@@ -171,7 +177,11 @@ object ArcTrajectoryCalculator {
      * @param fraction Progress from 0.0 to 1.0
      * @return Interpolated angle
      */
-    private fun interpolateAngular(start: Float, end: Float, fraction: Double): Float {
+    private fun interpolateAngular(
+        start: Float,
+        end: Float,
+        fraction: Double
+    ): Float {
         // Normalize angles to 0-360
         val startNorm = (start % 360 + 360) % 360
         val endNorm = (end % 360 + 360) % 360

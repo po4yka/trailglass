@@ -3,7 +3,6 @@ package com.po4yka.trailglass.ui.components
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -31,12 +30,14 @@ fun RouteReplayMapView(
 
     // Update camera to follow vehicle
     LaunchedEffect(cameraPosition, cameraBearing, cameraTilt) {
-        val newCameraPosition = CameraPosition.Builder()
-            .target(LatLng(cameraPosition.latitude, cameraPosition.longitude))
-            .bearing(cameraBearing.toFloat())
-            .tilt(cameraTilt.toFloat())
-            .zoom(cameraZoom)
-            .build()
+        val newCameraPosition =
+            CameraPosition
+                .Builder()
+                .target(LatLng(cameraPosition.latitude, cameraPosition.longitude))
+                .bearing(cameraBearing.toFloat())
+                .tilt(cameraTilt.toFloat())
+                .zoom(cameraZoom)
+                .build()
 
         cameraPositionState.animate(
             CameraUpdateFactory.newCameraPosition(newCameraPosition),
@@ -47,19 +48,21 @@ fun RouteReplayMapView(
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
-        properties = MapProperties(
-            mapType = MapType.NORMAL
-        ),
-        uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,
-            myLocationButtonEnabled = false,
-            compassEnabled = false,
-            mapToolbarEnabled = false,
-            zoomGesturesEnabled = false,  // Disable user gestures during replay
-            scrollGesturesEnabled = false,
-            tiltGesturesEnabled = false
-            // Note: rotateGesturesEnabled not available in maps-compose 6.2.0
-        )
+        properties =
+            MapProperties(
+                mapType = MapType.NORMAL
+            ),
+        uiSettings =
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = false,
+                compassEnabled = false,
+                mapToolbarEnabled = false,
+                zoomGesturesEnabled = false, // Disable user gestures during replay
+                scrollGesturesEnabled = false,
+                tiltGesturesEnabled = false
+                // Note: rotateGesturesEnabled not available in maps-compose 6.2.0
+            )
     ) {
         // Draw route polyline
         if (tripRoute.fullPath.isNotEmpty()) {
@@ -79,9 +82,7 @@ fun RouteReplayMapView(
  * Uses Silent Waters palette: Coastal Path for active/replaying routes.
  */
 @Composable
-private fun RoutePolylineReplay(
-    routePoints: List<com.po4yka.trailglass.domain.model.RoutePoint>
-) {
+private fun RoutePolylineReplay(routePoints: List<com.po4yka.trailglass.domain.model.RoutePoint>) {
     // Use Coastal Path color for active route being replayed
     val routeColor = MaterialTheme.colorScheme.extended.activeRoute
 
@@ -102,9 +103,10 @@ private fun VehicleMarker(
     vehicleState: VehicleState,
     transportType: TransportType
 ) {
-    val markerState = remember {
-        MarkerState(position = LatLng(vehicleState.position.latitude, vehicleState.position.longitude))
-    }
+    val markerState =
+        remember {
+            MarkerState(position = LatLng(vehicleState.position.latitude, vehicleState.position.longitude))
+        }
 
     // Update marker position and rotation
     LaunchedEffect(vehicleState) {
@@ -124,7 +126,10 @@ private fun VehicleMarker(
 /**
  * Format vehicle information for marker snippet.
  */
-private fun formatVehicleInfo(vehicleState: VehicleState, transportType: TransportType): String {
+private fun formatVehicleInfo(
+    vehicleState: VehicleState,
+    transportType: TransportType
+): String {
     val speed = vehicleState.currentPoint.speed
     return buildString {
         append(transportType.name.lowercase().replaceFirstChar { it.uppercase() })

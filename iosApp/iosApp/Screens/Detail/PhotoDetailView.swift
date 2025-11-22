@@ -366,7 +366,12 @@ private struct PhotoLocationMap: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            Map(coordinateRegion: .constant(region), annotationItems: [MapMarkerItem(coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))]) { item in
+            Map(
+                coordinateRegion: .constant(region),
+                annotationItems: [
+                    MapMarkerItem(coordinate: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
+                ]
+            ) { item in
                 MapMarker(coordinate: item.coordinate, tint: .red)
             }
             .frame(height: 200)

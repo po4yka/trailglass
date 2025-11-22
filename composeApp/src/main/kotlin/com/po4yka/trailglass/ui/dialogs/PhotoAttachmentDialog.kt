@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.feature.photo.AttachPhotoToVisitUseCase
@@ -34,16 +33,17 @@ fun PhotoAttachmentHandler(
     val scope = rememberCoroutineScope()
 
     // Photo picker launcher
-    val photoPicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
-        if (uri != null) {
-            selectedPhotoUri = uri.toString()
-            showCaptionDialog = true
-        } else {
-            onDismiss()
+    val photoPicker =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia()
+        ) { uri ->
+            if (uri != null) {
+                selectedPhotoUri = uri.toString()
+                showCaptionDialog = true
+            } else {
+                onDismiss()
+            }
         }
-    }
 
     // Launch photo picker on first composition
     LaunchedEffect(Unit) {
@@ -112,7 +112,8 @@ fun PhotoAttachmentHandler(
                             // }
 
                             // For now, show error explaining this needs photo upload implementation
-                            error = "Photo upload not yet implemented. Please use the Photos tab to import photos first."
+                            error =
+                                "Photo upload not yet implemented. Please use the Photos tab to import photos first."
                             isAttaching = false
                         }
                     },
@@ -147,9 +148,7 @@ fun PhotoAttachmentHandler(
  * Simple info dialog explaining photo attachment feature status.
  */
 @Composable
-fun PhotoAttachmentInfoDialog(
-    onDismiss: () -> Unit
-) {
+fun PhotoAttachmentInfoDialog(onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {

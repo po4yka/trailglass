@@ -9,7 +9,6 @@ import kotlinx.datetime.Instant
  * All operations return Result<T> for consistent error handling.
  */
 interface LocationRepository {
-
     /**
      * Insert a new location sample.
      */
@@ -37,12 +36,18 @@ interface LocationRepository {
     /**
      * Get unprocessed samples (not assigned to a trip yet).
      */
-    suspend fun getUnprocessedSamples(userId: String, limit: Int): Result<List<LocationSample>>
+    suspend fun getUnprocessedSamples(
+        userId: String,
+        limit: Int
+    ): Result<List<LocationSample>>
 
     /**
      * Update the trip ID for a location sample.
      */
-    suspend fun updateTripId(sampleId: String, tripId: String?): Result<Unit>
+    suspend fun updateTripId(
+        sampleId: String,
+        tripId: String?
+    ): Result<Unit>
 
     /**
      * Soft delete a location sample.
@@ -52,5 +57,8 @@ interface LocationRepository {
     /**
      * Permanently delete old samples.
      */
-    suspend fun deleteOldSamples(userId: String, beforeTime: Instant): Result<Unit>
+    suspend fun deleteOldSamples(
+        userId: String,
+        beforeTime: Instant
+    ): Result<Unit>
 }

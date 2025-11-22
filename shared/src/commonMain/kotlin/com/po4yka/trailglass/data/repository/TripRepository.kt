@@ -39,7 +39,10 @@ interface TripRepository {
     /**
      * Mark a trip as complete (no longer ongoing).
      */
-    suspend fun completeTrip(tripId: String, endTime: Instant)
+    suspend fun completeTrip(
+        tripId: String,
+        endTime: Instant
+    )
 
     /**
      * Delete a trip.

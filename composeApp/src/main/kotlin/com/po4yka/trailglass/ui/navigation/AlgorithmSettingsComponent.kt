@@ -18,4 +18,5 @@ class DefaultAlgorithmSettingsComponent(
     componentContext: ComponentContext,
     override val settingsController: SettingsController,
     override val onBack: () -> Unit
-) : AlgorithmSettingsComponent, ComponentContext by componentContext
+) : AlgorithmSettingsComponent,
+    ComponentContext by componentContext

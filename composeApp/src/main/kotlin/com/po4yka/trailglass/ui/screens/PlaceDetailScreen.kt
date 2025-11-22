@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Label
+import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Church
@@ -11,10 +13,8 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Park
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Place
@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceSignificance
-import com.po4yka.trailglass.ui.components.MediumFlexibleTopAppBar
 import com.po4yka.trailglass.ui.components.FlexibleTopAppBarDefaults
+import com.po4yka.trailglass.ui.components.MediumFlexibleTopAppBar
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -61,28 +61,31 @@ fun PlaceDetailScreen(
     val scrollBehavior = FlexibleTopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     // Format place metadata for subtitle
-    val metadataText = if (place != null) {
-        buildString {
-            append("${place.visitCount} visits")
+    val metadataText =
+        if (place != null) {
+            buildString {
+                append("${place.visitCount} visits")
 
-            if (place.totalDuration > Duration.ZERO) {
-                append(" • ${formatDuration(place.totalDuration)} total")
-            }
+                if (place.totalDuration > Duration.ZERO) {
+                    append(" • ${formatDuration(place.totalDuration)} total")
+                }
 
-            place.lastVisitTime?.let { lastVisit ->
-                val now = kotlinx.datetime.Clock.System.now()
-                val daysSince = (now - lastVisit).inWholeDays
-                when {
-                    daysSince == 0L -> append(" • Last visit today")
-                    daysSince == 1L -> append(" • Last visit yesterday")
-                    daysSince < 7 -> append(" • Last visit $daysSince days ago")
-                    else -> append(" • Last visit ${formatDate(lastVisit)}")
+                place.lastVisitTime?.let { lastVisit ->
+                    val now =
+                        kotlinx.datetime.Clock.System
+                            .now()
+                    val daysSince = (now - lastVisit).inWholeDays
+                    when {
+                        daysSince == 0L -> append(" • Last visit today")
+                        daysSince == 1L -> append(" • Last visit yesterday")
+                        daysSince < 7 -> append(" • Last visit $daysSince days ago")
+                        else -> append(" • Last visit ${formatDate(lastVisit)}")
+                    }
                 }
             }
+        } else {
+            ""
         }
-    } else {
-        ""
-    }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -114,20 +117,24 @@ fun PlaceDetailScreen(
                         }
                     },
                     scrollBehavior = scrollBehavior,
-                    colors = when (place.significance) {
-                        PlaceSignificance.PRIMARY -> FlexibleTopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            scrolledContainerColor = MaterialTheme.colorScheme.surface
-                        )
-                        PlaceSignificance.FREQUENT -> FlexibleTopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            scrolledContainerColor = MaterialTheme.colorScheme.surface
-                        )
-                        else -> FlexibleTopAppBarDefaults.topAppBarColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            scrolledContainerColor = MaterialTheme.colorScheme.surface
-                        )
-                    }
+                    colors =
+                        when (place.significance) {
+                            PlaceSignificance.PRIMARY ->
+                                FlexibleTopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                                )
+                            PlaceSignificance.FREQUENT ->
+                                FlexibleTopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                                )
+                            else ->
+                                FlexibleTopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                                )
+                        }
                 )
             } else {
                 TopAppBar(
@@ -143,9 +150,10 @@ fun PlaceDetailScreen(
     ) { paddingValues ->
         if (place == null) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
                 Text("Place not found")
@@ -153,9 +161,10 @@ fun PlaceDetailScreen(
         } else {
             PlaceDetailContent(
                 place = place,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
             )
         }
     }
@@ -174,143 +183,143 @@ private fun PlaceDetailContent(
         // Statistics Section
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Statistics",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                StatRow(
-                    icon = Icons.Default.Event,
-                    label = "Total Visits",
-                    value = place.visitCount.toString()
-                )
-
-                if (place.totalDuration > Duration.ZERO) {
-                    StatRow(
-                        icon = Icons.Default.Schedule,
-                        label = "Total Time",
-                        value = formatDuration(place.totalDuration)
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Statistics",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
                     )
-                }
 
-                if (place.averageDuration > Duration.ZERO) {
                     StatRow(
-                        icon = Icons.Default.Timelapse,
-                        label = "Average Duration",
-                        value = formatDuration(place.averageDuration)
+                        icon = Icons.Default.Event,
+                        label = "Total Visits",
+                        value = place.visitCount.toString()
                     )
-                }
 
-                place.firstVisitTime?.let { firstVisit ->
-                    StatRow(
-                        icon = Icons.Default.CalendarToday,
-                        label = "First Visit",
-                        value = formatDate(firstVisit)
-                    )
-                }
+                    if (place.totalDuration > Duration.ZERO) {
+                        StatRow(
+                            icon = Icons.Default.Schedule,
+                            label = "Total Time",
+                            value = formatDuration(place.totalDuration)
+                        )
+                    }
 
-                place.lastVisitTime?.let { lastVisit ->
-                    StatRow(
-                        icon = Icons.Default.Update,
-                        label = "Last Visit",
-                        value = formatDate(lastVisit)
-                    )
+                    if (place.averageDuration > Duration.ZERO) {
+                        StatRow(
+                            icon = Icons.Default.Timelapse,
+                            label = "Average Duration",
+                            value = formatDuration(place.averageDuration)
+                        )
+                    }
+
+                    place.firstVisitTime?.let { firstVisit ->
+                        StatRow(
+                            icon = Icons.Default.CalendarToday,
+                            label = "First Visit",
+                            value = formatDate(firstVisit)
+                        )
+                    }
+
+                    place.lastVisitTime?.let { lastVisit ->
+                        StatRow(
+                            icon = Icons.Default.Update,
+                            label = "Last Visit",
+                            value = formatDate(lastVisit)
+                        )
+                    }
                 }
             }
-        }
         }
 
         // Location Section
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(
-                    text = "Location",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Location",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
 
-                place.address?.let { address ->
+                    place.address?.let { address ->
+                        StatRow(
+                            icon = Icons.Default.Place,
+                            label = "Address",
+                            value = address
+                        )
+                    }
+
                     StatRow(
-                        icon = Icons.Default.Place,
-                        label = "Address",
-                        value = address
+                        icon = Icons.Default.MyLocation,
+                        label = "Coordinates",
+                        value = "${place.centerLatitude.format(6)}, ${place.centerLongitude.format(6)}"
+                    )
+
+                    StatRow(
+                        icon = Icons.Default.RadioButtonChecked,
+                        label = "Radius",
+                        value = "${place.radiusMeters.toInt()} meters"
                     )
                 }
-
-                StatRow(
-                    icon = Icons.Default.MyLocation,
-                    label = "Coordinates",
-                    value = "${place.centerLatitude.format(6)}, ${place.centerLongitude.format(6)}"
-                )
-
-                StatRow(
-                    icon = Icons.Default.RadioButtonChecked,
-                    label = "Radius",
-                    value = "${place.radiusMeters.toInt()} meters"
-                )
             }
-        }
         }
 
         // Notes Section (if available)
         if (place.userNotes != null || place.userLabel != null) {
             item {
                 Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text(
-                        text = "Custom Info",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    place.userLabel?.let { label ->
-                        StatRow(
-                            icon = Icons.AutoMirrored.Filled.Label,
-                            label = "Custom Label",
-                            value = label
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Text(
+                            text = "Custom Info",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
                         )
-                    }
 
-                    place.userNotes?.let { notes ->
-                        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                verticalAlignment = Alignment.Top
-                            ) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.Notes,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(20.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
+                        place.userLabel?.let { label ->
+                            StatRow(
+                                icon = Icons.AutoMirrored.Filled.Label,
+                                label = "Custom Label",
+                                value = label
+                            )
+                        }
+
+                        place.userNotes?.let { notes ->
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.Top
+                                ) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.Notes,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = "Notes",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
                                 Text(
-                                    text = "Notes",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    text = notes,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(start = 28.dp)
                                 )
                             }
-                            Text(
-                                text = notes,
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.padding(start = 28.dp)
-                            )
                         }
                     }
                 }
             }
-        }
         }
     }
 }
@@ -349,8 +358,8 @@ private fun StatRow(
 }
 
 @Composable
-private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector {
-    return when (category) {
+private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector =
+    when (category) {
         PlaceCategory.HOME -> Icons.Default.Home
         PlaceCategory.WORK -> Icons.Default.Work
         PlaceCategory.FOOD -> Icons.Default.Restaurant
@@ -366,7 +375,6 @@ private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphi
         PlaceCategory.SERVICE -> Icons.Default.Build
         PlaceCategory.OTHER -> Icons.Default.Place
     }
-}
 
 private fun formatDuration(duration: Duration): String {
     val hours = duration.inWholeHours
@@ -386,7 +394,9 @@ private fun formatDuration(duration: Duration): String {
 
 private fun formatDate(instant: Instant): String {
     val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${dateTime.month.name.lowercase().replaceFirstChar { it.uppercase() }} ${dateTime.dayOfMonth}, ${dateTime.year}"
+    return "${dateTime.month.name.lowercase().replaceFirstChar {
+        it.uppercase()
+    }} ${dateTime.dayOfMonth}, ${dateTime.year}"
 }
 
 private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)

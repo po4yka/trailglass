@@ -29,13 +29,13 @@ class LocationTrackingController(
     private val permissionFlow: PermissionFlowController,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Location tracking UI state.

@@ -11,7 +11,6 @@ import XCTest
  * Test coverage target: 75%+
  */
 final class StatsScreenUITests: XCTestCase {
-
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -67,7 +66,7 @@ final class StatsScreenUITests: XCTestCase {
 
         // Then - country count should be displayed
         // The actual count will depend on test data
-        let exists = app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "\\d+")).count > 0
+        let exists = !app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "\\d+")).isEmpty
         XCTAssertTrue(exists, "Country count should be displayed")
     }
 
@@ -145,7 +144,7 @@ final class StatsScreenUITests: XCTestCase {
         // Then - bottom content should be visible
         // Either Top Cities or country/city list items should be visible
         let topCitiesExists = app.staticTexts["Top Cities"].exists
-        let hasListItems = app.tables.cells.count > 0
+        let hasListItems = !app.tables.cells.isEmpty
 
         XCTAssertTrue(topCitiesExists || hasListItems, "Bottom content should be visible after scrolling")
     }

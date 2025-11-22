@@ -30,15 +30,20 @@ class EnhancedTimelineController(
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Enhanced timeline UI state.
      */
     data class EnhancedTimelineState(
-        val selectedDate: LocalDate = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
+        val selectedDate: LocalDate =
+            Clock.System
+                .now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date,
         val zoomLevel: TimelineZoomLevel = TimelineZoomLevel.DAY,
         val items: List<GetTimelineUseCase.TimelineItemUI> = emptyList(),
         val filter: TimelineFilter = TimelineFilter(),
@@ -67,12 +72,13 @@ class EnhancedTimelineController(
 
         controllerScope.launch {
             try {
-                val items = getTimelineUseCase.execute(
-                    zoomLevel = currentState.zoomLevel,
-                    referenceDate = currentState.selectedDate,
-                    userId = userId,
-                    filter = currentState.filter
-                )
+                val items =
+                    getTimelineUseCase.execute(
+                        zoomLevel = currentState.zoomLevel,
+                        referenceDate = currentState.selectedDate,
+                        userId = userId,
+                        filter = currentState.filter
+                    )
 
                 _state.update { it.copy(items = items, isLoading = false) }
                 logger.info { "Loaded ${items.size} timeline items" }
@@ -97,16 +103,42 @@ class EnhancedTimelineController(
      */
     fun navigateNext() {
         val currentState = _state.value
-        val nextDate = when (currentState.zoomLevel) {
-            TimelineZoomLevel.DAY -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() + 1)
-            TimelineZoomLevel.WEEK -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() + 7)
-            TimelineZoomLevel.MONTH -> {
-                val year = if (currentState.selectedDate.monthNumber == 12) currentState.selectedDate.year + 1 else currentState.selectedDate.year
-                val month = if (currentState.selectedDate.monthNumber == 12) 1 else currentState.selectedDate.monthNumber + 1
-                kotlinx.datetime.LocalDate(year, month, 1)
+        val nextDate =
+            when (currentState.zoomLevel) {
+                TimelineZoomLevel.DAY ->
+                    kotlinx.datetime.LocalDate.Companion.fromEpochDays(
+                        currentState.selectedDate.toEpochDays() + 1
+                    )
+                TimelineZoomLevel.WEEK ->
+                    kotlinx.datetime.LocalDate.Companion.fromEpochDays(
+                        currentState.selectedDate.toEpochDays() + 7
+                    )
+                TimelineZoomLevel.MONTH -> {
+                    val year =
+                        if (currentState.selectedDate.monthNumber ==
+                            12
+                        ) {
+                            currentState.selectedDate.year + 1
+                        } else {
+                            currentState.selectedDate.year
+                        }
+                    val month =
+                        if (currentState.selectedDate.monthNumber ==
+                            12
+                        ) {
+                            1
+                        } else {
+                            currentState.selectedDate.monthNumber + 1
+                        }
+                    kotlinx.datetime.LocalDate(year, month, 1)
+                }
+                TimelineZoomLevel.YEAR ->
+                    kotlinx.datetime.LocalDate(
+                        currentState.selectedDate.year + 1,
+                        currentState.selectedDate.monthNumber,
+                        1
+                    )
             }
-            TimelineZoomLevel.YEAR -> kotlinx.datetime.LocalDate(currentState.selectedDate.year + 1, currentState.selectedDate.monthNumber, 1)
-        }
         selectDate(nextDate)
     }
 
@@ -115,16 +147,42 @@ class EnhancedTimelineController(
      */
     fun navigatePrevious() {
         val currentState = _state.value
-        val previousDate = when (currentState.zoomLevel) {
-            TimelineZoomLevel.DAY -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() - 1)
-            TimelineZoomLevel.WEEK -> kotlinx.datetime.LocalDate.Companion.fromEpochDays(currentState.selectedDate.toEpochDays() - 7)
-            TimelineZoomLevel.MONTH -> {
-                val year = if (currentState.selectedDate.monthNumber == 1) currentState.selectedDate.year - 1 else currentState.selectedDate.year
-                val month = if (currentState.selectedDate.monthNumber == 1) 12 else currentState.selectedDate.monthNumber - 1
-                kotlinx.datetime.LocalDate(year, month, 1)
+        val previousDate =
+            when (currentState.zoomLevel) {
+                TimelineZoomLevel.DAY ->
+                    kotlinx.datetime.LocalDate.Companion.fromEpochDays(
+                        currentState.selectedDate.toEpochDays() - 1
+                    )
+                TimelineZoomLevel.WEEK ->
+                    kotlinx.datetime.LocalDate.Companion.fromEpochDays(
+                        currentState.selectedDate.toEpochDays() - 7
+                    )
+                TimelineZoomLevel.MONTH -> {
+                    val year =
+                        if (currentState.selectedDate.monthNumber ==
+                            1
+                        ) {
+                            currentState.selectedDate.year - 1
+                        } else {
+                            currentState.selectedDate.year
+                        }
+                    val month =
+                        if (currentState.selectedDate.monthNumber ==
+                            1
+                        ) {
+                            12
+                        } else {
+                            currentState.selectedDate.monthNumber - 1
+                        }
+                    kotlinx.datetime.LocalDate(year, month, 1)
+                }
+                TimelineZoomLevel.YEAR ->
+                    kotlinx.datetime.LocalDate(
+                        currentState.selectedDate.year - 1,
+                        currentState.selectedDate.monthNumber,
+                        1
+                    )
             }
-            TimelineZoomLevel.YEAR -> kotlinx.datetime.LocalDate(currentState.selectedDate.year - 1, currentState.selectedDate.monthNumber, 1)
-        }
         selectDate(previousDate)
     }
 
@@ -132,7 +190,11 @@ class EnhancedTimelineController(
      * Jump to today.
      */
     fun jumpToToday() {
-        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val today =
+            Clock.System
+                .now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
         selectDate(today)
     }
 

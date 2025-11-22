@@ -9,7 +9,6 @@ import platform.Foundation.NSUserDefaults
  */
 @Inject
 actual class SyncStateRepositoryImpl : SyncStateRepository {
-
     private val userDefaults = NSUserDefaults.standardUserDefaults
 
     private object Keys {
@@ -20,21 +19,21 @@ actual class SyncStateRepositoryImpl : SyncStateRepository {
         const val ERROR = "sync_error"
     }
 
-    actual override suspend fun getSyncState(): SyncState {
-        return SyncState(
-            lastSyncTimestamp = userDefaults.stringForKey(Keys.LAST_SYNC_TIMESTAMP)?.let {
-                try {
-                    Instant.parse(it)
-                } catch (e: Exception) {
-                    null
-                }
-            },
+    actual override suspend fun getSyncState(): SyncState =
+        SyncState(
+            lastSyncTimestamp =
+                userDefaults.stringForKey(Keys.LAST_SYNC_TIMESTAMP)?.let {
+                    try {
+                        Instant.parse(it)
+                    } catch (e: Exception) {
+                        null
+                    }
+                },
             lastSyncVersion = userDefaults.integerForKey(Keys.LAST_SYNC_VERSION),
             isSyncing = userDefaults.boolForKey(Keys.IS_SYNCING),
             pendingChanges = userDefaults.integerForKey(Keys.PENDING_CHANGES).toInt(),
             error = userDefaults.stringForKey(Keys.ERROR)
         )
-    }
 
     actual override suspend fun updateSyncState(state: SyncState) {
         state.lastSyncTimestamp?.let {

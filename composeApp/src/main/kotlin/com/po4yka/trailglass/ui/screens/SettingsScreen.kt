@@ -4,8 +4,8 @@ import android.os.Build
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,28 +32,31 @@ fun SettingsScreen(
     val uiState by trackingController.uiState.collectAsState()
 
     // Android permission launcher
-    val permissionLauncher = rememberLocationPermissionLauncher { granted ->
-        if (granted) {
-            trackingController.checkPermissions()
+    val permissionLauncher =
+        rememberLocationPermissionLauncher { granted ->
+            if (granted) {
+                trackingController.checkPermissions()
+            }
         }
-    }
 
     // Permission state for background location
-    val permissionState = rememberLocationPermissionState { granted ->
-        if (granted) {
-            trackingController.checkPermissions()
+    val permissionState =
+        rememberLocationPermissionState { granted ->
+            if (granted) {
+                trackingController.checkPermissions()
+            }
         }
-    }
 
     // Lifecycle observer to refresh permissions when returning from settings
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                permissionState.refresh()
-                trackingController.checkPermissions()
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    permissionState.refresh()
+                    trackingController.checkPermissions()
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -121,9 +124,10 @@ fun SettingsScreen(
                 onClick = onNavigateToAlgorithmSettings
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -167,9 +171,10 @@ fun SettingsScreen(
                 onClick = onNavigateToDeviceManagement
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
@@ -238,12 +243,15 @@ private fun TrackingStatusCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isTracking)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceVariant
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (isTracking) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    }
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -253,10 +261,12 @@ private fun TrackingStatusCard(
                 Icon(
                     imageVector = if (isTracking) Icons.Default.GpsFixed else Icons.Default.GpsOff,
                     contentDescription = null,
-                    tint = if (isTracking)
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                    tint =
+                        if (isTracking) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                 )
 
                 Column {
@@ -321,10 +331,12 @@ private fun PermissionsCard(
                 Icon(
                     imageVector = if (hasPermissions) Icons.Default.CheckCircle else Icons.Default.Error,
                     contentDescription = null,
-                    tint = if (hasPermissions)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.error
+                    tint =
+                        if (hasPermissions) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.error
+                        }
                 )
 
                 Column {
@@ -365,10 +377,12 @@ private fun PermissionsCard(
                     Icon(
                         imageVector = if (hasBackgroundPermission) Icons.Default.CheckCircle else Icons.Default.LocationOn,
                         contentDescription = null,
-                        tint = if (hasBackgroundPermission)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
+                        tint =
+                            if (hasBackgroundPermission) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                            }
                     )
 
                     Column {
@@ -378,10 +392,12 @@ private fun PermissionsCard(
                         )
 
                         Text(
-                            text = if (hasBackgroundPermission)
-                                "Always allowed"
-                            else
-                                "Only while using app",
+                            text =
+                                if (hasBackgroundPermission) {
+                                    "Always allowed"
+                                } else {
+                                    "Only while using app"
+                                },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

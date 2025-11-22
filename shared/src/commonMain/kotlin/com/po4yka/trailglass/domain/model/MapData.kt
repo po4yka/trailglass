@@ -9,16 +9,18 @@ data class MapRegion(
     val longitudeDelta: Double
 ) {
     val northEast: Coordinate
-        get() = Coordinate(
-            latitude = center.latitude + latitudeDelta / 2,
-            longitude = center.longitude + longitudeDelta / 2
-        )
+        get() =
+            Coordinate(
+                latitude = center.latitude + latitudeDelta / 2,
+                longitude = center.longitude + longitudeDelta / 2
+            )
 
     val southWest: Coordinate
-        get() = Coordinate(
-            latitude = center.latitude - latitudeDelta / 2,
-            longitude = center.longitude - longitudeDelta / 2
-        )
+        get() =
+            Coordinate(
+                latitude = center.latitude - latitudeDelta / 2,
+                longitude = center.longitude - longitudeDelta / 2
+            )
 }
 
 /**

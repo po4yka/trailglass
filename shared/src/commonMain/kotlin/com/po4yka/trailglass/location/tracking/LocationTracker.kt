@@ -104,4 +104,7 @@ interface LocationPermissions {
  * This composite interface maintains backward compatibility while
  * adhering to Interface Segregation Principle through composition.
  */
-interface LocationTracker : LocationTracking, LocationStateObserver, LocationPermissions
+interface LocationTracker :
+    LocationTracking,
+    LocationStateObserver,
+    LocationPermissions

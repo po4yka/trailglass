@@ -3,9 +3,7 @@ package com.po4yka.trailglass.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Delete
@@ -27,11 +25,10 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Trip
-import com.po4yka.trailglass.ui.components.LargeFlexibleTopAppBar
 import com.po4yka.trailglass.ui.components.FlexibleTopAppBarDefaults
-import com.po4yka.trailglass.ui.theme.CoastalPath
+import com.po4yka.trailglass.ui.components.LargeFlexibleTopAppBar
 import com.po4yka.trailglass.ui.theme.BlueSlate
-import kotlinx.datetime.Instant
+import com.po4yka.trailglass.ui.theme.CoastalPath
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
@@ -60,33 +57,35 @@ fun TripDetailScreen(
 
     // Format trip metadata for subtitle
     val startDate = trip.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
-    val metadataText = buildString {
-        // Date range
-        trip.endTime?.let { endTime ->
-            val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
-            append("${startDate.date} to ${endDate.date}")
-        } ?: append("Started ${startDate.date}")
+    val metadataText =
+        buildString {
+            // Date range
+            trip.endTime?.let { endTime ->
+                val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                append("${startDate.date} to ${endDate.date}")
+            } ?: append("Started ${startDate.date}")
 
-        // Duration
-        if (trip.duration != null) {
-            append(" • ${formatDuration(trip.duration!!)}")
-        }
+            // Duration
+            if (trip.duration != null) {
+                append(" • ${formatDuration(trip.duration!!)}")
+            }
 
-        // Distance
-        if (trip.totalDistanceMeters > 0) {
-            append(" • ${(trip.totalDistanceMeters / 1000).toInt()} km")
-        }
+            // Distance
+            if (trip.totalDistanceMeters > 0) {
+                append(" • ${(trip.totalDistanceMeters / 1000).toInt()} km")
+            }
 
-        // Places
-        if (trip.visitedPlaceCount > 0) {
-            append(" • ${trip.visitedPlaceCount} places")
+            // Places
+            if (trip.visitedPlaceCount > 0) {
+                append(" • ${trip.visitedPlaceCount} places")
+            }
         }
-    }
 
     Scaffold(
-        modifier = modifier
-            .fillMaxSize()
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             LargeFlexibleTopAppBar(
                 title = { Text(trip.displayName) },
@@ -140,20 +139,22 @@ fun TripDetailScreen(
                 backgroundContent = {
                     // Hero gradient background using trip route color or default
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = if (trip.isOngoing) {
-                                        listOf(CoastalPath, BlueSlate)
-                                    } else {
-                                        listOf(
-                                            MaterialTheme.colorScheme.primaryContainer,
-                                            MaterialTheme.colorScheme.surfaceVariant
-                                        )
-                                    }
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        colors =
+                                            if (trip.isOngoing) {
+                                                listOf(CoastalPath, BlueSlate)
+                                            } else {
+                                                listOf(
+                                                    MaterialTheme.colorScheme.primaryContainer,
+                                                    MaterialTheme.colorScheme.surfaceVariant
+                                                )
+                                            }
+                                    )
                                 )
-                            )
                     )
                 }
             )
@@ -169,9 +170,10 @@ fun TripDetailScreen(
                 Button(
                     onClick = onViewRoute,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+                    colors =
+                        ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
                 ) {
                     Icon(Icons.Default.Map, contentDescription = null)
                     Spacer(Modifier.width(8.dp))
@@ -262,9 +264,10 @@ fun TripDetailScreen(
                         showDeleteDialog = false
                         onDelete()
                     },
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error
+                        )
                 ) {
                     Text("Delete")
                 }
@@ -282,12 +285,15 @@ fun TripDetailScreen(
 private fun TripHeaderCard(trip: Trip) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (trip.isOngoing)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceVariant
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (trip.isOngoing) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    }
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -306,10 +312,11 @@ private fun TripHeaderCard(trip: Trip) {
 
                     // Date range
                     val startDate = trip.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
-                    val dateText = trip.endTime?.let { endTime ->
-                        val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
-                        "${startDate.date} to ${endDate.date}"
-                    } ?: "Started ${startDate.date}"
+                    val dateText =
+                        trip.endTime?.let { endTime ->
+                            val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                            "${startDate.date} to ${endDate.date}"
+                        } ?: "Started ${startDate.date}"
 
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -476,7 +483,8 @@ private fun VisitedPlacesCard(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = cities.take(10).joinToString(", ") +
+                    text =
+                        cities.take(10).joinToString(", ") +
                             if (cities.size > 10) " and ${cities.size - 10} more" else "",
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -486,7 +494,8 @@ private fun VisitedPlacesCard(
 }
 
 enum class ExportFormat {
-    GPX, KML
+    GPX,
+    KML
 }
 
 private fun formatDuration(duration: kotlin.time.Duration): String {

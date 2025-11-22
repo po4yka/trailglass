@@ -19,7 +19,7 @@ data class EnhancedMapMarker(
  */
 data class MarkerCluster(
     val id: String,
-    val coordinate: Coordinate,  // Center of cluster
+    val coordinate: Coordinate, // Center of cluster
     val markers: List<EnhancedMapMarker>,
     val count: Int = markers.size
 )
@@ -50,38 +50,44 @@ data class HeatmapGradient(
     val startPoints: List<Float>
 ) {
     companion object {
-        val DEFAULT = HeatmapGradient(
-            colors = listOf(
-                0x00000000.toInt(), // Transparent
-                0x550000FF.toInt(), // Blue
-                0xAA00FF00.toInt(), // Green
-                0xFFFFFF00.toInt(), // Yellow
-                0xFFFF0000.toInt()  // Red
-            ),
-            startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
-        )
+        val DEFAULT =
+            HeatmapGradient(
+                colors =
+                    listOf(
+                        0x00000000.toInt(), // Transparent
+                        0x550000FF.toInt(), // Blue
+                        0xAA00FF00.toInt(), // Green
+                        0xFFFFFF00.toInt(), // Yellow
+                        0xFFFF0000.toInt() // Red
+                    ),
+                startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
+            )
 
-        val COOL = HeatmapGradient(
-            colors = listOf(
-                0x00000000.toInt(),
-                0x5500FFFF.toInt(),
-                0xAA0099FF.toInt(),
-                0xFF0066FF.toInt(),
-                0xFF0033FF.toInt()
-            ),
-            startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
-        )
+        val COOL =
+            HeatmapGradient(
+                colors =
+                    listOf(
+                        0x00000000.toInt(),
+                        0x5500FFFF.toInt(),
+                        0xAA0099FF.toInt(),
+                        0xFF0066FF.toInt(),
+                        0xFF0033FF.toInt()
+                    ),
+                startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
+            )
 
-        val WARM = HeatmapGradient(
-            colors = listOf(
-                0x00000000.toInt(),
-                0x55FFAA00.toInt(),
-                0xAAFF6600.toInt(),
-                0xFFFF3300.toInt(),
-                0xFFFF0000.toInt()
-            ),
-            startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
-        )
+        val WARM =
+            HeatmapGradient(
+                colors =
+                    listOf(
+                        0x00000000.toInt(),
+                        0x55FFAA00.toInt(),
+                        0xAAFF6600.toInt(),
+                        0xFFFF3300.toInt(),
+                        0xFFFF0000.toInt()
+                    ),
+                startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
+            )
     }
 }
 
@@ -102,8 +108,8 @@ data class EnhancedMapDisplayData(
  * Map visualization mode.
  */
 enum class MapVisualizationMode {
-    MARKERS,      // Show individual markers
-    CLUSTERS,     // Show clustered markers
-    HEATMAP,      // Show heatmap visualization
-    HYBRID        // Show both markers/clusters and routes
+    MARKERS, // Show individual markers
+    CLUSTERS, // Show clustered markers
+    HEATMAP, // Show heatmap visualization
+    HYBRID // Show both markers/clusters and routes
 }

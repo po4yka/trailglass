@@ -12,7 +12,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.ui.theme.MotionConfig
@@ -113,23 +112,25 @@ fun LargeFlexibleTopAppBar(
     )
 
     // Calculate parallax offset for background (moves slower than content)
-    val parallaxOffset = if (scrollBehavior != null) {
-        scrollBehavior.state.heightOffset * 0.5f
-    } else {
-        0f
-    }
+    val parallaxOffset =
+        if (scrollBehavior != null) {
+            scrollBehavior.state.heightOffset * 0.5f
+        } else {
+            0f
+        }
 
     // Calculate subtitle alpha (fades out as app bar collapses)
     val subtitleAlpha = 1f - min(1f, animatedProgress * 2f)
 
     // Calculate current height based on scroll
-    val currentHeight = if (scrollBehavior != null) {
-        val maxOffset = expandedHeight - collapsedHeight
-        val offset = scrollBehavior.state.heightOffset
-        max(collapsedHeight.value, expandedHeight.value + offset)
-    } else {
-        expandedHeight.value
-    }
+    val currentHeight =
+        if (scrollBehavior != null) {
+            val maxOffset = expandedHeight - collapsedHeight
+            val offset = scrollBehavior.state.heightOffset
+            max(collapsedHeight.value, expandedHeight.value + offset)
+        } else {
+            expandedHeight.value
+        }
 
     androidx.compose.material3.Surface(
         modifier = modifier.height(currentHeight.dp),
@@ -139,54 +140,60 @@ fun LargeFlexibleTopAppBar(
             // Background layer with parallax effect
             if (backgroundContent != null) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            translationY = parallaxOffset
-                            alpha = 1f - (animatedProgress * 0.3f) // Slight fade on collapse
-                        }
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .graphicsLayer {
+                                translationY = parallaxOffset
+                                alpha = 1f - (animatedProgress * 0.3f) // Slight fade on collapse
+                            }
                 ) {
                     backgroundContent()
                 }
             } else {
                 // Default gradient background using Silent Waters colors
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.primaryContainer,
-                                    MaterialTheme.colorScheme.surface
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors =
+                                        listOf(
+                                            MaterialTheme.colorScheme.primaryContainer,
+                                            MaterialTheme.colorScheme.surface
+                                        )
                                 )
                             )
-                        )
                 )
             }
 
             // Scrim overlay that increases opacity as app bar collapses
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        MaterialTheme.colorScheme.surface.copy(
-                            alpha = animatedProgress * 0.9f
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(
+                            MaterialTheme.colorScheme.surface.copy(
+                                alpha = animatedProgress * 0.9f
+                            )
                         )
-                    )
             )
 
             // Content layer
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .windowInsetsPadding(windowInsets)
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .windowInsetsPadding(windowInsets)
             ) {
                 // Top controls (navigation + actions)
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(collapsedHeight)
-                        .padding(horizontal = 4.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(collapsedHeight)
+                            .padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Navigation icon
@@ -196,10 +203,11 @@ fun LargeFlexibleTopAppBar(
 
                     // Title in collapsed state
                     Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .alpha(animatedProgress)
-                            .padding(horizontal = 8.dp)
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .alpha(animatedProgress)
+                                .padding(horizontal = 8.dp)
                     ) {
                         ProvideTextStyle(
                             value = MaterialTheme.typography.titleLarge
@@ -219,28 +227,31 @@ fun LargeFlexibleTopAppBar(
 
                 // Expanded content (title + subtitle)
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.BottomStart)
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    horizontalAlignment = when (titleHorizontalAlignment) {
-                        Alignment.Start -> Alignment.Start
-                        Alignment.CenterHorizontally -> Alignment.CenterHorizontally
-                        Alignment.End -> Alignment.End
-                        else -> Alignment.Start
-                    }
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomStart)
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 16.dp),
+                    horizontalAlignment =
+                        when (titleHorizontalAlignment) {
+                            Alignment.Start -> Alignment.Start
+                            Alignment.CenterHorizontally -> Alignment.CenterHorizontally
+                            Alignment.End -> Alignment.End
+                            else -> Alignment.Start
+                        }
                 ) {
                     // Large title (visible when expanded)
                     Box(
-                        modifier = Modifier
-                            .alpha(1f - animatedProgress)
-                            .graphicsLayer {
-                                // Slight scale animation
-                                val scale = 1f - (animatedProgress * 0.1f)
-                                scaleX = scale
-                                scaleY = scale
-                            }
+                        modifier =
+                            Modifier
+                                .alpha(1f - animatedProgress)
+                                .graphicsLayer {
+                                    // Slight scale animation
+                                    val scale = 1f - (animatedProgress * 0.1f)
+                                    scaleX = scale
+                                    scaleY = scale
+                                }
                     ) {
                         ProvideTextStyle(
                             value = MaterialTheme.typography.emphasized.headlineLargeEmphasized
@@ -256,9 +267,10 @@ fun LargeFlexibleTopAppBar(
                             modifier = Modifier.alpha(subtitleAlpha)
                         ) {
                             ProvideTextStyle(
-                                value = MaterialTheme.typography.bodyLarge.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                value =
+                                    MaterialTheme.typography.bodyLarge.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                             ) {
                                 subtitle()
                             }
@@ -351,29 +363,32 @@ fun MediumFlexibleTopAppBar(
     val iconAlpha = 1f - animatedProgress
 
     // Calculate current height
-    val currentHeight = if (scrollBehavior != null) {
-        val maxOffset = expandedHeight - collapsedHeight
-        val offset = scrollBehavior.state.heightOffset
-        max(collapsedHeight.value, expandedHeight.value + offset)
-    } else {
-        expandedHeight.value
-    }
+    val currentHeight =
+        if (scrollBehavior != null) {
+            val maxOffset = expandedHeight - collapsedHeight
+            val offset = scrollBehavior.state.heightOffset
+            max(collapsedHeight.value, expandedHeight.value + offset)
+        } else {
+            expandedHeight.value
+        }
 
     androidx.compose.material3.Surface(
         modifier = modifier.height(currentHeight.dp),
         color = colors.containerColor
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .windowInsetsPadding(windowInsets)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(windowInsets)
         ) {
             // Top controls
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(collapsedHeight)
-                    .padding(horizontal = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(collapsedHeight)
+                        .padding(horizontal = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Navigation icon
@@ -383,10 +398,11 @@ fun MediumFlexibleTopAppBar(
 
                 // Title in collapsed state
                 Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .alpha(animatedProgress)
-                        .padding(horizontal = 8.dp)
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .alpha(animatedProgress)
+                            .padding(horizontal = 8.dp)
                 ) {
                     ProvideTextStyle(
                         value = MaterialTheme.typography.titleLarge
@@ -406,11 +422,12 @@ fun MediumFlexibleTopAppBar(
 
             // Expanded content
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomStart)
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomStart)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -426,17 +443,19 @@ fun MediumFlexibleTopAppBar(
                 // Title and subtitle column
                 Column(
                     modifier = Modifier.weight(1f),
-                    horizontalAlignment = when (titleHorizontalAlignment) {
-                        Alignment.Start -> Alignment.Start
-                        Alignment.CenterHorizontally -> Alignment.CenterHorizontally
-                        Alignment.End -> Alignment.End
-                        else -> Alignment.Start
-                    }
+                    horizontalAlignment =
+                        when (titleHorizontalAlignment) {
+                            Alignment.Start -> Alignment.Start
+                            Alignment.CenterHorizontally -> Alignment.CenterHorizontally
+                            Alignment.End -> Alignment.End
+                            else -> Alignment.Start
+                        }
                 ) {
                     // Medium title (visible when expanded)
                     Box(
-                        modifier = Modifier
-                            .alpha(1f - animatedProgress)
+                        modifier =
+                            Modifier
+                                .alpha(1f - animatedProgress)
                     ) {
                         ProvideTextStyle(
                             value = MaterialTheme.typography.emphasized.headlineMediumEmphasized
@@ -452,9 +471,10 @@ fun MediumFlexibleTopAppBar(
                             modifier = Modifier.alpha(subtitleAlpha)
                         ) {
                             ProvideTextStyle(
-                                value = MaterialTheme.typography.bodyMedium.copy(
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
+                                value =
+                                    MaterialTheme.typography.bodyMedium.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
                             ) {
                                 subtitle()
                             }
@@ -529,7 +549,6 @@ fun CompactFlexibleTopAppBar(
  * Helper object providing default values and utilities for FlexibleTopAppBar components.
  */
 object FlexibleTopAppBarDefaults {
-
     /**
      * Default expanded height for LargeFlexibleTopAppBar.
      */
@@ -549,9 +568,7 @@ object FlexibleTopAppBarDefaults {
     fun exitUntilCollapsedScrollBehavior(
         state: TopAppBarState = rememberTopAppBarState(),
         canScroll: () -> Boolean = { true }
-    ): TopAppBarScrollBehavior {
-        return TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state, canScroll)
-    }
+    ): TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state, canScroll)
 
     /**
      * Creates colors for a top app bar with hero background.
@@ -565,13 +582,14 @@ object FlexibleTopAppBarDefaults {
         navigationIconContentColor: Color = MaterialTheme.colorScheme.onSurface,
         titleContentColor: Color = MaterialTheme.colorScheme.onSurface,
         actionIconContentColor: Color = MaterialTheme.colorScheme.onSurface
-    ): TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = containerColor,
-        scrolledContainerColor = scrolledContainerColor,
-        navigationIconContentColor = navigationIconContentColor,
-        titleContentColor = titleContentColor,
-        actionIconContentColor = actionIconContentColor
-    )
+    ): TopAppBarColors =
+        TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor,
+            scrolledContainerColor = scrolledContainerColor,
+            navigationIconContentColor = navigationIconContentColor,
+            titleContentColor = titleContentColor,
+            actionIconContentColor = actionIconContentColor
+        )
 
     /**
      * Creates colors for a top app bar with Silent Waters theme.
@@ -584,13 +602,14 @@ object FlexibleTopAppBarDefaults {
         navigationIconContentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
         titleContentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
         actionIconContentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
-    ): TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = containerColor,
-        scrolledContainerColor = scrolledContainerColor,
-        navigationIconContentColor = navigationIconContentColor,
-        titleContentColor = titleContentColor,
-        actionIconContentColor = actionIconContentColor
-    )
+    ): TopAppBarColors =
+        TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor,
+            scrolledContainerColor = scrolledContainerColor,
+            navigationIconContentColor = navigationIconContentColor,
+            titleContentColor = titleContentColor,
+            actionIconContentColor = actionIconContentColor
+        )
 
     /**
      * Creates standard top app bar colors.
@@ -604,11 +623,12 @@ object FlexibleTopAppBarDefaults {
         navigationIconContentColor: Color = MaterialTheme.colorScheme.onSurface,
         titleContentColor: Color = MaterialTheme.colorScheme.onSurface,
         actionIconContentColor: Color = MaterialTheme.colorScheme.onSurface
-    ): TopAppBarColors = TopAppBarDefaults.topAppBarColors(
-        containerColor = containerColor,
-        scrolledContainerColor = scrolledContainerColor,
-        navigationIconContentColor = navigationIconContentColor,
-        titleContentColor = titleContentColor,
-        actionIconContentColor = actionIconContentColor
-    )
+    ): TopAppBarColors =
+        TopAppBarDefaults.topAppBarColors(
+            containerColor = containerColor,
+            scrolledContainerColor = scrolledContainerColor,
+            navigationIconContentColor = navigationIconContentColor,
+            titleContentColor = titleContentColor,
+            actionIconContentColor = actionIconContentColor
+        )
 }

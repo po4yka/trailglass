@@ -10,8 +10,10 @@ class DatabaseCachedReverseGeocoder(
     private val geocoder: ReverseGeocoder,
     private val cache: DatabaseGeocodingCache
 ) : ReverseGeocoder {
-
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation? {
+    override suspend fun reverseGeocode(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         // Check cache first
         cache.get(latitude, longitude)?.let { return it }
 
@@ -41,7 +43,5 @@ class DatabaseCachedReverseGeocoder(
     /**
      * Get count of cached entries.
      */
-    suspend fun getCacheCount(): Long {
-        return cache.count()
-    }
+    suspend fun getCacheCount(): Long = cache.count()
 }

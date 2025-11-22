@@ -18,7 +18,6 @@ class PlaceVisitProcessor(
     private val minDurationThreshold: Duration = 10.minutes,
     private val spatialThresholdMeters: Double = 100.0
 ) {
-
     private val logger = logger()
 
     /**
@@ -43,11 +42,14 @@ class PlaceVisitProcessor(
         logger.debug { "Found ${clusters.size} clusters from ${samples.size} samples" }
 
         // Convert clusters to PlaceVisits with geocoding
-        val visits = clusters.mapNotNull { cluster ->
-            createPlaceVisit(cluster)
-        }
+        val visits =
+            clusters.mapNotNull { cluster ->
+                createPlaceVisit(cluster)
+            }
 
-        logger.info { "Detected ${visits.size} place visits after filtering by duration threshold (${minDurationThreshold})" }
+        logger.info {
+            "Detected ${visits.size} place visits after filtering by duration threshold ($minDurationThreshold)"
+        }
         return visits
     }
 
@@ -67,10 +69,13 @@ class PlaceVisitProcessor(
             }
 
             val last = currentCluster.last()
-            val distance = calculateDistance(
-                last.latitude, last.longitude,
-                current.latitude, current.longitude
-            )
+            val distance =
+                calculateDistance(
+                    last.latitude,
+                    last.longitude,
+                    current.latitude,
+                    current.longitude
+                )
 
             // If sample is within spatial threshold, add to current cluster
             if (distance < spatialThresholdMeters) {
@@ -112,13 +117,17 @@ class PlaceVisitProcessor(
         val centerLat = samples.map { it.latitude }.average()
         val centerLon = samples.map { it.longitude }.average()
 
-        logger.debug { "Creating place visit at ($centerLat, $centerLon) with ${samples.size} samples, duration: $duration" }
+        logger.debug {
+            "Creating place visit at ($centerLat, $centerLon) with ${samples.size} samples, duration: $duration"
+        }
 
         // Perform reverse geocoding
         val geocoded = reverseGeocoder.reverseGeocode(centerLat, centerLon)
 
         if (geocoded != null) {
-            logger.info { "Geocoded place visit: ${geocoded.city ?: geocoded.formattedAddress} (${geocoded.countryCode})" }
+            logger.info {
+                "Geocoded place visit: ${geocoded.city ?: geocoded.formattedAddress} (${geocoded.countryCode})"
+            }
         } else {
             logger.warn { "Failed to geocode place visit at ($centerLat, $centerLon)" }
         }
@@ -140,9 +149,11 @@ class PlaceVisitProcessor(
     /**
      * Generate a deterministic ID for a PlaceVisit.
      */
-    private fun generatePlaceVisitId(time: Instant, lat: Double, lon: Double): String {
-        return "visit_${time.toEpochMilliseconds()}_${lat.hashCode()}_${lon.hashCode()}"
-    }
+    private fun generatePlaceVisitId(
+        time: Instant,
+        lat: Double,
+        lon: Double
+    ): String = "visit_${time.toEpochMilliseconds()}_${lat.hashCode()}_${lon.hashCode()}"
 
     /**
      * Calculate distance between two coordinates using Haversine formula.
@@ -150,15 +161,18 @@ class PlaceVisitProcessor(
      * @return Distance in meters
      */
     private fun calculateDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 

@@ -5,8 +5,6 @@ import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
@@ -25,16 +23,19 @@ import kotlin.coroutines.suspendCoroutine
 @OptIn(ExperimentalForeignApi::class)
 @Inject
 class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
-
     private val logger = logger()
 
-    override suspend fun extractMetadata(photoUri: String, photoId: String): PhotoMetadata? {
-        return try {
+    override suspend fun extractMetadata(
+        photoUri: String,
+        photoId: String
+    ): PhotoMetadata? =
+        try {
             // photoUri on iOS is the PHAsset localIdentifier
-            val fetchResult = PHAsset.fetchAssetsWithLocalIdentifiers(
-                listOf(photoUri),
-                null
-            )
+            val fetchResult =
+                PHAsset.fetchAssetsWithLocalIdentifiers(
+                    listOf(photoUri),
+                    null
+                )
 
             if (fetchResult.count > 0u) {
                 val asset = fetchResult.firstObject as? PHAsset
@@ -46,9 +47,11 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
             logger.error(e) { "Failed to extract metadata from iOS asset $photoUri" }
             null
         }
-    }
 
-    private suspend fun extractFromAsset(asset: PHAsset, photoId: String): PhotoMetadata {
+    private suspend fun extractFromAsset(
+        asset: PHAsset,
+        photoId: String
+    ): PhotoMetadata {
         // Extract basic info from PHAsset
         val location = asset.location as? CLLocation
         val latitude = location?.coordinate?.useContents { latitude }
@@ -57,27 +60,38 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
 
         // Extract date/time
         val creationDate = asset.creationDate as? NSDate
-        val exifTimestamp = creationDate?.let {
-            Instant.fromEpochSeconds(it.timeIntervalSince1970.toLong())
-        }
+        val exifTimestamp =
+            creationDate?.let {
+                Instant.fromEpochSeconds(it.timeIntervalSince1970.toLong())
+            }
 
         val modificationDate = asset.modificationDate as? NSDate
-        val modifiedTimestamp = modificationDate?.let {
-            Instant.fromEpochSeconds(it.timeIntervalSince1970.toLong())
-        }
+        val modifiedTimestamp =
+            modificationDate?.let {
+                Instant.fromEpochSeconds(it.timeIntervalSince1970.toLong())
+            }
 
         // Extract full EXIF data using ImageIO
         val exifData = extractFullExifData(asset)
 
         // Computed location
-        val computedLocation = if (latitude != null && longitude != null) {
-            Location(Coordinate(latitude!!, longitude!!), altitude = altitude, timestamp = exifTimestamp ?: Clock.System.now())
-        } else null
+        val computedLocation =
+            if (latitude != null && longitude != null) {
+                Location(
+                    Coordinate(latitude!!, longitude!!),
+                    altitude = altitude,
+                    timestamp =
+                        exifTimestamp ?: Clock.System.now()
+                )
+            } else {
+                null
+            }
 
-        val locationSource = when {
-            latitude != null && longitude != null -> PhotoMetadata.LocationSource.EXIF
-            else -> PhotoMetadata.LocationSource.NONE
-        }
+        val locationSource =
+            when {
+                latitude != null && longitude != null -> PhotoMetadata.LocationSource.EXIF
+                else -> PhotoMetadata.LocationSource.NONE
+            }
 
         return PhotoMetadata(
             photoId = photoId,
@@ -101,37 +115,42 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
         )
     }
 
-    private suspend fun extractFullExifData(asset: PHAsset): ExifData = suspendCoroutine { continuation ->
-        val options = PHImageRequestOptions().apply {
-            version = PHImageRequestOptionsVersionCurrent
-            deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat
-            synchronous = false
-            networkAccessAllowed = true
-        }
+    private suspend fun extractFullExifData(asset: PHAsset): ExifData =
+        suspendCoroutine { continuation ->
+            val options =
+                PHImageRequestOptions().apply {
+                    version = PHImageRequestOptionsVersionCurrent
+                    deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat
+                    synchronous = false
+                    networkAccessAllowed = true
+                }
 
-        PHImageManager.defaultManager().requestImageDataForAsset(
-            asset,
-            options
-        ) { imageData, dataUTI, orientation, info ->
-            val exifData = if (imageData != null) {
-                parseExifFromImageData(imageData)
-            } else {
-                ExifData()
+            PHImageManager.defaultManager().requestImageDataForAsset(
+                asset,
+                options
+            ) { imageData, dataUTI, orientation, info ->
+                val exifData =
+                    if (imageData != null) {
+                        parseExifFromImageData(imageData)
+                    } else {
+                        ExifData()
+                    }
+                continuation.resume(exifData)
             }
-            continuation.resume(exifData)
         }
-    }
 
     @OptIn(ExperimentalForeignApi::class)
     private fun parseExifFromImageData(imageData: NSData): ExifData {
         return try {
             // Create image source from data
-            val imageSource = CGImageSourceCreateWithData(imageData as CFDataRef, null)
-                ?: return ExifData()
+            val imageSource =
+                CGImageSourceCreateWithData(imageData as CFDataRef, null)
+                    ?: return ExifData()
 
             // Get metadata dictionary at index 0
-            val metadata = CGImageSourceCopyPropertiesAtIndex(imageSource, 0u, null)
-                ?: return ExifData()
+            val metadata =
+                CGImageSourceCopyPropertiesAtIndex(imageSource, 0u, null)
+                    ?: return ExifData()
 
             val metadataDict = metadata as NSDictionary
 
@@ -158,20 +177,24 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
 
             // Extract ISO
             val isoArray = exifDict?.objectForKey(kCGImagePropertyExifISOSpeedRatings) as? NSArray
-            val iso = if (isoArray != null && isoArray.count > 0u) {
-                (isoArray.objectAtIndex(0u) as? NSNumber)?.intValue
-            } else null
+            val iso =
+                if (isoArray != null && isoArray.count > 0u) {
+                    (isoArray.objectAtIndex(0u) as? NSNumber)?.intValue
+                } else {
+                    null
+                }
 
             // Extract shutter speed (exposure time)
             val exposureTime = exifDict?.objectForKey(kCGImagePropertyExifExposureTime) as? NSNumber
-            val shutterSpeed = exposureTime?.let {
-                val time = it.doubleValue
-                if (time >= 1.0) {
-                    "${time.toInt()}s"
-                } else {
-                    "1/${(1.0 / time).toInt()}"
+            val shutterSpeed =
+                exposureTime?.let {
+                    val time = it.doubleValue
+                    if (time >= 1.0) {
+                        "${time.toInt()}s"
+                    } else {
+                        "1/${(1.0 / time).toInt()}"
+                    }
                 }
-            }
 
             // Extract flash
             val flash = exifDict?.objectForKey(kCGImagePropertyExifFlash) as? NSNumber
@@ -183,11 +206,12 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
 
             // Extract color space
             val colorSpace = exifDict?.objectForKey(kCGImagePropertyExifColorSpace) as? NSNumber
-            val colorSpaceName = when (colorSpace?.intValue) {
-                1 -> "sRGB"
-                65535 -> "Uncalibrated"
-                else -> null
-            }
+            val colorSpaceName =
+                when (colorSpace?.intValue) {
+                    1 -> "sRGB"
+                    65535 -> "Uncalibrated"
+                    else -> null
+                }
 
             ExifData(
                 cameraMake = cameraMake,

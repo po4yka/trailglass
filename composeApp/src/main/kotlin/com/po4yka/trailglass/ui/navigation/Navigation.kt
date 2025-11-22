@@ -23,36 +23,48 @@ import com.po4yka.trailglass.ui.screens.*
 /**
  * Main navigation destinations.
  */
-sealed class Screen(val route: String, val title: String, val icon: ImageVector) {
+sealed class Screen(
+    val route: String,
+    val title: String,
+    val icon: ImageVector
+) {
     object Stats : Screen("stats", "Stats", Icons.Default.BarChart)
+
     object Timeline : Screen("timeline", "Timeline", Icons.Default.ViewTimeline)
+
     object Map : Screen("map", "Map", Icons.Default.Map)
+
     object Photos : Screen("photos", "Photos", Icons.Default.PhotoLibrary)
+
     object Trips : Screen("trips", "Trips", Icons.Default.CardTravel)
+
     object Places : Screen("places", "Places", Icons.Default.Place)
+
     object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 
     companion object {
-        fun fromConfig(config: RootComponent.Config): Screen? = when (config) {
-            is RootComponent.Config.Stats -> Stats
-            is RootComponent.Config.Timeline -> Timeline
-            is RootComponent.Config.Map -> Map
-            is RootComponent.Config.Photos -> Photos
-            is RootComponent.Config.Trips -> Trips
-            is RootComponent.Config.Places -> Places
-            is RootComponent.Config.Settings -> Settings
-            else -> null
-        }
+        fun fromConfig(config: RootComponent.Config): Screen? =
+            when (config) {
+                is RootComponent.Config.Stats -> Stats
+                is RootComponent.Config.Timeline -> Timeline
+                is RootComponent.Config.Map -> Map
+                is RootComponent.Config.Photos -> Photos
+                is RootComponent.Config.Trips -> Trips
+                is RootComponent.Config.Places -> Places
+                is RootComponent.Config.Settings -> Settings
+                else -> null
+            }
 
-        fun toConfig(screen: Screen): RootComponent.Config = when (screen) {
-            is Stats -> RootComponent.Config.Stats
-            is Timeline -> RootComponent.Config.Timeline
-            is Map -> RootComponent.Config.Map
-            is Photos -> RootComponent.Config.Photos
-            is Trips -> RootComponent.Config.Trips
-            is Places -> RootComponent.Config.Places
-            is Settings -> RootComponent.Config.Settings
-        }
+        fun toConfig(screen: Screen): RootComponent.Config =
+            when (screen) {
+                is Stats -> RootComponent.Config.Stats
+                is Timeline -> RootComponent.Config.Timeline
+                is Map -> RootComponent.Config.Map
+                is Photos -> RootComponent.Config.Photos
+                is Trips -> RootComponent.Config.Trips
+                is Places -> RootComponent.Config.Places
+                is Settings -> RootComponent.Config.Settings
+            }
     }
 }
 
@@ -70,23 +82,24 @@ fun MainScaffold(
     val activeChild = childStack.active
 
     // Determine current screen from active child
-    val currentScreen = when (activeChild.instance) {
-        is RootComponent.Child.Stats -> Screen.Stats
-        is RootComponent.Child.Timeline -> Screen.Timeline
-        is RootComponent.Child.Map -> Screen.Map
-        is RootComponent.Child.Photos -> Screen.Photos
-        is RootComponent.Child.Trips -> Screen.Trips
-        is RootComponent.Child.Places -> Screen.Places
-        is RootComponent.Child.Settings -> Screen.Settings
-        is RootComponent.Child.RouteView,
-        is RootComponent.Child.RouteReplay,
-        is RootComponent.Child.TripStatistics,
-        is RootComponent.Child.PhotoDetail,
-        is RootComponent.Child.PlaceVisitDetail,
-        is RootComponent.Child.PlaceDetail,
-        is RootComponent.Child.DeviceManagement,
-        is RootComponent.Child.AlgorithmSettings -> null // No bottom nav for detail screens
-    }
+    val currentScreen =
+        when (activeChild.instance) {
+            is RootComponent.Child.Stats -> Screen.Stats
+            is RootComponent.Child.Timeline -> Screen.Timeline
+            is RootComponent.Child.Map -> Screen.Map
+            is RootComponent.Child.Photos -> Screen.Photos
+            is RootComponent.Child.Trips -> Screen.Trips
+            is RootComponent.Child.Places -> Screen.Places
+            is RootComponent.Child.Settings -> Screen.Settings
+            is RootComponent.Child.RouteView,
+            is RootComponent.Child.RouteReplay,
+            is RootComponent.Child.TripStatistics,
+            is RootComponent.Child.PhotoDetail,
+            is RootComponent.Child.PlaceVisitDetail,
+            is RootComponent.Child.PlaceDetail,
+            is RootComponent.Child.DeviceManagement,
+            is RootComponent.Child.AlgorithmSettings -> null // No bottom nav for detail screens
+        }
 
     // Show bottom nav and top bar only for main screens
     val showBottomNav = currentScreen != null
@@ -100,17 +113,27 @@ fun MainScaffold(
             if (showBottomNav) {
                 TopAppBar(
                     title = { Text(currentScreen!!.title) },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimary
-                    )
+                    colors =
+                        TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary
+                        )
                 )
             }
         },
         bottomBar = {
             if (showBottomNav) {
                 NavigationBar {
-                    val screens = listOf(Screen.Stats, Screen.Timeline, Screen.Map, Screen.Photos, Screen.Trips, Screen.Places, Screen.Settings)
+                    val screens =
+                        listOf(
+                            Screen.Stats,
+                            Screen.Timeline,
+                            Screen.Map,
+                            Screen.Photos,
+                            Screen.Trips,
+                            Screen.Places,
+                            Screen.Settings
+                        )
 
                     screens.forEach { screen ->
                         NavigationBarItem(
@@ -180,7 +203,10 @@ fun MainScaffold(
 
                     is RootComponent.Child.Trips -> {
                         TripsScreen(
-                            trips = instance.component.tripsController.state.collectAsState().value.filteredTrips,
+                            trips =
+                                instance.component.tripsController.state
+                                    .collectAsState()
+                                    .value.filteredTrips,
                             onTripClick = { trip ->
                                 rootComponent.navigateToScreen(RootComponent.Config.RouteView(trip.id))
                             },
@@ -205,7 +231,10 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.Places -> {
-                        val placesState = instance.component.placesController.state.collectAsState().value
+                        val placesState =
+                            instance.component.placesController.state
+                                .collectAsState()
+                                .value
 
                         PlacesScreen(
                             places = placesState.places,
@@ -285,12 +314,13 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.PlaceDetail -> {
-                        val place = remember(instance.component.placeId) {
-                            derivedStateOf {
-                                instance.component.placesController.state.value.places
-                                    .find { it.id == instance.component.placeId }
+                        val place =
+                            remember(instance.component.placeId) {
+                                derivedStateOf {
+                                    instance.component.placesController.state.value.places
+                                        .find { it.id == instance.component.placeId }
+                                }
                             }
-                        }
 
                         PlaceDetailScreen(
                             place = place.value,

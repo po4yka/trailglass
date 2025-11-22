@@ -34,12 +34,19 @@ enum class ConflictStatus {
  */
 interface ConflictRepository {
     suspend fun storeConflict(conflict: StoredConflict)
+
     suspend fun getConflict(conflictId: String): StoredConflict?
+
     suspend fun getPendingConflicts(): List<StoredConflict>
+
     suspend fun getConflictCount(): Int
+
     suspend fun markAsResolved(conflictId: String)
+
     suspend fun markAsIgnored(conflictId: String)
+
     suspend fun deleteConflict(conflictId: String)
+
     suspend fun clearResolvedConflicts()
 }
 
@@ -48,13 +55,14 @@ interface ConflictRepository {
  */
 fun SyncConflictDto.toStoredConflict(): StoredConflict {
     // Convert remote EntityType to sync EntityType
-    val syncEntityType = when (entityType) {
-        com.po4yka.trailglass.data.remote.dto.EntityType.LOCATION -> EntityType.LOCATION_SAMPLE
-        com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
-        com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
-        com.po4yka.trailglass.data.remote.dto.EntityType.PHOTO -> EntityType.PHOTO
-        com.po4yka.trailglass.data.remote.dto.EntityType.SETTINGS -> EntityType.SETTINGS
-    }
+    val syncEntityType =
+        when (entityType) {
+            com.po4yka.trailglass.data.remote.dto.EntityType.LOCATION -> EntityType.LOCATION_SAMPLE
+            com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
+            com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
+            com.po4yka.trailglass.data.remote.dto.EntityType.PHOTO -> EntityType.PHOTO
+            com.po4yka.trailglass.data.remote.dto.EntityType.SETTINGS -> EntityType.SETTINGS
+        }
 
     return StoredConflict(
         conflictId = "${entityType.name}_${entityId}_${kotlinx.datetime.Clock.System.now().toEpochMilliseconds()}",
@@ -66,6 +74,8 @@ fun SyncConflictDto.toStoredConflict(): StoredConflict {
         remoteData = remoteVersion.toString(),
         conflictedFields = emptyList(), // Not provided in DTO
         suggestedResolution = suggestedResolution.name,
-        createdAt = kotlinx.datetime.Clock.System.now()
+        createdAt =
+            kotlinx.datetime.Clock.System
+                .now()
     )
 }

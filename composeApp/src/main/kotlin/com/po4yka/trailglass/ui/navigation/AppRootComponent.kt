@@ -51,8 +51,13 @@ interface AppRootComponent {
      * Sealed class representing child components.
      */
     sealed class Child {
-        data class Auth(val component: AuthRootComponent) : Child()
-        data class Main(val component: RootComponent) : Child()
+        data class Auth(
+            val component: AuthRootComponent
+        ) : Child()
+
+        data class Main(
+            val component: RootComponent
+        ) : Child()
     }
 }
 
@@ -62,18 +67,19 @@ interface AppRootComponent {
 class DefaultAppRootComponent(
     componentContext: ComponentContext,
     private val appComponent: AppComponent
-) : AppRootComponent, ComponentContext by componentContext {
-
+) : AppRootComponent,
+    ComponentContext by componentContext {
     private val navigation = StackNavigation<AppRootComponent.Config>()
 
-    override val childStack: Value<ChildStack<*, AppRootComponent.Child>> = childStack(
-        source = navigation,
-        serializer = AppRootComponent.Config.serializer(),
-        // Start with Auth flow - will check authentication status on initialization
-        initialConfiguration = AppRootComponent.Config.Auth,
-        handleBackButton = true,
-        childFactory = ::createChild
-    )
+    override val childStack: Value<ChildStack<*, AppRootComponent.Child>> =
+        childStack(
+            source = navigation,
+            serializer = AppRootComponent.Config.serializer(),
+            // Start with Auth flow - will check authentication status on initialization
+            initialConfiguration = AppRootComponent.Config.Auth,
+            handleBackButton = true,
+            childFactory = ::createChild
+        )
 
     override fun navigateToAuth() {
         navigation.replaceCurrent(AppRootComponent.Config.Auth)
@@ -86,20 +92,25 @@ class DefaultAppRootComponent(
     private fun createChild(
         config: AppRootComponent.Config,
         componentContext: ComponentContext
-    ): AppRootComponent.Child = when (config) {
-        is AppRootComponent.Config.Auth -> AppRootComponent.Child.Auth(
-            component = DefaultAuthRootComponent(
-                componentContext = componentContext,
-                authController = appComponent.authController,
-                onAuthenticated = ::navigateToMain
-            )
-        )
+    ): AppRootComponent.Child =
+        when (config) {
+            is AppRootComponent.Config.Auth ->
+                AppRootComponent.Child.Auth(
+                    component =
+                        DefaultAuthRootComponent(
+                            componentContext = componentContext,
+                            authController = appComponent.authController,
+                            onAuthenticated = ::navigateToMain
+                        )
+                )
 
-        is AppRootComponent.Config.Main -> AppRootComponent.Child.Main(
-            component = DefaultRootComponent(
-                componentContext = componentContext,
-                appComponent = appComponent
-            )
-        )
-    }
+            is AppRootComponent.Config.Main ->
+                AppRootComponent.Child.Main(
+                    component =
+                        DefaultRootComponent(
+                            componentContext = componentContext,
+                            appComponent = appComponent
+                        )
+                )
+        }
 }

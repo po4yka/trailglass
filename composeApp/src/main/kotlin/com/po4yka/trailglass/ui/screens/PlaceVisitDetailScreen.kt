@@ -2,13 +2,12 @@ package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.automirrored.filled.Label
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Place
@@ -52,16 +51,17 @@ fun PlaceVisitDetailScreen(
             isLoading = true
             error = null
             val result = apiClient.getPlaceVisit(placeVisitId)
-            result.onSuccess { dto ->
-                // TODO: Implement proper DTO to domain model mapping
-                // The PlaceVisitDto structure doesn't match PlaceVisit domain model
-                // Need to create a proper mapper function
-                error = "Mapping not implemented"
-                isLoading = false
-            }.onFailure { e ->
-                error = e.message ?: "Failed to load place visit"
-                isLoading = false
-            }
+            result
+                .onSuccess { dto ->
+                    // TODO: Implement proper DTO to domain model mapping
+                    // The PlaceVisitDto structure doesn't match PlaceVisit domain model
+                    // Need to create a proper mapper function
+                    error = "Mapping not implemented"
+                    isLoading = false
+                }.onFailure { e ->
+                    error = e.message ?: "Failed to load place visit"
+                    isLoading = false
+                }
         }
     }
 
@@ -84,9 +84,10 @@ fun PlaceVisitDetailScreen(
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
         ) {
             when {
                 isLoading -> {
@@ -96,9 +97,10 @@ fun PlaceVisitDetailScreen(
                 }
                 error != null -> {
                     Column(
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .align(Alignment.Center)
+                                .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -118,14 +120,15 @@ fun PlaceVisitDetailScreen(
                                 isLoading = true
                                 error = null
                                 val result = apiClient.getPlaceVisit(placeVisitId)
-                                result.onSuccess { dto ->
-                                    // TODO: Implement proper DTO to domain model mapping
-                                    error = "Mapping not implemented"
-                                    isLoading = false
-                                }.onFailure { e ->
-                                    error = e.message ?: "Failed to load place visit"
-                                    isLoading = false
-                                }
+                                result
+                                    .onSuccess { dto ->
+                                        // TODO: Implement proper DTO to domain model mapping
+                                        error = "Mapping not implemented"
+                                        isLoading = false
+                                    }.onFailure { e ->
+                                        error = e.message ?: "Failed to load place visit"
+                                        isLoading = false
+                                    }
                             }
                         }) {
                             Text("Retry")
@@ -141,7 +144,10 @@ fun PlaceVisitDetailScreen(
 }
 
 @Composable
-private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) {
+private fun PlaceVisitContent(
+    visit: PlaceVisit,
+    modifier: Modifier = Modifier
+) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -151,9 +157,10 @@ private fun PlaceVisitContent(visit: PlaceVisit, modifier: Modifier = Modifier) 
         item {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -367,7 +374,10 @@ private fun DetailRow(
 
 private fun formatInstant(instant: Instant): String {
     val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${localDateTime.date} ${localDateTime.time.hour.toString().padStart(2, '0')}:${localDateTime.time.minute.toString().padStart(2, '0')}"
+    return "${localDateTime.date} ${localDateTime.time.hour.toString().padStart(
+        2,
+        '0'
+    )}:${localDateTime.time.minute.toString().padStart(2, '0')}"
 }
 
 private fun formatDuration(duration: kotlin.time.Duration): String {

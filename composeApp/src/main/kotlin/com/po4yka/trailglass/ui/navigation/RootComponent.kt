@@ -71,22 +71,34 @@ interface RootComponent {
         data object Settings : Config
 
         @Serializable
-        data class RouteView(val tripId: String) : Config
+        data class RouteView(
+            val tripId: String
+        ) : Config
 
         @Serializable
-        data class RouteReplay(val tripId: String) : Config
+        data class RouteReplay(
+            val tripId: String
+        ) : Config
 
         @Serializable
-        data class TripStatistics(val tripId: String) : Config
+        data class TripStatistics(
+            val tripId: String
+        ) : Config
 
         @Serializable
-        data class PhotoDetail(val photoId: String) : Config
+        data class PhotoDetail(
+            val photoId: String
+        ) : Config
 
         @Serializable
-        data class PlaceVisitDetail(val placeVisitId: String) : Config
+        data class PlaceVisitDetail(
+            val placeVisitId: String
+        ) : Config
 
         @Serializable
-        data class PlaceDetail(val placeId: String) : Config
+        data class PlaceDetail(
+            val placeId: String
+        ) : Config
 
         @Serializable
         data object DeviceManagement : Config
@@ -99,21 +111,65 @@ interface RootComponent {
      * Sealed class representing the child components.
      */
     sealed class Child {
-        data class Stats(val component: StatsComponent) : Child()
-        data class Timeline(val component: TimelineComponent) : Child()
-        data class Map(val component: MapComponent) : Child()
-        data class Photos(val component: PhotosComponent) : Child()
-        data class Trips(val component: TripsComponent) : Child()
-        data class Places(val component: PlacesComponent) : Child()
-        data class Settings(val component: SettingsComponent) : Child()
-        data class RouteView(val component: RouteViewComponent) : Child()
-        data class RouteReplay(val component: RouteReplayComponent) : Child()
-        data class TripStatistics(val component: TripStatisticsComponent) : Child()
-        data class PhotoDetail(val component: PhotoDetailComponent) : Child()
-        data class PlaceVisitDetail(val component: PlaceVisitDetailComponent) : Child()
-        data class PlaceDetail(val component: PlaceDetailComponent) : Child()
-        data class DeviceManagement(val component: DeviceManagementComponent) : Child()
-        data class AlgorithmSettings(val component: AlgorithmSettingsComponent) : Child()
+        data class Stats(
+            val component: StatsComponent
+        ) : Child()
+
+        data class Timeline(
+            val component: TimelineComponent
+        ) : Child()
+
+        data class Map(
+            val component: MapComponent
+        ) : Child()
+
+        data class Photos(
+            val component: PhotosComponent
+        ) : Child()
+
+        data class Trips(
+            val component: TripsComponent
+        ) : Child()
+
+        data class Places(
+            val component: PlacesComponent
+        ) : Child()
+
+        data class Settings(
+            val component: SettingsComponent
+        ) : Child()
+
+        data class RouteView(
+            val component: RouteViewComponent
+        ) : Child()
+
+        data class RouteReplay(
+            val component: RouteReplayComponent
+        ) : Child()
+
+        data class TripStatistics(
+            val component: TripStatisticsComponent
+        ) : Child()
+
+        data class PhotoDetail(
+            val component: PhotoDetailComponent
+        ) : Child()
+
+        data class PlaceVisitDetail(
+            val component: PlaceVisitDetailComponent
+        ) : Child()
+
+        data class PlaceDetail(
+            val component: PlaceDetailComponent
+        ) : Child()
+
+        data class DeviceManagement(
+            val component: DeviceManagementComponent
+        ) : Child()
+
+        data class AlgorithmSettings(
+            val component: AlgorithmSettingsComponent
+        ) : Child()
     }
 }
 
@@ -123,17 +179,18 @@ interface RootComponent {
 class DefaultRootComponent(
     componentContext: ComponentContext,
     override val appComponent: AppComponent
-) : RootComponent, ComponentContext by componentContext {
-
+) : RootComponent,
+    ComponentContext by componentContext {
     private val navigation = StackNavigation<RootComponent.Config>()
 
-    override val childStack: Value<ChildStack<*, RootComponent.Child>> = childStack(
-        source = navigation,
-        serializer = RootComponent.Config.serializer(),
-        initialConfiguration = RootComponent.Config.Stats,
-        handleBackButton = true,
-        childFactory = ::createChild
-    )
+    override val childStack: Value<ChildStack<*, RootComponent.Child>> =
+        childStack(
+            source = navigation,
+            serializer = RootComponent.Config.serializer(),
+            initialConfiguration = RootComponent.Config.Stats,
+            handleBackButton = true,
+            childFactory = ::createChild
+        )
 
     @OptIn(DelicateDecomposeApi::class)
     override fun navigateToScreen(config: RootComponent.Config) {
@@ -187,126 +244,161 @@ class DefaultRootComponent(
     private fun createChild(
         config: RootComponent.Config,
         componentContext: ComponentContext
-    ): RootComponent.Child = when (config) {
-        is RootComponent.Config.Stats -> RootComponent.Child.Stats(
-            component = DefaultStatsComponent(
-                componentContext = componentContext,
-                enhancedStatsController = appComponent.enhancedStatsController
-            )
-        )
+    ): RootComponent.Child =
+        when (config) {
+            is RootComponent.Config.Stats ->
+                RootComponent.Child.Stats(
+                    component =
+                        DefaultStatsComponent(
+                            componentContext = componentContext,
+                            enhancedStatsController = appComponent.enhancedStatsController
+                        )
+                )
 
-        is RootComponent.Config.Timeline -> RootComponent.Child.Timeline(
-            component = DefaultTimelineComponent(
-                componentContext = componentContext,
-                enhancedTimelineController = appComponent.enhancedTimelineController,
-                locationTrackingController = appComponent.locationTrackingController
-            )
-        )
+            is RootComponent.Config.Timeline ->
+                RootComponent.Child.Timeline(
+                    component =
+                        DefaultTimelineComponent(
+                            componentContext = componentContext,
+                            enhancedTimelineController = appComponent.enhancedTimelineController,
+                            locationTrackingController = appComponent.locationTrackingController
+                        )
+                )
 
-        is RootComponent.Config.Map -> RootComponent.Child.Map(
-            component = DefaultMapComponent(
-                componentContext = componentContext,
-                mapController = appComponent.mapController
-            )
-        )
+            is RootComponent.Config.Map ->
+                RootComponent.Child.Map(
+                    component =
+                        DefaultMapComponent(
+                            componentContext = componentContext,
+                            mapController = appComponent.mapController
+                        )
+                )
 
-        is RootComponent.Config.Photos -> RootComponent.Child.Photos(
-            component = DefaultPhotosComponent(
-                componentContext = componentContext,
-                photoGalleryController = appComponent.photoGalleryController
-            )
-        )
+            is RootComponent.Config.Photos ->
+                RootComponent.Child.Photos(
+                    component =
+                        DefaultPhotosComponent(
+                            componentContext = componentContext,
+                            photoGalleryController = appComponent.photoGalleryController
+                        )
+                )
 
-        is RootComponent.Config.Trips -> RootComponent.Child.Trips(
-            component = DefaultTripsComponent(
-                componentContext = componentContext,
-                tripsController = appComponent.tripsController
-            )
-        )
+            is RootComponent.Config.Trips ->
+                RootComponent.Child.Trips(
+                    component =
+                        DefaultTripsComponent(
+                            componentContext = componentContext,
+                            tripsController = appComponent.tripsController
+                        )
+                )
 
-        is RootComponent.Config.Places -> RootComponent.Child.Places(
-            component = DefaultPlacesComponent(
-                componentContext = componentContext,
-                placesController = appComponent.placesController
-            )
-        )
+            is RootComponent.Config.Places ->
+                RootComponent.Child.Places(
+                    component =
+                        DefaultPlacesComponent(
+                            componentContext = componentContext,
+                            placesController = appComponent.placesController
+                        )
+                )
 
-        is RootComponent.Config.Settings -> RootComponent.Child.Settings(
-            component = DefaultSettingsComponent(
-                componentContext = componentContext,
-                locationTrackingController = appComponent.locationTrackingController
-            )
-        )
+            is RootComponent.Config.Settings ->
+                RootComponent.Child.Settings(
+                    component =
+                        DefaultSettingsComponent(
+                            componentContext = componentContext,
+                            locationTrackingController = appComponent.locationTrackingController
+                        )
+                )
 
-        is RootComponent.Config.RouteView -> RootComponent.Child.RouteView(
-            component = DefaultRouteViewComponent(
-                componentContext = componentContext,
-                tripId = config.tripId,
-                routeViewController = appComponent.routeViewController,
-                onNavigateToReplay = { tripId -> navigateToScreen(RootComponent.Config.RouteReplay(tripId)) },
-                onNavigateToStatistics = { tripId -> navigateToScreen(RootComponent.Config.TripStatistics(tripId)) },
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.RouteView ->
+                RootComponent.Child.RouteView(
+                    component =
+                        DefaultRouteViewComponent(
+                            componentContext = componentContext,
+                            tripId = config.tripId,
+                            routeViewController = appComponent.routeViewController,
+                            onNavigateToReplay = { tripId ->
+                                navigateToScreen(RootComponent.Config.RouteReplay(tripId))
+                            },
+                            onNavigateToStatistics = { tripId ->
+                                navigateToScreen(RootComponent.Config.TripStatistics(tripId))
+                            },
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.RouteReplay -> RootComponent.Child.RouteReplay(
-            component = DefaultRouteReplayComponent(
-                componentContext = componentContext,
-                tripId = config.tripId,
-                routeReplayController = appComponent.routeReplayController,
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.RouteReplay ->
+                RootComponent.Child.RouteReplay(
+                    component =
+                        DefaultRouteReplayComponent(
+                            componentContext = componentContext,
+                            tripId = config.tripId,
+                            routeReplayController = appComponent.routeReplayController,
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.TripStatistics -> RootComponent.Child.TripStatistics(
-            component = DefaultTripStatisticsComponent(
-                componentContext = componentContext,
-                tripId = config.tripId,
-                tripStatisticsController = appComponent.tripStatisticsController,
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.TripStatistics ->
+                RootComponent.Child.TripStatistics(
+                    component =
+                        DefaultTripStatisticsComponent(
+                            componentContext = componentContext,
+                            tripId = config.tripId,
+                            tripStatisticsController = appComponent.tripStatisticsController,
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.PhotoDetail -> RootComponent.Child.PhotoDetail(
-            component = DefaultPhotoDetailComponent(
-                componentContext = componentContext,
-                photoDetailController = appComponent.photoDetailController,
-                photoId = config.photoId,
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.PhotoDetail ->
+                RootComponent.Child.PhotoDetail(
+                    component =
+                        DefaultPhotoDetailComponent(
+                            componentContext = componentContext,
+                            photoDetailController = appComponent.photoDetailController,
+                            photoId = config.photoId,
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.PlaceVisitDetail -> RootComponent.Child.PlaceVisitDetail(
-            component = DefaultPlaceVisitDetailComponent(
-                componentContext = componentContext,
-                placeVisitId = config.placeVisitId,
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.PlaceVisitDetail ->
+                RootComponent.Child.PlaceVisitDetail(
+                    component =
+                        DefaultPlaceVisitDetailComponent(
+                            componentContext = componentContext,
+                            placeVisitId = config.placeVisitId,
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.PlaceDetail -> RootComponent.Child.PlaceDetail(
-            component = DefaultPlaceDetailComponent(
-                componentContext = componentContext,
-                placeId = config.placeId,
-                placesController = appComponent.placesController,
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.PlaceDetail ->
+                RootComponent.Child.PlaceDetail(
+                    component =
+                        DefaultPlaceDetailComponent(
+                            componentContext = componentContext,
+                            placeId = config.placeId,
+                            placesController = appComponent.placesController,
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.DeviceManagement -> RootComponent.Child.DeviceManagement(
-            component = DefaultDeviceManagementComponent(
-                componentContext = componentContext,
-                deviceManagementController = appComponent.deviceManagementController,
-                onBack = { navigation.pop() }
-            )
-        )
+            is RootComponent.Config.DeviceManagement ->
+                RootComponent.Child.DeviceManagement(
+                    component =
+                        DefaultDeviceManagementComponent(
+                            componentContext = componentContext,
+                            deviceManagementController = appComponent.deviceManagementController,
+                            onBack = { navigation.pop() }
+                        )
+                )
 
-        is RootComponent.Config.AlgorithmSettings -> RootComponent.Child.AlgorithmSettings(
-            component = DefaultAlgorithmSettingsComponent(
-                componentContext = componentContext,
-                settingsController = appComponent.settingsController,
-                onBack = { navigation.pop() }
-            )
-        )
-    }
+            is RootComponent.Config.AlgorithmSettings ->
+                RootComponent.Child.AlgorithmSettings(
+                    component =
+                        DefaultAlgorithmSettingsComponent(
+                            componentContext = componentContext,
+                            settingsController = appComponent.settingsController,
+                            onBack = { navigation.pop() }
+                        )
+                )
+        }
 }

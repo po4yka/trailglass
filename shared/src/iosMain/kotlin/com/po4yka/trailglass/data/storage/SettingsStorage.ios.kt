@@ -12,7 +12,6 @@ import platform.Foundation.NSUserDefaults
  * iOS implementation of SettingsStorage using UserDefaults.
  */
 actual class SettingsStorage {
-
     private val logger = logger()
     private val userDefaults = NSUserDefaults.standardUserDefaults
 
@@ -58,13 +57,9 @@ actual class SettingsStorage {
         const val DATA_STORAGE_MB = "data_storage_mb"
     }
 
-    actual fun getSettingsFlow(): Flow<AppSettings> {
-        return _settingsFlow.asStateFlow()
-    }
+    actual fun getSettingsFlow(): Flow<AppSettings> = _settingsFlow.asStateFlow()
 
-    actual suspend fun getSettings(): AppSettings {
-        return _settingsFlow.value
-    }
+    actual suspend fun getSettings(): AppSettings = _settingsFlow.value
 
     actual suspend fun saveSettings(settings: AppSettings) {
         // Tracking
@@ -118,15 +113,30 @@ actual class SettingsStorage {
     actual suspend fun clearSettings() {
         // Remove all settings keys
         listOf(
-            Keys.TRACKING_ACCURACY, Keys.TRACKING_UPDATE_INTERVAL, Keys.TRACKING_BATTERY_OPT,
-            Keys.TRACKING_WHEN_STATIONARY, Keys.TRACKING_MIN_DISTANCE,
-            Keys.PRIVACY_RETENTION_DAYS, Keys.PRIVACY_SHARE_ANALYTICS, Keys.PRIVACY_SHARE_CRASH,
-            Keys.PRIVACY_AUTO_BACKUP, Keys.PRIVACY_ENCRYPT_BACKUPS,
-            Keys.UNIT_DISTANCE, Keys.UNIT_TEMPERATURE, Keys.UNIT_TIME_FORMAT,
-            Keys.APPEARANCE_THEME, Keys.APPEARANCE_DEVICE_WALLPAPER, Keys.APPEARANCE_MAP_IN_TIMELINE,
+            Keys.TRACKING_ACCURACY,
+            Keys.TRACKING_UPDATE_INTERVAL,
+            Keys.TRACKING_BATTERY_OPT,
+            Keys.TRACKING_WHEN_STATIONARY,
+            Keys.TRACKING_MIN_DISTANCE,
+            Keys.PRIVACY_RETENTION_DAYS,
+            Keys.PRIVACY_SHARE_ANALYTICS,
+            Keys.PRIVACY_SHARE_CRASH,
+            Keys.PRIVACY_AUTO_BACKUP,
+            Keys.PRIVACY_ENCRYPT_BACKUPS,
+            Keys.UNIT_DISTANCE,
+            Keys.UNIT_TEMPERATURE,
+            Keys.UNIT_TIME_FORMAT,
+            Keys.APPEARANCE_THEME,
+            Keys.APPEARANCE_DEVICE_WALLPAPER,
+            Keys.APPEARANCE_MAP_IN_TIMELINE,
             Keys.APPEARANCE_COMPACT_VIEW,
-            Keys.ACCOUNT_EMAIL, Keys.ACCOUNT_AUTO_SYNC, Keys.ACCOUNT_SYNC_WIFI_ONLY, Keys.ACCOUNT_LAST_SYNC,
-            Keys.DATA_LAST_EXPORT, Keys.DATA_LAST_BACKUP, Keys.DATA_STORAGE_MB
+            Keys.ACCOUNT_EMAIL,
+            Keys.ACCOUNT_AUTO_SYNC,
+            Keys.ACCOUNT_SYNC_WIFI_ONLY,
+            Keys.ACCOUNT_LAST_SYNC,
+            Keys.DATA_LAST_EXPORT,
+            Keys.DATA_LAST_BACKUP,
+            Keys.DATA_STORAGE_MB
         ).forEach { key ->
             userDefaults.removeObjectForKey(key)
         }
@@ -137,82 +147,132 @@ actual class SettingsStorage {
         _settingsFlow.value = AppSettings()
     }
 
-    private fun loadSettings(): AppSettings {
-        return AppSettings(
-            trackingPreferences = TrackingPreferences(
-                accuracy = (userDefaults.stringForKey(Keys.TRACKING_ACCURACY) as? String)?.let {
-                    TrackingAccuracy.valueOf(it)
-                } ?: TrackingAccuracy.BALANCED,
-                updateInterval = (userDefaults.stringForKey(Keys.TRACKING_UPDATE_INTERVAL) as? String)?.let {
-                    UpdateInterval.valueOf(it)
-                } ?: UpdateInterval.NORMAL,
-                batteryOptimization = if (userDefaults.objectForKey(Keys.TRACKING_BATTERY_OPT) != null) {
-                    userDefaults.boolForKey(Keys.TRACKING_BATTERY_OPT)
-                } else true,
-                trackWhenStationary = userDefaults.boolForKey(Keys.TRACKING_WHEN_STATIONARY),
-                minimumDistance = if (userDefaults.objectForKey(Keys.TRACKING_MIN_DISTANCE) != null) {
-                    userDefaults.integerForKey(Keys.TRACKING_MIN_DISTANCE).toInt()
-                } else 10
-            ),
-            privacySettings = PrivacySettings(
-                dataRetentionDays = if (userDefaults.objectForKey(Keys.PRIVACY_RETENTION_DAYS) != null) {
-                    userDefaults.integerForKey(Keys.PRIVACY_RETENTION_DAYS).toInt()
-                } else 365,
-                shareAnalytics = userDefaults.boolForKey(Keys.PRIVACY_SHARE_ANALYTICS),
-                shareCrashReports = if (userDefaults.objectForKey(Keys.PRIVACY_SHARE_CRASH) != null) {
-                    userDefaults.boolForKey(Keys.PRIVACY_SHARE_CRASH)
-                } else true,
-                autoBackup = if (userDefaults.objectForKey(Keys.PRIVACY_AUTO_BACKUP) != null) {
-                    userDefaults.boolForKey(Keys.PRIVACY_AUTO_BACKUP)
-                } else true,
-                encryptBackups = if (userDefaults.objectForKey(Keys.PRIVACY_ENCRYPT_BACKUPS) != null) {
-                    userDefaults.boolForKey(Keys.PRIVACY_ENCRYPT_BACKUPS)
-                } else true
-            ),
-            unitPreferences = UnitPreferences(
-                distanceUnit = (userDefaults.stringForKey(Keys.UNIT_DISTANCE) as? String)?.let {
-                    DistanceUnit.valueOf(it)
-                } ?: DistanceUnit.METRIC,
-                temperatureUnit = (userDefaults.stringForKey(Keys.UNIT_TEMPERATURE) as? String)?.let {
-                    TemperatureUnit.valueOf(it)
-                } ?: TemperatureUnit.CELSIUS,
-                timeFormat = (userDefaults.stringForKey(Keys.UNIT_TIME_FORMAT) as? String)?.let {
-                    TimeFormat.valueOf(it)
-                } ?: TimeFormat.TWENTY_FOUR_HOUR
-            ),
-            appearanceSettings = AppearanceSettings(
-                theme = (userDefaults.stringForKey(Keys.APPEARANCE_THEME) as? String)?.let {
-                    AppTheme.valueOf(it)
-                } ?: AppTheme.SYSTEM,
-                useDeviceWallpaper = userDefaults.boolForKey(Keys.APPEARANCE_DEVICE_WALLPAPER),
-                showMapInTimeline = if (userDefaults.objectForKey(Keys.APPEARANCE_MAP_IN_TIMELINE) != null) {
-                    userDefaults.boolForKey(Keys.APPEARANCE_MAP_IN_TIMELINE)
-                } else true,
-                compactView = userDefaults.boolForKey(Keys.APPEARANCE_COMPACT_VIEW)
-            ),
-            accountSettings = AccountSettings(
-                email = userDefaults.stringForKey(Keys.ACCOUNT_EMAIL) as? String,
-                autoSync = if (userDefaults.objectForKey(Keys.ACCOUNT_AUTO_SYNC) != null) {
-                    userDefaults.boolForKey(Keys.ACCOUNT_AUTO_SYNC)
-                } else true,
-                syncOnWifiOnly = if (userDefaults.objectForKey(Keys.ACCOUNT_SYNC_WIFI_ONLY) != null) {
-                    userDefaults.boolForKey(Keys.ACCOUNT_SYNC_WIFI_ONLY)
-                } else true,
-                lastSyncTime = if (userDefaults.objectForKey(Keys.ACCOUNT_LAST_SYNC) != null) {
-                    Instant.fromEpochSeconds(userDefaults.doubleForKey(Keys.ACCOUNT_LAST_SYNC).toLong())
-                } else null
-            ),
-            dataManagement = DataManagement(
-                lastExportTime = if (userDefaults.objectForKey(Keys.DATA_LAST_EXPORT) != null) {
-                    Instant.fromEpochSeconds(userDefaults.doubleForKey(Keys.DATA_LAST_EXPORT).toLong())
-                } else null,
-                lastBackupTime = if (userDefaults.objectForKey(Keys.DATA_LAST_BACKUP) != null) {
-                    Instant.fromEpochSeconds(userDefaults.doubleForKey(Keys.DATA_LAST_BACKUP).toLong())
-                } else null,
-                storageUsedMb = if (userDefaults.objectForKey(Keys.DATA_STORAGE_MB) != null) {
-                    userDefaults.doubleForKey(Keys.DATA_STORAGE_MB)
-                } else 0.0
-            )
+    private fun loadSettings(): AppSettings =
+        AppSettings(
+            trackingPreferences =
+                TrackingPreferences(
+                    accuracy =
+                        (userDefaults.stringForKey(Keys.TRACKING_ACCURACY) as? String)?.let {
+                            TrackingAccuracy.valueOf(it)
+                        } ?: TrackingAccuracy.BALANCED,
+                    updateInterval =
+                        (userDefaults.stringForKey(Keys.TRACKING_UPDATE_INTERVAL) as? String)?.let {
+                            UpdateInterval.valueOf(it)
+                        } ?: UpdateInterval.NORMAL,
+                    batteryOptimization =
+                        if (userDefaults.objectForKey(Keys.TRACKING_BATTERY_OPT) != null) {
+                            userDefaults.boolForKey(Keys.TRACKING_BATTERY_OPT)
+                        } else {
+                            true
+                        },
+                    trackWhenStationary = userDefaults.boolForKey(Keys.TRACKING_WHEN_STATIONARY),
+                    minimumDistance =
+                        if (userDefaults.objectForKey(Keys.TRACKING_MIN_DISTANCE) != null) {
+                            userDefaults.integerForKey(Keys.TRACKING_MIN_DISTANCE).toInt()
+                        } else {
+                            10
+                        }
+                ),
+            privacySettings =
+                PrivacySettings(
+                    dataRetentionDays =
+                        if (userDefaults.objectForKey(Keys.PRIVACY_RETENTION_DAYS) != null) {
+                            userDefaults.integerForKey(Keys.PRIVACY_RETENTION_DAYS).toInt()
+                        } else {
+                            365
+                        },
+                    shareAnalytics = userDefaults.boolForKey(Keys.PRIVACY_SHARE_ANALYTICS),
+                    shareCrashReports =
+                        if (userDefaults.objectForKey(Keys.PRIVACY_SHARE_CRASH) != null) {
+                            userDefaults.boolForKey(Keys.PRIVACY_SHARE_CRASH)
+                        } else {
+                            true
+                        },
+                    autoBackup =
+                        if (userDefaults.objectForKey(Keys.PRIVACY_AUTO_BACKUP) != null) {
+                            userDefaults.boolForKey(Keys.PRIVACY_AUTO_BACKUP)
+                        } else {
+                            true
+                        },
+                    encryptBackups =
+                        if (userDefaults.objectForKey(Keys.PRIVACY_ENCRYPT_BACKUPS) != null) {
+                            userDefaults.boolForKey(Keys.PRIVACY_ENCRYPT_BACKUPS)
+                        } else {
+                            true
+                        }
+                ),
+            unitPreferences =
+                UnitPreferences(
+                    distanceUnit =
+                        (userDefaults.stringForKey(Keys.UNIT_DISTANCE) as? String)?.let {
+                            DistanceUnit.valueOf(it)
+                        } ?: DistanceUnit.METRIC,
+                    temperatureUnit =
+                        (userDefaults.stringForKey(Keys.UNIT_TEMPERATURE) as? String)?.let {
+                            TemperatureUnit.valueOf(it)
+                        } ?: TemperatureUnit.CELSIUS,
+                    timeFormat =
+                        (userDefaults.stringForKey(Keys.UNIT_TIME_FORMAT) as? String)?.let {
+                            TimeFormat.valueOf(it)
+                        } ?: TimeFormat.TWENTY_FOUR_HOUR
+                ),
+            appearanceSettings =
+                AppearanceSettings(
+                    theme =
+                        (userDefaults.stringForKey(Keys.APPEARANCE_THEME) as? String)?.let {
+                            AppTheme.valueOf(it)
+                        } ?: AppTheme.SYSTEM,
+                    useDeviceWallpaper = userDefaults.boolForKey(Keys.APPEARANCE_DEVICE_WALLPAPER),
+                    showMapInTimeline =
+                        if (userDefaults.objectForKey(Keys.APPEARANCE_MAP_IN_TIMELINE) != null) {
+                            userDefaults.boolForKey(Keys.APPEARANCE_MAP_IN_TIMELINE)
+                        } else {
+                            true
+                        },
+                    compactView = userDefaults.boolForKey(Keys.APPEARANCE_COMPACT_VIEW)
+                ),
+            accountSettings =
+                AccountSettings(
+                    email = userDefaults.stringForKey(Keys.ACCOUNT_EMAIL) as? String,
+                    autoSync =
+                        if (userDefaults.objectForKey(Keys.ACCOUNT_AUTO_SYNC) != null) {
+                            userDefaults.boolForKey(Keys.ACCOUNT_AUTO_SYNC)
+                        } else {
+                            true
+                        },
+                    syncOnWifiOnly =
+                        if (userDefaults.objectForKey(Keys.ACCOUNT_SYNC_WIFI_ONLY) != null) {
+                            userDefaults.boolForKey(Keys.ACCOUNT_SYNC_WIFI_ONLY)
+                        } else {
+                            true
+                        },
+                    lastSyncTime =
+                        if (userDefaults.objectForKey(Keys.ACCOUNT_LAST_SYNC) != null) {
+                            Instant.fromEpochSeconds(userDefaults.doubleForKey(Keys.ACCOUNT_LAST_SYNC).toLong())
+                        } else {
+                            null
+                        }
+                ),
+            dataManagement =
+                DataManagement(
+                    lastExportTime =
+                        if (userDefaults.objectForKey(Keys.DATA_LAST_EXPORT) != null) {
+                            Instant.fromEpochSeconds(userDefaults.doubleForKey(Keys.DATA_LAST_EXPORT).toLong())
+                        } else {
+                            null
+                        },
+                    lastBackupTime =
+                        if (userDefaults.objectForKey(Keys.DATA_LAST_BACKUP) != null) {
+                            Instant.fromEpochSeconds(userDefaults.doubleForKey(Keys.DATA_LAST_BACKUP).toLong())
+                        } else {
+                            null
+                        },
+                    storageUsedMb =
+                        if (userDefaults.objectForKey(Keys.DATA_STORAGE_MB) != null) {
+                            userDefaults.doubleForKey(Keys.DATA_STORAGE_MB)
+                        } else {
+                            0.0
+                        }
+                )
         )
-    }
 }

@@ -1,8 +1,6 @@
 package com.po4yka.trailglass.feature.auth
 
 import com.po4yka.trailglass.data.auth.UserSession
-import com.po4yka.trailglass.data.remote.dto.LoginResponse
-import com.po4yka.trailglass.data.remote.dto.RegisterResponse
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
@@ -11,7 +9,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
@@ -30,13 +27,13 @@ class AuthController(
     private val userSession: UserSession,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Authentication state.
@@ -70,12 +67,17 @@ class AuthController(
         /**
          * Authentication in progress (login or register).
          */
-        data class Loading(val operation: String) : AuthState()
+        data class Loading(
+            val operation: String
+        ) : AuthState()
 
         /**
          * Authentication error.
          */
-        data class Error(val message: String, val previousState: AuthState) : AuthState()
+        data class Error(
+            val message: String,
+            val previousState: AuthState
+        ) : AuthState()
     }
 
     private val _state = MutableStateFlow<AuthState>(AuthState.Initializing)
@@ -120,7 +122,10 @@ class AuthController(
     /**
      * Login with email and password.
      */
-    fun login(email: String, password: String) {
+    fun login(
+        email: String,
+        password: String
+    ) {
         logger.info { "Login requested for: $email" }
 
         val previousState = _state.value
@@ -130,31 +135,35 @@ class AuthController(
             try {
                 val result = loginUseCase.execute(email, password)
 
-                result.onSuccess { response ->
-                    _state.value = AuthState.Authenticated(
-                        userId = response.userId,
-                        email = response.email,
-                        displayName = response.displayName
-                    )
-                    logger.info { "Login successful for: ${response.email}" }
-                }.onFailure { error ->
-                    val errorMessage = when {
-                        error.message?.contains("401") == true ||
-                        error.message?.contains("Unauthorized") == true ->
-                            "Invalid email or password"
-                        error.message?.contains("network") == true ||
-                        error.message?.contains("timeout") == true ->
-                            "Network error. Please check your connection."
-                        else -> error.message ?: "Login failed. Please try again."
+                result
+                    .onSuccess { response ->
+                        _state.value =
+                            AuthState.Authenticated(
+                                userId = response.userId,
+                                email = response.email,
+                                displayName = response.displayName
+                            )
+                        logger.info { "Login successful for: ${response.email}" }
+                    }.onFailure { error ->
+                        val errorMessage =
+                            when {
+                                error.message?.contains("401") == true ||
+                                    error.message?.contains("Unauthorized") == true ->
+                                    "Invalid email or password"
+                                error.message?.contains("network") == true ||
+                                    error.message?.contains("timeout") == true ->
+                                    "Network error. Please check your connection."
+                                else -> error.message ?: "Login failed. Please try again."
+                            }
+                        _state.value = AuthState.Error(errorMessage, previousState)
+                        logger.error(error) { "Login failed for: $email" }
                     }
-                    _state.value = AuthState.Error(errorMessage, previousState)
-                    logger.error(error) { "Login failed for: $email" }
-                }
             } catch (e: Exception) {
-                _state.value = AuthState.Error(
-                    e.message ?: "An unexpected error occurred",
-                    previousState
-                )
+                _state.value =
+                    AuthState.Error(
+                        e.message ?: "An unexpected error occurred",
+                        previousState
+                    )
                 logger.error(e) { "Login exception for: $email" }
             }
         }
@@ -163,7 +172,11 @@ class AuthController(
     /**
      * Register a new user.
      */
-    fun register(email: String, password: String, displayName: String) {
+    fun register(
+        email: String,
+        password: String,
+        displayName: String
+    ) {
         logger.info { "Registration requested for: $email" }
 
         val previousState = _state.value
@@ -173,35 +186,39 @@ class AuthController(
             try {
                 val result = registerUseCase.execute(email, password, displayName)
 
-                result.onSuccess { response ->
-                    _state.value = AuthState.Authenticated(
-                        userId = response.userId,
-                        email = response.email,
-                        displayName = response.displayName
-                    )
-                    logger.info { "Registration successful for: ${response.email}" }
-                }.onFailure { error ->
-                    val errorMessage = when {
-                        error.message?.contains("409") == true ||
-                        error.message?.contains("already exists") == true ->
-                            "An account with this email already exists"
-                        error.message?.contains("Invalid email") == true ->
-                            "Please enter a valid email address"
-                        error.message?.contains("Password must") == true ->
-                            error.message!!
-                        error.message?.contains("network") == true ||
-                        error.message?.contains("timeout") == true ->
-                            "Network error. Please check your connection."
-                        else -> error.message ?: "Registration failed. Please try again."
+                result
+                    .onSuccess { response ->
+                        _state.value =
+                            AuthState.Authenticated(
+                                userId = response.userId,
+                                email = response.email,
+                                displayName = response.displayName
+                            )
+                        logger.info { "Registration successful for: ${response.email}" }
+                    }.onFailure { error ->
+                        val errorMessage =
+                            when {
+                                error.message?.contains("409") == true ||
+                                    error.message?.contains("already exists") == true ->
+                                    "An account with this email already exists"
+                                error.message?.contains("Invalid email") == true ->
+                                    "Please enter a valid email address"
+                                error.message?.contains("Password must") == true ->
+                                    error.message!!
+                                error.message?.contains("network") == true ||
+                                    error.message?.contains("timeout") == true ->
+                                    "Network error. Please check your connection."
+                                else -> error.message ?: "Registration failed. Please try again."
+                            }
+                        _state.value = AuthState.Error(errorMessage, previousState)
+                        logger.error(error) { "Registration failed for: $email" }
                     }
-                    _state.value = AuthState.Error(errorMessage, previousState)
-                    logger.error(error) { "Registration failed for: $email" }
-                }
             } catch (e: Exception) {
-                _state.value = AuthState.Error(
-                    e.message ?: "An unexpected error occurred",
-                    previousState
-                )
+                _state.value =
+                    AuthState.Error(
+                        e.message ?: "An unexpected error occurred",
+                        previousState
+                    )
                 logger.error(e) { "Registration exception for: $email" }
             }
         }
@@ -241,10 +258,11 @@ class AuthController(
                 _state.value = AuthState.Guest
                 logger.info { "Guest mode activated" }
             } catch (e: Exception) {
-                _state.value = AuthState.Error(
-                    "Failed to enter guest mode: ${e.message}",
-                    AuthState.Unauthenticated
-                )
+                _state.value =
+                    AuthState.Error(
+                        "Failed to enter guest mode: ${e.message}",
+                        AuthState.Unauthenticated
+                    )
                 logger.error(e) { "Failed to activate guest mode" }
             }
         }
@@ -253,10 +271,9 @@ class AuthController(
     /**
      * Check if user is currently in guest mode.
      */
-    fun isGuest(): Boolean {
-        return _state.value is AuthState.Guest ||
-                userSession.getCurrentUserId() == UserSession.GUEST_USER_ID
-    }
+    fun isGuest(): Boolean =
+        _state.value is AuthState.Guest ||
+            userSession.getCurrentUserId() == UserSession.GUEST_USER_ID
 
     /**
      * Clear error state and return to previous state.

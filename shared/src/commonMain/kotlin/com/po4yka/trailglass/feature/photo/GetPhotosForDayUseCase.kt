@@ -13,7 +13,6 @@ import me.tatarka.inject.annotations.Inject
 class GetPhotosForDayUseCase(
     private val photoRepository: PhotoRepository
 ) {
-
     private val logger = logger()
 
     /**
@@ -23,7 +22,10 @@ class GetPhotosForDayUseCase(
      * @param userId User ID
      * @return List of photos sorted by timestamp
      */
-    suspend fun execute(date: LocalDate, userId: String): List<Photo> {
+    suspend fun execute(
+        date: LocalDate,
+        userId: String
+    ): List<Photo> {
         logger.debug { "Getting photos for $date, user: $userId" }
 
         val photos = photoRepository.getPhotosForDay(userId, date)

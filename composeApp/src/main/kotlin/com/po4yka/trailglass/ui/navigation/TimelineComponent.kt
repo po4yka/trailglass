@@ -19,4 +19,5 @@ class DefaultTimelineComponent(
     componentContext: ComponentContext,
     override val enhancedTimelineController: EnhancedTimelineController,
     override val locationTrackingController: LocationTrackingController
-) : TimelineComponent, ComponentContext by componentContext
+) : TimelineComponent,
+    ComponentContext by componentContext

@@ -6,7 +6,6 @@ import com.po4yka.trailglass.domain.model.GeocodedLocation
  * Repository for managing geocoding cache.
  */
 interface GeocodingCacheRepository {
-
     /**
      * Get a cached geocoded location near the specified coordinates.
      * Uses spatial proximity matching.
@@ -28,7 +27,10 @@ interface GeocodingCacheRepository {
      * @param location The location to cache
      * @param ttlSeconds Time-to-live in seconds (default 30 days)
      */
-    suspend fun put(location: GeocodedLocation, ttlSeconds: Long = 2592000)
+    suspend fun put(
+        location: GeocodedLocation,
+        ttlSeconds: Long = 2592000
+    )
 
     /**
      * Clear all expired cache entries.

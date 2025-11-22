@@ -16,7 +16,6 @@ class DatabaseGeocodingCache(
     private val proximityThresholdMeters: Double = 100.0,
     private val cacheDuration: Duration = 30.days
 ) {
-
     /**
      * Get a cached geocoded location if available within proximity threshold.
      *
@@ -24,9 +23,10 @@ class DatabaseGeocodingCache(
      * @param longitude The longitude to look up
      * @return Cached GeocodedLocation if found within proximity, null otherwise
      */
-    suspend fun get(latitude: Double, longitude: Double): GeocodedLocation? {
-        return repository.get(latitude, longitude, proximityThresholdMeters)
-    }
+    suspend fun get(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? = repository.get(latitude, longitude, proximityThresholdMeters)
 
     /**
      * Store a geocoded location in the cache.
@@ -55,7 +55,5 @@ class DatabaseGeocodingCache(
     /**
      * Get count of valid cached entries.
      */
-    suspend fun count(): Long {
-        return repository.count()
-    }
+    suspend fun count(): Long = repository.count()
 }

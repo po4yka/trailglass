@@ -5,6 +5,7 @@ import kotlin.math.*
 
 // Extension functions for degrees/radians conversion
 private fun Double.toRadians(): Double = this * PI / 180.0
+
 private fun Double.toDegrees(): Double = this * 180.0 / PI
 
 /**
@@ -18,7 +19,11 @@ interface InterpolationAlgorithm {
      * @param fraction Interpolation fraction (0.0 to 1.0)
      * @return Interpolated coordinate
      */
-    fun interpolate(from: Coordinate, to: Coordinate, fraction: Double): Coordinate
+    fun interpolate(
+        from: Coordinate,
+        to: Coordinate,
+        fraction: Double
+    ): Coordinate
 
     /**
      * Generate multiple intermediate points along the path.
@@ -27,7 +32,11 @@ interface InterpolationAlgorithm {
      * @param steps Number of intermediate steps (excluding start and end)
      * @return List of coordinates including start, intermediates, and end
      */
-    fun generatePath(from: Coordinate, to: Coordinate, steps: Int): List<Coordinate> {
+    fun generatePath(
+        from: Coordinate,
+        to: Coordinate,
+        steps: Int
+    ): List<Coordinate> {
         if (steps <= 0) return listOf(from, to)
 
         return buildList {
@@ -72,7 +81,11 @@ enum class InterpolationAlgorithmType {
  * Fast but not geographically accurate over long distances.
  */
 class LinearInterpolation : InterpolationAlgorithm {
-    override fun interpolate(from: Coordinate, to: Coordinate, fraction: Double): Coordinate {
+    override fun interpolate(
+        from: Coordinate,
+        to: Coordinate,
+        fraction: Double
+    ): Coordinate {
         val clampedFraction = fraction.coerceIn(0.0, 1.0)
         return Coordinate(
             latitude = from.latitude + (to.latitude - from.latitude) * clampedFraction,
@@ -86,7 +99,11 @@ class LinearInterpolation : InterpolationAlgorithm {
  * Most accurate for geographic interpolation, follows shortest path.
  */
 class SphericalInterpolation : InterpolationAlgorithm {
-    override fun interpolate(from: Coordinate, to: Coordinate, fraction: Double): Coordinate {
+    override fun interpolate(
+        from: Coordinate,
+        to: Coordinate,
+        fraction: Double
+    ): Coordinate {
         val clampedFraction = fraction.coerceIn(0.0, 1.0)
 
         // Convert to radians
@@ -139,7 +156,11 @@ class SphericalInterpolation : InterpolationAlgorithm {
  * Creates aesthetically pleasing curves for animations.
  */
 class CubicInterpolation : InterpolationAlgorithm {
-    override fun interpolate(from: Coordinate, to: Coordinate, fraction: Double): Coordinate {
+    override fun interpolate(
+        from: Coordinate,
+        to: Coordinate,
+        fraction: Double
+    ): Coordinate {
         val clampedFraction = fraction.coerceIn(0.0, 1.0)
 
         // Hermite basis functions for smooth interpolation
@@ -148,10 +169,10 @@ class CubicInterpolation : InterpolationAlgorithm {
         val t3 = t2 * t
 
         // Cubic Hermite curve: smooth acceleration and deceleration
-        val h00 = 2 * t3 - 3 * t2 + 1  // Starting point weight
-        val h10 = t3 - 2 * t2 + t      // Starting tangent weight
-        val h01 = -2 * t3 + 3 * t2     // Ending point weight
-        val h11 = t3 - t2              // Ending tangent weight
+        val h00 = 2 * t3 - 3 * t2 + 1 // Starting point weight
+        val h10 = t3 - 2 * t2 + t // Starting tangent weight
+        val h01 = -2 * t3 + 3 * t2 // Ending point weight
+        val h11 = t3 - t2 // Ending tangent weight
 
         // Calculate tangent vectors (velocity at endpoints)
         // Use direction to next/previous point scaled by distance
@@ -181,11 +202,10 @@ class CubicInterpolation : InterpolationAlgorithm {
  * Factory for creating interpolation algorithm instances.
  */
 object InterpolationAlgorithmFactory {
-    fun create(type: InterpolationAlgorithmType): InterpolationAlgorithm {
-        return when (type) {
+    fun create(type: InterpolationAlgorithmType): InterpolationAlgorithm =
+        when (type) {
             InterpolationAlgorithmType.LINEAR -> LinearInterpolation()
             InterpolationAlgorithmType.SLERP -> SphericalInterpolation()
             InterpolationAlgorithmType.CUBIC -> CubicInterpolation()
         }
-    }
 }

@@ -22,7 +22,6 @@ import kotlin.time.measureTime
  */
 @Ignore("Performance benchmarks - run manually")
 class AlgorithmPerformanceBenchmark {
-
     companion object {
         private const val ITERATIONS = 1000
         private const val WARMUP_ITERATIONS = 100
@@ -38,57 +37,55 @@ class AlgorithmPerformanceBenchmark {
         val expectedDistance: Double
     )
 
-    private val scenarios = listOf(
-        // Short distances (<1km)
-        DistanceScenario(
-            name = "100m (New York, same block)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(40.7138, -74.0060),
-            expectedDistance = 111.0
-        ),
-        DistanceScenario(
-            name = "500m (New York, 5 blocks)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(40.7173, -74.0060),
-            expectedDistance = 500.0
-        ),
-
-        // Medium distances (1-100km)
-        DistanceScenario(
-            name = "10km (NYC to Brooklyn)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(40.6782, -73.9442),
-            expectedDistance = 10_000.0
-        ),
-        DistanceScenario(
-            name = "50km (NYC to Newark)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(40.7357, -74.1724),
-            expectedDistance = 50_000.0
-        ),
-
-        // Long distances (100-10000km)
-        DistanceScenario(
-            name = "1000km (NYC to Chicago)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(41.8781, -87.6298),
-            expectedDistance = 1_150_000.0
-        ),
-        DistanceScenario(
-            name = "5000km (NYC to London)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(51.5074, -0.1278),
-            expectedDistance = 5_570_000.0
-        ),
-
-        // Very long distances (>10000km)
-        DistanceScenario(
-            name = "15000km (NYC to Sydney, half Earth)",
-            from = Coordinate(40.7128, -74.0060),
-            to = Coordinate(-33.8688, 151.2093),
-            expectedDistance = 15_990_000.0
+    private val scenarios =
+        listOf(
+            // Short distances (<1km)
+            DistanceScenario(
+                name = "100m (New York, same block)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(40.7138, -74.0060),
+                expectedDistance = 111.0
+            ),
+            DistanceScenario(
+                name = "500m (New York, 5 blocks)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(40.7173, -74.0060),
+                expectedDistance = 500.0
+            ),
+            // Medium distances (1-100km)
+            DistanceScenario(
+                name = "10km (NYC to Brooklyn)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(40.6782, -73.9442),
+                expectedDistance = 10_000.0
+            ),
+            DistanceScenario(
+                name = "50km (NYC to Newark)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(40.7357, -74.1724),
+                expectedDistance = 50_000.0
+            ),
+            // Long distances (100-10000km)
+            DistanceScenario(
+                name = "1000km (NYC to Chicago)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(41.8781, -87.6298),
+                expectedDistance = 1_150_000.0
+            ),
+            DistanceScenario(
+                name = "5000km (NYC to London)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(51.5074, -0.1278),
+                expectedDistance = 5_570_000.0
+            ),
+            // Very long distances (>10000km)
+            DistanceScenario(
+                name = "15000km (NYC to Sydney, half Earth)",
+                from = Coordinate(40.7128, -74.0060),
+                to = Coordinate(-33.8688, 151.2093),
+                expectedDistance = 15_990_000.0
+            )
         )
-    )
 
     /**
      * Benchmark results for a single algorithm.
@@ -106,8 +103,8 @@ class AlgorithmPerformanceBenchmark {
         val averageTimeNanos: Long get() = averageTime.inWholeNanoseconds
         val averageTimeMicros: Double get() = averageTime.inWholeMicroseconds.toDouble()
 
-        fun format(): String {
-            return buildString {
+        fun format(): String =
+            buildString {
                 appendLine("  $algorithmName:")
                 appendLine("    Total time: ${totalTime.inWholeMilliseconds}ms")
                 appendLine("    Average: ${formatDuration(averageTime)}")
@@ -115,15 +112,13 @@ class AlgorithmPerformanceBenchmark {
                 appendLine("    Max: ${formatDuration(maxTime)}")
                 appendLine("    Result: ${result.toLong()}m")
             }
-        }
 
-        private fun formatDuration(duration: Duration): String {
-            return when {
+        private fun formatDuration(duration: Duration): String =
+            when {
                 duration.inWholeMilliseconds > 0 -> "${duration.inWholeMilliseconds}ms"
                 duration.inWholeMicroseconds > 0 -> "${duration.inWholeMicroseconds}us"
                 else -> "${duration.inWholeNanoseconds}ns"
             }
-        }
     }
 
     /**
@@ -143,9 +138,10 @@ class AlgorithmPerformanceBenchmark {
         var result = 0.0
 
         repeat(ITERATIONS) {
-            val time = measureTime {
-                result = algorithm.calculate(scenario.from, scenario.to)
-            }
+            val time =
+                measureTime {
+                    result = algorithm.calculate(scenario.from, scenario.to)
+                }
             times.add(time)
         }
 
@@ -183,9 +179,10 @@ class AlgorithmPerformanceBenchmark {
         var result = 0.0
 
         repeat(ITERATIONS) {
-            val time = measureTime {
-                result = algorithm.calculate(scenario.from, scenario.to)
-            }
+            val time =
+                measureTime {
+                    result = algorithm.calculate(scenario.from, scenario.to)
+                }
             times.add(time)
         }
 
@@ -224,10 +221,11 @@ class AlgorithmPerformanceBenchmark {
         var resultSize = 0
 
         repeat(ITERATIONS) {
-            val time = measureTime {
-                val path = algorithm.generatePath(scenario.from, scenario.to, steps)
-                resultSize = path.size
-            }
+            val time =
+                measureTime {
+                    val path = algorithm.generatePath(scenario.from, scenario.to, steps)
+                    resultSize = path.size
+                }
             times.add(time)
         }
 
@@ -257,11 +255,12 @@ class AlgorithmPerformanceBenchmark {
         println("Warmup iterations: $WARMUP_ITERATIONS")
         println()
 
-        val algorithms = listOf(
-            SimpleDistance() to "Simple",
-            HaversineDistance() to "Haversine",
-            VincentyDistance() to "Vincenty"
-        )
+        val algorithms =
+            listOf(
+                SimpleDistance() to "Simple",
+                HaversineDistance() to "Haversine",
+                VincentyDistance() to "Vincenty"
+            )
 
         for (scenario in scenarios) {
             println("-".repeat(80))
@@ -269,9 +268,10 @@ class AlgorithmPerformanceBenchmark {
             println("Expected distance: ${scenario.expectedDistance.toLong()}m")
             println()
 
-            val results = algorithms.map { (algorithm, name) ->
-                benchmarkDistance(algorithm, name, scenario)
-            }
+            val results =
+                algorithms.map { (algorithm, name) ->
+                    benchmarkDistance(algorithm, name, scenario)
+                }
 
             results.forEach { println(it.format()) }
 
@@ -280,11 +280,12 @@ class AlgorithmPerformanceBenchmark {
             val baseline = results.first()
             results.drop(1).forEach { result ->
                 val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
-                val comparison = if (ratio > 1) {
-                    "${String.format("%.2f", ratio)}x slower"
-                } else {
-                    "${String.format("%.2f", 1 / ratio)}x faster"
-                }
+                val comparison =
+                    if (ratio > 1) {
+                        "${String.format("%.2f", ratio)}x slower"
+                    } else {
+                        "${String.format("%.2f", 1 / ratio)}x faster"
+                    }
                 println("    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison")
             }
             println()
@@ -302,27 +303,30 @@ class AlgorithmPerformanceBenchmark {
         println("Warmup iterations: $WARMUP_ITERATIONS")
         println()
 
-        val algorithms = listOf(
-            InitialBearing() to "Initial",
-            FinalBearing() to "Final",
-            RhumbLineBearing() to "Rhumb Line"
-        )
+        val algorithms =
+            listOf(
+                InitialBearing() to "Initial",
+                FinalBearing() to "Final",
+                RhumbLineBearing() to "Rhumb Line"
+            )
 
         // Use a subset of scenarios for bearing tests
-        val bearingScenarios = listOf(
-            scenarios[2], // 10km
-            scenarios[4], // 1000km
-            scenarios[6]  // 15000km
-        )
+        val bearingScenarios =
+            listOf(
+                scenarios[2], // 10km
+                scenarios[4], // 1000km
+                scenarios[6] // 15000km
+            )
 
         for (scenario in bearingScenarios) {
             println("-".repeat(80))
             println("Scenario: ${scenario.name}")
             println()
 
-            val results = algorithms.map { (algorithm, name) ->
-                benchmarkBearing(algorithm, name, scenario)
-            }
+            val results =
+                algorithms.map { (algorithm, name) ->
+                    benchmarkBearing(algorithm, name, scenario)
+                }
 
             results.forEach { println(it.format()) }
 
@@ -331,11 +335,12 @@ class AlgorithmPerformanceBenchmark {
             val baseline = results.first()
             results.drop(1).forEach { result ->
                 val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
-                val comparison = if (ratio > 1) {
-                    "${String.format("%.2f", ratio)}x slower"
-                } else {
-                    "${String.format("%.2f", 1 / ratio)}x faster"
-                }
+                val comparison =
+                    if (ratio > 1) {
+                        "${String.format("%.2f", ratio)}x slower"
+                    } else {
+                        "${String.format("%.2f", 1 / ratio)}x faster"
+                    }
                 println("    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison")
             }
             println()
@@ -353,19 +358,21 @@ class AlgorithmPerformanceBenchmark {
         println("Warmup iterations: $WARMUP_ITERATIONS")
         println()
 
-        val algorithms = listOf(
-            LinearInterpolation() to "Linear",
-            SphericalInterpolation() to "SLERP",
-            CubicInterpolation() to "Cubic"
-        )
+        val algorithms =
+            listOf(
+                LinearInterpolation() to "Linear",
+                SphericalInterpolation() to "SLERP",
+                CubicInterpolation() to "Cubic"
+            )
 
         val stepCounts = listOf(10, 50, 100)
 
         // Use medium and long distance scenarios
-        val interpolationScenarios = listOf(
-            scenarios[2], // 10km
-            scenarios[4]  // 1000km
-        )
+        val interpolationScenarios =
+            listOf(
+                scenarios[2], // 10km
+                scenarios[4] // 1000km
+            )
 
         for (scenario in interpolationScenarios) {
             println("-".repeat(80))
@@ -376,9 +383,10 @@ class AlgorithmPerformanceBenchmark {
                 println("  Step count: $steps")
                 println()
 
-                val results = algorithms.map { (algorithm, name) ->
-                    benchmarkInterpolation(algorithm, name, scenario, steps)
-                }
+                val results =
+                    algorithms.map { (algorithm, name) ->
+                        benchmarkInterpolation(algorithm, name, scenario, steps)
+                    }
 
                 results.forEach { result ->
                     println("    ${result.algorithmName}:")
@@ -391,11 +399,12 @@ class AlgorithmPerformanceBenchmark {
                 val baseline = results.first()
                 results.drop(1).forEach { result ->
                     val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
-                    val comparison = if (ratio > 1) {
-                        "${String.format("%.2f", ratio)}x slower"
-                    } else {
-                        "${String.format("%.2f", 1 / ratio)}x faster"
-                    }
+                    val comparison =
+                        if (ratio > 1) {
+                            "${String.format("%.2f", ratio)}x slower"
+                        } else {
+                            "${String.format("%.2f", 1 / ratio)}x faster"
+                        }
                     val algoName = result.algorithmName.substringBefore(" (")
                     val baselineName = baseline.algorithmName.substringBefore(" (")
                     println("      $algoName vs $baselineName: $comparison")
@@ -426,11 +435,12 @@ class AlgorithmPerformanceBenchmark {
         println("DISTANCE ALGORITHMS - AVERAGE PERFORMANCE ACROSS ALL SCENARIOS")
         println("-".repeat(80))
 
-        val distanceAlgorithms = listOf(
-            SimpleDistance() to "Simple",
-            HaversineDistance() to "Haversine",
-            VincentyDistance() to "Vincenty"
-        )
+        val distanceAlgorithms =
+            listOf(
+                SimpleDistance() to "Simple",
+                HaversineDistance() to "Haversine",
+                VincentyDistance() to "Vincenty"
+            )
 
         val distanceResults = mutableMapOf<String, MutableList<Duration>>()
 
@@ -456,9 +466,24 @@ class AlgorithmPerformanceBenchmark {
         val vincentyAvg = distanceResults["Vincenty"]!!.reduce { acc, d -> acc + d } / scenarios.size
 
         println("Performance ratios (across all distances):")
-        println("  Haversine vs Simple: ${String.format("%.2f", haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds)}x")
-        println("  Vincenty vs Simple: ${String.format("%.2f", vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds)}x")
-        println("  Vincenty vs Haversine: ${String.format("%.2f", vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds)}x")
+        println(
+            "  Haversine vs Simple: ${String.format(
+                "%.2f",
+                haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
+            )}x"
+        )
+        println(
+            "  Vincenty vs Simple: ${String.format(
+                "%.2f",
+                vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
+            )}x"
+        )
+        println(
+            "  Vincenty vs Haversine: ${String.format(
+                "%.2f",
+                vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds
+            )}x"
+        )
 
         println()
         println("=".repeat(80))

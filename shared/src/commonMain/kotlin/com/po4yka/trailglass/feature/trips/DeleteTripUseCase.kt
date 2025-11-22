@@ -1,9 +1,9 @@
 package com.po4yka.trailglass.feature.trips
 
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import me.tatarka.inject.annotations.Inject
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
-import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for deleting a trip.
@@ -21,8 +21,9 @@ class DeleteTripUseCase(
     suspend fun execute(tripId: String): TrailGlassResult<Unit> {
         return try {
             // Verify trip exists before deleting
-            val trip = tripRepository.getTripById(tripId)
-                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
+            val trip =
+                tripRepository.getTripById(tripId)
+                    ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
 
             // Delete the trip
             tripRepository.deleteTrip(tripId)

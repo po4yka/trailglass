@@ -11,7 +11,6 @@ import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -28,7 +27,6 @@ class AndroidLocationTracker(
     private val userId: String,
     private val coroutineScope: kotlinx.coroutines.CoroutineScope
 ) : LocationTracker {
-
     private val logger = logger()
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
@@ -102,25 +100,30 @@ class AndroidLocationTracker(
     }
 
     override suspend fun hasPermissions(): Boolean {
-        val fineLocation = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        val coarseLocation = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        // Check background location permission for Android 10+
-        val backgroundLocation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && configuration.requireBackgroundLocation) {
+        val fineLocation =
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            true // Not required or not applicable
-        }
+
+        val coarseLocation =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+
+        // Check background location permission for Android 10+
+        val backgroundLocation =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
+                configuration.requireBackgroundLocation
+            ) {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            } else {
+                true // Not required or not applicable
+            }
 
         val hasAll = fineLocation && coarseLocation && backgroundLocation
         logger.debug { "Permission check: fine=$fineLocation, coarse=$coarseLocation, background=$backgroundLocation" }
@@ -135,33 +138,36 @@ class AndroidLocationTracker(
         return false
     }
 
-    override suspend fun getCurrentState(): TrackingState {
-        return _trackingState.value
-    }
+    override suspend fun getCurrentState(): TrackingState = _trackingState.value
 
     /**
      * Create a LocationRequest based on the tracking mode.
      */
     private fun createLocationRequest(mode: TrackingMode): LocationRequest {
-        val (interval, distance, priority) = when (mode) {
-            TrackingMode.PASSIVE -> Triple(
-                configuration.passiveInterval.inWholeMilliseconds,
-                configuration.passiveDistance.toFloat(),
-                Priority.PRIORITY_BALANCED_POWER_ACCURACY
-            )
-            TrackingMode.ACTIVE -> Triple(
-                configuration.activeInterval.inWholeMilliseconds,
-                configuration.activeDistance.toFloat(),
-                Priority.PRIORITY_HIGH_ACCURACY
-            )
-            TrackingMode.IDLE -> Triple(
-                Long.MAX_VALUE,
-                Float.MAX_VALUE,
-                Priority.PRIORITY_PASSIVE
-            )
-        }
+        val (interval, distance, priority) =
+            when (mode) {
+                TrackingMode.PASSIVE ->
+                    Triple(
+                        configuration.passiveInterval.inWholeMilliseconds,
+                        configuration.passiveDistance.toFloat(),
+                        Priority.PRIORITY_BALANCED_POWER_ACCURACY
+                    )
+                TrackingMode.ACTIVE ->
+                    Triple(
+                        configuration.activeInterval.inWholeMilliseconds,
+                        configuration.activeDistance.toFloat(),
+                        Priority.PRIORITY_HIGH_ACCURACY
+                    )
+                TrackingMode.IDLE ->
+                    Triple(
+                        Long.MAX_VALUE,
+                        Float.MAX_VALUE,
+                        Priority.PRIORITY_PASSIVE
+                    )
+            }
 
-        return LocationRequest.Builder(priority, interval)
+        return LocationRequest
+            .Builder(priority, interval)
             .setMinUpdateDistanceMeters(distance)
             .setWaitForAccurateLocation(mode == TrackingMode.ACTIVE)
             .build()
@@ -170,8 +176,8 @@ class AndroidLocationTracker(
     /**
      * Create a LocationCallback that processes location updates.
      */
-    private fun createLocationCallback(): LocationCallback {
-        return object : LocationCallback() {
+    private fun createLocationCallback(): LocationCallback =
+        object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.locations.forEach { location ->
                     processLocation(location)
@@ -182,7 +188,6 @@ class AndroidLocationTracker(
                 logger.debug { "Location availability changed: ${availability.isLocationAvailable}" }
             }
         }
-    }
 
     /**
      * Process a location update and save it.
@@ -190,25 +195,27 @@ class AndroidLocationTracker(
     private fun processLocation(location: Location) {
         logger.debug {
             "Received location: (${location.latitude}, ${location.longitude}), " +
-            "accuracy: ${location.accuracy}m"
+                "accuracy: ${location.accuracy}m"
         }
 
-        val sample = LocationSample(
-            id = "sample_${UUID.randomUUID()}",
-            timestamp = Clock.System.now(),
-            latitude = location.latitude,
-            longitude = location.longitude,
-            accuracy = location.accuracy.toDouble(),
-            speed = if (location.hasSpeed()) location.speed.toDouble() else null,
-            bearing = if (location.hasBearing()) location.bearing.toDouble() else null,
-            source = when {
-                location.provider == "gps" -> LocationSource.GPS
-                location.provider == "network" -> LocationSource.NETWORK
-                else -> LocationSource.GPS
-            },
-            deviceId = deviceId,
-            userId = userId
-        )
+        val sample =
+            LocationSample(
+                id = "sample_${UUID.randomUUID()}",
+                timestamp = Clock.System.now(),
+                latitude = location.latitude,
+                longitude = location.longitude,
+                accuracy = location.accuracy.toDouble(),
+                speed = if (location.hasSpeed()) location.speed.toDouble() else null,
+                bearing = if (location.hasBearing()) location.bearing.toDouble() else null,
+                source =
+                    when {
+                        location.provider == "gps" -> LocationSource.GPS
+                        location.provider == "network" -> LocationSource.NETWORK
+                        else -> LocationSource.GPS
+                    },
+                deviceId = deviceId,
+                userId = userId
+            )
 
         // Emit to flow
         _locationUpdates.tryEmit(sample)
@@ -223,11 +230,11 @@ class AndroidLocationTracker(
 
         // Save to repository using injected coroutine scope
         coroutineScope.launch {
-            repository.insertSample(sample)
+            repository
+                .insertSample(sample)
                 .onSuccess {
                     logger.trace { "Location sample saved: ${sample.id}" }
-                }
-                .onError { error ->
+                }.onError { error ->
                     logger.error { "Failed to save location sample ${sample.id}: ${error.userMessage}" }
                 }
         }

@@ -1,7 +1,6 @@
 package com.po4yka.trailglass.data.sync
 
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.Instant
 
 /**
  * Interface for resolving sync conflicts.
@@ -32,7 +31,7 @@ class DefaultConflictResolver<T : SyncableEntity> : ConflictResolver<T> {
     ): T {
         logger.debug {
             "Resolving conflict for ${conflict.entityType}:${conflict.entityId} " +
-                    "using strategy $strategy"
+                "using strategy $strategy"
         }
 
         return when (strategy) {
@@ -91,7 +90,6 @@ class ConflictRequiresManualResolutionException(
  * Conflict detection helper.
  */
 object ConflictDetector {
-
     /**
      * Detect if there's a conflict between local and remote entities.
      */
@@ -106,21 +104,24 @@ object ConflictDetector {
         }
 
         // If local was deleted but remote was modified
-        if (local.isDeleted && remote.serverVersion != null &&
+        if (local.isDeleted &&
+            remote.serverVersion != null &&
             remote.serverVersion!! > lastSyncVersion
         ) {
             return ConflictType.MODIFY_DELETE_CONFLICT
         }
 
         // If remote was deleted but local was modified
-        if (remote.isDeleted && local.serverVersion != null &&
+        if (remote.isDeleted &&
+            local.serverVersion != null &&
             local.serverVersion!! > lastSyncVersion
         ) {
             return ConflictType.DELETE_MODIFY_CONFLICT
         }
 
         // If both were modified (concurrent modification)
-        if (local.serverVersion != null && remote.serverVersion != null &&
+        if (local.serverVersion != null &&
+            remote.serverVersion != null &&
             local.serverVersion != remote.serverVersion &&
             local.lastModified != remote.lastModified
         ) {
@@ -138,12 +139,11 @@ object ConflictDetector {
     /**
      * Suggest a resolution strategy based on conflict type.
      */
-    fun suggestResolutionStrategy(conflictType: ConflictType): ResolutionStrategy {
-        return when (conflictType) {
+    fun suggestResolutionStrategy(conflictType: ConflictType): ResolutionStrategy =
+        when (conflictType) {
             ConflictType.CONCURRENT_MODIFICATION -> ResolutionStrategy.MERGE
             ConflictType.DELETE_MODIFY_CONFLICT -> ResolutionStrategy.KEEP_LOCAL
             ConflictType.MODIFY_DELETE_CONFLICT -> ResolutionStrategy.KEEP_REMOTE
             ConflictType.VERSION_MISMATCH -> ResolutionStrategy.KEEP_REMOTE
         }
-    }
 }

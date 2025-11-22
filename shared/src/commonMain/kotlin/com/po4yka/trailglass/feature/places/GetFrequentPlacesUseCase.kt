@@ -6,7 +6,6 @@ import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceSignificance
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration.Companion.days
 
@@ -31,27 +30,28 @@ class GetFrequentPlacesUseCase(
     suspend fun execute(
         userId: String,
         minSignificance: PlaceSignificance = PlaceSignificance.RARE
-    ): Result<List<FrequentPlace>> {
-        return try {
+    ): Result<List<FrequentPlace>> =
+        try {
             val places = frequentPlaceRepository.getPlacesByUser(userId)
 
             // Filter by significance
-            val filtered = places.filter { place ->
-                place.significance.ordinal >= minSignificance.ordinal
-            }
+            val filtered =
+                places.filter { place ->
+                    place.significance.ordinal >= minSignificance.ordinal
+                }
 
             // Sort by significance (PRIMARY first) then by visit count
-            val sorted = filtered.sortedWith(
-                compareByDescending<FrequentPlace> { it.significance.ordinal }
-                    .thenByDescending { it.visitCount }
-            )
+            val sorted =
+                filtered.sortedWith(
+                    compareByDescending<FrequentPlace> { it.significance.ordinal }
+                        .thenByDescending { it.visitCount }
+                )
 
             Result.success(sorted)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get frequent places for user $userId" }
             Result.failure(e)
         }
-    }
 
     /**
      * Refresh frequent places by re-clustering all place visits.
@@ -60,8 +60,8 @@ class GetFrequentPlacesUseCase(
      * @param userId User ID
      * @return Updated list of frequent places
      */
-    suspend fun refresh(userId: String): Result<List<FrequentPlace>> {
-        return try {
+    suspend fun refresh(userId: String): Result<List<FrequentPlace>> =
+        try {
             logger.info { "Refreshing frequent places for user $userId" }
 
             // Get all place visits for the user (last 90 days for performance)
@@ -75,11 +75,12 @@ class GetFrequentPlacesUseCase(
             val existingPlaces = frequentPlaceRepository.getPlacesByUser(userId)
 
             // Update frequent places with new visits
-            val updatedPlaces = placeClusterer.updateFrequentPlaces(
-                visits = visits,
-                existingPlaces = existingPlaces,
-                userId = userId
-            )
+            val updatedPlaces =
+                placeClusterer.updateFrequentPlaces(
+                    visits = visits,
+                    existingPlaces = existingPlaces,
+                    userId = userId
+                )
 
             logger.info { "Updated ${updatedPlaces.size} frequent places" }
 
@@ -98,5 +99,4 @@ class GetFrequentPlacesUseCase(
             logger.error(e) { "Failed to refresh frequent places for user $userId" }
             Result.failure(e)
         }
-    }
 }

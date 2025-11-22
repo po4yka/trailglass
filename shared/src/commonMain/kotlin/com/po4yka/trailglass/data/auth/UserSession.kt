@@ -55,7 +55,6 @@ interface UserSession {
 class DefaultUserSession(
     private var currentUserId: String? = DEFAULT_USER_ID
 ) : UserSession {
-
     override fun getCurrentUserId(): String? = currentUserId
 
     override fun isAuthenticated(): Boolean = currentUserId != null
@@ -81,9 +80,7 @@ class DefaultUserSession(
         /**
          * Gets the shared UserSession instance.
          */
-        fun getInstance(): UserSession {
-            return instance ?: DefaultUserSession().also { instance = it }
-        }
+        fun getInstance(): UserSession = instance ?: DefaultUserSession().also { instance = it }
 
         /**
          * Sets a custom UserSession implementation.

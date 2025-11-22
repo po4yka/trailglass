@@ -32,7 +32,6 @@ import platform.UIKit.UIDevice
  */
 @Inject
 class IOSPlatformModule : PlatformModule {
-
     @Provides
     override fun databaseDriverFactory(): DatabaseDriverFactory = IosDatabaseDriverFactory()
 
@@ -59,21 +58,24 @@ class IOSPlatformModule : PlatformModule {
      */
     @Provides
     override fun encryptionService(): com.po4yka.trailglass.data.security.EncryptionService =
-        com.po4yka.trailglass.data.security.EncryptionService()
+        com.po4yka.trailglass.data.security
+            .EncryptionService()
 
     /**
      * Provides iOS-specific photo metadata extractor.
      */
     @Provides
     override fun photoMetadataExtractor(): com.po4yka.trailglass.photo.PhotoMetadataExtractor =
-        com.po4yka.trailglass.photo.IosPhotoMetadataExtractor()
+        com.po4yka.trailglass.photo
+            .IosPhotoMetadataExtractor()
 
     /**
      * Provides iOS-specific settings storage.
      */
     @Provides
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
-        com.po4yka.trailglass.data.storage.SettingsStorage()
+        com.po4yka.trailglass.data.storage
+            .SettingsStorage()
 
     @Provides
     override fun secureTokenStorage(): SecureTokenStorage = SecureTokenStorage()

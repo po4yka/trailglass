@@ -9,11 +9,11 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlin.uuid.ExperimentalUuidApi
-import kotlin.uuid.Uuid
 import platform.Foundation.NSDate
 import platform.Photos.*
 import kotlin.coroutines.resume
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 
 /**
  * iOS implementation of PhotoPicker using PHPicker and Photos framework.
@@ -24,7 +24,6 @@ import kotlin.coroutines.resume
 class IOSPhotoPicker(
     private val userId: String
 ) : PhotoPicker {
-
     private val logger = logger()
 
     override suspend fun pickPhoto(): Photo? {
@@ -40,7 +39,7 @@ class IOSPhotoPicker(
     override suspend fun hasPermissions(): Boolean {
         val authStatus = PHPhotoLibrary.authorizationStatus()
         return authStatus == PHAuthorizationStatusAuthorized ||
-               authStatus == PHAuthorizationStatusLimited
+            authStatus == PHAuthorizationStatusLimited
     }
 
     override suspend fun requestPermissions(): Boolean {
@@ -69,41 +68,43 @@ class IOSPhotoPicker(
      * Extract photo metadata from a PHAsset.
      * This is called after the user has selected photos via PHPickerViewController.
      */
-    suspend fun extractPhotoFromAsset(asset: PHAsset): Photo? = withContext(Dispatchers.Default) {
-        logger.debug { "Extracting photo metadata from PHAsset: ${asset.localIdentifier}" }
+    suspend fun extractPhotoFromAsset(asset: PHAsset): Photo? =
+        withContext(Dispatchers.Default) {
+            logger.debug { "Extracting photo metadata from PHAsset: ${asset.localIdentifier}" }
 
-        try {
-            val metadata = extractMetadataFromAsset(asset)
+            try {
+                val metadata = extractMetadataFromAsset(asset)
 
-            Photo(
-                id = "photo_${Uuid.random()}",
-                uri = asset.localIdentifier,
-                timestamp = metadata.timestamp,
-                latitude = metadata.latitude,
-                longitude = metadata.longitude,
-                width = metadata.width,
-                height = metadata.height,
-                sizeBytes = metadata.sizeBytes,
-                mimeType = metadata.mimeType,
-                userId = userId,
-                addedAt = Clock.System.now()
-            )
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to extract photo from PHAsset" }
-            null
+                Photo(
+                    id = "photo_${Uuid.random()}",
+                    uri = asset.localIdentifier,
+                    timestamp = metadata.timestamp,
+                    latitude = metadata.latitude,
+                    longitude = metadata.longitude,
+                    width = metadata.width,
+                    height = metadata.height,
+                    sizeBytes = metadata.sizeBytes,
+                    mimeType = metadata.mimeType,
+                    userId = userId,
+                    addedAt = Clock.System.now()
+                )
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to extract photo from PHAsset" }
+                null
+            }
         }
-    }
 
     /**
      * Extract multiple photos from PHAssets.
      */
-    suspend fun extractPhotosFromAssets(assets: List<PHAsset>): List<Photo> = withContext(Dispatchers.Default) {
-        logger.debug { "Extracting ${assets.size} photos from PHAssets" }
+    suspend fun extractPhotosFromAssets(assets: List<PHAsset>): List<Photo> =
+        withContext(Dispatchers.Default) {
+            logger.debug { "Extracting ${assets.size} photos from PHAssets" }
 
-        assets.mapNotNull { asset ->
-            extractPhotoFromAsset(asset)
+            assets.mapNotNull { asset ->
+                extractPhotoFromAsset(asset)
+            }
         }
-    }
 
     /**
      * Extract metadata from a PHAsset.
@@ -112,16 +113,17 @@ class IOSPhotoPicker(
     private suspend fun extractMetadataFromAsset(asset: PHAsset): PhotoMetadata {
         // Extract timestamp
         val creationDate = asset.creationDate as? NSDate
-        val timestamp = if (creationDate != null) {
-            // Convert NSDate to Instant using reference date calculation
-            // NSDate.timeIntervalSinceReferenceDate is seconds since Jan 1, 2001
-            // Unix epoch is Jan 1, 1970, so we need to add the offset
-            val referenceDate = creationDate.timeIntervalSinceReferenceDate
-            val epochSeconds = referenceDate + 978307200.0 // Seconds from 1970 to 2001
-            Instant.fromEpochSeconds(epochSeconds.toLong())
-        } else {
-            Clock.System.now()
-        }
+        val timestamp =
+            if (creationDate != null) {
+                // Convert NSDate to Instant using reference date calculation
+                // NSDate.timeIntervalSinceReferenceDate is seconds since Jan 1, 2001
+                // Unix epoch is Jan 1, 1970, so we need to add the offset
+                val referenceDate = creationDate.timeIntervalSinceReferenceDate
+                val epochSeconds = referenceDate + 978307200.0 // Seconds from 1970 to 2001
+                Instant.fromEpochSeconds(epochSeconds.toLong())
+            } else {
+                Clock.System.now()
+            }
 
         // Extract location
         val location = asset.location
@@ -155,13 +157,14 @@ class IOSPhotoPicker(
      * This requests the image resource info to get the actual file size.
      */
     @OptIn(ExperimentalForeignApi::class)
-    private suspend fun extractFileSizeFromAsset(asset: PHAsset): Long? {
-        return suspendCancellableCoroutine { continuation ->
-            val options = PHImageRequestOptions().apply {
-                deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat
-                networkAccessAllowed = true
-                synchronous = false
-            }
+    private suspend fun extractFileSizeFromAsset(asset: PHAsset): Long? =
+        suspendCancellableCoroutine { continuation ->
+            val options =
+                PHImageRequestOptions().apply {
+                    deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat
+                    networkAccessAllowed = true
+                    synchronous = false
+                }
 
             val imageManager = PHImageManager.defaultManager()
 
@@ -195,7 +198,6 @@ class IOSPhotoPicker(
                 }
             )
         }
-    }
 
     /**
      * Determine MIME type from PHAsset.

@@ -26,7 +26,10 @@ class LoginUseCase(
      * @param password User's password
      * @return Result containing LoginResponse on success, or Exception on failure
      */
-    suspend fun execute(email: String, password: String): Result<LoginResponse> {
+    suspend fun execute(
+        email: String,
+        password: String
+    ): Result<LoginResponse> {
         logger.info { "Attempting login for user: $email" }
 
         // Validate inputs
@@ -44,13 +47,14 @@ class LoginUseCase(
             // Call API to login
             val result = apiClient.login(email, password)
 
-            result.onSuccess { response ->
-                // Update user session with the authenticated user ID
-                userSession.setUserId(response.userId)
-                logger.info { "Login successful for user: ${response.email}" }
-            }.onFailure { error ->
-                logger.error(error) { "Login failed for user: $email" }
-            }
+            result
+                .onSuccess { response ->
+                    // Update user session with the authenticated user ID
+                    userSession.setUserId(response.userId)
+                    logger.info { "Login successful for user: ${response.email}" }
+                }.onFailure { error ->
+                    logger.error(error) { "Login failed for user: $email" }
+                }
 
             result
         } catch (e: Exception) {
@@ -62,7 +66,5 @@ class LoginUseCase(
     /**
      * Simple email validation.
      */
-    private fun isValidEmail(email: String): Boolean {
-        return email.contains("@") && email.contains(".")
-    }
+    private fun isValidEmail(email: String): Boolean = email.contains("@") && email.contains(".")
 }

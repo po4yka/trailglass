@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,9 +35,10 @@ fun ForgotPasswordScreen(
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -75,9 +76,10 @@ fun ForgotPasswordScreen(
             // Success message
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    )
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -128,9 +130,10 @@ fun ForgotPasswordScreen(
             if (errorMessage != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer
+                        )
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
@@ -164,24 +167,26 @@ fun ForgotPasswordScreen(
                 leadingIcon = {
                     Icon(Icons.Default.Email, contentDescription = "Email")
                 },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        focusManager.clearFocus()
-                        if (email.isNotBlank()) {
-                            isSubmitting = true
-                            // TODO: Implement password reset API call
-                            // For now, simulate success after delay
-                            errorMessage = "Password reset is not yet implemented. Please contact support."
-                            isSubmitting = false
-                            // Once implemented:
-                            // isSuccess = true
+                keyboardOptions =
+                    KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Done
+                    ),
+                keyboardActions =
+                    KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                            if (email.isNotBlank()) {
+                                isSubmitting = true
+                                // TODO: Implement password reset API call
+                                // For now, simulate success after delay
+                                errorMessage = "Password reset is not yet implemented. Please contact support."
+                                isSubmitting = false
+                                // Once implemented:
+                                // isSuccess = true
+                            }
                         }
-                    }
-                ),
+                    ),
                 singleLine = true,
                 enabled = !isSubmitting,
                 modifier = Modifier.fillMaxWidth()

@@ -18,7 +18,6 @@ class AutoAssociatePhotosUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
     private val photoLocationAssociator: PhotoLocationAssociator
 ) {
-
     private val logger = logger()
 
     /**
@@ -36,10 +35,11 @@ class AutoAssociatePhotosUseCase(
             logger.debug { "Found ${allPhotos.size} total photos" }
 
             // Filter to unattached photos with location
-            val unattachedPhotos = allPhotos.filter { photo ->
-                val attachments = photoRepository.getAttachmentsForPhoto(photo.id)
-                attachments.isEmpty() && (photo.latitude != null || photo.longitude != null)
-            }
+            val unattachedPhotos =
+                allPhotos.filter { photo ->
+                    val attachments = photoRepository.getAttachmentsForPhoto(photo.id)
+                    attachments.isEmpty() && (photo.latitude != null || photo.longitude != null)
+                }
 
             logger.info { "Found ${unattachedPhotos.size} unattached photos with location" }
 
@@ -57,29 +57,32 @@ class AutoAssociatePhotosUseCase(
             // Try to associate each photo
             unattachedPhotos.forEach { photo ->
                 // Create PhotoWithMetadata (without full metadata for now)
-                val photoWithMeta = PhotoWithMetadata(
-                    photo = photo,
-                    metadata = null, // Would load from metadata repository
-                    attachments = emptyList(),
-                    clusterId = null
-                )
+                val photoWithMeta =
+                    PhotoWithMetadata(
+                        photo = photo,
+                        metadata = null, // Would load from metadata repository
+                        attachments = emptyList(),
+                        clusterId = null
+                    )
 
                 // Find best matching visit
-                val bestMatch = photoLocationAssociator.findBestMatch(
-                    photo = photo,
-                    metadata = null,
-                    visits = visits
-                )
+                val bestMatch =
+                    photoLocationAssociator.findBestMatch(
+                        photo = photo,
+                        metadata = null,
+                        visits = visits
+                    )
 
                 if (bestMatch != null) {
                     // Create attachment
-                    val attachment = PhotoAttachment(
-                        id = UuidGenerator.randomUUID(),
-                        photoId = photo.id,
-                        placeVisitId = bestMatch.id,
-                        attachedAt = Clock.System.now(),
-                        caption = "Auto-attached"
-                    )
+                    val attachment =
+                        PhotoAttachment(
+                            id = UuidGenerator.randomUUID(),
+                            photoId = photo.id,
+                            placeVisitId = bestMatch.id,
+                            attachedAt = Clock.System.now(),
+                            caption = "Auto-attached"
+                        )
 
                     try {
                         photoRepository.attachPhotoToVisit(attachment)
@@ -113,6 +116,8 @@ class AutoAssociatePhotosUseCase(
             val failedCount: Int
         ) : AssociationResult()
 
-        data class Error(val message: String) : AssociationResult()
+        data class Error(
+            val message: String
+        ) : AssociationResult()
     }
 }

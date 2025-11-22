@@ -12,16 +12,13 @@ import me.tatarka.inject.annotations.Provides
  * Provides repositories and database dependencies.
  */
 interface DataModule {
-
     /**
      * Provides the application database.
      * Scoped to application lifecycle.
      */
     @AppScope
     @Provides
-    fun provideDatabase(driverFactory: DatabaseDriverFactory): Database {
-        return Database(driverFactory)
-    }
+    fun provideDatabase(driverFactory: DatabaseDriverFactory): Database = Database(driverFactory)
 
     /**
      * Provides LocationRepository implementation.
@@ -63,9 +60,7 @@ interface DataModule {
      */
     @AppScope
     @Provides
-    fun provideGeocodingCacheRepository(database: Database): GeocodingCacheRepository {
-        return GeocodingCacheRepositoryImpl(database)
-    }
+    fun provideGeocodingCacheRepository(database: Database): GeocodingCacheRepository = GeocodingCacheRepositoryImpl(database)
 
     /**
      * Provides FrequentPlaceRepository implementation.
@@ -86,7 +81,5 @@ interface DataModule {
      */
     @AppScope
     @Provides
-    fun provideAlgorithmProvider(settingsRepository: SettingsRepository): AlgorithmProvider {
-        return AlgorithmProvider(settingsRepository)
-    }
+    fun provideAlgorithmProvider(settingsRepository: SettingsRepository): AlgorithmProvider = AlgorithmProvider(settingsRepository)
 }

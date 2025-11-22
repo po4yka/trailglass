@@ -20,23 +20,26 @@ import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
-import kotlin.math.sqrt
 
 /**
  * Playback speed multiplier options.
  */
-enum class PlaybackSpeed(val multiplier: Float, val displayName: String) {
+enum class PlaybackSpeed(
+    val multiplier: Float,
+    val displayName: String
+) {
     HALF(0.5f, "0.5×"),
     NORMAL(1.0f, "1×"),
     DOUBLE(2.0f, "2×"),
     QUAD(4.0f, "4×");
 
-    fun next(): PlaybackSpeed = when (this) {
-        HALF -> NORMAL
-        NORMAL -> DOUBLE
-        DOUBLE -> QUAD
-        QUAD -> HALF
-    }
+    fun next(): PlaybackSpeed =
+        when (this) {
+            HALF -> NORMAL
+            NORMAL -> DOUBLE
+            DOUBLE -> QUAD
+            QUAD -> HALF
+        }
 }
 
 /**
@@ -60,13 +63,13 @@ class RouteReplayController(
     private val getTripRouteUseCase: GetTripRouteUseCase,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * State for Route Replay screen.
@@ -75,21 +78,17 @@ class RouteReplayController(
         val tripRoute: TripRoute? = null,
         val isLoading: Boolean = false,
         val error: String? = null,
-
         // Playback state
         val isPlaying: Boolean = false,
-        val progress: Float = 0f,  // 0.0 to 1.0
+        val progress: Float = 0f, // 0.0 to 1.0
         val playbackSpeed: PlaybackSpeed = PlaybackSpeed.NORMAL,
-
         // Vehicle state
         val vehicleState: VehicleState? = null,
-
         // Camera state
         val cameraPosition: Coordinate? = null,
         val cameraBearing: Double = 0.0,
-        val cameraTilt: Double = 45.0,  // 3D perspective angle
+        val cameraTilt: Double = 45.0, // 3D perspective angle
         val cameraZoom: Float = 16f,
-
         // UI state
         val showControls: Boolean = true
     )
@@ -108,24 +107,27 @@ class RouteReplayController(
             logger.info { "Loading route for replay: $tripId" }
             _state.value = _state.value.copy(isLoading = true, error = null)
 
-            getTripRouteUseCase.execute(tripId)
+            getTripRouteUseCase
+                .execute(tripId)
                 .onSuccess { tripRoute ->
                     logger.info { "Route loaded for replay: ${tripRoute.fullPath.size} points" }
-                    _state.value = _state.value.copy(
-                        tripRoute = tripRoute,
-                        isLoading = false,
-                        vehicleState = createInitialVehicleState(tripRoute),
-                        cameraPosition = tripRoute.fullPath.firstOrNull()?.let {
-                            Coordinate(it.latitude, it.longitude)
-                        }
-                    )
-                }
-                .onError { error ->
+                    _state.value =
+                        _state.value.copy(
+                            tripRoute = tripRoute,
+                            isLoading = false,
+                            vehicleState = createInitialVehicleState(tripRoute),
+                            cameraPosition =
+                                tripRoute.fullPath.firstOrNull()?.let {
+                                    Coordinate(it.latitude, it.longitude)
+                                }
+                        )
+                }.onError { error ->
                     logger.error { "Failed to load route for replay: $tripId - ${error.getTechnicalDetails()}" }
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = error.getUserFriendlyMessage()
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            isLoading = false,
+                            error = error.getUserFriendlyMessage()
+                        )
                 }
         }
     }
@@ -144,9 +146,10 @@ class RouteReplayController(
         animationJob?.cancel()
 
         // Start animation loop
-        animationJob = controllerScope.launch {
-            animateRoute()
-        }
+        animationJob =
+            controllerScope.launch {
+                animateRoute()
+            }
     }
 
     /**
@@ -182,12 +185,13 @@ class RouteReplayController(
         // Calculate new vehicle state at this position
         val newVehicleState = calculateVehicleStateAtProgress(route, clampedProgress)
 
-        _state.value = _state.value.copy(
-            progress = clampedProgress,
-            vehicleState = newVehicleState,
-            cameraPosition = newVehicleState.position,
-            cameraBearing = newVehicleState.bearing
-        )
+        _state.value =
+            _state.value.copy(
+                progress = clampedProgress,
+                vehicleState = newVehicleState,
+                cameraPosition = newVehicleState.position,
+                cameraBearing = newVehicleState.bearing
+            )
     }
 
     /**
@@ -212,9 +216,10 @@ class RouteReplayController(
      * Toggle controls visibility.
      */
     fun toggleControls() {
-        _state.value = _state.value.copy(
-            showControls = !_state.value.showControls
-        )
+        _state.value =
+            _state.value.copy(
+                showControls = !_state.value.showControls
+            )
     }
 
     /**
@@ -254,12 +259,13 @@ class RouteReplayController(
             // Update vehicle state
             val newVehicleState = calculateVehicleStateAtProgress(route, newProgress)
 
-            _state.value = _state.value.copy(
-                progress = newProgress,
-                vehicleState = newVehicleState,
-                cameraPosition = newVehicleState.position,
-                cameraBearing = newVehicleState.bearing
-            )
+            _state.value =
+                _state.value.copy(
+                    progress = newProgress,
+                    vehicleState = newVehicleState,
+                    cameraPosition = newVehicleState.position,
+                    cameraBearing = newVehicleState.bearing
+                )
 
             // Stop if we reached the end
             if (newProgress >= 1f) {
@@ -276,7 +282,10 @@ class RouteReplayController(
      * Calculate vehicle state at a given progress (0.0 to 1.0).
      * Uses linear interpolation for smooth animation between route points.
      */
-    private fun calculateVehicleStateAtProgress(route: TripRoute, progress: Float): VehicleState {
+    private fun calculateVehicleStateAtProgress(
+        route: TripRoute,
+        progress: Float
+    ): VehicleState {
         val path = route.fullPath
         if (path.isEmpty()) {
             return VehicleState(
@@ -311,10 +320,13 @@ class RouteReplayController(
         val interpolatedLon = lerp(currentPoint.longitude, nextPoint.longitude, fraction.toDouble())
 
         // Calculate bearing between current and next point
-        val bearing = calculateBearing(
-            currentPoint.latitude, currentPoint.longitude,
-            nextPoint.latitude, nextPoint.longitude
-        )
+        val bearing =
+            calculateBearing(
+                currentPoint.latitude,
+                currentPoint.longitude,
+                nextPoint.latitude,
+                nextPoint.longitude
+            )
 
         // Interpolate timestamp
         val currentMillis = currentPoint.timestamp.toEpochMilliseconds()
@@ -337,9 +349,11 @@ class RouteReplayController(
      * @param t Interpolation factor (0.0 to 1.0)
      * @return Interpolated value
      */
-    private fun lerp(a: Double, b: Double, t: Double): Double {
-        return a + (b - a) * t
-    }
+    private fun lerp(
+        a: Double,
+        b: Double,
+        t: Double
+    ): Double = a + (b - a) * t
 
     /**
      * Create initial vehicle state at the start of the route.
@@ -353,7 +367,12 @@ class RouteReplayController(
      * Calculate bearing (direction) between two coordinates.
      * Returns bearing in degrees (0-360).
      */
-    private fun calculateBearing(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    private fun calculateBearing(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         val lat1Rad = (lat1 * PI / 180.0)
         val lat2Rad = (lat2 * PI / 180.0)
         val dLon = (lon2 - lon1 * PI / 180.0)

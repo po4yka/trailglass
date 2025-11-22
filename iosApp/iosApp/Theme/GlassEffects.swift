@@ -247,7 +247,7 @@ struct LensingEffect: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(
-                GeometryReader { geometry in
+                GeometryReader { _ in
                     ZStack {
                         if isActive {
                             Circle()

@@ -16,4 +16,5 @@ interface SettingsComponent {
 class DefaultSettingsComponent(
     componentContext: ComponentContext,
     override val locationTrackingController: LocationTrackingController
-) : SettingsComponent, ComponentContext by componentContext
+) : SettingsComponent,
+    ComponentContext by componentContext

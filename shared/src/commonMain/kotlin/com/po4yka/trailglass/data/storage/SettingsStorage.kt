@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.Flow
  * Platform-specific settings storage.
  */
 expect class SettingsStorage {
-
     /**
      * Get settings as a Flow.
      */

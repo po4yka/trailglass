@@ -42,11 +42,12 @@ fun Example1_TrackingFAB() {
     FloatingActionButton(
         onClick = { isTracking = !isTracking },
         shape = fabShape,
-        containerColor = if (isTracking) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.secondaryContainer
-        }
+        containerColor =
+            if (isTracking) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            }
     ) {
         Icon(
             imageVector = Icons.Default.Navigation,
@@ -61,31 +62,34 @@ fun Example1_TrackingFAB() {
  */
 @Composable
 fun Example2_ShapeSelector() {
-    val shapes = listOf(
-        "Circle" to MorphableShapes.Circle,
-        "Triangle" to MorphableShapes.Triangle,
-        "Hexagon" to MorphableShapes.Hexagon,
-        "Diamond" to MorphableShapes.Diamond,
-        "Square" to MorphableShapes.RoundedSquare,
-        "Wave" to MorphableShapes.Wave,
-        "Petal" to MorphableShapes.Petal
-    )
+    val shapes =
+        listOf(
+            "Circle" to MorphableShapes.Circle,
+            "Triangle" to MorphableShapes.Triangle,
+            "Hexagon" to MorphableShapes.Hexagon,
+            "Diamond" to MorphableShapes.Diamond,
+            "Square" to MorphableShapes.RoundedSquare,
+            "Wave" to MorphableShapes.Wave,
+            "Petal" to MorphableShapes.Petal
+        )
 
     var selectedIndex by remember { mutableStateOf(0) }
     val (shapeName, currentShape) = shapes[selectedIndex]
 
     val morphedShape by animateShapeMorph(
         targetShape = currentShape,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        )
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
     )
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -95,11 +99,12 @@ fun Example2_ShapeSelector() {
         )
 
         Surface(
-            modifier = Modifier
-                .size(120.dp)
-                .clickable {
-                    selectedIndex = (selectedIndex + 1) % shapes.size
-                },
+            modifier =
+                Modifier
+                    .size(120.dp)
+                    .clickable {
+                        selectedIndex = (selectedIndex + 1) % shapes.size
+                    },
             shape = morphedShape,
             color = MaterialTheme.colorScheme.primary
         ) {}
@@ -118,15 +123,23 @@ fun Example2_ShapeSelector() {
  */
 @Composable
 fun Example3_CategoryShowcase() {
-    val categories = listOf(
-        "water", "transport", "food", "work",
-        "flight", "bike", "cafe", "nature"
-    )
+    val categories =
+        listOf(
+            "water",
+            "transport",
+            "food",
+            "work",
+            "flight",
+            "bike",
+            "cafe",
+            "nature"
+        )
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
@@ -160,9 +173,10 @@ fun Example4_LoadingStates() {
     var isLoading by remember { mutableStateOf(true) }
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -187,21 +201,24 @@ fun Example5_InteractiveCard() {
 
     val cardShape by animateShapeMorph(
         targetShape = if (isPressed) MorphableShapes.RoundedSquare else MorphableShapes.Circle,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        )
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            )
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .clickable { isPressed = !isPressed },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .clickable { isPressed = !isPressed },
         shape = cardShape,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -228,9 +245,10 @@ fun Example5_InteractiveCard() {
 private fun ShapeMorphingExamplesPreview() {
     MaterialTheme {
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(

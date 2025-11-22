@@ -1,16 +1,12 @@
 package com.po4yka.trailglass.feature.photo
 
-import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PhotoCluster
-import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.domain.model.PhotoWithMetadata
 import com.po4yka.trailglass.logging.logger
 import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlin.math.*
-import kotlin.time.Duration.Companion.hours
 import me.tatarka.inject.annotations.Inject
+import kotlin.math.*
 
 /**
  * Clusters photos by location and time proximity using DBSCAN-like algorithm.
@@ -21,7 +17,6 @@ class PhotoClusterer(
     private val maxTimeGapHours: Double = 2.0, // Max time gap between photos
     private val minClusterSize: Int = 3 // Minimum photos to form a cluster
 ) {
-
     private val logger = logger()
 
     /**
@@ -32,13 +27,16 @@ class PhotoClusterer(
      */
     fun cluster(photos: List<PhotoWithMetadata>): List<PhotoCluster> {
         // Filter photos with location data
-        val photosWithLocation = photos.filter { photoWithMeta ->
-            val hasExifLocation = photoWithMeta.metadata?.exifLatitude != null &&
-                                photoWithMeta.metadata.exifLongitude != null
-            val hasPhotoLocation = photoWithMeta.photo.latitude != null &&
-                                  photoWithMeta.photo.longitude != null
-            hasExifLocation || hasPhotoLocation
-        }
+        val photosWithLocation =
+            photos.filter { photoWithMeta ->
+                val hasExifLocation =
+                    photoWithMeta.metadata?.exifLatitude != null &&
+                        photoWithMeta.metadata.exifLongitude != null
+                val hasPhotoLocation =
+                    photoWithMeta.photo.latitude != null &&
+                        photoWithMeta.photo.longitude != null
+                hasExifLocation || hasPhotoLocation
+            }
 
         if (photosWithLocation.size < minClusterSize) {
             logger.debug { "Not enough photos with location for clustering: ${photosWithLocation.size}" }
@@ -116,10 +114,12 @@ class PhotoClusterer(
             if (candidate.photo.id in visited) return@filter false
             if (candidate.photo.id == photo.photo.id) return@filter false
 
-            val candidateLat = candidate.metadata?.exifLatitude ?: candidate.photo.latitude
-                ?: return@filter false
-            val candidateLon = candidate.metadata?.exifLongitude ?: candidate.photo.longitude
-                ?: return@filter false
+            val candidateLat =
+                candidate.metadata?.exifLatitude ?: candidate.photo.latitude
+                    ?: return@filter false
+            val candidateLon =
+                candidate.metadata?.exifLongitude ?: candidate.photo.longitude
+                    ?: return@filter false
             val candidateTime = candidate.photo.timestamp
 
             // Check distance
@@ -172,15 +172,18 @@ class PhotoClusterer(
      * Calculate distance between two coordinates using Haversine formula.
      */
     private fun calculateDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusKm = 6371.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2) * sin(dLat / 2) +
+        val a =
+            sin(dLat / 2) * sin(dLat / 2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2) * sin(dLon / 2)
 
@@ -203,21 +206,26 @@ class PhotoClusterer(
         if (visits.isEmpty()) return null
 
         // Find visit that overlaps in time and location
-        val matchingVisit = visits.firstOrNull { visit ->
-            // Check time overlap
-            val timeOverlap = cluster.startTime <= visit.endTime &&
-                            cluster.endTime >= visit.startTime
+        val matchingVisit =
+            visits.firstOrNull { visit ->
+                // Check time overlap
+                val timeOverlap =
+                    cluster.startTime <= visit.endTime &&
+                        cluster.endTime >= visit.startTime
 
-            if (!timeOverlap) return@firstOrNull false
+                if (!timeOverlap) return@firstOrNull false
 
-            // Check distance
-            val distance = calculateDistance(
-                cluster.centerLatitude, cluster.centerLongitude,
-                visit.location.latitude, visit.location.longitude
-            )
+                // Check distance
+                val distance =
+                    calculateDistance(
+                        cluster.centerLatitude,
+                        cluster.centerLongitude,
+                        visit.location.latitude,
+                        visit.location.longitude
+                    )
 
-            distance <= 500.0 // 500m threshold for cluster-visit association
-        }
+                distance <= 500.0 // 500m threshold for cluster-visit association
+            }
 
         return matchingVisit?.id
     }

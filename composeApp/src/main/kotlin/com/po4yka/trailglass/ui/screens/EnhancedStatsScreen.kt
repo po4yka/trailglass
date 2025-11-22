@@ -27,7 +27,6 @@ import com.po4yka.trailglass.ui.components.TransportModeSelector
 import com.po4yka.trailglass.ui.components.charts.*
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.Clock
-import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -45,9 +44,11 @@ fun EnhancedStatsScreen(
 
     // Load current year on first composition
     LaunchedEffect(Unit) {
-        val currentYear = Clock.System.now()
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .year
+        val currentYear =
+            Clock.System
+                .now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .year
         controller.loadPeriod(GetStatsUseCase.Period.Year(currentYear))
     }
 
@@ -112,9 +113,11 @@ private fun PeriodSelector(
     onPeriodChange: (GetStatsUseCase.Period) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val currentYear = Clock.System.now()
-        .toLocalDateTime(TimeZone.currentSystemDefault())
-        .year
+    val currentYear =
+        Clock.System
+            .now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .year
 
     var isYearSelected by remember { mutableStateOf(true) }
 
@@ -134,24 +137,32 @@ private fun PeriodSelector(
                     onPeriodChange(GetStatsUseCase.Period.Year(currentYear))
                 },
                 label = { Text("Year") },
-                leadingIcon = if (isYearSelected) {
-                    { Icon(Icons.Default.Check, contentDescription = null) }
-                } else null
+                leadingIcon =
+                    if (isYearSelected) {
+                        { Icon(Icons.Default.Check, contentDescription = null) }
+                    } else {
+                        null
+                    }
             )
 
             FilterChip(
                 selected = !isYearSelected,
                 onClick = {
                     isYearSelected = false
-                    val currentMonth = Clock.System.now()
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .monthNumber
+                    val currentMonth =
+                        Clock.System
+                            .now()
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                            .monthNumber
                     onPeriodChange(GetStatsUseCase.Period.Month(currentYear, currentMonth))
                 },
                 label = { Text("Month") },
-                leadingIcon = if (!isYearSelected) {
-                    { Icon(Icons.Default.Check, contentDescription = null) }
-                } else null
+                leadingIcon =
+                    if (!isYearSelected) {
+                        { Icon(Icons.Default.Check, contentDescription = null) }
+                    } else {
+                        null
+                    }
             )
         }
     }
@@ -165,11 +176,12 @@ private fun EnhancedStatsContent(
     modifier: Modifier = Modifier
 ) {
     // Filter stats by selected transport mode
-    val filteredStats = if (selectedTransportMode != null) {
-        filterStatsByTransportMode(stats, selectedTransportMode)
-    } else {
-        stats
-    }
+    val filteredStats =
+        if (selectedTransportMode != null) {
+            filterStatsByTransportMode(stats, selectedTransportMode)
+        } else {
+            stats
+        }
 
     LazyColumn(
         modifier = modifier,
@@ -195,14 +207,17 @@ private fun EnhancedStatsContent(
 
                     if (selectedTransportMode != null) {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 12.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                "Showing: ${selectedTransportMode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                                "Showing: ${selectedTransportMode.name.lowercase().replaceFirstChar {
+                                    it.uppercase()
+                                }}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Medium
@@ -358,9 +373,10 @@ private fun StatCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -410,7 +426,10 @@ private fun DistanceStatsCard(stats: ComprehensiveStatistics) {
 }
 
 @Composable
-private fun TransportDistributionCard(stats: ComprehensiveStatistics, selectedMode: TransportType?) {
+private fun TransportDistributionCard(
+    stats: ComprehensiveStatistics,
+    selectedMode: TransportType?
+) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -422,23 +441,27 @@ private fun TransportDistributionCard(stats: ComprehensiveStatistics, selectedMo
 
             // Use gradient colors from Silent Waters palette for transport types
             val gradientColors = MaterialTheme.colorScheme.extended.gradientColors
-            val transportColors = TransportType.entries.associateWith { type ->
-                gradientColors[type.ordinal % gradientColors.size]
-            }
+            val transportColors =
+                TransportType.entries.associateWith { type ->
+                    gradientColors[type.ordinal % gradientColors.size]
+                }
 
-            val barData = stats.distanceStats.byTransportType.map { (type, meters) ->
-                val isSelected = selectedMode == type
-                BarData(
-                    label = type.name.take(4),
-                    value = (meters / 1000).toFloat(),
-                    formattedValue = "${(meters / 1000).toInt()}km",
-                    color = if (selectedMode != null && !isSelected) {
-                        transportColors[type]?.copy(alpha = 0.3f)
-                    } else {
-                        transportColors[type]
-                    }
-                )
-            }.sortedByDescending { it.value }
+            val barData =
+                stats.distanceStats.byTransportType
+                    .map { (type, meters) ->
+                        val isSelected = selectedMode == type
+                        BarData(
+                            label = type.name.take(4),
+                            value = (meters / 1000).toFloat(),
+                            formattedValue = "${(meters / 1000).toInt()}km",
+                            color =
+                                if (selectedMode != null && !isSelected) {
+                                    transportColors[type]?.copy(alpha = 0.3f)
+                                } else {
+                                    transportColors[type]
+                                }
+                        )
+                    }.sortedByDescending { it.value }
 
             BarChart(
                 data = barData,
@@ -481,34 +504,35 @@ private fun CategoryDistributionCard(stats: ComprehensiveStatistics) {
             )
 
             // Use semantic and gradient colors from Silent Waters palette
-            val categoryColors = mapOf(
-                PlaceCategory.HOME to MaterialTheme.colorScheme.extended.neutralCategory,
-                PlaceCategory.WORK to MaterialTheme.colorScheme.primary,
-                PlaceCategory.FOOD to MaterialTheme.colorScheme.extended.morningCategory,
-                PlaceCategory.SHOPPING to MaterialTheme.colorScheme.extended.waterCategory,
-                PlaceCategory.FITNESS to MaterialTheme.colorScheme.extended.success,
-                PlaceCategory.ENTERTAINMENT to MaterialTheme.colorScheme.extended.eveningCategory,
-                PlaceCategory.TRAVEL to MaterialTheme.colorScheme.extended.activeRoute,
-                PlaceCategory.HEALTHCARE to MaterialTheme.colorScheme.extended.warning,
-                PlaceCategory.EDUCATION to MaterialTheme.colorScheme.secondary,
-                PlaceCategory.RELIGIOUS to MaterialTheme.colorScheme.tertiary,
-                PlaceCategory.SOCIAL to MaterialTheme.colorScheme.extended.waterCategory,
-                PlaceCategory.OUTDOOR to MaterialTheme.colorScheme.extended.success,
-                PlaceCategory.SERVICE to MaterialTheme.colorScheme.extended.neutralCategory,
-                PlaceCategory.OTHER to MaterialTheme.colorScheme.extended.disabled
-            )
+            val categoryColors =
+                mapOf(
+                    PlaceCategory.HOME to MaterialTheme.colorScheme.extended.neutralCategory,
+                    PlaceCategory.WORK to MaterialTheme.colorScheme.primary,
+                    PlaceCategory.FOOD to MaterialTheme.colorScheme.extended.morningCategory,
+                    PlaceCategory.SHOPPING to MaterialTheme.colorScheme.extended.waterCategory,
+                    PlaceCategory.FITNESS to MaterialTheme.colorScheme.extended.success,
+                    PlaceCategory.ENTERTAINMENT to MaterialTheme.colorScheme.extended.eveningCategory,
+                    PlaceCategory.TRAVEL to MaterialTheme.colorScheme.extended.activeRoute,
+                    PlaceCategory.HEALTHCARE to MaterialTheme.colorScheme.extended.warning,
+                    PlaceCategory.EDUCATION to MaterialTheme.colorScheme.secondary,
+                    PlaceCategory.RELIGIOUS to MaterialTheme.colorScheme.tertiary,
+                    PlaceCategory.SOCIAL to MaterialTheme.colorScheme.extended.waterCategory,
+                    PlaceCategory.OUTDOOR to MaterialTheme.colorScheme.extended.success,
+                    PlaceCategory.SERVICE to MaterialTheme.colorScheme.extended.neutralCategory,
+                    PlaceCategory.OTHER to MaterialTheme.colorScheme.extended.disabled
+                )
 
-            val pieData = stats.placeStats.visitsByCategory
-                .filter { it.key != PlaceCategory.OTHER || it.value > 0 }
-                .map { (category, count) ->
-                    PieData(
-                        label = category.name.lowercase().replaceFirstChar { it.uppercase() },
-                        value = count.toFloat(),
-                        color = categoryColors[category] ?: Color.Gray
-                    )
-                }
-                .sortedByDescending { it.value }
-                .take(6)
+            val pieData =
+                stats.placeStats.visitsByCategory
+                    .filter { it.key != PlaceCategory.OTHER || it.value > 0 }
+                    .map { (category, count) ->
+                        PieData(
+                            label = category.name.lowercase().replaceFirstChar { it.uppercase() },
+                            value = count.toFloat(),
+                            color = categoryColors[category] ?: Color.Gray
+                        )
+                    }.sortedByDescending { it.value }
+                    .take(6)
 
             if (pieData.isNotEmpty()) {
                 PieChart(data = pieData)
@@ -549,12 +573,13 @@ private fun TravelPatternsCard(stats: ComprehensiveStatistics) {
             }
 
             stats.travelPatterns.peakTravelHour?.let { hour ->
-                val timeRange = when (hour) {
-                    in 0..5 -> "Night (12AM-6AM)"
-                    in 6..11 -> "Morning (6AM-12PM)"
-                    in 12..17 -> "Afternoon (12PM-6PM)"
-                    else -> "Evening (6PM-12AM)"
-                }
+                val timeRange =
+                    when (hour) {
+                        in 0..5 -> "Night (12AM-6AM)"
+                        in 6..11 -> "Morning (6AM-12PM)"
+                        in 12..17 -> "Afternoon (12PM-6PM)"
+                        else -> "Evening (6PM-12AM)"
+                    }
                 InfoRow("Most Active Time", timeRange)
             }
 
@@ -569,11 +594,12 @@ private fun ActivityHeatmapCard(stats: ComprehensiveStatistics) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Convert activity data to heatmap format
-            val heatmapData = stats.travelPatterns.weekdayActivity.mapValues { (_, activity) ->
-                stats.travelPatterns.hourlyActivity.mapValues { (_, hourActivity) ->
-                    hourActivity.totalEvents
+            val heatmapData =
+                stats.travelPatterns.weekdayActivity.mapValues { (_, activity) ->
+                    stats.travelPatterns.hourlyActivity.mapValues { (_, hourActivity) ->
+                        hourActivity.totalEvents
+                    }
                 }
-            }
 
             ActivityHeatmap(data = heatmapData)
         }
@@ -613,9 +639,10 @@ private fun TopCountriesCard(stats: ComprehensiveStatistics) {
 
             stats.geographicStats.topCountries.take(5).forEach { country ->
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -646,7 +673,10 @@ private fun TopCountriesCard(stats: ComprehensiveStatistics) {
 }
 
 @Composable
-private fun InfoRow(label: String, value: String) {
+private fun InfoRow(
+    label: String,
+    value: String
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -703,8 +733,9 @@ private fun filterStatsByTransportMode(
     transportMode: TransportType
 ): ComprehensiveStatistics {
     // Filter distance stats
-    val filteredByTransportType = stats.distanceStats.byTransportType
-        .filterKeys { it == transportMode }
+    val filteredByTransportType =
+        stats.distanceStats.byTransportType
+            .filterKeys { it == transportMode }
 
     val filteredTotalDistanceMeters = filteredByTransportType.values.sum()
 
@@ -712,9 +743,10 @@ private fun filterStatsByTransportMode(
     // This is a simplified filter - a full implementation would require
     // filtering routes, visits connected to those routes, etc.
     return stats.copy(
-        distanceStats = stats.distanceStats.copy(
-            totalDistanceMeters = filteredTotalDistanceMeters,
-            byTransportType = filteredByTransportType
-        )
+        distanceStats =
+            stats.distanceStats.copy(
+                totalDistanceMeters = filteredTotalDistanceMeters,
+                byTransportType = filteredByTransportType
+            )
     )
 }

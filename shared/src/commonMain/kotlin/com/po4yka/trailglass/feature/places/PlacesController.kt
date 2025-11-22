@@ -39,13 +39,13 @@ class PlacesController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Places UI state.
@@ -79,18 +79,19 @@ class PlacesController(
         sortOption: PlaceSortOption
     ): List<FrequentPlace> {
         // Filter by search query
-        var filtered = if (query.isBlank()) {
-            allPlaces
-        } else {
-            val searchTerm = query.trim().lowercase()
-            allPlaces.filter { place ->
-                place.displayName.lowercase().contains(searchTerm) ||
-                place.name?.lowercase()?.contains(searchTerm) == true ||
-                place.address?.lowercase()?.contains(searchTerm) == true ||
-                place.city?.lowercase()?.contains(searchTerm) == true ||
-                place.userLabel?.lowercase()?.contains(searchTerm) == true
+        var filtered =
+            if (query.isBlank()) {
+                allPlaces
+            } else {
+                val searchTerm = query.trim().lowercase()
+                allPlaces.filter { place ->
+                    place.displayName.lowercase().contains(searchTerm) ||
+                        place.name?.lowercase()?.contains(searchTerm) == true ||
+                        place.address?.lowercase()?.contains(searchTerm) == true ||
+                        place.city?.lowercase()?.contains(searchTerm) == true ||
+                        place.userLabel?.lowercase()?.contains(searchTerm) == true
+                }
             }
-        }
 
         // Filter by categories
         if (categories.isNotEmpty()) {
@@ -102,10 +103,11 @@ class PlacesController(
             PlaceSortOption.MOST_VISITED -> filtered.sortedByDescending { it.visitCount }
             PlaceSortOption.RECENTLY_VISITED -> filtered.sortedByDescending { it.lastVisitTime }
             PlaceSortOption.ALPHABETICAL -> filtered.sortedBy { it.displayName.lowercase() }
-            PlaceSortOption.BY_SIGNIFICANCE -> filtered.sortedWith(
-                compareByDescending<FrequentPlace> { it.significance.ordinal }
-                    .thenByDescending { it.visitCount }
-            )
+            PlaceSortOption.BY_SIGNIFICANCE ->
+                filtered.sortedWith(
+                    compareByDescending<FrequentPlace> { it.significance.ordinal }
+                        .thenByDescending { it.visitCount }
+                )
         }
     }
 
@@ -118,16 +120,18 @@ class PlacesController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            getFrequentPlacesUseCase.execute(userId, _state.value.minSignificance)
+            getFrequentPlacesUseCase
+                .execute(userId, _state.value.minSignificance)
                 .onSuccess { allPlaces ->
                     logger.info { "Loaded ${allPlaces.size} frequent places" }
                     val currentState = _state.value
-                    val filteredPlaces = filterAndSortPlaces(
-                        allPlaces,
-                        currentState.searchQuery,
-                        currentState.selectedCategories,
-                        currentState.sortOption
-                    )
+                    val filteredPlaces =
+                        filterAndSortPlaces(
+                            allPlaces,
+                            currentState.searchQuery,
+                            currentState.selectedCategories,
+                            currentState.sortOption
+                        )
                     _state.update {
                         it.copy(
                             allPlaces = allPlaces,
@@ -135,8 +139,7 @@ class PlacesController(
                             isLoading = false
                         )
                     }
-                }
-                .onFailure { error ->
+                }.onFailure { error ->
                     logger.error(error) { "Failed to load frequent places" }
                     _state.update {
                         it.copy(
@@ -157,16 +160,18 @@ class PlacesController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            getFrequentPlacesUseCase.refresh(userId)
+            getFrequentPlacesUseCase
+                .refresh(userId)
                 .onSuccess { allPlaces ->
                     logger.info { "Refreshed ${allPlaces.size} frequent places" }
                     val currentState = _state.value
-                    val filteredPlaces = filterAndSortPlaces(
-                        allPlaces,
-                        currentState.searchQuery,
-                        currentState.selectedCategories,
-                        currentState.sortOption
-                    )
+                    val filteredPlaces =
+                        filterAndSortPlaces(
+                            allPlaces,
+                            currentState.searchQuery,
+                            currentState.selectedCategories,
+                            currentState.sortOption
+                        )
                     _state.update {
                         it.copy(
                             allPlaces = allPlaces,
@@ -174,8 +179,7 @@ class PlacesController(
                             isLoading = false
                         )
                     }
-                }
-                .onFailure { error ->
+                }.onFailure { error ->
                     logger.error(error) { "Failed to refresh frequent places" }
                     _state.update {
                         it.copy(
@@ -200,12 +204,14 @@ class PlacesController(
 
                     // Update local state immediately for better UX
                     _state.update { state ->
-                        val updatedAllPlaces = state.allPlaces.map { p ->
-                            if (p.id == placeId) updatedPlace else p
-                        }
-                        val updatedFilteredPlaces = state.places.map { p ->
-                            if (p.id == placeId) updatedPlace else p
-                        }
+                        val updatedAllPlaces =
+                            state.allPlaces.map { p ->
+                                if (p.id == placeId) updatedPlace else p
+                            }
+                        val updatedFilteredPlaces =
+                            state.places.map { p ->
+                                if (p.id == placeId) updatedPlace else p
+                            }
                         state.copy(
                             allPlaces = updatedAllPlaces,
                             places = updatedFilteredPlaces
@@ -225,14 +231,13 @@ class PlacesController(
     /**
      * Get a specific place by ID.
      */
-    suspend fun getPlaceById(placeId: String): FrequentPlace? {
-        return try {
+    suspend fun getPlaceById(placeId: String): FrequentPlace? =
+        try {
             frequentPlaceRepository.getPlaceById(placeId)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get place $placeId" }
             null
         }
-    }
 
     /**
      * Filter places by minimum significance.
@@ -250,12 +255,13 @@ class PlacesController(
         logger.debug { "Searching places with query: $query" }
 
         _state.update { state ->
-            val filteredPlaces = filterAndSortPlaces(
-                state.allPlaces,
-                query,
-                state.selectedCategories,
-                state.sortOption
-            )
+            val filteredPlaces =
+                filterAndSortPlaces(
+                    state.allPlaces,
+                    query,
+                    state.selectedCategories,
+                    state.sortOption
+                )
             state.copy(
                 searchQuery = query,
                 places = filteredPlaces
@@ -270,12 +276,13 @@ class PlacesController(
         logger.debug { "Clearing search" }
 
         _state.update { state ->
-            val filteredPlaces = filterAndSortPlaces(
-                state.allPlaces,
-                "",
-                state.selectedCategories,
-                state.sortOption
-            )
+            val filteredPlaces =
+                filterAndSortPlaces(
+                    state.allPlaces,
+                    "",
+                    state.selectedCategories,
+                    state.sortOption
+                )
             state.copy(
                 searchQuery = "",
                 places = filteredPlaces
@@ -290,18 +297,20 @@ class PlacesController(
         logger.debug { "Toggling category filter: $category" }
 
         _state.update { state ->
-            val newCategories = if (category in state.selectedCategories) {
-                state.selectedCategories - category
-            } else {
-                state.selectedCategories + category
-            }
+            val newCategories =
+                if (category in state.selectedCategories) {
+                    state.selectedCategories - category
+                } else {
+                    state.selectedCategories + category
+                }
 
-            val filteredPlaces = filterAndSortPlaces(
-                state.allPlaces,
-                state.searchQuery,
-                newCategories,
-                state.sortOption
-            )
+            val filteredPlaces =
+                filterAndSortPlaces(
+                    state.allPlaces,
+                    state.searchQuery,
+                    newCategories,
+                    state.sortOption
+                )
 
             state.copy(
                 selectedCategories = newCategories,
@@ -317,12 +326,13 @@ class PlacesController(
         logger.debug { "Clearing category filters" }
 
         _state.update { state ->
-            val filteredPlaces = filterAndSortPlaces(
-                state.allPlaces,
-                state.searchQuery,
-                emptySet(),
-                state.sortOption
-            )
+            val filteredPlaces =
+                filterAndSortPlaces(
+                    state.allPlaces,
+                    state.searchQuery,
+                    emptySet(),
+                    state.sortOption
+                )
 
             state.copy(
                 selectedCategories = emptySet(),
@@ -338,12 +348,13 @@ class PlacesController(
         logger.debug { "Setting sort option: $option" }
 
         _state.update { state ->
-            val filteredPlaces = filterAndSortPlaces(
-                state.allPlaces,
-                state.searchQuery,
-                state.selectedCategories,
-                option
-            )
+            val filteredPlaces =
+                filterAndSortPlaces(
+                    state.allPlaces,
+                    state.searchQuery,
+                    state.selectedCategories,
+                    option
+                )
 
             state.copy(
                 sortOption = option,
@@ -355,7 +366,10 @@ class PlacesController(
     /**
      * Update place category manually.
      */
-    fun updatePlaceCategory(placeId: String, newCategory: PlaceCategory) {
+    fun updatePlaceCategory(
+        placeId: String,
+        newCategory: PlaceCategory
+    ) {
         controllerScope.launch {
             try {
                 val place = frequentPlaceRepository.getPlaceById(placeId)
@@ -365,15 +379,17 @@ class PlacesController(
 
                     // Update local state
                     _state.update { state ->
-                        val updatedAllPlaces = state.allPlaces.map { p ->
-                            if (p.id == placeId) updatedPlace else p
-                        }
-                        val filteredPlaces = filterAndSortPlaces(
-                            updatedAllPlaces,
-                            state.searchQuery,
-                            state.selectedCategories,
-                            state.sortOption
-                        )
+                        val updatedAllPlaces =
+                            state.allPlaces.map { p ->
+                                if (p.id == placeId) updatedPlace else p
+                            }
+                        val filteredPlaces =
+                            filterAndSortPlaces(
+                                updatedAllPlaces,
+                                state.searchQuery,
+                                state.selectedCategories,
+                                state.sortOption
+                            )
                         state.copy(
                             allPlaces = updatedAllPlaces,
                             places = filteredPlaces

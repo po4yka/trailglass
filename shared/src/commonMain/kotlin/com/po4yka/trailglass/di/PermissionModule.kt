@@ -10,7 +10,6 @@ import me.tatarka.inject.annotations.Provides
  * Dependency injection module for permission-related components.
  */
 interface PermissionModule {
-
     /**
      * Provides the platform-specific permission manager.
      * This should be implemented by platform-specific modules.
@@ -22,9 +21,7 @@ interface PermissionModule {
      */
     @AppScope
     @Provides
-    fun providePermissionRationaleProvider(): PermissionRationaleProvider {
-        return PermissionRationaleProvider()
-    }
+    fun providePermissionRationaleProvider(): PermissionRationaleProvider = PermissionRationaleProvider()
 
     /**
      * Provides the permission flow controller.
@@ -35,11 +32,10 @@ interface PermissionModule {
         permissionManager: PermissionManager,
         rationaleProvider: PermissionRationaleProvider,
         coroutineScope: CoroutineScope
-    ): PermissionFlowController {
-        return PermissionFlowController(
+    ): PermissionFlowController =
+        PermissionFlowController(
             permissionManager = permissionManager,
             rationaleProvider = rationaleProvider,
             coroutineScope = coroutineScope
         )
-    }
 }

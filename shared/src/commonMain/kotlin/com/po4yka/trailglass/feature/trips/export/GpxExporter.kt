@@ -3,15 +3,12 @@ package com.po4yka.trailglass.feature.trips.export
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.Trip
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 /**
  * Exports trip data to GPX (GPS Exchange Format) format.
  * GPX is an XML-based format for GPS data exchange.
  */
 class GpxExporter {
-
     /**
      * Export a trip to GPX format.
      *
@@ -24,8 +21,8 @@ class GpxExporter {
         trip: Trip,
         locationSamples: List<LocationSample>,
         placeVisits: List<PlaceVisit> = emptyList()
-    ): String {
-        return buildString {
+    ): String =
+        buildString {
             // XML declaration
             appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 
@@ -33,7 +30,9 @@ class GpxExporter {
             appendLine("<gpx version=\"1.1\" creator=\"TrailGlass\"")
             appendLine("  xmlns=\"http://www.topografix.com/GPX/1/1\"")
             appendLine("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
-            appendLine("  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">")
+            appendLine(
+                "  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">"
+            )
 
             // Metadata
             appendLine("  <metadata>")
@@ -76,17 +75,15 @@ class GpxExporter {
 
             appendLine("</gpx>")
         }
-    }
 
     /**
      * Escape special XML characters.
      */
-    private fun escapeXml(text: String): String {
-        return text
+    private fun escapeXml(text: String): String =
+        text
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
             .replace("\"", "&quot;")
             .replace("'", "&apos;")
-    }
 }

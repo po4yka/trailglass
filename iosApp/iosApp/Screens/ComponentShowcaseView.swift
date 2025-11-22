@@ -11,8 +11,8 @@ import Shared
 struct ComponentShowcaseView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var isDarkMode = false
-    @State private var selectedTransportMode: TransportType? = nil
-    @State private var selectedCategory: String? = nil
+    @State private var selectedTransportMode: TransportType?
+    @State private var selectedCategory: String?
     @State private var showAnimations = true
 
     var body: some View {

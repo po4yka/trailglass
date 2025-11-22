@@ -1,13 +1,13 @@
 package com.po4yka.trailglass.feature.route
 
 import com.po4yka.trailglass.data.repository.*
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import me.tatarka.inject.annotations.Inject
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
-import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for retrieving a complete trip route with all associated data.
@@ -27,7 +27,6 @@ class GetTripRouteUseCase(
     private val enableCache: Boolean = true,
     private val maxCacheSize: Int = 10
 ) {
-
     private val logger = logger()
 
     // Thread-safe cache for trip routes
@@ -46,7 +45,10 @@ class GetTripRouteUseCase(
      * @param forceRefresh If true, bypass cache and fetch fresh data
      * @return Result containing TripRoute or error
      */
-    suspend fun execute(tripId: String, forceRefresh: Boolean = false): TrailGlassResult<TripRoute> {
+    suspend fun execute(
+        tripId: String,
+        forceRefresh: Boolean = false
+    ): TrailGlassResult<TripRoute> {
         return try {
             // Check cache first (unless force refresh)
             if (enableCache && !forceRefresh) {
@@ -60,18 +62,25 @@ class GetTripRouteUseCase(
             logger.info { "Fetching route for trip $tripId" }
 
             // 1. Get trip details
-            val trip = tripRepository.getTripById(tripId)
-                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
+            val trip =
+                tripRepository.getTripById(tripId)
+                    ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
 
             // 2. Get all location samples for the trip time range
-            val endTime = trip.endTime ?: kotlinx.datetime.Clock.System.now()
-            val samplesResult = locationRepository.getSamples(
-                userId = trip.userId,
-                startTime = trip.startTime,
-                endTime = endTime
-            )
-            val allSamples = samplesResult.getOrNull()
-                ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Failed to fetch location samples for trip $tripId"))
+            val endTime =
+                trip.endTime ?: kotlinx.datetime.Clock.System
+                    .now()
+            val samplesResult =
+                locationRepository.getSamples(
+                    userId = trip.userId,
+                    startTime = trip.startTime,
+                    endTime = endTime
+                )
+            val allSamples =
+                samplesResult.getOrNull()
+                    ?: return TrailGlassResult.Error(
+                        TrailGlassError.Unknown("Failed to fetch location samples for trip $tripId")
+                    )
 
             // 3. Filter and validate location samples
             val filteredSamples = locationSampleFilter.filterAndValidate(allSamples)
@@ -81,7 +90,9 @@ class GetTripRouteUseCase(
             if (filteredSamples.isEmpty()) {
                 logger.warn { "No valid location samples for trip $tripId" }
                 return TrailGlassResult.Error(
-                    TrailGlassError.Unknown("No GPS data available for this trip. Enable location tracking to see routes.")
+                    TrailGlassError.Unknown(
+                        "No GPS data available for this trip. Enable location tracking to see routes."
+                    )
                 )
             }
 
@@ -95,60 +106,64 @@ class GetTripRouteUseCase(
             if (filteredSamples.size > 100000) {
                 logger.warn {
                     "Trip $tripId has ${filteredSamples.size} points - this may impact performance. " +
-                    "Consider splitting into multiple trips."
+                        "Consider splitting into multiple trips."
                 }
             }
 
             // 4. Get route segments
-            val routeSegments = try {
-                routeSegmentRepository.getRouteSegmentsInRange(
-                    userId = trip.userId,
-                    startTime = trip.startTime,
-                    endTime = endTime
-                )
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to fetch route segments for trip $tripId" }
-                emptyList()
-            }
+            val routeSegments =
+                try {
+                    routeSegmentRepository.getRouteSegmentsInRange(
+                        userId = trip.userId,
+                        startTime = trip.startTime,
+                        endTime = endTime
+                    )
+                } catch (e: Exception) {
+                    logger.error(e) { "Failed to fetch route segments for trip $tripId" }
+                    emptyList()
+                }
 
             // 5. Get place visits
-            val placeVisits = try {
-                placeVisitRepository.getVisits(
-                    userId = trip.userId,
-                    startTime = trip.startTime,
-                    endTime = endTime
-                )
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to fetch place visits for trip $tripId" }
-                emptyList()
-            }
+            val placeVisits =
+                try {
+                    placeVisitRepository.getVisits(
+                        userId = trip.userId,
+                        startTime = trip.startTime,
+                        endTime = endTime
+                    )
+                } catch (e: Exception) {
+                    logger.error(e) { "Failed to fetch place visits for trip $tripId" }
+                    emptyList()
+                }
 
             // 6. Get photos with location data
-            val photos = try {
-                photoRepository.getPhotosInTimeRange(
-                    userId = trip.userId,
-                    startTime = trip.startTime,
-                    endTime = endTime
-                )
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to fetch photos for trip $tripId" }
-                emptyList()
-            }
+            val photos =
+                try {
+                    photoRepository.getPhotosInTimeRange(
+                        userId = trip.userId,
+                        startTime = trip.startTime,
+                        endTime = endTime
+                    )
+                } catch (e: Exception) {
+                    logger.error(e) { "Failed to fetch photos for trip $tripId" }
+                    emptyList()
+                }
 
             // 7. Build complete trip route
-            val tripRoute = tripRouteBuilder.buildTripRoute(
-                trip = trip,
-                locationSamples = filteredSamples,
-                routeSegments = routeSegments,
-                placeVisits = placeVisits,
-                photos = photos
-            )
+            val tripRoute =
+                tripRouteBuilder.buildTripRoute(
+                    trip = trip,
+                    locationSamples = filteredSamples,
+                    routeSegments = routeSegments,
+                    placeVisits = placeVisits,
+                    photos = photos
+                )
 
             logger.info {
                 "Successfully built route for trip $tripId: " +
-                "${tripRoute.statistics.totalDistanceKilometers.toInt()}km, " +
-                "${tripRoute.fullPath.size} points, " +
-                "${tripRoute.photoMarkers.size} photos"
+                    "${tripRoute.statistics.totalDistanceKilometers.toInt()}km, " +
+                    "${tripRoute.fullPath.size} points, " +
+                    "${tripRoute.photoMarkers.size} photos"
             }
 
             // Cache the result
@@ -164,16 +179,18 @@ class GetTripRouteUseCase(
                         }
                     }
 
-                    cache[tripId] = CachedRoute(
-                        tripRoute = tripRoute,
-                        cachedAt = kotlinx.datetime.Clock.System.now()
-                    )
+                    cache[tripId] =
+                        CachedRoute(
+                            tripRoute = tripRoute,
+                            cachedAt =
+                                kotlinx.datetime.Clock.System
+                                    .now()
+                        )
                     logger.debug { "Cached route for trip $tripId (cache size: ${cache.size})" }
                 }
             }
 
             TrailGlassResult.Success(tripRoute)
-
         } catch (e: Exception) {
             logger.error(e) { "Unexpected error fetching trip route for $tripId" }
             TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
@@ -221,15 +238,14 @@ class GetTripRouteUseCase(
     /**
      * Get current cache statistics.
      */
-    suspend fun getCacheStats(): CacheStats {
-        return cacheMutex.withLock {
+    suspend fun getCacheStats(): CacheStats =
+        cacheMutex.withLock {
             CacheStats(
                 size = cache.size,
                 maxSize = maxCacheSize,
                 enabled = enableCache
             )
         }
-    }
 
     data class CacheStats(
         val size: Int,

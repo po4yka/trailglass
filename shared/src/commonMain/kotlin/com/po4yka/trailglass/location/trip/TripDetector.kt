@@ -15,7 +15,6 @@ class TripDetector(
     private val homeLocationDetector: HomeLocationDetector = HomeLocationDetector(),
     private val tripBoundaryDetector: TripBoundaryDetector = TripBoundaryDetector()
 ) {
-
     private val logger = logger()
 
     /**
@@ -25,7 +24,10 @@ class TripDetector(
      * @param userId The user ID
      * @return List of detected trips
      */
-    fun detectTrips(visits: List<PlaceVisit>, userId: String): List<Trip> {
+    fun detectTrips(
+        visits: List<PlaceVisit>,
+        userId: String
+    ): List<Trip> {
         if (visits.isEmpty()) {
             logger.debug { "No visits provided for trip detection" }
             return emptyList()
@@ -48,23 +50,25 @@ class TripDetector(
         logger.debug { "Detected ${tripSegments.size} trip segments" }
 
         // Step 3: Convert to Trip domain objects
-        val trips = tripSegments.mapIndexed { index, segment ->
-            val tripId = generateTripId(userId, segment.startTime, index)
+        val trips =
+            tripSegments.mapIndexed { index, segment ->
+                val tripId = generateTripId(userId, segment.startTime, index)
 
-            // Determine if trip is ongoing (last trip and recent)
-            val isOngoing = index == tripSegments.lastIndex &&
-                    isRecentTrip(segment.endTime)
+                // Determine if trip is ongoing (last trip and recent)
+                val isOngoing =
+                    index == tripSegments.lastIndex &&
+                        isRecentTrip(segment.endTime)
 
-            Trip(
-                id = tripId,
-                name = null, // Auto-generated name can be added later
-                startTime = segment.startTime,
-                endTime = if (isOngoing) null else segment.endTime,
-                primaryCountry = segment.primaryCountry,
-                isOngoing = isOngoing,
-                userId = userId
-            )
-        }
+                Trip(
+                    id = tripId,
+                    name = null, // Auto-generated name can be added later
+                    startTime = segment.startTime,
+                    endTime = if (isOngoing) null else segment.endTime,
+                    primaryCountry = segment.primaryCountry,
+                    isOngoing = isOngoing,
+                    userId = userId
+                )
+            }
 
         logger.info { "Detected ${trips.size} trips (${trips.count { it.isOngoing }} ongoing)" }
         return trips
@@ -73,9 +77,11 @@ class TripDetector(
     /**
      * Generate a deterministic trip ID.
      */
-    private fun generateTripId(userId: String, startTime: Instant, index: Int): String {
-        return "trip_${userId.hashCode()}_${startTime.toEpochMilliseconds()}_$index"
-    }
+    private fun generateTripId(
+        userId: String,
+        startTime: Instant,
+        index: Int
+    ): String = "trip_${userId.hashCode()}_${startTime.toEpochMilliseconds()}_$index"
 
     /**
      * Check if a trip is recent (within last 24 hours).

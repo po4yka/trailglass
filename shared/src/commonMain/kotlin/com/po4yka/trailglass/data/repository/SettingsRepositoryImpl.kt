@@ -17,16 +17,11 @@ class SettingsRepositoryImpl(
     private val storage: SettingsStorage,
     private val json: Json
 ) : SettingsRepository {
-
     private val logger = logger()
 
-    override fun getSettings(): Flow<AppSettings> {
-        return storage.getSettingsFlow()
-    }
+    override fun getSettings(): Flow<AppSettings> = storage.getSettingsFlow()
 
-    override suspend fun getCurrentSettings(): AppSettings {
-        return storage.getSettings()
-    }
+    override suspend fun getCurrentSettings(): AppSettings = storage.getSettings()
 
     override suspend fun updateSettings(settings: AppSettings) {
         logger.info { "Updating settings" }
@@ -44,8 +39,8 @@ class SettingsRepositoryImpl(
         return json.encodeToString(settings)
     }
 
-    override suspend fun importSettings(json: String): Result<Unit> {
-        return try {
+    override suspend fun importSettings(json: String): Result<Unit> =
+        try {
             val settings = this.json.decodeFromString<AppSettings>(json)
             storage.saveSettings(settings)
             Result.Success(Unit)
@@ -58,5 +53,4 @@ class SettingsRepositoryImpl(
                 )
             )
         }
-    }
 }

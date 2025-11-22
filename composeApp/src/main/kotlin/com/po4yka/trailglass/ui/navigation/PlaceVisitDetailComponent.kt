@@ -17,4 +17,5 @@ class DefaultPlaceVisitDetailComponent(
     componentContext: ComponentContext,
     override val placeVisitId: String,
     override val onBack: () -> Unit
-) : PlaceVisitDetailComponent, ComponentContext by componentContext
+) : PlaceVisitDetailComponent,
+    ComponentContext by componentContext

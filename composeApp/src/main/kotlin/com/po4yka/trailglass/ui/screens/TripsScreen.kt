@@ -1,5 +1,9 @@
 package com.po4yka.trailglass.ui.screens
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,20 +19,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Trip
-import kotlinx.datetime.Instant
+import com.po4yka.trailglass.ui.theme.MorphableShapes
+import com.po4yka.trailglass.ui.theme.animateShapeMorph
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Duration
-import com.po4yka.trailglass.ui.theme.MorphableShapes
-import com.po4yka.trailglass.ui.theme.CategoryShapes
-import com.po4yka.trailglass.ui.theme.animateShapeMorph
-import com.po4yka.trailglass.ui.theme.shapeMorphSpring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.ui.draw.clip
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
 
 /**
  * Screen showing all trips with filtering and sorting options.
@@ -162,26 +156,31 @@ private fun TripCard(
     // Animate card shape: slight morph when pressed for tactile feedback
     // Ongoing trips get a more dynamic shape
     val cardShape by animateShapeMorph(
-        targetShape = when {
-            isPressed -> MorphableShapes.RoundedSquare
-            trip.isOngoing -> MorphableShapes.Wave
-            else -> MorphableShapes.Circle
-        },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        )
+        targetShape =
+            when {
+                isPressed -> MorphableShapes.RoundedSquare
+                trip.isOngoing -> MorphableShapes.Wave
+                else -> MorphableShapes.Circle
+            },
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            )
     )
 
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (trip.isOngoing)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.surfaceVariant
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (trip.isOngoing) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    }
+            ),
         shape = cardShape,
         interactionSource = interactionSource
     ) {
@@ -211,10 +210,11 @@ private fun TripCard(
 
                     // Date range
                     val startDate = trip.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
-                    val dateText = trip.endTime?.let { endTime ->
-                        val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
-                        "${startDate.date} - ${endDate.date}"
-                    } ?: "Started ${startDate.date}"
+                    val dateText =
+                        trip.endTime?.let { endTime ->
+                            val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
+                            "${startDate.date} - ${endDate.date}"
+                        } ?: "Started ${startDate.date}"
 
                     Text(
                         text = dateText,

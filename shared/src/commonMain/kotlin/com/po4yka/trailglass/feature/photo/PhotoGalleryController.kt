@@ -27,13 +27,13 @@ class PhotoGalleryController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Photo gallery UI state.
@@ -64,11 +64,12 @@ class PhotoGalleryController(
                 val endDate = now.toLocalDateTime(timeZone).date
                 val startDate = endDate.minus(30, kotlinx.datetime.DateTimeUnit.DAY)
 
-                val photoGroups = getPhotoGalleryUseCase.execute(
-                    userId = userId,
-                    startDate = startDate,
-                    endDate = endDate
-                )
+                val photoGroups =
+                    getPhotoGalleryUseCase.execute(
+                        userId = userId,
+                        startDate = startDate,
+                        endDate = endDate
+                    )
 
                 _state.update {
                     it.copy(
@@ -103,18 +104,23 @@ class PhotoGalleryController(
                 val photosByMonth = getPhotoGalleryUseCase.getAllPhotosGroupedByMonth(userId)
 
                 // Flatten to photo groups (convert YearMonth to PhotoGroup)
-                val photoGroups = photosByMonth.flatMap { (yearMonth, photos) ->
-                    // Group photos by exact date within the month
-                    photos.groupBy {
-                        it.photo.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date
-                    }.map { (date, photosForDate) ->
-                        PhotoGroup(
-                            date = date,
-                            photos = photosForDate,
-                            location = null
-                        )
-                    }
-                }.sortedByDescending { it.date }
+                val photoGroups =
+                    photosByMonth
+                        .flatMap { (yearMonth, photos) ->
+                            // Group photos by exact date within the month
+                            photos
+                                .groupBy {
+                                    it.photo.timestamp
+                                        .toLocalDateTime(TimeZone.currentSystemDefault())
+                                        .date
+                                }.map { (date, photosForDate) ->
+                                    PhotoGroup(
+                                        date = date,
+                                        photos = photosForDate,
+                                        location = null
+                                    )
+                                }
+                        }.sortedByDescending { it.date }
 
                 _state.update {
                     it.copy(

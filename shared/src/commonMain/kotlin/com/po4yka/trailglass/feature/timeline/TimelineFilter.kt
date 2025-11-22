@@ -22,7 +22,8 @@ data class TimelineFilter(
      * Check if any filters are active.
      */
     val isActive: Boolean
-        get() = transportTypes.isNotEmpty() ||
+        get() =
+            transportTypes.isNotEmpty() ||
                 placeCategories.isNotEmpty() ||
                 countries.isNotEmpty() ||
                 cities.isNotEmpty() ||
@@ -36,17 +37,18 @@ data class TimelineFilter(
      * Get count of active filters.
      */
     val activeFilterCount: Int
-        get() = listOf(
-            transportTypes.isNotEmpty(),
-            placeCategories.isNotEmpty(),
-            countries.isNotEmpty(),
-            cities.isNotEmpty(),
-            searchQuery != null,
-            dateRange != null,
-            minDuration != null,
-            maxDuration != null,
-            showOnlyFavorites
-        ).count { it }
+        get() =
+            listOf(
+                transportTypes.isNotEmpty(),
+                placeCategories.isNotEmpty(),
+                countries.isNotEmpty(),
+                cities.isNotEmpty(),
+                searchQuery != null,
+                dateRange != null,
+                minDuration != null,
+                maxDuration != null,
+                showOnlyFavorites
+            ).count { it }
 }
 
 /**

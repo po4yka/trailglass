@@ -29,23 +29,23 @@ class TripsController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Sort option for trips list.
      */
     enum class SortOption {
-        DATE_DESC,      // Most recent first (default)
-        DATE_ASC,       // Oldest first
-        NAME_ASC,       // Alphabetical by name
-        DURATION_DESC,  // Longest trips first
-        DISTANCE_DESC   // Farthest trips first
+        DATE_DESC, // Most recent first (default)
+        DATE_ASC, // Oldest first
+        NAME_ASC, // Alphabetical by name
+        DURATION_DESC, // Longest trips first
+        DISTANCE_DESC // Farthest trips first
     }
 
     /**
@@ -82,22 +82,24 @@ class TripsController(
 
                 // Apply filter
                 if (!filterOptions.showOngoing || !filterOptions.showCompleted) {
-                    result = result.filter {
-                        (filterOptions.showOngoing && it.isOngoing) ||
-                        (filterOptions.showCompleted && !it.isOngoing)
-                    }
+                    result =
+                        result.filter {
+                            (filterOptions.showOngoing && it.isOngoing) ||
+                                (filterOptions.showCompleted && !it.isOngoing)
+                        }
                 }
 
                 // Apply search query
                 if (filterOptions.searchQuery.isNotEmpty()) {
                     val query = filterOptions.searchQuery.lowercase()
-                    result = result.filter {
-                        it.displayName.lowercase().contains(query) ||
-                        it.description?.lowercase()?.contains(query) == true ||
-                        it.primaryCountry?.lowercase()?.contains(query) == true ||
-                        it.countriesVisited.any { country -> country.lowercase().contains(query) } ||
-                        it.citiesVisited.any { city -> city.lowercase().contains(query) }
-                    }
+                    result =
+                        result.filter {
+                            it.displayName.lowercase().contains(query) ||
+                                it.description?.lowercase()?.contains(query) == true ||
+                                it.primaryCountry?.lowercase()?.contains(query) == true ||
+                                it.countriesVisited.any { country -> country.lowercase().contains(query) } ||
+                                it.citiesVisited.any { city -> city.lowercase().contains(query) }
+                        }
                 }
 
                 // Apply sort
@@ -211,15 +213,16 @@ class TripsController(
         _state.update { it.copy(isLoading = true, error = null, showCreateDialog = false) }
 
         controllerScope.launch {
-            val result = createTripUseCase.execute(
-                userId = userId,
-                name = trip.name,
-                startTime = trip.startTime,
-                endTime = trip.endTime,
-                description = trip.description,
-                isAutoDetected = trip.isAutoDetected,
-                detectionConfidence = trip.detectionConfidence
-            )
+            val result =
+                createTripUseCase.execute(
+                    userId = userId,
+                    name = trip.name,
+                    startTime = trip.startTime,
+                    endTime = trip.endTime,
+                    description = trip.description,
+                    isAutoDetected = trip.isAutoDetected,
+                    detectionConfidence = trip.detectionConfidence
+                )
 
             when (result) {
                 is TrailGlassResult.Success -> {
@@ -248,15 +251,16 @@ class TripsController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            val result = updateTripUseCase.execute(
-                tripId = trip.id,
-                name = trip.name,
-                description = trip.description,
-                endTime = trip.endTime,
-                coverPhotoUri = trip.coverPhotoUri,
-                tags = trip.tags,
-                isPublic = trip.isPublic
-            )
+            val result =
+                updateTripUseCase.execute(
+                    tripId = trip.id,
+                    name = trip.name,
+                    description = trip.description,
+                    endTime = trip.endTime,
+                    coverPhotoUri = trip.coverPhotoUri,
+                    tags = trip.tags,
+                    isPublic = trip.isPublic
+                )
 
             when (result) {
                 is TrailGlassResult.Success -> {
@@ -282,7 +286,10 @@ class TripsController(
     /**
      * Delete a trip.
      */
-    fun deleteTrip(tripId: String, onSuccess: () -> Unit = {}) {
+    fun deleteTrip(
+        tripId: String,
+        onSuccess: () -> Unit = {}
+    ) {
         logger.debug { "Deleting trip: $tripId" }
 
         _state.update { it.copy(isLoading = true, error = null) }

@@ -14,7 +14,6 @@ class MarkerClusterer(
     private val gridSize: Int = 60, // Grid size in pixels at zoom level 20
     private val minClusterSize: Int = 2
 ) {
-
     /**
      * Cluster markers based on zoom level and screen size.
      *
@@ -84,7 +83,10 @@ class MarkerClusterer(
     /**
      * Get grid cell key for a coordinate.
      */
-    private fun getCellKey(coordinate: Coordinate, cellSize: Double): String {
+    private fun getCellKey(
+        coordinate: Coordinate,
+        cellSize: Double
+    ): String {
         val cellX = floor(coordinate.longitude / cellSize).toInt()
         val cellY = floor(coordinate.latitude / cellSize).toInt()
         return "$cellX,$cellY"
@@ -113,7 +115,6 @@ class DistanceBasedClusterer(
     private val maxDistance: Double = 0.001, // ~100 meters
     private val minClusterSize: Int = 2
 ) {
-
     /**
      * Cluster markers based on distance.
      */
@@ -161,8 +162,8 @@ class DistanceBasedClusterer(
         marker: EnhancedMapMarker,
         allMarkers: List<EnhancedMapMarker>,
         maxDistance: Double
-    ): List<EnhancedMapMarker> {
-        return allMarkers.filter { other ->
+    ): List<EnhancedMapMarker> =
+        allMarkers.filter { other ->
             if (other.id == marker.id) {
                 true // Include self
             } else {
@@ -170,16 +171,19 @@ class DistanceBasedClusterer(
                 distance <= maxDistance
             }
         }
-    }
 
     /**
      * Calculate haversine distance between two coordinates in degrees.
      */
-    private fun haversineDistance(c1: Coordinate, c2: Coordinate): Double {
+    private fun haversineDistance(
+        c1: Coordinate,
+        c2: Coordinate
+    ): Double {
         val dLat = (c2.latitude - c1.latitude) * PI / 180.0
         val dLng = (c2.longitude - c1.longitude) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(c1.latitude * PI / 180.0) *
                 cos(c2.latitude * PI / 180.0) *
                 sin(dLng / 2).pow(2)

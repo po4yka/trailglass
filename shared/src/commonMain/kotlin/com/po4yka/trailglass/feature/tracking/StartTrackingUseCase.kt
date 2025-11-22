@@ -12,7 +12,6 @@ import me.tatarka.inject.annotations.Inject
 class StartTrackingUseCase(
     private val locationTracker: LocationTracker
 ) {
-
     private val logger = logger()
 
     /**
@@ -20,8 +19,12 @@ class StartTrackingUseCase(
      */
     sealed class Result {
         object Success : Result()
+
         object PermissionDenied : Result()
-        data class Error(val message: String) : Result()
+
+        data class Error(
+            val message: String
+        ) : Result()
     }
 
     /**

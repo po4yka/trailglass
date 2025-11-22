@@ -2,8 +2,6 @@ package com.po4yka.trailglass.service
 
 import android.content.Context
 import androidx.work.*
-import com.po4yka.trailglass.location.tracking.LocationTracker
-import com.po4yka.trailglass.location.tracking.TrackingMode
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
@@ -20,7 +18,6 @@ class LocationTrackingWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
-
     companion object {
         const val WORK_NAME = "location_tracking_worker"
         private const val TRACKING_DURATION_MS = 60000L // Track for 1 minute per cycle
@@ -39,24 +36,25 @@ class LocationTrackingWorker(
             requiresCharging: Boolean = false,
             requiresWifi: Boolean = false
         ) {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(if (requiresWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
-                .setRequiresCharging(requiresCharging)
-                .setRequiresBatteryNotLow(true)
-                .build()
+            val constraints =
+                Constraints
+                    .Builder()
+                    .setRequiredNetworkType(if (requiresWifi) NetworkType.UNMETERED else NetworkType.CONNECTED)
+                    .setRequiresCharging(requiresCharging)
+                    .setRequiresBatteryNotLow(true)
+                    .build()
 
-            val workRequest = PeriodicWorkRequestBuilder<LocationTrackingWorker>(
-                repeatInterval = intervalMinutes,
-                repeatIntervalTimeUnit = TimeUnit.MINUTES
-            )
-                .setConstraints(constraints)
-                .setBackoffCriteria(
-                    BackoffPolicy.EXPONENTIAL,
-                    WorkRequest.MIN_BACKOFF_MILLIS,
-                    TimeUnit.MILLISECONDS
-                )
-                .addTag(WORK_NAME)
-                .build()
+            val workRequest =
+                PeriodicWorkRequestBuilder<LocationTrackingWorker>(
+                    repeatInterval = intervalMinutes,
+                    repeatIntervalTimeUnit = TimeUnit.MINUTES
+                ).setConstraints(constraints)
+                    .setBackoffCriteria(
+                        BackoffPolicy.EXPONENTIAL,
+                        WorkRequest.MIN_BACKOFF_MILLIS,
+                        TimeUnit.MILLISECONDS
+                    ).addTag(WORK_NAME)
+                    .build()
 
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
@@ -73,8 +71,8 @@ class LocationTrackingWorker(
         }
     }
 
-    override suspend fun doWork(): Result {
-        return try {
+    override suspend fun doWork(): Result =
+        try {
             // Get LocationTracker from DI container
             // Note: Workers cannot use constructor injection. Use one of these patterns:
             // 1. Service Locator: Access AppComponent.locationTracker via Application class
@@ -100,5 +98,4 @@ class LocationTrackingWorker(
                 Result.failure()
             }
         }
-    }
 }

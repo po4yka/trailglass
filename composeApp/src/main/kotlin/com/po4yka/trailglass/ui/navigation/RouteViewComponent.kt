@@ -24,4 +24,5 @@ class DefaultRouteViewComponent(
     override val onNavigateToReplay: (String) -> Unit,
     override val onNavigateToStatistics: (String) -> Unit,
     override val onBack: () -> Unit
-) : RouteViewComponent, ComponentContext by componentContext
+) : RouteViewComponent,
+    ComponentContext by componentContext

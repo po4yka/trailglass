@@ -12,18 +12,20 @@ class MockTrailGlassApiClient {
     var shouldFailLogin = false
     var syncDelayMs = 0L
     var mockConflicts: List<SyncConflictDto> = emptyList()
-    var mockRemoteChanges: RemoteChanges = RemoteChanges(
-        locations = emptyList(),
-        placeVisits = emptyList(),
-        trips = emptyList(),
-        photos = emptyList(),
-        deletedIds = DeletedIds(
+    var mockRemoteChanges: RemoteChanges =
+        RemoteChanges(
             locations = emptyList(),
             placeVisits = emptyList(),
             trips = emptyList(),
-            photos = emptyList()
+            photos = emptyList(),
+            deletedIds =
+                DeletedIds(
+                    locations = emptyList(),
+                    placeVisits = emptyList(),
+                    trips = emptyList(),
+                    photos = emptyList()
+                )
         )
-    )
 
     private val syncHistory = mutableListOf<DeltaSyncRequest>()
 
@@ -40,28 +42,36 @@ class MockTrailGlassApiClient {
             Result.success(
                 DeltaSyncResponse(
                     syncVersion = 42L,
-                    syncTimestamp = kotlinx.datetime.Clock.System.now().toString(),
+                    syncTimestamp =
+                        kotlinx.datetime.Clock.System
+                            .now()
+                            .toString(),
                     conflicts = mockConflicts,
                     remoteChanges = mockRemoteChanges,
-                    accepted = AcceptedEntities(
-                        locations = request.localChanges.locations.map { it.id },
-                        placeVisits = request.localChanges.placeVisits.map { it.id },
-                        trips = request.localChanges.trips.map { it.id },
-                        photos = request.localChanges.photos.map { it.id }
-                    ),
-                    rejected = RejectedEntities(
-                        locations = emptyList(),
-                        placeVisits = emptyList(),
-                        trips = emptyList(),
-                        photos = emptyList()
-                    )
+                    accepted =
+                        AcceptedEntities(
+                            locations = request.localChanges.locations.map { it.id },
+                            placeVisits = request.localChanges.placeVisits.map { it.id },
+                            trips = request.localChanges.trips.map { it.id },
+                            photos = request.localChanges.photos.map { it.id }
+                        ),
+                    rejected =
+                        RejectedEntities(
+                            locations = emptyList(),
+                            placeVisits = emptyList(),
+                            trips = emptyList(),
+                            photos = emptyList()
+                        )
                 )
             )
         }
     }
 
-    suspend fun login(email: String, password: String): Result<LoginResponse> {
-        return if (shouldFailLogin) {
+    suspend fun login(
+        email: String,
+        password: String
+    ): Result<LoginResponse> =
+        if (shouldFailLogin) {
             Result.failure(Exception("Mock login failure"))
         } else {
             Result.success(
@@ -72,11 +82,13 @@ class MockTrailGlassApiClient {
                     accessToken = "mock_access_token",
                     refreshToken = "mock_refresh_token",
                     expiresIn = 3600,
-                    lastSyncTimestamp = kotlinx.datetime.Clock.System.now().toString()
+                    lastSyncTimestamp =
+                        kotlinx.datetime.Clock.System
+                            .now()
+                            .toString()
                 )
             )
         }
-    }
 
     // Test helpers
     fun getSyncHistory(): List<DeltaSyncRequest> = syncHistory.toList()
@@ -96,7 +108,11 @@ class MockTokenProvider : TokenProvider {
 
     override suspend fun getRefreshToken(): String? = refreshToken
 
-    override suspend fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Long) {
+    override suspend fun saveTokens(
+        accessToken: String,
+        refreshToken: String,
+        expiresIn: Long
+    ) {
         this.accessToken = accessToken
         this.refreshToken = refreshToken
     }

@@ -39,13 +39,13 @@ class RouteViewController(
     private val exportRouteUseCase: ExportRouteUseCase,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * State for Route View screen.
@@ -54,16 +54,13 @@ class RouteViewController(
         val tripRoute: TripRoute? = null,
         val isLoading: Boolean = false,
         val error: String? = null,
-
         // Map state
         val mapStyle: MapStyle = MapStyle.STANDARD,
         val shouldRecenterCamera: Boolean = false,
         val selectedPhotoMarker: PhotoMarker? = null,
-
         // UI state
         val showMapStyleSelector: Boolean = false,
         val showStatistics: Boolean = false,
-
         // Export state
         val isExporting: Boolean = false,
         val exportResult: ExportResult? = null
@@ -80,21 +77,23 @@ class RouteViewController(
             logger.info { "Loading route for trip $tripId" }
             _state.value = _state.value.copy(isLoading = true, error = null)
 
-            getTripRouteUseCase.execute(tripId)
+            getTripRouteUseCase
+                .execute(tripId)
                 .onSuccess { tripRoute ->
                     logger.info { "Route loaded successfully: ${tripRoute.fullPath.size} points" }
-                    _state.value = _state.value.copy(
-                        tripRoute = tripRoute,
-                        isLoading = false,
-                        shouldRecenterCamera = true // Trigger initial camera fit
-                    )
-                }
-                .onError { error ->
+                    _state.value =
+                        _state.value.copy(
+                            tripRoute = tripRoute,
+                            isLoading = false,
+                            shouldRecenterCamera = true // Trigger initial camera fit
+                        )
+                }.onError { error ->
                     logger.error { "Failed to load route for trip $tripId - ${error.getTechnicalDetails()}" }
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = error.getUserFriendlyMessage()
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            isLoading = false,
+                            error = error.getUserFriendlyMessage()
+                        )
                 }
         }
     }
@@ -111,18 +110,20 @@ class RouteViewController(
      * Show/hide map style selector.
      */
     fun toggleMapStyleSelector() {
-        _state.value = _state.value.copy(
-            showMapStyleSelector = !_state.value.showMapStyleSelector
-        )
+        _state.value =
+            _state.value.copy(
+                showMapStyleSelector = !_state.value.showMapStyleSelector
+            )
     }
 
     /**
      * Show/hide statistics screen.
      */
     fun toggleStatistics() {
-        _state.value = _state.value.copy(
-            showStatistics = !_state.value.showStatistics
-        )
+        _state.value =
+            _state.value.copy(
+                showStatistics = !_state.value.showStatistics
+            )
     }
 
     /**
@@ -169,27 +170,32 @@ class RouteViewController(
     /**
      * Export route to specified format.
      */
-    fun exportRoute(tripName: String, format: ExportFormat) {
+    fun exportRoute(
+        tripName: String,
+        format: ExportFormat
+    ) {
         val route = _state.value.tripRoute ?: return
 
         controllerScope.launch {
             logger.info { "Exporting route to $format" }
             _state.value = _state.value.copy(isExporting = true)
 
-            exportRouteUseCase.execute(route, tripName, format)
+            exportRouteUseCase
+                .execute(route, tripName, format)
                 .onSuccess { result ->
                     logger.info { "Export successful: ${result.fileName}" }
-                    _state.value = _state.value.copy(
-                        isExporting = false,
-                        exportResult = result
-                    )
-                }
-                .onFailure { error ->
+                    _state.value =
+                        _state.value.copy(
+                            isExporting = false,
+                            exportResult = result
+                        )
+                }.onFailure { error ->
                     logger.error(error) { "Export failed" }
-                    _state.value = _state.value.copy(
-                        isExporting = false,
-                        error = "Export failed: ${error.message}"
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            isExporting = false,
+                            error = "Export failed: ${error.message}"
+                        )
                 }
         }
     }

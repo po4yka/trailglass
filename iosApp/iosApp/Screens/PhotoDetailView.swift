@@ -288,9 +288,9 @@ private struct InfoRow: View {
 class PhotoDetailViewModel: ObservableObject {
     private let controller: PhotoDetailController
 
-    @Published var photo: PhotoWithMetadata? = nil
+    @Published var photo: PhotoWithMetadata?
     @Published var isLoading: Bool = false
-    @Published var error: String? = nil
+    @Published var error: String?
 
     init(controller: PhotoDetailController) {
         self.controller = controller

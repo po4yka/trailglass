@@ -54,13 +54,14 @@ class RegisterUseCase(
             // Call API to register
             val result = apiClient.register(email, password, displayName)
 
-            result.onSuccess { response ->
-                // Update user session with the new user ID
-                userSession.setUserId(response.userId)
-                logger.info { "Registration successful for user: ${response.email}" }
-            }.onFailure { error ->
-                logger.error(error) { "Registration failed for email: $email" }
-            }
+            result
+                .onSuccess { response ->
+                    // Update user session with the new user ID
+                    userSession.setUserId(response.userId)
+                    logger.info { "Registration successful for user: ${response.email}" }
+                }.onFailure { error ->
+                    logger.error(error) { "Registration failed for email: $email" }
+                }
 
             result
         } catch (e: Exception) {
@@ -72,7 +73,5 @@ class RegisterUseCase(
     /**
      * Simple email validation.
      */
-    private fun isValidEmail(email: String): Boolean {
-        return email.contains("@") && email.contains(".")
-    }
+    private fun isValidEmail(email: String): Boolean = email.contains("@") && email.contains(".")
 }

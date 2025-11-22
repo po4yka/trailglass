@@ -1,12 +1,11 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.animation.core.*
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.*
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,17 +15,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.po4yka.trailglass.ui.theme.extended
 import com.po4yka.trailglass.ui.theme.MorphableShapes
 import com.po4yka.trailglass.ui.theme.animateShapeMorph
 import com.po4yka.trailglass.ui.theme.expressiveShapeMorphSpring
-import androidx.compose.ui.draw.clip
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
@@ -54,20 +52,22 @@ fun WavyLoadingIndicator(
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(2000, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            ),
         label = "rotation"
     )
 
     val waveOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 2 * PI.toFloat(),
-        animationSpec = infiniteRepeatable(
-            animation = tween(1500, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
+        animationSpec =
+            infiniteRepeatable(
+                animation = tween(1500, easing = LinearEasing),
+                repeatMode = RepeatMode.Restart
+            ),
         label = "wave_offset"
     )
 
@@ -79,7 +79,9 @@ fun WavyLoadingIndicator(
         val center = Offset(this.size.width / 2f, this.size.height / 2f)
 
         // Draw wavy circular path
-        val path = androidx.compose.ui.graphics.Path()
+        val path =
+            androidx.compose.ui.graphics
+                .Path()
         val segments = 60
 
         for (i in 0..segments) {
@@ -101,10 +103,11 @@ fun WavyLoadingIndicator(
         drawPath(
             path = path,
             color = color,
-            style = Stroke(
-                width = strokeWidth.toPx(),
-                cap = StrokeCap.Round
-            )
+            style =
+                Stroke(
+                    width = strokeWidth.toPx(),
+                    cap = StrokeCap.Round
+                )
         )
     }
 }
@@ -127,28 +130,36 @@ fun AnimatedLoadingIndicator(
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        ) + scaleIn(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        ),
-        exit = fadeOut(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        ) + scaleOut(
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMedium
-            )
-        )
+        enter =
+            fadeIn(
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+            ) +
+                scaleIn(
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                ),
+        exit =
+            fadeOut(
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+            ) +
+                scaleOut(
+                    animationSpec =
+                        spring(
+                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                            stiffness = Spring.StiffnessMedium
+                        )
+                )
     ) {
         CircularProgressIndicator(
             modifier = modifier.size(size),
@@ -175,10 +186,11 @@ fun WavyLinearProgressIndicator(
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = progress.coerceIn(0f, 1f),
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioLowBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            ),
         label = "progress"
     )
 
@@ -219,9 +231,10 @@ fun ContainedLoadingIndicator(
             tonalElevation = 2.dp
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -270,9 +283,10 @@ fun SyncOperationIndicator(
         modifier = modifier
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -376,19 +390,21 @@ fun MorphingLoadingIndicator(
         val shapeIndex by infiniteTransition.animateFloat(
             initialValue = 0f,
             targetValue = 3f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(3000, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(3000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
             label = "shape_cycle"
         )
 
         // Determine current target shape based on cycle
-        val targetShape = when {
-            shapeIndex < 1f -> MorphableShapes.Circle
-            shapeIndex < 2f -> MorphableShapes.Diamond
-            else -> MorphableShapes.RoundedSquare
-        }
+        val targetShape =
+            when {
+                shapeIndex < 1f -> MorphableShapes.Circle
+                shapeIndex < 2f -> MorphableShapes.Diamond
+                else -> MorphableShapes.RoundedSquare
+            }
 
         val morphedShape by animateShapeMorph(
             targetShape = targetShape,
@@ -409,17 +425,19 @@ fun MorphingLoadingIndicator(
                 val scale by infiniteTransition.animateFloat(
                     initialValue = 0.6f,
                     targetValue = 0.9f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(1000, easing = FastOutSlowInEasing),
-                        repeatMode = RepeatMode.Reverse
-                    ),
+                    animationSpec =
+                        infiniteRepeatable(
+                            animation = tween(1000, easing = FastOutSlowInEasing),
+                            repeatMode = RepeatMode.Reverse
+                        ),
                     label = "pulse"
                 )
 
                 Surface(
-                    modifier = Modifier
-                        .fillMaxSize(scale)
-                        .clip(morphedShape),
+                    modifier =
+                        Modifier
+                            .fillMaxSize(scale)
+                            .clip(morphedShape),
                     color = color
                 ) {}
             }
@@ -446,9 +464,10 @@ fun MorphingSyncIndicator(
         modifier = modifier
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

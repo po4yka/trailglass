@@ -15,8 +15,7 @@ data class DistanceStatistics(
 ) {
     val totalDistanceKm: Double get() = totalDistanceMeters / 1000.0
 
-    fun distanceKmByType(type: TransportType): Double =
-        (byTransportType[type] ?: 0.0) / 1000.0
+    fun distanceKmByType(type: TransportType): Double = (byTransportType[type] ?: 0.0) / 1000.0
 
     val mostUsedTransportType: TransportType? =
         byTransportType.maxByOrNull { it.value }?.key
@@ -82,9 +81,11 @@ data class WeekdaySplit(
     val weekendDistance: Double // meters
 ) {
     val weekdayPercentage: Double =
-        if (weekdayTrips + weekendTrips > 0)
+        if (weekdayTrips + weekendTrips > 0) {
             weekdayTrips.toDouble() / (weekdayTrips + weekendTrips) * 100
-        else 0.0
+        } else {
+            0.0
+        }
 
     val weekendPercentage: Double = 100.0 - weekdayPercentage
 }

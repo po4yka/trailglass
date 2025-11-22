@@ -1,29 +1,21 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.GroupWork
-import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileOverlay
@@ -33,7 +25,6 @@ import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.feature.map.EnhancedMapController
 import com.po4yka.trailglass.feature.map.MarkerIconProvider
-import kotlinx.coroutines.launch
 
 /**
  * Enhanced Google Maps view with clustering, heatmap, and custom markers.
@@ -91,9 +82,10 @@ fun EnhancedMapView(
                 onModeChange = { mode ->
                     controller.setVisualizationMode(mode)
                 },
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.TopStart)
+                        .padding(16.dp)
             )
 
             // Control panel for clustering and heatmap
@@ -102,9 +94,10 @@ fun EnhancedMapView(
                 heatmapEnabled = state.heatmapEnabled,
                 onToggleClustering = { controller.toggleClustering() },
                 onToggleHeatmap = { controller.toggleHeatmap() },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
             )
         }
     }
@@ -122,16 +115,17 @@ private fun EnhancedGoogleMapContent(
     onZoomChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val cameraPositionState = rememberCameraPositionState {
-        position = mapData.region?.let {
-            // Calculate appropriate zoom level based on region deltas
-            val zoom = calculateZoomLevel(it.latitudeDelta, it.longitudeDelta)
-            CameraPosition.fromLatLngZoom(
-                LatLng(it.center.latitude, it.center.longitude),
-                zoom
-            )
-        } ?: CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
-    }
+    val cameraPositionState =
+        rememberCameraPositionState {
+            position = mapData.region?.let {
+                // Calculate appropriate zoom level based on region deltas
+                val zoom = calculateZoomLevel(it.latitudeDelta, it.longitudeDelta)
+                CameraPosition.fromLatLngZoom(
+                    LatLng(it.center.latitude, it.center.longitude),
+                    zoom
+                )
+            } ?: CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
+        }
 
     // Track zoom level changes
     LaunchedEffect(cameraPositionState.position.zoom) {
@@ -141,11 +135,12 @@ private fun EnhancedGoogleMapContent(
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
-        uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,
-            myLocationButtonEnabled = true,
-            compassEnabled = true
-        )
+        uiSettings =
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = true,
+                compassEnabled = true
+            )
     ) {
         // Draw heatmap if enabled
         val heatmapData = mapData.heatmapData
@@ -194,9 +189,10 @@ private fun RenderEnhancedMarker(
     val icon = MarkerIconProvider.getIcon(marker.category, marker.isFavorite)
 
     Marker(
-        state = MarkerState(
-            position = LatLng(marker.coordinate.latitude, marker.coordinate.longitude)
-        ),
+        state =
+            MarkerState(
+                position = LatLng(marker.coordinate.latitude, marker.coordinate.longitude)
+            ),
         title = marker.title,
         snippet = marker.snippet,
         icon = getMarkerBitmapDescriptor(icon.color, isSelected),
@@ -216,9 +212,10 @@ private fun RenderCluster(
     val clusterColor = MarkerIconProvider.getClusterColor(cluster.count)
 
     Marker(
-        state = MarkerState(
-            position = LatLng(cluster.coordinate.latitude, cluster.coordinate.longitude)
-        ),
+        state =
+            MarkerState(
+                position = LatLng(cluster.coordinate.latitude, cluster.coordinate.longitude)
+            ),
         title = "${cluster.count} places",
         snippet = "Tap to expand",
         icon = getClusterBitmapDescriptor(cluster.count, clusterColor, isSelected),
@@ -235,24 +232,27 @@ private fun RenderRoute(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val points = route.coordinates.map { coord ->
-        LatLng(coord.latitude, coord.longitude)
-    }
+    val points =
+        route.coordinates.map { coord ->
+            LatLng(coord.latitude, coord.longitude)
+        }
 
     val routeColor = MarkerIconProvider.getRouteColor(route.transportType.name)
 
     Polyline(
         points = points,
-        color = if (isSelected) {
-            Color(routeColor).copy(alpha = 1f)
-        } else {
-            Color(routeColor).copy(alpha = 0.7f)
-        },
-        width = if (isSelected) {
-            getRouteWidth(route.transportType) * 1.5f
-        } else {
-            getRouteWidth(route.transportType)
-        },
+        color =
+            if (isSelected) {
+                Color(routeColor).copy(alpha = 1f)
+            } else {
+                Color(routeColor).copy(alpha = 0.7f)
+            },
+        width =
+            if (isSelected) {
+                getRouteWidth(route.transportType) * 1.5f
+            } else {
+                getRouteWidth(route.transportType)
+            },
         clickable = true,
         onClick = {
             onClick()
@@ -264,14 +264,15 @@ private fun RenderRoute(
 @Composable
 private fun RenderHeatmap(heatmapData: HeatmapData) {
     // Convert heatmap points to WeightedLatLng
-    val heatmapPoints = remember(heatmapData) {
-        heatmapData.points.map { point ->
-            com.google.maps.android.heatmaps.WeightedLatLng(
-                LatLng(point.coordinate.latitude, point.coordinate.longitude),
-                point.intensity.toDouble()
-            )
+    val heatmapPoints =
+        remember(heatmapData) {
+            heatmapData.points.map { point ->
+                com.google.maps.android.heatmaps.WeightedLatLng(
+                    LatLng(point.coordinate.latitude, point.coordinate.longitude),
+                    point.intensity.toDouble()
+                )
+            }
         }
-    }
 
     // Track the current overlay reference to enable proper cleanup
     var currentOverlay by remember { mutableStateOf<TileOverlay?>(null) }
@@ -292,16 +293,19 @@ private fun RenderHeatmap(heatmapData: HeatmapData) {
         currentOverlay?.remove()
 
         // Create heatmap tile provider with custom gradient colors
-        val heatmapProvider = HeatmapTileProvider.Builder()
-            .weightedData(heatmapPoints)
-            .radius(50) // Radius of influence for each point in pixels
-            .opacity(0.6) // Transparency of heatmap layer
-            .build()
+        val heatmapProvider =
+            HeatmapTileProvider
+                .Builder()
+                .weightedData(heatmapPoints)
+                .radius(50) // Radius of influence for each point in pixels
+                .opacity(0.6) // Transparency of heatmap layer
+                .build()
 
         // Add tile overlay to the map and store the reference
-        currentOverlay = map.addTileOverlay(
-            TileOverlayOptions().tileProvider(heatmapProvider)
-        )
+        currentOverlay =
+            map.addTileOverlay(
+                TileOverlayOptions().tileProvider(heatmapProvider)
+            )
     }
 }
 
@@ -470,12 +474,14 @@ private fun EnhancedMapErrorView(
  *
  * Uses custom-generated bitmaps with proper marker shape and selection highlighting.
  */
-private fun getMarkerBitmapDescriptor(color: Int, isSelected: Boolean): BitmapDescriptor {
-    return MapMarkerBitmapGenerator.getCachedMarkerBitmap(
+private fun getMarkerBitmapDescriptor(
+    color: Int,
+    isSelected: Boolean
+): BitmapDescriptor =
+    MapMarkerBitmapGenerator.getCachedMarkerBitmap(
         color = color,
         isSelected = isSelected
     )
-}
 
 /**
  * Get cluster bitmap descriptor with count badge.
@@ -486,19 +492,18 @@ private fun getClusterBitmapDescriptor(
     count: Int,
     color: Int,
     isSelected: Boolean
-): BitmapDescriptor {
-    return MapMarkerBitmapGenerator.getCachedClusterBitmap(
+): BitmapDescriptor =
+    MapMarkerBitmapGenerator.getCachedClusterBitmap(
         count = count,
         color = color,
         isSelected = isSelected
     )
-}
 
 /**
  * Get route width based on transport type.
  */
-private fun getRouteWidth(transportType: TransportType): Float {
-    return when (transportType) {
+private fun getRouteWidth(transportType: TransportType): Float =
+    when (transportType) {
         TransportType.WALK -> 8f
         TransportType.BIKE -> 10f
         TransportType.CAR -> 12f
@@ -507,33 +512,37 @@ private fun getRouteWidth(transportType: TransportType): Float {
         TransportType.BOAT -> 12f
         TransportType.UNKNOWN -> 8f
     }
-}
 
 /**
  * Get icon for visualization mode.
  */
-private fun getModeIcon(mode: MapVisualizationMode) = when (mode) {
-    MapVisualizationMode.MARKERS -> Icons.Default.Place
-    MapVisualizationMode.CLUSTERS -> Icons.Default.GroupWork
-    MapVisualizationMode.HEATMAP -> Icons.Default.Whatshot
-    MapVisualizationMode.HYBRID -> Icons.Default.Layers
-}
+private fun getModeIcon(mode: MapVisualizationMode) =
+    when (mode) {
+        MapVisualizationMode.MARKERS -> Icons.Default.Place
+        MapVisualizationMode.CLUSTERS -> Icons.Default.GroupWork
+        MapVisualizationMode.HEATMAP -> Icons.Default.Whatshot
+        MapVisualizationMode.HYBRID -> Icons.Default.Layers
+    }
 
 /**
  * Get label for visualization mode.
  */
-private fun getModeLabel(mode: MapVisualizationMode) = when (mode) {
-    MapVisualizationMode.MARKERS -> "Markers"
-    MapVisualizationMode.CLUSTERS -> "Clusters"
-    MapVisualizationMode.HEATMAP -> "Heatmap"
-    MapVisualizationMode.HYBRID -> "Hybrid"
-}
+private fun getModeLabel(mode: MapVisualizationMode) =
+    when (mode) {
+        MapVisualizationMode.MARKERS -> "Markers"
+        MapVisualizationMode.CLUSTERS -> "Clusters"
+        MapVisualizationMode.HEATMAP -> "Heatmap"
+        MapVisualizationMode.HYBRID -> "Hybrid"
+    }
 
 /**
  * Calculate appropriate zoom level based on region deltas.
  * Uses the larger delta (latitude or longitude) to determine zoom.
  */
-private fun calculateZoomLevel(latitudeDelta: Double, longitudeDelta: Double): Float {
+private fun calculateZoomLevel(
+    latitudeDelta: Double,
+    longitudeDelta: Double
+): Float {
     val maxDelta = maxOf(latitudeDelta, longitudeDelta)
     return when {
         maxDelta >= 40.0 -> 3f

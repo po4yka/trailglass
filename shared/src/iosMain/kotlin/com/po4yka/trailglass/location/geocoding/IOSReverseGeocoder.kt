@@ -10,11 +10,13 @@ import kotlin.coroutines.resume
  * iOS implementation of ReverseGeocoder using CoreLocation's CLGeocoder.
  */
 class IOSReverseGeocoder : ReverseGeocoder {
-
     private val geocoder = CLGeocoder()
     private val logger = logger()
 
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation? {
+    override suspend fun reverseGeocode(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         logger.trace { "Reverse geocoding ($latitude, $longitude) using iOS CLGeocoder" }
 
         return suspendCancellableCoroutine { continuation ->
@@ -48,21 +50,26 @@ class IOSReverseGeocoder : ReverseGeocoder {
         }
     }
 
-    private fun CLPlacemark.toGeocodedLocation(lat: Double, lon: Double): GeocodedLocation {
+    private fun CLPlacemark.toGeocodedLocation(
+        lat: Double,
+        lon: Double
+    ): GeocodedLocation {
         // Build formatted address from components
-        val addressComponents = listOfNotNull(
-            subThoroughfare,
-            thoroughfare,
-            locality,
-            administrativeArea,
-            postalCode,
-            country
-        )
-        val formattedAddress = if (addressComponents.isNotEmpty()) {
-            addressComponents.joinToString(", ")
-        } else {
-            null
-        }
+        val addressComponents =
+            listOfNotNull(
+                subThoroughfare,
+                thoroughfare,
+                locality,
+                administrativeArea,
+                postalCode,
+                country
+            )
+        val formattedAddress =
+            if (addressComponents.isNotEmpty()) {
+                addressComponents.joinToString(", ")
+            } else {
+                null
+            }
 
         return GeocodedLocation(
             latitude = lat,
@@ -83,6 +90,4 @@ class IOSReverseGeocoder : ReverseGeocoder {
 /**
  * Factory function to create IOSReverseGeocoder.
  */
-actual fun createReverseGeocoder(): ReverseGeocoder {
-    return IOSReverseGeocoder()
-}
+actual fun createReverseGeocoder(): ReverseGeocoder = IOSReverseGeocoder()

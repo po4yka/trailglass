@@ -12,31 +12,27 @@ import platform.darwin.dispatch_queue_create
  */
 @Inject
 class IOSNetworkConnectivityMonitor : NetworkConnectivityMonitor {
-
     private val pathMonitor = nw_path_monitor_create()
     private val queue = dispatch_queue_create("com.po4yka.trailglass.networkmonitor", null)
 
     private val _networkState = MutableStateFlow<NetworkState>(NetworkState.Disconnected)
     override val networkState: StateFlow<NetworkState> = _networkState.asStateFlow()
 
-    private val _networkInfo = MutableStateFlow(
-        NetworkInfo(
-            state = NetworkState.Disconnected,
-            type = NetworkType.NONE,
-            isMetered = false
+    private val _networkInfo =
+        MutableStateFlow(
+            NetworkInfo(
+                state = NetworkState.Disconnected,
+                type = NetworkType.NONE,
+                isMetered = false
+            )
         )
-    )
     override val networkInfo: StateFlow<NetworkInfo> = _networkInfo.asStateFlow()
 
     private var isMonitoring = false
 
-    override fun isConnected(): Boolean {
-        return networkState.value is NetworkState.Connected
-    }
+    override fun isConnected(): Boolean = networkState.value is NetworkState.Connected
 
-    override fun isMetered(): Boolean {
-        return networkInfo.value.isMetered
-    }
+    override fun isMetered(): Boolean = networkInfo.value.isMetered
 
     override fun startMonitoring() {
         if (isMonitoring) return
@@ -64,11 +60,12 @@ class IOSNetworkConnectivityMonitor : NetworkConnectivityMonitor {
     private fun updateNetworkState(path: nw_path_t?) {
         if (path == null) {
             _networkState.value = NetworkState.Disconnected
-            _networkInfo.value = NetworkInfo(
-                state = NetworkState.Disconnected,
-                type = NetworkType.NONE,
-                isMetered = false
-            )
+            _networkInfo.value =
+                NetworkInfo(
+                    state = NetworkState.Disconnected,
+                    type = NetworkType.NONE,
+                    isMetered = false
+                )
             return
         }
 
@@ -76,26 +73,29 @@ class IOSNetworkConnectivityMonitor : NetworkConnectivityMonitor {
         val isExpensive = nw_path_is_expensive(path)
         val isConstrained = nw_path_is_constrained(path)
 
-        val state = when (status) {
-            nw_path_status_satisfied -> NetworkState.Connected
-            nw_path_status_unsatisfied -> NetworkState.Disconnected
-            nw_path_status_satisfiable -> NetworkState.Disconnected
-            else -> NetworkState.Disconnected
-        }
+        val state =
+            when (status) {
+                nw_path_status_satisfied -> NetworkState.Connected
+                nw_path_status_unsatisfied -> NetworkState.Disconnected
+                nw_path_status_satisfiable -> NetworkState.Disconnected
+                else -> NetworkState.Disconnected
+            }
 
-        val type = when {
-            nw_path_uses_interface_type(path, nw_interface_type_wifi) -> NetworkType.WIFI
-            nw_path_uses_interface_type(path, nw_interface_type_cellular) -> NetworkType.CELLULAR
-            nw_path_uses_interface_type(path, nw_interface_type_wired) -> NetworkType.ETHERNET
-            else -> NetworkType.NONE
-        }
+        val type =
+            when {
+                nw_path_uses_interface_type(path, nw_interface_type_wifi) -> NetworkType.WIFI
+                nw_path_uses_interface_type(path, nw_interface_type_cellular) -> NetworkType.CELLULAR
+                nw_path_uses_interface_type(path, nw_interface_type_wired) -> NetworkType.ETHERNET
+                else -> NetworkType.NONE
+            }
 
         _networkState.value = state
-        _networkInfo.value = NetworkInfo(
-            state = state,
-            type = type,
-            isMetered = isExpensive
-        )
+        _networkInfo.value =
+            NetworkInfo(
+                state = state,
+                type = type,
+                isMetered = isExpensive
+            )
 
         println("Network state updated: state=$state, type=$type, metered=$isExpensive, constrained=$isConstrained")
     }

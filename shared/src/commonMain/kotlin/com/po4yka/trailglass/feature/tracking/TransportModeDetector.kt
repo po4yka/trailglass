@@ -62,8 +62,11 @@ class TransportModeDetector {
             val curr = recentLocations[i]
 
             val distance = calculateDistance(prev.coordinate, curr.coordinate)
-            val timeDiffSeconds = (curr.timestamp.toEpochMilliseconds() -
-                    prev.timestamp.toEpochMilliseconds()) / 1000.0
+            val timeDiffSeconds =
+                (
+                    curr.timestamp.toEpochMilliseconds() -
+                        prev.timestamp.toEpochMilliseconds()
+                ) / 1000.0
 
             if (timeDiffSeconds > 0) {
                 val speedKmh = (distance / timeDiffSeconds) * 3.6 // m/s to km/h
@@ -83,34 +86,35 @@ class TransportModeDetector {
         val altitudeChange = checkAltitudeChange()
 
         // Detect transport mode
-        val mode = when {
-            // Plane: High speed or significant altitude change
-            avgSpeed >= PLANE_MIN_SPEED || altitudeChange >= PLANE_ALTITUDE_THRESHOLD -> {
-                TransportType.PLANE
-            }
+        val mode =
+            when {
+                // Plane: High speed or significant altitude change
+                avgSpeed >= PLANE_MIN_SPEED || altitudeChange >= PLANE_ALTITUDE_THRESHOLD -> {
+                    TransportType.PLANE
+                }
 
-            // Train: High consistent speed with low variance
-            avgSpeed >= TRAIN_MIN_SPEED && avgSpeed <= TRAIN_MAX_SPEED && speedVariance < 100 -> {
-                TransportType.TRAIN
-            }
+                // Train: High consistent speed with low variance
+                avgSpeed >= TRAIN_MIN_SPEED && avgSpeed <= TRAIN_MAX_SPEED && speedVariance < 100 -> {
+                    TransportType.TRAIN
+                }
 
-            // Car: Medium to high speed
-            avgSpeed > BIKE_MAX_SPEED && avgSpeed <= CAR_MAX_SPEED -> {
-                TransportType.CAR
-            }
+                // Car: Medium to high speed
+                avgSpeed > BIKE_MAX_SPEED && avgSpeed <= CAR_MAX_SPEED -> {
+                    TransportType.CAR
+                }
 
-            // Bike: Low to medium speed
-            avgSpeed > WALK_MAX_SPEED && avgSpeed <= BIKE_MAX_SPEED -> {
-                TransportType.BIKE
-            }
+                // Bike: Low to medium speed
+                avgSpeed > WALK_MAX_SPEED && avgSpeed <= BIKE_MAX_SPEED -> {
+                    TransportType.BIKE
+                }
 
-            // Walk: Low speed
-            avgSpeed <= WALK_MAX_SPEED -> {
-                TransportType.WALK
-            }
+                // Walk: Low speed
+                avgSpeed <= WALK_MAX_SPEED -> {
+                    TransportType.WALK
+                }
 
-            else -> TransportType.UNKNOWN
-        }
+                else -> TransportType.UNKNOWN
+            }
 
         logger.debug { "Transport mode detected: $mode (avg speed: ${avgSpeed.toInt()} km/h)" }
         return mode
@@ -127,7 +131,10 @@ class TransportModeDetector {
     /**
      * Calculate distance between two coordinates in meters.
      */
-    private fun calculateDistance(start: Coordinate, end: Coordinate): Double {
+    private fun calculateDistance(
+        start: Coordinate,
+        end: Coordinate
+    ): Double {
         val earthRadiusMeters = 6371000.0
 
         val lat1 = (start.latitude * PI / 180.0)
@@ -135,7 +142,8 @@ class TransportModeDetector {
         val dLat = (end.latitude - start.latitude * PI / 180.0)
         val dLon = (end.longitude - start.longitude * PI / 180.0)
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 

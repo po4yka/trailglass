@@ -16,4 +16,5 @@ interface TripsComponent {
 class DefaultTripsComponent(
     componentContext: ComponentContext,
     override val tripsController: TripsController
-) : TripsComponent, ComponentContext by componentContext
+) : TripsComponent,
+    ComponentContext by componentContext

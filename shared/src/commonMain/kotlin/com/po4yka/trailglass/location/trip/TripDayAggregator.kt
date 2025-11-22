@@ -11,7 +11,6 @@ import kotlinx.datetime.*
 class TripDayAggregator(
     private val timeZone: TimeZone = TimeZone.UTC
 ) {
-
     private val logger = logger()
 
     /**
@@ -30,15 +29,19 @@ class TripDayAggregator(
         logger.info { "Aggregating trip ${trip.id} into daily timelines" }
 
         // Filter visits and routes to only those in the trip
-        val tripVisits = visits.filter { visit ->
-            visit.startTime >= trip.startTime &&
-            (trip.endTime == null || visit.startTime <= trip.endTime)
-        }.sortedBy { it.startTime }
+        val tripVisits =
+            visits
+                .filter { visit ->
+                    visit.startTime >= trip.startTime &&
+                        (trip.endTime == null || visit.startTime <= trip.endTime)
+                }.sortedBy { it.startTime }
 
-        val tripRoutes = routes.filter { route ->
-            route.startTime >= trip.startTime &&
-            (trip.endTime == null || route.startTime <= trip.endTime)
-        }.sortedBy { it.startTime }
+        val tripRoutes =
+            routes
+                .filter { route ->
+                    route.startTime >= trip.startTime &&
+                        (trip.endTime == null || route.startTime <= trip.endTime)
+                }.sortedBy { it.startTime }
 
         if (tripVisits.isEmpty() && tripRoutes.isEmpty()) {
             logger.warn { "No visits or routes found for trip ${trip.id}" }
@@ -55,9 +58,10 @@ class TripDayAggregator(
         logger.debug { "Trip spans ${days.size} days from $startDate to $endDate" }
 
         // Build a TripDay for each day
-        val tripDays = days.map { date ->
-            buildTripDay(trip.id, date, tripVisits, tripRoutes)
-        }
+        val tripDays =
+            days.map { date ->
+                buildTripDay(trip.id, date, tripVisits, tripRoutes)
+            }
 
         logger.info { "Built ${tripDays.size} trip days for trip ${trip.id}" }
         return tripDays
@@ -76,13 +80,15 @@ class TripDayAggregator(
         val dayEnd = date.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
         // Find visits and routes that fall on this day
-        val dayVisits = allVisits.filter { visit ->
-            visit.startTime >= dayStart && visit.startTime < dayEnd
-        }
+        val dayVisits =
+            allVisits.filter { visit ->
+                visit.startTime >= dayStart && visit.startTime < dayEnd
+            }
 
-        val dayRoutes = allRoutes.filter { route ->
-            route.startTime >= dayStart && route.startTime < dayEnd
-        }
+        val dayRoutes =
+            allRoutes.filter { route ->
+                route.startTime >= dayStart && route.startTime < dayEnd
+            }
 
         // Build timeline items
         val items = buildTimelineItems(date, dayVisits, dayRoutes, dayStart, dayEnd)
@@ -120,21 +126,23 @@ class TripDayAggregator(
         )
 
         // Merge visits and routes into a single sorted timeline
-        val visitItems = visits.map { visit ->
-            TimelineItem.Visit(
-                id = generateTimelineItemId("visit", visit.id),
-                timestamp = visit.startTime,
-                placeVisit = visit
-            )
-        }
+        val visitItems =
+            visits.map { visit ->
+                TimelineItem.Visit(
+                    id = generateTimelineItemId("visit", visit.id),
+                    timestamp = visit.startTime,
+                    placeVisit = visit
+                )
+            }
 
-        val routeItems = routes.map { route ->
-            TimelineItem.Route(
-                id = generateTimelineItemId("route", route.id),
-                timestamp = route.startTime,
-                routeSegment = route
-            )
-        }
+        val routeItems =
+            routes.map { route ->
+                TimelineItem.Route(
+                    id = generateTimelineItemId("route", route.id),
+                    timestamp = route.startTime,
+                    routeSegment = route
+                )
+            }
 
         // Combine and sort by timestamp
         val allItems = (visitItems + routeItems).sortedBy { it.timestamp }
@@ -154,7 +162,10 @@ class TripDayAggregator(
     /**
      * Generate a range of dates from start to end (inclusive).
      */
-    private fun generateDayRange(start: LocalDate, end: LocalDate): List<LocalDate> {
+    private fun generateDayRange(
+        start: LocalDate,
+        end: LocalDate
+    ): List<LocalDate> {
         val days = mutableListOf<LocalDate>()
         var current = start
 
@@ -169,14 +180,16 @@ class TripDayAggregator(
     /**
      * Generate a deterministic ID for a TripDay.
      */
-    private fun generateTripDayId(tripId: String, date: LocalDate): String {
-        return "trip_day_${tripId}_${date}"
-    }
+    private fun generateTripDayId(
+        tripId: String,
+        date: LocalDate
+    ): String = "trip_day_${tripId}_$date"
 
     /**
      * Generate a deterministic ID for a timeline item.
      */
-    private fun generateTimelineItemId(type: String, identifier: Any): String {
-        return "timeline_${type}_${identifier.hashCode()}"
-    }
+    private fun generateTimelineItemId(
+        type: String,
+        identifier: Any
+    ): String = "timeline_${type}_${identifier.hashCode()}"
 }

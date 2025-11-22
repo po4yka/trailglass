@@ -3,7 +3,6 @@ package com.po4yka.trailglass.feature.route
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.Instant
 import kotlin.math.*
 
 /**
@@ -13,9 +12,8 @@ import kotlin.math.*
 class LocationSampleFilter(
     private val maxAccuracyMeters: Double = 100.0,
     private val minTimeBetweenSamplesSeconds: Long = 5,
-    private val maxSpeedMps: Double = 150.0  // ~540 km/h, filter out obvious GPS errors
+    private val maxSpeedMps: Double = 150.0 // ~540 km/h, filter out obvious GPS errors
 ) {
-
     private val logger = logger()
 
     /**
@@ -41,7 +39,7 @@ class LocationSampleFilter(
 
         val removed = samples.size - filtered.size
         val percentage = (removed.toDouble() / samples.size * 100).toInt()
-        logger.info { "Filtered out $removed samples (${percentage}%) -> ${filtered.size} remaining" }
+        logger.info { "Filtered out $removed samples ($percentage%) -> ${filtered.size} remaining" }
 
         return filtered
     }
@@ -50,9 +48,10 @@ class LocationSampleFilter(
      * Remove samples with poor GPS accuracy.
      */
     private fun filterByAccuracy(samples: List<LocationSample>): List<LocationSample> {
-        val filtered = samples.filter { sample ->
-            sample.accuracy <= maxAccuracyMeters
-        }
+        val filtered =
+            samples.filter { sample ->
+                sample.accuracy <= maxAccuracyMeters
+            }
 
         val removed = samples.size - filtered.size
         if (removed > 0) {
@@ -79,10 +78,13 @@ class LocationSampleFilter(
             val timeDiff = (current.timestamp - previous.timestamp).inWholeSeconds
 
             // Keep sample if enough time has passed OR if location changed significantly
-            val distance = haversineDistance(
-                previous.latitude, previous.longitude,
-                current.latitude, current.longitude
-            )
+            val distance =
+                haversineDistance(
+                    previous.latitude,
+                    previous.longitude,
+                    current.latitude,
+                    current.longitude
+                )
 
             if (timeDiff >= minTimeBetweenSamplesSeconds || distance > 10.0) {
                 filtered.add(current)
@@ -111,10 +113,13 @@ class LocationSampleFilter(
             val previous = filtered.last()
             val current = samples[i]
 
-            val distance = haversineDistance(
-                previous.latitude, previous.longitude,
-                current.latitude, current.longitude
-            )
+            val distance =
+                haversineDistance(
+                    previous.latitude,
+                    previous.longitude,
+                    current.latitude,
+                    current.longitude
+                )
 
             val timeDiff = (current.timestamp - previous.timestamp).inWholeSeconds
             if (timeDiff <= 0) {
@@ -129,7 +134,7 @@ class LocationSampleFilter(
             } else {
                 logger.trace {
                     "Filtered sample with unrealistic speed: ${speed.toInt()} m/s " +
-                    "(${(speed * 3.6).toInt()} km/h)"
+                        "(${(speed * 3.6).toInt()} km/h)"
                 }
             }
         }
@@ -161,10 +166,13 @@ class LocationSampleFilter(
             var staticCount = 0
 
             while (j < samples.size && j < i + 10) {
-                val distance = haversineDistance(
-                    current.latitude, current.longitude,
-                    samples[j].latitude, samples[j].longitude
-                )
+                val distance =
+                    haversineDistance(
+                        current.latitude,
+                        current.longitude,
+                        samples[j].latitude,
+                        samples[j].longitude
+                    )
 
                 if (distance < 20.0) { // Within 20m radius
                     staticCount++
@@ -197,18 +205,20 @@ class LocationSampleFilter(
      */
     fun preferGpsSamples(samples: List<LocationSample>): List<LocationSample> {
         // Group samples by approximate time and location
-        val grouped = samples.groupBy { sample ->
-            val roundedTime = (sample.timestamp.epochSeconds / 10) * 10 // Group by 10-sec window
-            val roundedLat = (sample.latitude * 100).toInt() // ~1.1km grouping
-            val roundedLon = (sample.longitude * 100).toInt()
-            Triple(roundedTime, roundedLat, roundedLon)
-        }
+        val grouped =
+            samples.groupBy { sample ->
+                val roundedTime = (sample.timestamp.epochSeconds / 10) * 10 // Group by 10-sec window
+                val roundedLat = (sample.latitude * 100).toInt() // ~1.1km grouping
+                val roundedLon = (sample.longitude * 100).toInt()
+                Triple(roundedTime, roundedLat, roundedLon)
+            }
 
         // From each group, prefer GPS over NETWORK
-        val preferred = grouped.values.map { group ->
-            group.firstOrNull { it.source == LocationSource.GPS }
-                ?: group.first()
-        }
+        val preferred =
+            grouped.values.map { group ->
+                group.firstOrNull { it.source == LocationSource.GPS }
+                    ?: group.first()
+            }
 
         val removed = samples.size - preferred.size
         if (removed > 0) {
@@ -222,15 +232,18 @@ class LocationSampleFilter(
      * Calculate Haversine distance between two coordinates.
      */
     private fun haversineDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 

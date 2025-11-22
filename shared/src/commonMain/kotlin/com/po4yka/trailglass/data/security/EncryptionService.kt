@@ -53,7 +53,10 @@ expect class EncryptionService() {
      * @param encryptedKeyBackup Base64-encoded encrypted key backup
      * @param password User password to decrypt the key backup
      */
-    suspend fun importKey(encryptedKeyBackup: String, password: String): Result<Unit>
+    suspend fun importKey(
+        encryptedKeyBackup: String,
+        password: String
+    ): Result<Unit>
 
     /**
      * Delete the encryption key.
@@ -70,12 +73,10 @@ data class EncryptedData(
      * Base64-encoded ciphertext
      */
     val ciphertext: String,
-
     /**
      * Base64-encoded initialization vector (12 bytes for GCM)
      */
     val iv: String,
-
     /**
      * Base64-encoded authentication tag (16 bytes for GCM)
      */
@@ -106,4 +107,7 @@ data class EncryptedData(
 /**
  * Exception thrown when encryption operations fail.
  */
-class EncryptionException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class EncryptionException(
+    message: String,
+    cause: Throwable? = null
+) : Exception(message, cause)

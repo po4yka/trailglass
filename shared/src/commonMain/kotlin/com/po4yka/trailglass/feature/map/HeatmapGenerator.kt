@@ -11,7 +11,6 @@ import kotlin.math.*
  * Generates heatmap data from markers based on visit frequency.
  */
 class HeatmapGenerator {
-
     /**
      * Generate heatmap data from markers.
      *
@@ -34,24 +33,27 @@ class HeatmapGenerator {
         }
 
         // Calculate intensity for each marker
-        val maxIntensity = when (intensityMode) {
-            IntensityMode.UNIFORM -> 1.0f
-            IntensityMode.VISIT_COUNT -> markers.maxOf { it.visitCount }.toFloat()
-            IntensityMode.DENSITY -> calculateMaxDensity(markers)
-        }
-
-        val points = markers.map { marker ->
-            val intensity = when (intensityMode) {
+        val maxIntensity =
+            when (intensityMode) {
                 IntensityMode.UNIFORM -> 1.0f
-                IntensityMode.VISIT_COUNT -> marker.visitCount.toFloat()
-                IntensityMode.DENSITY -> calculateDensity(marker, markers)
+                IntensityMode.VISIT_COUNT -> markers.maxOf { it.visitCount }.toFloat()
+                IntensityMode.DENSITY -> calculateMaxDensity(markers)
             }
 
-            HeatmapPoint(
-                coordinate = marker.coordinate,
-                intensity = (intensity / maxIntensity).coerceIn(0f, 1f)
-            )
-        }
+        val points =
+            markers.map { marker ->
+                val intensity =
+                    when (intensityMode) {
+                        IntensityMode.UNIFORM -> 1.0f
+                        IntensityMode.VISIT_COUNT -> marker.visitCount.toFloat()
+                        IntensityMode.DENSITY -> calculateDensity(marker, markers)
+                    }
+
+                HeatmapPoint(
+                    coordinate = marker.coordinate,
+                    intensity = (intensity / maxIntensity).coerceIn(0f, 1f)
+                )
+            }
 
         return HeatmapData(
             points = points,
@@ -70,12 +72,13 @@ class HeatmapGenerator {
         opacity: Float = 0.6f,
         gradient: HeatmapGradient = HeatmapGradient.DEFAULT
     ): HeatmapData {
-        val points = coordinates.map { coordinate ->
-            HeatmapPoint(
-                coordinate = coordinate,
-                intensity = 1.0f
-            )
-        }
+        val points =
+            coordinates.map { coordinate ->
+                HeatmapPoint(
+                    coordinate = coordinate,
+                    intensity = 1.0f
+                )
+            }
 
         return HeatmapData(
             points = points,
@@ -100,12 +103,13 @@ class HeatmapGenerator {
 
         val maxWeight = coordinatesWithWeights.maxOf { it.second }
 
-        val points = coordinatesWithWeights.map { (coordinate, weight) ->
-            HeatmapPoint(
-                coordinate = coordinate,
-                intensity = (weight / maxWeight).coerceIn(0f, 1f)
-            )
-        }
+        val points =
+            coordinatesWithWeights.map { (coordinate, weight) ->
+                HeatmapPoint(
+                    coordinate = coordinate,
+                    intensity = (weight / maxWeight).coerceIn(0f, 1f)
+                )
+            }
 
         return HeatmapData(
             points = points,
@@ -122,15 +126,15 @@ class HeatmapGenerator {
         marker: EnhancedMapMarker,
         allMarkers: List<EnhancedMapMarker>,
         radius: Double = 0.01 // ~1km radius
-    ): Float {
-        return allMarkers.count { other ->
-            if (other.id == marker.id) {
-                false
-            } else {
-                haversineDistance(marker.coordinate, other.coordinate) <= radius
-            }
-        }.toFloat()
-    }
+    ): Float =
+        allMarkers
+            .count { other ->
+                if (other.id == marker.id) {
+                    false
+                } else {
+                    haversineDistance(marker.coordinate, other.coordinate) <= radius
+                }
+            }.toFloat()
 
     /**
      * Calculate maximum density across all markers.
@@ -146,11 +150,15 @@ class HeatmapGenerator {
     /**
      * Calculate haversine distance between two coordinates in degrees.
      */
-    private fun haversineDistance(c1: Coordinate, c2: Coordinate): Double {
+    private fun haversineDistance(
+        c1: Coordinate,
+        c2: Coordinate
+    ): Double {
         val dLat = (c2.latitude - c1.latitude) * PI / 180.0
         val dLng = (c2.longitude - c1.longitude) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(c1.latitude * PI / 180.0) *
                 cos(c2.latitude * PI / 180.0) *
                 sin(dLng / 2).pow(2)

@@ -4,16 +4,15 @@ import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import platform.CoreLocation.*
+import platform.darwin.NSObject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-import platform.CoreLocation.*
-import platform.Foundation.NSNumber
-import platform.darwin.NSObject
 
 /**
  * iOS implementation of LocationTracker using CLLocationManager.
@@ -26,7 +25,6 @@ class IOSLocationTracker(
     private val userId: String,
     private val coroutineScope: kotlinx.coroutines.CoroutineScope
 ) : LocationTracker {
-
     private val logger = logger()
     private val locationManager = CLLocationManager()
     private val delegate = LocationManagerDelegate()
@@ -100,14 +98,16 @@ class IOSLocationTracker(
     override suspend fun hasPermissions(): Boolean {
         val authStatus = locationManager.authorizationStatus
 
-        val hasBasicPermission = authStatus == kCLAuthorizationStatusAuthorizedWhenInUse ||
-                                 authStatus == kCLAuthorizationStatusAuthorizedAlways
+        val hasBasicPermission =
+            authStatus == kCLAuthorizationStatusAuthorizedWhenInUse ||
+                authStatus == kCLAuthorizationStatusAuthorizedAlways
 
-        val hasBackgroundPermission = if (configuration.requireBackgroundLocation) {
-            authStatus == kCLAuthorizationStatusAuthorizedAlways
-        } else {
-            true
-        }
+        val hasBackgroundPermission =
+            if (configuration.requireBackgroundLocation) {
+                authStatus == kCLAuthorizationStatusAuthorizedAlways
+            } else {
+                true
+            }
 
         val hasAll = hasBasicPermission && hasBackgroundPermission
         logger.debug { "Permission check: authStatus=$authStatus, hasAll=$hasAll" }
@@ -131,9 +131,7 @@ class IOSLocationTracker(
         return false
     }
 
-    override suspend fun getCurrentState(): TrackingState {
-        return _trackingState.value
-    }
+    override suspend fun getCurrentState(): TrackingState = _trackingState.value
 
     /**
      * Configure CLLocationManager based on tracking mode.
@@ -168,21 +166,22 @@ class IOSLocationTracker(
         val lng = location.coordinate.useContents { longitude }
         logger.debug {
             "Received location: ($lat, $lng), " +
-            "accuracy: ${location.horizontalAccuracy}m"
+                "accuracy: ${location.horizontalAccuracy}m"
         }
 
-        val sample = LocationSample(
-            id = "sample_${Uuid.random()}",
-            timestamp = Clock.System.now(),
-            latitude = location.coordinate.useContents { latitude },
-            longitude = location.coordinate.useContents { longitude },
-            accuracy = location.horizontalAccuracy,
-            speed = if (location.speed >= 0) location.speed else null,
-            bearing = if (location.course >= 0) location.course else null,
-            source = LocationSource.GPS, // iOS doesn't distinguish between GPS and network
-            deviceId = deviceId,
-            userId = userId
-        )
+        val sample =
+            LocationSample(
+                id = "sample_${Uuid.random()}",
+                timestamp = Clock.System.now(),
+                latitude = location.coordinate.useContents { latitude },
+                longitude = location.coordinate.useContents { longitude },
+                accuracy = location.horizontalAccuracy,
+                speed = if (location.speed >= 0) location.speed else null,
+                bearing = if (location.course >= 0) location.course else null,
+                source = LocationSource.GPS, // iOS doesn't distinguish between GPS and network
+                deviceId = deviceId,
+                userId = userId
+            )
 
         // Emit to flow
         _locationUpdates.tryEmit(sample)
@@ -197,11 +196,11 @@ class IOSLocationTracker(
 
         // Save to repository using injected coroutine scope
         coroutineScope.launch {
-            repository.insertSample(sample)
+            repository
+                .insertSample(sample)
                 .onSuccess {
                     logger.trace { "Location sample saved: ${sample.id}" }
-                }
-                .onError { error ->
+                }.onError { error ->
                     logger.error { "Failed to save location sample ${sample.id}: ${error.userMessage}" }
                 }
         }
@@ -215,22 +214,23 @@ class IOSLocationTracker(
         val lng = visit.coordinate.useContents { longitude }
         logger.debug {
             "Received visit: ($lat, $lng), " +
-            "arrival: ${visit.arrivalDate}, departure: ${visit.departureDate}"
+                "arrival: ${visit.arrivalDate}, departure: ${visit.departureDate}"
         }
 
         // Create a location sample from the visit
-        val sample = LocationSample(
-            id = "sample_visit_${Uuid.random()}",
-            timestamp = Clock.System.now(),
-            latitude = lat,
-            longitude = lng,
-            accuracy = visit.horizontalAccuracy,
-            speed = null,
-            bearing = null,
-            source = LocationSource.VISIT,
-            deviceId = deviceId,
-            userId = userId
-        )
+        val sample =
+            LocationSample(
+                id = "sample_visit_${Uuid.random()}",
+                timestamp = Clock.System.now(),
+                latitude = lat,
+                longitude = lng,
+                accuracy = visit.horizontalAccuracy,
+                speed = null,
+                bearing = null,
+                source = LocationSource.VISIT,
+                deviceId = deviceId,
+                userId = userId
+            )
 
         // Emit to flow
         _locationUpdates.tryEmit(sample)
@@ -245,11 +245,11 @@ class IOSLocationTracker(
 
         // Save to repository using injected coroutine scope
         coroutineScope.launch {
-            repository.insertSample(sample)
+            repository
+                .insertSample(sample)
                 .onSuccess {
                     logger.trace { "Visit sample saved: ${sample.id}" }
-                }
-                .onError { error ->
+                }.onError { error ->
                     logger.error { "Failed to save visit sample ${sample.id}: ${error.userMessage}" }
                 }
         }
@@ -258,10 +258,15 @@ class IOSLocationTracker(
     /**
      * CLLocationManagerDelegate implementation.
      */
-    private class LocationManagerDelegate : NSObject(), CLLocationManagerDelegateProtocol {
+    private class LocationManagerDelegate :
+        NSObject(),
+        CLLocationManagerDelegateProtocol {
         var locationTracker: IOSLocationTracker? = null
 
-        override fun locationManager(manager: CLLocationManager, didUpdateLocations: List<*>) {
+        override fun locationManager(
+            manager: CLLocationManager,
+            didUpdateLocations: List<*>
+        ) {
             @Suppress("UNCHECKED_CAST")
             val locations = didUpdateLocations as List<CLLocation>
             locations.forEach { location ->
@@ -269,11 +274,17 @@ class IOSLocationTracker(
             }
         }
 
-        override fun locationManager(manager: CLLocationManager, didVisit: CLVisit) {
+        override fun locationManager(
+            manager: CLLocationManager,
+            didVisit: CLVisit
+        ) {
             locationTracker?.processVisit(didVisit)
         }
 
-        override fun locationManager(manager: CLLocationManager, didFailWithError: platform.Foundation.NSError) {
+        override fun locationManager(
+            manager: CLLocationManager,
+            didFailWithError: platform.Foundation.NSError
+        ) {
             locationTracker?.logger?.error { "Location manager failed: ${didFailWithError.localizedDescription}" }
         }
 

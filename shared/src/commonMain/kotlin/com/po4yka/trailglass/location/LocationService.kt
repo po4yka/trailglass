@@ -14,7 +14,6 @@ import kotlinx.coroutines.sync.withLock
 class LocationService(
     reverseGeocoder: ReverseGeocoder
 ) : LocationRecorder {
-
     private val cachedGeocoder = CachedReverseGeocoder(reverseGeocoder)
     private val placeVisitProcessor = PlaceVisitProcessor(cachedGeocoder)
 
@@ -29,9 +28,10 @@ class LocationService(
     }
 
     override suspend fun processSamples() {
-        val samplesToProcess = mutex.withLock {
-            samples.toList()
-        }
+        val samplesToProcess =
+            mutex.withLock {
+                samples.toList()
+            }
 
         if (samplesToProcess.isEmpty()) return
 
@@ -46,20 +46,18 @@ class LocationService(
     /**
      * Get all recorded location samples.
      */
-    suspend fun getSamples(): List<LocationSample> {
-        return mutex.withLock {
+    suspend fun getSamples(): List<LocationSample> =
+        mutex.withLock {
             samples.toList()
         }
-    }
 
     /**
      * Get all detected place visits.
      */
-    suspend fun getPlaceVisits(): List<PlaceVisit> {
-        return mutex.withLock {
+    suspend fun getPlaceVisits(): List<PlaceVisit> =
+        mutex.withLock {
             placeVisits.toList()
         }
-    }
 
     /**
      * Clear all recorded data.

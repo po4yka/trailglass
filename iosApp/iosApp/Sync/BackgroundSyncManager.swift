@@ -4,7 +4,6 @@ import shared
 
 /// Manages background synchronization for iOS using BackgroundTasks framework
 class BackgroundSyncManager {
-
     static let shared = BackgroundSyncManager()
 
     // Background task identifier - must match Info.plist entry
@@ -27,7 +26,12 @@ class BackgroundSyncManager {
             forTaskWithIdentifier: syncTaskIdentifier,
             using: nil
         ) { task in
-            self.handleSyncTask(task: task as! BGAppRefreshTask)
+            guard let refreshTask = task as? BGAppRefreshTask else {
+                print("Invalid task type for background sync")
+                task.setTaskCompleted(success: false)
+                return
+            }
+            self.handleSyncTask(task: refreshTask)
         }
 
         print("Background sync task registered: \(syncTaskIdentifier)")

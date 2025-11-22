@@ -5,8 +5,8 @@ import android.content.Context
 /**
  * Android implementation of PhotoPickerFactory.
  */
-actual class PhotoPickerFactory(private val context: Context) {
-    actual fun create(userId: String): PhotoPicker {
-        return AndroidPhotoPicker(context, userId)
-    }
+actual class PhotoPickerFactory(
+    private val context: Context
+) {
+    actual fun create(userId: String): PhotoPicker = AndroidPhotoPicker(context, userId)
 }

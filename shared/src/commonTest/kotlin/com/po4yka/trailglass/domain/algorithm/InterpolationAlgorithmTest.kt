@@ -9,7 +9,6 @@ import kotlin.math.abs
 import kotlin.test.Test
 
 class InterpolationAlgorithmTest {
-
     private val start = Coordinate(40.0, -74.0)
     private val end = Coordinate(41.0, -73.0)
 
@@ -84,7 +83,7 @@ class InterpolationAlgorithmTest {
         val dist2 = distanceAlg.calculate(mid, end)
         val totalDist = distanceAlg.calculate(start, end)
 
-        abs(dist1 - totalDist / 2) shouldBeLessThan (totalDist * 0.01)  // Within 1%
+        abs(dist1 - totalDist / 2) shouldBeLessThan (totalDist * 0.01) // Within 1%
         abs(dist2 - totalDist / 2) shouldBeLessThan (totalDist * 0.01)
     }
 
@@ -140,9 +139,10 @@ class InterpolationAlgorithmTest {
     fun `cubic interpolation should create smooth curve`() {
         val algorithm = CubicInterpolation()
 
-        val points = (0..10).map { i ->
-            algorithm.interpolate(start, end, i / 10.0)
-        }
+        val points =
+            (0..10).map { i ->
+                algorithm.interpolate(start, end, i / 10.0)
+            }
 
         // Path should be monotonic (always moving toward destination)
         for (i in 1 until points.size) {
@@ -161,14 +161,16 @@ class InterpolationAlgorithmTest {
         val longEnd = Coordinate(50.0, -64.0)
 
         // Generate path with more steps
-        val points = (0..20).map { i ->
-            algorithm.interpolate(longStart, longEnd, i / 20.0)
-        }
+        val points =
+            (0..20).map { i ->
+                algorithm.interpolate(longStart, longEnd, i / 20.0)
+            }
 
         // Calculate segment distances
-        val segments = (1 until points.size).map { i ->
-            distanceAlg.calculate(points[i - 1], points[i])
-        }
+        val segments =
+            (1 until points.size).map { i ->
+                distanceAlg.calculate(points[i - 1], points[i])
+            }
 
         // Average middle segments should be longer than edge segments
         val firstThird = segments.take(segments.size / 3).average()
@@ -176,7 +178,7 @@ class InterpolationAlgorithmTest {
         val lastThird = segments.takeLast(segments.size / 3).average()
 
         // Middle section should have faster movement
-        middleThird shouldBeGreaterThan (firstThird * 0.9)  // Allow some tolerance
+        middleThird shouldBeGreaterThan (firstThird * 0.9) // Allow some tolerance
         middleThird shouldBeGreaterThan (lastThird * 0.9)
     }
 
@@ -235,11 +237,10 @@ class InterpolationAlgorithmTest {
         val sphericalPath = spherical.generatePath(west, east, steps = 20)
 
         // Sum segment distances
-        fun pathLength(path: List<Coordinate>): Double {
-            return (1 until path.size).sumOf { i ->
+        fun pathLength(path: List<Coordinate>): Double =
+            (1 until path.size).sumOf { i ->
                 distanceAlg.calculate(path[i - 1], path[i])
             }
-        }
 
         val linearDist = pathLength(linearPath)
         val sphericalDist = pathLength(sphericalPath)

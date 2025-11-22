@@ -5,6 +5,7 @@ import kotlin.math.*
 
 // Extension functions for degrees/radians conversion
 private fun Double.toRadians(): Double = this * PI / 180.0
+
 private fun Double.toDegrees(): Double = this * 180.0 / PI
 
 /**
@@ -14,12 +15,20 @@ interface DistanceAlgorithm {
     /**
      * Calculate distance between two coordinates in meters.
      */
-    fun calculate(from: Coordinate, to: Coordinate): Double
+    fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double
 
     /**
      * Calculate distance between two lat/lon pairs in meters.
      */
-    fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double
+    fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double
 }
 
 /**
@@ -55,15 +64,22 @@ class HaversineDistance : DistanceAlgorithm {
         private const val EARTH_RADIUS_METERS = 6371000.0
     }
 
-    override fun calculate(from: Coordinate, to: Coordinate): Double {
-        return calculate(from.latitude, from.longitude, to.latitude, to.longitude)
-    }
+    override fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double = calculate(from.latitude, from.longitude, to.latitude, to.longitude)
 
-    override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    override fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         val dLat = (lat2 - lat1).toRadians()
         val dLon = (lon2 - lon1).toRadians()
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos((lat1).toRadians()) * cos((lat2).toRadians()) *
                 sin(dLon / 2).pow(2)
 
@@ -80,18 +96,24 @@ class HaversineDistance : DistanceAlgorithm {
 class VincentyDistance : DistanceAlgorithm {
     companion object {
         // WGS-84 ellipsoid parameters
-        private const val SEMI_MAJOR_AXIS = 6378137.0  // a (equatorial radius)
-        private const val SEMI_MINOR_AXIS = 6356752.314245  // b (polar radius)
-        private const val FLATTENING = 1.0 / 298.257223563  // f
+        private const val SEMI_MAJOR_AXIS = 6378137.0 // a (equatorial radius)
+        private const val SEMI_MINOR_AXIS = 6356752.314245 // b (polar radius)
+        private const val FLATTENING = 1.0 / 298.257223563 // f
         private const val MAX_ITERATIONS = 200
         private const val CONVERGENCE_THRESHOLD = 1e-12
     }
 
-    override fun calculate(from: Coordinate, to: Coordinate): Double {
-        return calculate(from.latitude, from.longitude, to.latitude, to.longitude)
-    }
+    override fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double = calculate(from.latitude, from.longitude, to.latitude, to.longitude)
 
-    override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    override fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         // Handle identical points
         if (lat1 == lat2 && lon1 == lon2) return 0.0
 
@@ -121,22 +143,24 @@ class VincentyDistance : DistanceAlgorithm {
         do {
             val sinLambda = sin(lambda)
             val cosLambda = cos(lambda)
-            sinSigma = sqrt(
-                (cosU2 * sinLambda).pow(2) +
-                (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda).pow(2)
-            )
+            sinSigma =
+                sqrt(
+                    (cosU2 * sinLambda).pow(2) +
+                        (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda).pow(2)
+                )
 
-            if (sinSigma == 0.0) return 0.0  // Co-incident points
+            if (sinSigma == 0.0) return 0.0 // Co-incident points
 
             cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda
             sigma = atan2(sinSigma, cosSigma)
             val sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma
             cosSqAlpha = 1 - sinAlpha.pow(2)
-            cos2SigmaM = if (cosSqAlpha != 0.0) {
-                cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha
-            } else {
-                0.0  // Equatorial line
-            }
+            cos2SigmaM =
+                if (cosSqAlpha != 0.0) {
+                    cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha
+                } else {
+                    0.0 // Equatorial line
+                }
 
             val C = FLATTENING / 16 * cosSqAlpha * (4 + FLATTENING * (4 - 3 * cosSqAlpha))
             lambdaP = lambda
@@ -155,12 +179,13 @@ class VincentyDistance : DistanceAlgorithm {
         val uSq = cosSqAlpha * (SEMI_MAJOR_AXIS.pow(2) - SEMI_MINOR_AXIS.pow(2)) / SEMI_MINOR_AXIS.pow(2)
         val A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)))
         val B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)))
-        val deltaSigma = B * sinSigma * (
-            cos2SigmaM + B / 4 * (
-                cosSigma * (-1 + 2 * cos2SigmaM.pow(2)) -
-                B / 6 * cos2SigmaM * (-3 + 4 * sinSigma.pow(2)) * (-3 + 4 * cos2SigmaM.pow(2))
+        val deltaSigma =
+            B * sinSigma * (
+                cos2SigmaM + B / 4 * (
+                    cosSigma * (-1 + 2 * cos2SigmaM.pow(2)) -
+                        B / 6 * cos2SigmaM * (-3 + 4 * sinSigma.pow(2)) * (-3 + 4 * cos2SigmaM.pow(2))
+                )
             )
-        )
 
         return SEMI_MINOR_AXIS * A * (sigma - deltaSigma)
     }
@@ -173,14 +198,20 @@ class VincentyDistance : DistanceAlgorithm {
  */
 class SimpleDistance : DistanceAlgorithm {
     companion object {
-        private const val METERS_PER_DEGREE_LAT = 111000.0  // Approximate
+        private const val METERS_PER_DEGREE_LAT = 111000.0 // Approximate
     }
 
-    override fun calculate(from: Coordinate, to: Coordinate): Double {
-        return calculate(from.latitude, from.longitude, to.latitude, to.longitude)
-    }
+    override fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double = calculate(from.latitude, from.longitude, to.latitude, to.longitude)
 
-    override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    override fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         val avgLat = (lat1 + lat2) / 2.0
         val metersPerDegreeLon = METERS_PER_DEGREE_LAT * cos((avgLat).toRadians())
 
@@ -195,11 +226,10 @@ class SimpleDistance : DistanceAlgorithm {
  * Factory for creating distance algorithm instances.
  */
 object DistanceAlgorithmFactory {
-    fun create(type: DistanceAlgorithmType): DistanceAlgorithm {
-        return when (type) {
+    fun create(type: DistanceAlgorithmType): DistanceAlgorithm =
+        when (type) {
             DistanceAlgorithmType.HAVERSINE -> HaversineDistance()
             DistanceAlgorithmType.VINCENTY -> VincentyDistance()
             DistanceAlgorithmType.SIMPLE -> SimpleDistance()
         }
-    }
 }

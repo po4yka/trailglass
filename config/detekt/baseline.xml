@@ -1,0 +1,921 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ComplexCondition:RegisterScreen.kt$displayName.isNotBlank() &amp;&amp; email.isNotBlank() &amp;&amp; password.isNotBlank() &amp;&amp; passwordMatch &amp;&amp; passwordError == null</ID>
+    <ID>CyclomaticComplexMethod:CategoryBadge.kt$private fun getCategoryIcon(category: String): ImageVector?</ID>
+    <ID>CyclomaticComplexMethod:EnhancedTimelineScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedTimelineScreen( controller: EnhancedTimelineController, modifier: Modifier = Modifier, trackingController: com.po4yka.trailglass.feature.tracking.LocationTrackingController? = null, onAddPhoto: () -&gt; Unit = {}, onAddNote: () -&gt; Unit = {}, onCheckIn: () -&gt; Unit = {} )</ID>
+    <ID>CyclomaticComplexMethod:EnhancedTimelineScreen.kt$private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector</ID>
+    <ID>CyclomaticComplexMethod:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$fun generateClusterBitmap( count: Int, color: Int, isSelected: Boolean ): BitmapDescriptor</ID>
+    <ID>CyclomaticComplexMethod:Navigation.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun MainScaffold( rootComponent: RootComponent, networkConnectivityMonitor: NetworkConnectivityMonitor, modifier: Modifier = Modifier )</ID>
+    <ID>CyclomaticComplexMethod:PlaceDetailScreen.kt$@Composable private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector</ID>
+    <ID>CyclomaticComplexMethod:PlaceDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlaceDetailScreen( place: FrequentPlace?, onToggleFavorite: () -&gt; Unit, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>CyclomaticComplexMethod:PlacesScreen.kt$@Composable private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector</ID>
+    <ID>CyclomaticComplexMethod:RegisterScreen.kt$@Composable fun RegisterScreen( authController: AuthController, onNavigateToLogin: () -&gt; Unit, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>CyclomaticComplexMethod:RootComponent.kt$DefaultRootComponent$private fun createChild( config: RootComponent.Config, componentContext: ComponentContext ): RootComponent.Child</ID>
+    <ID>CyclomaticComplexMethod:TripStatisticsScreen.kt$private fun getCountryFlag(countryCode: String): String</ID>
+    <ID>DestructuringDeclarationWithTooManyEntries:NetworkStatusBanner.kt$val (icon, text, backgroundColor, contentColor) = when (networkState) { is NetworkState.Disconnected -&gt; { Tuple4( Icons.Default.CloudOff, "No internet connection", MaterialTheme.colorScheme.errorContainer, MaterialTheme.colorScheme.onErrorContainer ) } is NetworkState.Limited -&gt; { Tuple4( Icons.Default.Warning, "Limited connectivity: ${networkState.reason}", MaterialTheme.colorScheme.extended.warning, MaterialTheme.colorScheme.extended.onWarning ) } is NetworkState.Connected -&gt; { // Should not be visible when connected return } }</ID>
+    <ID>ForEachOnRange:ActivityHeatmap.kt$0..23</ID>
+    <ID>ForEachOnRange:ActivityHeatmap.kt$0..4</ID>
+    <ID>ForbiddenComment:ForgotPasswordScreen.kt$// TODO: Implement password reset API call</ID>
+    <ID>ForbiddenComment:MainActivity.kt$MainActivity$// TODO: Handle deep linking to main screens once authenticated</ID>
+    <ID>ForbiddenComment:Navigation.kt$// TODO: Navigate to add note screen</ID>
+    <ID>ForbiddenComment:Navigation.kt$// TODO: Navigate to add photo screen</ID>
+    <ID>ForbiddenComment:Navigation.kt$// TODO: Navigate to manual check-in screen</ID>
+    <ID>ForbiddenComment:PhotoAttachmentDialog.kt$// TODO: First need to import/upload the photo to get photoId</ID>
+    <ID>ForbiddenComment:PlaceVisitDetailScreen.kt$// TODO: Implement proper DTO to domain model mapping</ID>
+    <ID>ForbiddenComment:RouteViewScreen.kt$// TODO: Implement map snapshot sharing</ID>
+    <ID>FunctionNaming:ActivityHeatmap.kt$@Composable fun ActivityHeatmap( data: Map&lt;DayOfWeek, Map&lt;Int, Int&gt;&gt;, // day -&gt; hour -&gt; activity count modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:AlgorithmSettingsScreen.kt$@Composable private fun &lt;T&gt; AlgorithmSelectionDialog( title: String, options: List&lt;T&gt;, selectedOption: T, getOptionLabel: (T) -&gt; String, getOptionDescription: (T) -&gt; String, onDismiss: () -&gt; Unit, onSelect: (T) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:AlgorithmSettingsScreen.kt$@Composable private fun AlgorithmCard( icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, currentValue: String, description: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:AlgorithmSettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AlgorithmSettingsScreen( controller: SettingsController, onBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:App.kt$@Composable fun App( appRootComponent: AppRootComponent, networkConnectivityMonitor: NetworkConnectivityMonitor )</ID>
+    <ID>FunctionNaming:App.kt$@Composable fun AppNavigation( appRootComponent: AppRootComponent, networkConnectivityMonitor: NetworkConnectivityMonitor, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:AuthNavigation.kt$@Composable fun AuthNavigation( authRootComponent: AuthRootComponent, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:BackgroundLocationEducation.kt$@Composable fun BackgroundLocationEducationScreen( onGrantPermission: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:BackgroundLocationEducation.kt$@Composable fun BackgroundLocationInstructionsDialog( onOpenSettings: () -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:BackgroundLocationEducation.kt$@Composable private fun BenefitItem( icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, description: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:BackgroundLocationEducation.kt$@Composable private fun InstructionStep( number: Int, text: String )</ID>
+    <ID>FunctionNaming:BackgroundLocationEducation.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun BackgroundLocationBottomSheet( onOpenSettings: () -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:BarChart.kt$@Composable fun BarChart( data: List&lt;BarData&gt;, modifier: Modifier = Modifier, barColor: Color = MaterialTheme.colorScheme.primary, showValues: Boolean = true, maxBarHeight: Float = 200f )</ID>
+    <ID>FunctionNaming:CategoryBadge.kt$@Composable fun CategoryBadge( category: String, onClick: () -&gt; Unit = {}, modifier: Modifier = Modifier, enabled: Boolean = true )</ID>
+    <ID>FunctionNaming:CategoryBadge.kt$@Composable fun CategoryBadgeGroup( selectedCategory: String?, categories: List&lt;String&gt;, onCategorySelected: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:CategoryBadge.kt$@Composable fun CompactCategoryBadge( category: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ComponentShowcaseScreen.kt$@Composable private fun ComponentSection( title: String, description: String, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:ComponentShowcaseScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ComponentShowcaseScreen( onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionScreen.kt$@Composable private fun CompletionView( resolvedCount: Int, onClose: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionScreen.kt$@Composable private fun ConflictView( state: ConflictResolutionController.ConflictResolutionState, onKeepLocal: () -&gt; Unit, onKeepRemote: () -&gt; Unit, onMerge: () -&gt; Unit, onSkip: () -&gt; Unit, onPrevious: () -&gt; Unit, onNext: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionScreen.kt$@Composable private fun EmptyConflictsView( onClose: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionScreen.kt$@Composable private fun VersionCard( title: String, icon: androidx.compose.ui.graphics.vector.ImageVector, data: Map&lt;String, String&gt;, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ConflictResolutionScreen( controller: ConflictResolutionController, onClose: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionUI.kt$@Composable fun ConflictCard( conflict: ConflictUiModel, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionUI.kt$@Composable fun ConflictResolutionDialog( conflict: ConflictUiModel, onResolve: (ConflictResolutionChoice) -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionUI.kt$@Composable private fun Chip( text: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ConflictResolutionUI.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ConflictListScreen( conflicts: List&lt;ConflictUiModel&gt;, onConflictClick: (ConflictUiModel) -&gt; Unit, onBackClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:CreateTripDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun CreateTripDialog( userId: String, onDismiss: () -&gt; Unit, onConfirm: (Trip) -&gt; Unit )</ID>
+    <ID>FunctionNaming:DeviceManagementScreen.kt$@Composable private fun DeviceCard( device: DeviceDto, isDeleting: Boolean, onDelete: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:DeviceManagementScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DeviceManagementScreen( controller: DeviceManagementController, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@Composable private fun EnhancedGoogleMapContent( mapData: EnhancedMapDisplayData, selectedMarker: EnhancedMapMarker?, selectedCluster: MarkerCluster?, selectedRoute: MapRoute?, onMarkerClick: (EnhancedMapMarker) -&gt; Unit, onClusterClick: (MarkerCluster) -&gt; Unit, onRouteClick: (MapRoute) -&gt; Unit, onZoomChange: (Float) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@Composable private fun EnhancedMapControls( clusteringEnabled: Boolean, heatmapEnabled: Boolean, onToggleClustering: () -&gt; Unit, onToggleHeatmap: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@Composable private fun EnhancedMapErrorView( error: String, onRetry: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@Composable private fun RenderCluster( cluster: MarkerCluster, isSelected: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@Composable private fun RenderEnhancedMarker( marker: EnhancedMapMarker, isSelected: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@Composable private fun RenderRoute( route: MapRoute, isSelected: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedMapView( controller: EnhancedMapController, modifier: Modifier = Modifier, onMarkerClick: (EnhancedMapMarker) -&gt; Unit = {}, onClusterClick: (MarkerCluster) -&gt; Unit = {}, onRouteClick: (MapRoute) -&gt; Unit = {} )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun VisualizationModeSelector( currentMode: MapVisualizationMode, onModeChange: (MapVisualizationMode) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedMapView.kt$@OptIn(MapsComposeExperimentalApi::class) @Composable private fun RenderHeatmap(heatmapData: HeatmapData)</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable fun EnhancedSettingsScreen( controller: SettingsController, onNavigateToAccount: () -&gt; Unit = {}, onNavigateToDataManagement: () -&gt; Unit = {}, onNavigateToAlgorithmSettings: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun AboutCard()</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun AccountSettingsCard( account: AccountSettings, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun AlgorithmSettingsNavigationCard(onClick: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun AppearanceSettingsCard( appearance: AppearanceSettings, onUpdate: (AppearanceSettings) -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun DataManagementCard( data: DataManagement, onClick: () -&gt; Unit, onClearData: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun PrivacySettingsCard( privacy: PrivacySettings, onUpdate: (PrivacySettings) -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun TrackingPreferencesCard( preferences: TrackingPreferences, onUpdate: (TrackingPreferences) -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedSettingsScreen.kt$@Composable private fun UnitPreferencesCard( units: UnitPreferences, onUpdate: (UnitPreferences) -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun ActivityHeatmapCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun CategoryDistributionCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun DistanceStatsCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun EmptyStatsView(modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun EnhancedStatsContent( stats: ComprehensiveStatistics, selectedTransportMode: TransportType?, onTransportModeSelected: (TransportType) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun GeographicStatsCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun InfoRow( label: String, value: String )</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun MostVisitedPlaceCard(place: com.po4yka.trailglass.feature.stats.models.PlaceVisitCount)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun OverviewCards(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun PeriodSelector( selectedPeriod: GetStatsUseCase.Period?, onPeriodChange: (GetStatsUseCase.Period) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun PlaceStatsCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun SectionHeader(text: String)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun StatCard( title: String, value: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun TopCountriesCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun TransportDistributionCard( stats: ComprehensiveStatistics, selectedMode: TransportType? )</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@Composable private fun TravelPatternsCard(stats: ComprehensiveStatistics)</ID>
+    <ID>FunctionNaming:EnhancedStatsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedStatsScreen( controller: EnhancedStatsController, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun ActiveFiltersChips( filter: TimelineFilter, onClearAll: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun DateNavigationBar( selectedDate: LocalDate, zoomLevel: TimelineZoomLevel, onPrevious: () -&gt; Unit, onNext: () -&gt; Unit, onToday: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun DayMarkerCard( text: String, icon: androidx.compose.ui.graphics.vector.ImageVector, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun DaySummaryCard( summary: GetTimelineUseCase.TimelineItemUI.DaySummaryUI, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun EmptyTimelineView(modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun EnhancedRouteCard( route: com.po4yka.trailglass.domain.model.RouteSegment, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun EnhancedTimelineContent( items: List&lt;GetTimelineUseCase.TimelineItemUI&gt;, zoomLevel: TimelineZoomLevel, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun EnhancedVisitCard( visit: com.po4yka.trailglass.domain.model.PlaceVisit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun FilterSection( title: String, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun MonthSummaryCard( summary: GetTimelineUseCase.TimelineItemUI.MonthSummaryUI, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun SummaryStatItem( icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun TimelineSearchBar( query: String, onQueryChange: (String) -&gt; Unit, onClose: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun TopCategoriesSection( categories: List&lt;PlaceCategory&gt;, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun WeekSummaryCard( summary: GetTimelineUseCase.TimelineItemUI.WeekSummaryUI, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@Composable private fun ZoomLevelSelector( currentZoom: TimelineZoomLevel, onZoomChanged: (TimelineZoomLevel) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedTimelineScreen( controller: EnhancedTimelineController, modifier: Modifier = Modifier, trackingController: com.po4yka.trailglass.feature.tracking.LocationTrackingController? = null, onAddPhoto: () -&gt; Unit = {}, onAddNote: () -&gt; Unit = {}, onCheckIn: () -&gt; Unit = {} )</ID>
+    <ID>FunctionNaming:EnhancedTimelineScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun TimelineFilterBottomSheet( currentFilter: TimelineFilter, onFilterChanged: (TimelineFilter) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:ErrorView.kt$@Composable fun ErrorView( error: String, onRetry: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:FlexibleTopAppBar.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun CompactFlexibleTopAppBar( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null )</ID>
+    <ID>FunctionNaming:FlexibleTopAppBar.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class) @Composable fun LargeFlexibleTopAppBar( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, subtitle: (@Composable () -&gt; Unit)? = null, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start, collapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight, expandedHeight: Dp = 180.dp, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null, backgroundContent: @Composable (BoxScope.() -&gt; Unit)? = null )</ID>
+    <ID>FunctionNaming:FlexibleTopAppBar.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class) @Composable fun MediumFlexibleTopAppBar( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, subtitle: (@Composable () -&gt; Unit)? = null, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, leadingIcon: @Composable (() -&gt; Unit)? = null, titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start, collapsedHeight: Dp = TopAppBarDefaults.MediumAppBarCollapsedHeight, expandedHeight: Dp = 128.dp, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null )</ID>
+    <ID>FunctionNaming:ForgotPasswordScreen.kt$@Composable fun ForgotPasswordScreen( onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:LocationPermissionHandler.kt$@Composable private fun LocationPermissionRationaleDialog( onDismiss: () -&gt; Unit, onConfirm: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:LoginScreen.kt$@Composable fun LoginScreen( authController: AuthController, onNavigateToRegister: () -&gt; Unit, onNavigateToForgotPassword: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:MainActivity.kt$@Preview @Composable fun AppAndroidPreview()</ID>
+    <ID>FunctionNaming:MapScreen.kt$@Composable fun MapScreen( controller: MapController, onNavigateToPlaceVisitDetail: (String) -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:MapScreen.kt$@Composable private fun MarkerInfoCard( marker: MapMarker, onClose: () -&gt; Unit, onViewDetails: () -&gt; Unit, onAddPhoto: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:MapView.kt$@Composable fun MapView( controller: MapController, modifier: Modifier = Modifier, onMarkerClick: (MapMarker) -&gt; Unit = {}, onRouteClick: (MapRoute) -&gt; Unit = {} )</ID>
+    <ID>FunctionNaming:MapView.kt$@Composable private fun GoogleMapContent( mapData: MapDisplayData, cameraMove: CameraMove?, eventSink: MapEventSink, onMarkerClick: (MapMarker) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:MapView.kt$@Composable private fun MapErrorView( error: String, onRetry: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:Navigation.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun MainScaffold( rootComponent: RootComponent, networkConnectivityMonitor: NetworkConnectivityMonitor, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:NetworkStatusBanner.kt$@Composable fun NetworkStatusBanner( networkState: NetworkState, networkType: NetworkType, isMetered: Boolean, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:NetworkStatusBanner.kt$@Composable fun NetworkStatusIndicatorCompact( networkState: NetworkState, networkType: NetworkType, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:NetworkStatusBanner.kt$@Composable private fun NetworkBannerContent( networkState: NetworkState, networkType: NetworkType, isMetered: Boolean )</ID>
+    <ID>FunctionNaming:NetworkStatusWrapper.kt$@Composable fun NetworkStatusWrapper( networkConnectivityMonitor: NetworkConnectivityMonitor, modifier: Modifier = Modifier, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:PermissionDialogs.kt$@Composable fun PermissionDeniedDialog( requestState: PermissionRequestState, onRetry: () -&gt; Unit, onContinue: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PermissionDialogs.kt$@Composable fun PermissionPermanentlyDeniedDialog( requestState: PermissionRequestState, instructions: SettingsInstructions, onOpenSettings: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PermissionDialogs.kt$@Composable fun PermissionRationaleDialog( requestState: PermissionRequestState, onAccept: () -&gt; Unit, onDeny: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PermissionDialogs.kt$@Composable fun PermissionRequestBanner( requestState: PermissionRequestState, onGrant: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoAttachmentDialog.kt$@Composable fun PhotoAttachmentHandler( placeVisitId: String, attachPhotoUseCase: AttachPhotoToVisitUseCase, onDismiss: () -&gt; Unit, onPhotoAttached: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:PhotoAttachmentDialog.kt$@Composable fun PhotoAttachmentInfoDialog(onDismiss: () -&gt; Unit)</ID>
+    <ID>FunctionNaming:PhotoCarousel.kt$@Composable fun PhotoCarousel( photos: List&lt;Photo&gt;, onPhotoClick: (Photo) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoCarousel.kt$@Composable fun PhotoCountIndicator( photoCount: Int, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoCarousel.kt$@Composable private fun PhotoThumbnail( photo: Photo, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@Composable private fun AttachmentsSection(attachments: List&lt;com.po4yka.trailglass.domain.model.PhotoAttachment&gt;)</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@Composable private fun ExifSection(metadata: com.po4yka.trailglass.domain.model.PhotoMetadata)</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@Composable private fun InfoRow( label: String, value: String )</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@Composable private fun MetadataSection(photoWithMetadata: PhotoWithMetadata)</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@Composable private fun PhotoDetailContent( photoWithMetadata: PhotoWithMetadata, onAttachToVisit: () -&gt; Unit, onViewOnRoute: ((String) -&gt; Unit)?, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@Composable private fun SettingChip(text: String)</ID>
+    <ID>FunctionNaming:PhotoDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PhotoDetailScreen( photoId: String, controller: PhotoDetailController, onNavigateBack: () -&gt; Unit, onViewOnRoute: ((String) -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoDetailScreenWrapper.kt$@Composable fun PhotoDetailScreenWrapper( photoId: String, photoDetailController: SharedPhotoDetailController, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoGalleryScreen.kt$@Composable private fun EmptyGalleryView( onImportClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoGalleryScreen.kt$@Composable private fun PhotoGalleryContent( photoGroups: List&lt;PhotoGroup&gt;, onPhotoClick: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoGalleryScreen.kt$@Composable private fun PhotoGridItem( photo: PhotoWithMetadata, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoGalleryScreen.kt$@Composable private fun PhotoGroupGrid( photos: List&lt;PhotoWithMetadata&gt;, onPhotoClick: (String) -&gt; Unit )</ID>
+    <ID>FunctionNaming:PhotoGalleryScreen.kt$@Composable private fun PhotoGroupSection( group: PhotoGroup, onPhotoClick: (String) -&gt; Unit )</ID>
+    <ID>FunctionNaming:PhotoGalleryScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PhotoGalleryScreen( controller: PhotoGalleryController, onPhotoClick: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotoGrid.kt$@Composable fun PhotoGrid( photos: List&lt;Photo&gt;, onPhotoClick: (Photo) -&gt; Unit, modifier: Modifier = Modifier, columns: Int = 3 )</ID>
+    <ID>FunctionNaming:PhotoGrid.kt$@Composable private fun EmptyPhotoGrid(modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:PhotoGrid.kt$@Composable private fun PhotoGridItem( photo: Photo, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PhotosScreenWrapper.kt$@Composable fun PhotosScreenWrapper( photoGalleryController: SharedPhotoGalleryController, onPhotoClick: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PieChart.kt$@Composable fun PieChart( data: List&lt;PieData&gt;, modifier: Modifier = Modifier, showLegend: Boolean = true )</ID>
+    <ID>FunctionNaming:PieChart.kt$@Composable private fun LegendItem( color: Color, label: String, value: String )</ID>
+    <ID>FunctionNaming:PlaceDetailScreen.kt$@Composable private fun PlaceDetailContent( place: FrequentPlace, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlaceDetailScreen.kt$@Composable private fun StatRow( icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlaceDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlaceDetailScreen( place: FrequentPlace?, onToggleFavorite: () -&gt; Unit, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlaceVisitDetailScreen.kt$@Composable private fun DetailRow( icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlaceVisitDetailScreen.kt$@Composable private fun PlaceVisitContent( visit: PlaceVisit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlaceVisitDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlaceVisitDetailScreen( placeVisitId: String, apiClient: TrailGlassApiClient, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable fun PlacesScreen( places: List&lt;FrequentPlace&gt;, searchQuery: String = "", onPlaceClick: (FrequentPlace) -&gt; Unit = {}, onRefresh: () -&gt; Unit = {}, onSearch: (String) -&gt; Unit = {}, onClearSearch: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun EmptyPlacesView(modifier: Modifier = Modifier)</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun FrequentPlaceCard( place: FrequentPlace, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun NoSearchResultsView( query: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun PlacesContent( places: List&lt;FrequentPlace&gt;, onPlaceClick: (FrequentPlace) -&gt; Unit, onRefresh: () -&gt; Unit, showSearchButton: Boolean = true, onShowSearch: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun RarePlacesSection( rarePlaces: List&lt;FrequentPlace&gt;, onPlaceClick: (FrequentPlace) -&gt; Unit )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun SectionHeader(text: String)</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@Composable private fun StatChip( icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:PlacesScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun SearchBar( query: String, onQueryChange: (String) -&gt; Unit, onClose: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RegisterScreen.kt$@Composable fun RegisterScreen( authController: AuthController, onNavigateToLogin: () -&gt; Unit, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteMapView.kt$@Composable fun RouteMapView( tripRoute: TripRoute, mapStyle: MapStyle, shouldRecenterCamera: Boolean, selectedPhotoMarker: PhotoMarker?, onPhotoMarkerClick: (PhotoMarker) -&gt; Unit, onCameraRecentered: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteMapView.kt$@Composable private fun PhotoMarkerIcon( photoMarker: PhotoMarker, isSelected: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:RouteMapView.kt$@Composable private fun RoutePolyline(routePoints: List&lt;RoutePoint&gt;)</ID>
+    <ID>FunctionNaming:RouteReplayMapView.kt$@Composable fun RouteReplayMapView( tripRoute: TripRoute, vehicleState: VehicleState, cameraPosition: Coordinate, cameraBearing: Double, cameraTilt: Double, cameraZoom: Float, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteReplayMapView.kt$@Composable private fun RoutePolylineReplay(routePoints: List&lt;com.po4yka.trailglass.domain.model.RoutePoint&gt;)</ID>
+    <ID>FunctionNaming:RouteReplayMapView.kt$@Composable private fun VehicleMarker( vehicleState: VehicleState, transportType: TransportType )</ID>
+    <ID>FunctionNaming:RouteReplayScreen.kt$@Composable fun RouteReplayScreen( tripId: String, controller: RouteReplayController, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteReplayScreen.kt$@Composable private fun ReplayControlPanel( isPlaying: Boolean, progress: Float, playbackSpeed: PlaybackSpeed, onPlayPauseClick: () -&gt; Unit, onProgressChange: (Float) -&gt; Unit, onSpeedClick: () -&gt; Unit, onRestartClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteReplayScreen.kt$@Composable private fun RouteReplayContent( controller: RouteReplayController, onBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteSummaryCard.kt$@Composable fun RouteSummaryCard( tripRoute: TripRoute, onPlayClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteSummaryCard.kt$@Composable private fun StatisticItem( icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteSummaryCard.kt$@Composable private fun TransportChip( transportType: String, distance: Double )</ID>
+    <ID>FunctionNaming:RouteViewScreen.kt$@Composable private fun MapStyleOption( style: MapStyle, isSelected: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:RouteViewScreen.kt$@Composable private fun PrivacyWarningDialog( exportResult: com.po4yka.trailglass.feature.route.export.ExportResult, onConfirm: () -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:RouteViewScreen.kt$@Composable private fun RouteViewContent( tripRoute: TripRoute, mapStyle: MapStyle, shouldRecenterCamera: Boolean, selectedPhotoMarker: PhotoMarker?, onPhotoMarkerClick: (PhotoMarker) -&gt; Unit, onCameraRecentered: () -&gt; Unit, onPlayClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteViewScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun RouteViewScreen( tripId: String, controller: RouteViewController, onNavigateToReplay: (String) -&gt; Unit = {}, onNavigateToStatistics: (String) -&gt; Unit = {}, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:RouteViewScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun MapStyleSelectorSheet( currentStyle: MapStyle, onStyleSelected: (MapStyle) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable fun SettingsScreen( trackingController: LocationTrackingController, onNavigateToDeviceManagement: () -&gt; Unit = {}, onNavigateToAlgorithmSettings: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun PermissionsCard( hasPermissions: Boolean, hasBackgroundPermission: Boolean, onRequestPermissions: () -&gt; Unit, onRequestBackgroundPermission: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SettingsScreen.kt$@Composable private fun TrackingStatusCard( isTracking: Boolean, mode: TrackingMode, samplesRecorded: Int, hasPermissions: Boolean, onStartTracking: () -&gt; Unit, onStopTracking: () -&gt; Unit, onRequestPermissions: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:ShapeMorphingExamples.kt$@Composable fun Example1_TrackingFAB()</ID>
+    <ID>FunctionNaming:ShapeMorphingExamples.kt$@Composable fun Example2_ShapeSelector()</ID>
+    <ID>FunctionNaming:ShapeMorphingExamples.kt$@Composable fun Example3_CategoryShowcase()</ID>
+    <ID>FunctionNaming:ShapeMorphingExamples.kt$@Composable fun Example4_LoadingStates()</ID>
+    <ID>FunctionNaming:ShapeMorphingExamples.kt$@Composable fun Example5_InteractiveCard()</ID>
+    <ID>FunctionNaming:ShapeMorphingExamples.kt$@Preview(showBackground = true) @Composable private fun ShapeMorphingExamplesPreview()</ID>
+    <ID>FunctionNaming:SplitButtonLayout.kt$@Composable fun SplitButton( primaryText: String, primaryIcon: ImageVector?, onPrimaryClick: () -&gt; Unit, secondaryIcon: ImageVector = Icons.Default.MoreVert, onSecondaryClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, colors: ButtonColors = ButtonDefaults.buttonColors(), variant: SplitButtonVariant = SplitButtonVariant.Filled )</ID>
+    <ID>FunctionNaming:SplitButtonLayout.kt$@Composable fun SplitButtonExamples()</ID>
+    <ID>FunctionNaming:SplitButtonLayout.kt$@Composable fun SplitButtonWithMenu( primaryText: String, onPrimaryClick: () -&gt; Unit, menuItems: List&lt;SplitButtonMenuItem&gt;, modifier: Modifier = Modifier, primaryIcon: ImageVector? = null, enabled: Boolean = true, colors: ButtonColors = ButtonDefaults.buttonColors(), variant: SplitButtonVariant = SplitButtonVariant.Filled )</ID>
+    <ID>FunctionNaming:SplitButtonLayout.kt$@Composable private fun PrimaryButtonContent( icon: ImageVector?, text: String )</ID>
+    <ID>FunctionNaming:StatisticsMetricCards.kt$@Composable fun StatisticsMetricCards( statistics: RouteStatistics, visitCount: Int, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:StatisticsMetricCards.kt$@Composable private fun MetricCard( icon: ImageVector, label: String, value: String, color: androidx.compose.ui.graphics.Color, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SummaryTimerDisplay.kt$@Composable fun SummaryTimerDisplay( days: Int, hours: Int, minutes: Int, seconds: Int, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SummaryTimerDisplay.kt$@Composable private fun TimerSegment( value: Int, label: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun AnimatedLoadingIndicator( visible: Boolean, modifier: Modifier = Modifier, size: Dp = 48.dp, color: Color = MaterialTheme.colorScheme.primary )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun ContainedLoadingIndicator( visible: Boolean, message: String? = null, progress: Float? = null, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun MorphingLoadingIndicator( visible: Boolean, modifier: Modifier = Modifier, size: Dp = 48.dp, color: Color = MaterialTheme.colorScheme.primary )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun MorphingSyncIndicator( isActive: Boolean, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun PhotoUploadIndicator( isUploading: Boolean, currentFile: Int, totalFiles: Int, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun RouteProcessingIndicator( isProcessing: Boolean, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun SyncOperationIndicator( isActive: Boolean, message: String, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun WavyLinearProgressIndicator( progress: Float, modifier: Modifier = Modifier, color: Color = MaterialTheme.colorScheme.primary, trackColor: Color = MaterialTheme.colorScheme.surfaceVariant )</ID>
+    <ID>FunctionNaming:SyncLoadingIndicator.kt$@Composable fun WavyLoadingIndicator( modifier: Modifier = Modifier, size: Dp = 48.dp, color: Color = MaterialTheme.colorScheme.primary, strokeWidth: Dp = 4.dp )</ID>
+    <ID>FunctionNaming:SyncStatusIndicator.kt$@Composable fun SyncStatusCard( syncStatus: SyncStatusUiModel, onSyncClick: () -&gt; Unit, onViewConflictsClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:SyncStatusIndicator.kt$@Composable fun SyncStatusIndicator( syncStatus: SyncStatusUiModel, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:Theme.kt$@Composable fun TrailGlassTheme( darkTheme: Boolean = isSystemInDarkTheme(), dynamicColor: Boolean = true, content: @Composable () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TrackingFABMenu.kt$@Composable fun TrackingFABMenu( isTracking: Boolean, onToggleTracking: () -&gt; Unit, onAddPhoto: () -&gt; Unit, onAddNote: () -&gt; Unit, onCheckIn: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TrackingFABMenu.kt$@Composable private fun FABMenuItem( icon: ImageVector, label: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier, containerColor: Color = MaterialTheme.colorScheme.secondaryContainer )</ID>
+    <ID>FunctionNaming:TransportBreakdownSection.kt$@Composable fun TransportBreakdownSection( distanceByTransport: Map&lt;TransportType, Double&gt;, durationByTransport: Map&lt;TransportType, Long&gt;, isExpanded: Boolean, onToggle: () -&gt; Unit, modifier: Modifier = Modifier, selectedMode: TransportType? = null, onModeSelected: ((TransportType) -&gt; Unit)? = null )</ID>
+    <ID>FunctionNaming:TransportBreakdownSection.kt$@Composable private fun DetailStatItem( label: String, value: String )</ID>
+    <ID>FunctionNaming:TransportBreakdownSection.kt$@Composable private fun SelectedModeDetails( transportType: TransportType, distanceMeters: Double, durationSeconds: Long, onClear: () -&gt; Unit )</ID>
+    <ID>FunctionNaming:TransportBreakdownSection.kt$@Composable private fun TransportBreakdownItem( transportType: TransportType, distanceMeters: Double, durationSeconds: Long, isHighlighted: Boolean = false, isDimmed: Boolean = false )</ID>
+    <ID>FunctionNaming:TransportModeSelector.kt$@Composable fun CompactTransportModeSelector( selectedMode: TransportType?, onModeSelected: (TransportType) -&gt; Unit, modifier: Modifier = Modifier, modes: List&lt;TransportType&gt; = listOf( TransportType.WALK, TransportType.BIKE, TransportType.CAR, TransportType.TRAIN ) )</ID>
+    <ID>FunctionNaming:TransportModeSelector.kt$@Composable fun TransportModeSelector( selectedMode: TransportType?, onModeSelected: (TransportType) -&gt; Unit, modifier: Modifier = Modifier, modes: List&lt;TransportType&gt; = listOf( TransportType.WALK, TransportType.BIKE, TransportType.CAR, TransportType.TRAIN, TransportType.BOAT, TransportType.PLANE ), showLabels: Boolean = true )</ID>
+    <ID>FunctionNaming:TransportModeSelector.kt$@Composable private fun TransportModeButton( mode: TransportType, isSelected: Boolean, onClick: () -&gt; Unit, showLabel: Boolean, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripDetailScreen.kt$@Composable private fun StatItem( icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, value: String )</ID>
+    <ID>FunctionNaming:TripDetailScreen.kt$@Composable private fun TripHeaderCard(trip: Trip)</ID>
+    <ID>FunctionNaming:TripDetailScreen.kt$@Composable private fun TripStatisticsCard(trip: Trip)</ID>
+    <ID>FunctionNaming:TripDetailScreen.kt$@Composable private fun VisitedPlacesCard( countries: List&lt;String&gt;, cities: List&lt;String&gt; )</ID>
+    <ID>FunctionNaming:TripDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TripDetailScreen( trip: Trip, onBack: () -&gt; Unit = {}, onViewRoute: () -&gt; Unit = {}, onEdit: () -&gt; Unit = {}, onShare: () -&gt; Unit = {}, onExport: (ExportFormat) -&gt; Unit = {}, onDelete: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripStatisticsScreen.kt$@Composable private fun LocationsVisitedCard( countries: List&lt;String&gt;, cities: List&lt;String&gt; )</ID>
+    <ID>FunctionNaming:TripStatisticsScreen.kt$@Composable private fun SpeedMetricItem( label: String, speedMps: Double )</ID>
+    <ID>FunctionNaming:TripStatisticsScreen.kt$@Composable private fun SpeedMetricsCard(statistics: com.po4yka.trailglass.domain.model.RouteStatistics)</ID>
+    <ID>FunctionNaming:TripStatisticsScreen.kt$@Composable private fun TripStatisticsContent( tripRoute: TripRoute, tripName: String?, primaryCountry: String?, showTransportBreakdown: Boolean, onToggleTransportBreakdown: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripStatisticsScreen.kt$@Composable private fun TripStatisticsHeader( tripName: String?, primaryCountry: String? )</ID>
+    <ID>FunctionNaming:TripStatisticsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TripStatisticsScreen( tripId: String, controller: TripStatisticsController, onBack: () -&gt; Unit = {}, tripName: String? = null, primaryCountry: String? = null, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripsScreen.kt$@Composable fun TripsScreen( trips: List&lt;Trip&gt;, onTripClick: (Trip) -&gt; Unit = {}, onCreateTrip: () -&gt; Unit = {}, onRefresh: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripsScreen.kt$@Composable private fun EmptyTripsView( onCreateTrip: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripsScreen.kt$@Composable private fun SectionHeader(text: String)</ID>
+    <ID>FunctionNaming:TripsScreen.kt$@Composable private fun TripCard( trip: Trip, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>FunctionNaming:TripsScreen.kt$@Composable private fun TripsContent( trips: List&lt;Trip&gt;, onTripClick: (Trip) -&gt; Unit, onRefresh: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>ImplicitDefaultLocale:EnhancedLocationTrackingService.kt$EnhancedLocationTrackingService$String.format("%d:%02d", minutes, secs)</ID>
+    <ID>ImplicitDefaultLocale:EnhancedLocationTrackingService.kt$EnhancedLocationTrackingService$String.format("%d:%02d:%02d", hours, minutes, secs)</ID>
+    <ID>Indentation:ActivityHeatmap.kt$ </ID>
+    <ID>Indentation:AlgorithmSettingsScreen.kt$ </ID>
+    <ID>Indentation:AppRootComponent.kt$DefaultAppRootComponent$ </ID>
+    <ID>Indentation:AuthRootComponent.kt$DefaultAuthRootComponent$ </ID>
+    <ID>Indentation:BackgroundLocationEducation.kt$ </ID>
+    <ID>Indentation:BarChart.kt$ </ID>
+    <ID>Indentation:CategoryBadge.kt$ </ID>
+    <ID>Indentation:ColorExtensions.kt$ </ID>
+    <ID>Indentation:ComponentShowcaseScreen.kt$ </ID>
+    <ID>Indentation:ConflictResolutionScreen.kt$ </ID>
+    <ID>Indentation:ConflictResolutionUI.kt$ </ID>
+    <ID>Indentation:CreateTripDialog.kt$ </ID>
+    <ID>Indentation:DeviceManagementScreen.kt$ </ID>
+    <ID>Indentation:EnhancedMapView.kt$ </ID>
+    <ID>Indentation:EnhancedSettingsScreen.kt$ </ID>
+    <ID>Indentation:EnhancedStatsScreen.kt$ </ID>
+    <ID>Indentation:EnhancedTimelineScreen.kt$ </ID>
+    <ID>Indentation:FlexibleTopAppBar.kt$ </ID>
+    <ID>Indentation:ForgotPasswordScreen.kt$ </ID>
+    <ID>Indentation:LoginScreen.kt$ </ID>
+    <ID>Indentation:MapScreen.kt$ </ID>
+    <ID>Indentation:MapView.kt$ </ID>
+    <ID>Indentation:Navigation.kt$ </ID>
+    <ID>Indentation:NetworkStatusBanner.kt$ </ID>
+    <ID>Indentation:PhotoCarousel.kt$ </ID>
+    <ID>Indentation:PhotoDetailScreen.kt$ </ID>
+    <ID>Indentation:PhotoGalleryScreen.kt$ </ID>
+    <ID>Indentation:PhotoGrid.kt$ </ID>
+    <ID>Indentation:PieChart.kt$ </ID>
+    <ID>Indentation:PlaceDetailScreen.kt$ </ID>
+    <ID>Indentation:PlaceVisitDetailScreen.kt$ </ID>
+    <ID>Indentation:PlacesScreen.kt$ </ID>
+    <ID>Indentation:RegisterScreen.kt$ </ID>
+    <ID>Indentation:RootComponent.kt$DefaultRootComponent$ </ID>
+    <ID>Indentation:RouteMapView.kt$ </ID>
+    <ID>Indentation:RouteReplayMapView.kt$ </ID>
+    <ID>Indentation:RouteReplayScreen.kt$ </ID>
+    <ID>Indentation:RouteSummaryCard.kt$ </ID>
+    <ID>Indentation:RouteViewScreen.kt$ </ID>
+    <ID>Indentation:SettingsScreen.kt$ </ID>
+    <ID>Indentation:ShapeMorphingExamples.kt$ </ID>
+    <ID>Indentation:SplitButtonLayout.kt$ </ID>
+    <ID>Indentation:StatisticsMetricCards.kt$ </ID>
+    <ID>Indentation:SummaryTimerDisplay.kt$ </ID>
+    <ID>Indentation:SyncLoadingIndicator.kt$ </ID>
+    <ID>Indentation:SyncStatusIndicator.kt$ </ID>
+    <ID>Indentation:TrackingFABMenu.kt$ </ID>
+    <ID>Indentation:TransportBreakdownSection.kt$ </ID>
+    <ID>Indentation:TransportModeSelector.kt$ </ID>
+    <ID>Indentation:TripDetailScreen.kt$ </ID>
+    <ID>Indentation:TripStatisticsScreen.kt$ </ID>
+    <ID>Indentation:TripsScreen.kt$ </ID>
+    <ID>Indentation:Type.kt$ </ID>
+    <ID>LongMethod:ActivityHeatmap.kt$@Composable fun ActivityHeatmap( data: Map&lt;DayOfWeek, Map&lt;Int, Int&gt;&gt;, // day -&gt; hour -&gt; activity count modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:AlgorithmSettingsScreen.kt$@Composable private fun &lt;T&gt; AlgorithmSelectionDialog( title: String, options: List&lt;T&gt;, selectedOption: T, getOptionLabel: (T) -&gt; String, getOptionDescription: (T) -&gt; String, onDismiss: () -&gt; Unit, onSelect: (T) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:AlgorithmSettingsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AlgorithmSettingsScreen( controller: SettingsController, onBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:BackgroundLocationEducation.kt$@Composable fun BackgroundLocationEducationScreen( onGrantPermission: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:BackgroundLocationEducation.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun BackgroundLocationBottomSheet( onOpenSettings: () -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:ComponentShowcaseScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ComponentShowcaseScreen( onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ConflictResolutionScreen.kt$@Composable private fun ConflictView( state: ConflictResolutionController.ConflictResolutionState, onKeepLocal: () -&gt; Unit, onKeepRemote: () -&gt; Unit, onMerge: () -&gt; Unit, onSkip: () -&gt; Unit, onPrevious: () -&gt; Unit, onNext: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ConflictResolutionScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ConflictResolutionScreen( controller: ConflictResolutionController, onClose: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ConflictResolutionUI.kt$@Composable fun ConflictCard( conflict: ConflictUiModel, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ConflictResolutionUI.kt$@Composable fun ConflictResolutionDialog( conflict: ConflictUiModel, onResolve: (ConflictResolutionChoice) -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ConflictResolutionUI.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ConflictListScreen( conflicts: List&lt;ConflictUiModel&gt;, onConflictClick: (ConflictUiModel) -&gt; Unit, onBackClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:CreateTripDialog.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun CreateTripDialog( userId: String, onDismiss: () -&gt; Unit, onConfirm: (Trip) -&gt; Unit )</ID>
+    <ID>LongMethod:DeviceManagementScreen.kt$@Composable private fun DeviceCard( device: DeviceDto, isDeleting: Boolean, onDelete: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:DeviceManagementScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DeviceManagementScreen( controller: DeviceManagementController, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:EnhancedMapView.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedMapView( controller: EnhancedMapController, modifier: Modifier = Modifier, onMarkerClick: (EnhancedMapMarker) -&gt; Unit = {}, onClusterClick: (MarkerCluster) -&gt; Unit = {}, onRouteClick: (MapRoute) -&gt; Unit = {} )</ID>
+    <ID>LongMethod:EnhancedMapView.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun VisualizationModeSelector( currentMode: MapVisualizationMode, onModeChange: (MapVisualizationMode) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:EnhancedSettingsScreen.kt$@Composable fun EnhancedSettingsScreen( controller: SettingsController, onNavigateToAccount: () -&gt; Unit = {}, onNavigateToDataManagement: () -&gt; Unit = {}, onNavigateToAlgorithmSettings: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:EnhancedSettingsScreen.kt$@Composable private fun AppearanceSettingsCard( appearance: AppearanceSettings, onUpdate: (AppearanceSettings) -&gt; Unit )</ID>
+    <ID>LongMethod:EnhancedSettingsScreen.kt$@Composable private fun PrivacySettingsCard( privacy: PrivacySettings, onUpdate: (PrivacySettings) -&gt; Unit )</ID>
+    <ID>LongMethod:EnhancedSettingsScreen.kt$@Composable private fun TrackingPreferencesCard( preferences: TrackingPreferences, onUpdate: (TrackingPreferences) -&gt; Unit )</ID>
+    <ID>LongMethod:EnhancedSettingsScreen.kt$@Composable private fun UnitPreferencesCard( units: UnitPreferences, onUpdate: (UnitPreferences) -&gt; Unit )</ID>
+    <ID>LongMethod:EnhancedStatsScreen.kt$@Composable private fun EnhancedStatsContent( stats: ComprehensiveStatistics, selectedTransportMode: TransportType?, onTransportModeSelected: (TransportType) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:EnhancedStatsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedStatsScreen( controller: EnhancedStatsController, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:EnhancedTimelineScreen.kt$@Composable private fun EnhancedVisitCard( visit: com.po4yka.trailglass.domain.model.PlaceVisit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:EnhancedTimelineScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EnhancedTimelineScreen( controller: EnhancedTimelineController, modifier: Modifier = Modifier, trackingController: com.po4yka.trailglass.feature.tracking.LocationTrackingController? = null, onAddPhoto: () -&gt; Unit = {}, onAddNote: () -&gt; Unit = {}, onCheckIn: () -&gt; Unit = {} )</ID>
+    <ID>LongMethod:EnhancedTimelineScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable private fun TimelineFilterBottomSheet( currentFilter: TimelineFilter, onFilterChanged: (TimelineFilter) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:FlexibleTopAppBar.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class) @Composable fun LargeFlexibleTopAppBar( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, subtitle: (@Composable () -&gt; Unit)? = null, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start, collapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight, expandedHeight: Dp = 180.dp, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null, backgroundContent: @Composable (BoxScope.() -&gt; Unit)? = null )</ID>
+    <ID>LongMethod:FlexibleTopAppBar.kt$@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class) @Composable fun MediumFlexibleTopAppBar( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, subtitle: (@Composable () -&gt; Unit)? = null, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, leadingIcon: @Composable (() -&gt; Unit)? = null, titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start, collapsedHeight: Dp = TopAppBarDefaults.MediumAppBarCollapsedHeight, expandedHeight: Dp = 128.dp, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null )</ID>
+    <ID>LongMethod:ForgotPasswordScreen.kt$@Composable fun ForgotPasswordScreen( onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:LocationPermissionHandler.kt$@Composable fun rememberLocationPermissionState(onPermissionResult: (Boolean) -&gt; Unit = {}): LocationPermissionState</ID>
+    <ID>LongMethod:LoginScreen.kt$@Composable fun LoginScreen( authController: AuthController, onNavigateToRegister: () -&gt; Unit, onNavigateToForgotPassword: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$fun generateClusterBitmap( count: Int, color: Int, isSelected: Boolean ): BitmapDescriptor</ID>
+    <ID>LongMethod:MapScreen.kt$@Composable private fun MarkerInfoCard( marker: MapMarker, onClose: () -&gt; Unit, onViewDetails: () -&gt; Unit, onAddPhoto: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:MapView.kt$@Composable fun MapView( controller: MapController, modifier: Modifier = Modifier, onMarkerClick: (MapMarker) -&gt; Unit = {}, onRouteClick: (MapRoute) -&gt; Unit = {} )</ID>
+    <ID>LongMethod:MapView.kt$@Composable private fun GoogleMapContent( mapData: MapDisplayData, cameraMove: CameraMove?, eventSink: MapEventSink, onMarkerClick: (MapMarker) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:Navigation.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun MainScaffold( rootComponent: RootComponent, networkConnectivityMonitor: NetworkConnectivityMonitor, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PermissionDialogs.kt$@Composable fun PermissionDeniedDialog( requestState: PermissionRequestState, onRetry: () -&gt; Unit, onContinue: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PermissionDialogs.kt$@Composable fun PermissionPermanentlyDeniedDialog( requestState: PermissionRequestState, instructions: SettingsInstructions, onOpenSettings: () -&gt; Unit, onDismiss: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PermissionDialogs.kt$@Composable fun PermissionRationaleDialog( requestState: PermissionRequestState, onAccept: () -&gt; Unit, onDeny: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PhotoAttachmentDialog.kt$@Composable fun PhotoAttachmentHandler( placeVisitId: String, attachPhotoUseCase: AttachPhotoToVisitUseCase, onDismiss: () -&gt; Unit, onPhotoAttached: () -&gt; Unit )</ID>
+    <ID>LongMethod:PhotoDetailScreen.kt$@Composable private fun PhotoDetailContent( photoWithMetadata: PhotoWithMetadata, onAttachToVisit: () -&gt; Unit, onViewOnRoute: ((String) -&gt; Unit)?, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PhotoDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PhotoDetailScreen( photoId: String, controller: PhotoDetailController, onNavigateBack: () -&gt; Unit, onViewOnRoute: ((String) -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PhotoGalleryScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PhotoGalleryScreen( controller: PhotoGalleryController, onPhotoClick: (String) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlaceDetailScreen.kt$@Composable private fun PlaceDetailContent( place: FrequentPlace, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlaceDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlaceDetailScreen( place: FrequentPlace?, onToggleFavorite: () -&gt; Unit, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlaceVisitDetailScreen.kt$@Composable private fun PlaceVisitContent( visit: PlaceVisit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlaceVisitDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun PlaceVisitDetailScreen( placeVisitId: String, apiClient: TrailGlassApiClient, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlacesScreen.kt$@Composable private fun FrequentPlaceCard( place: FrequentPlace, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:PlacesScreen.kt$@Composable private fun PlacesContent( places: List&lt;FrequentPlace&gt;, onPlaceClick: (FrequentPlace) -&gt; Unit, onRefresh: () -&gt; Unit, showSearchButton: Boolean = true, onShowSearch: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:RegisterScreen.kt$@Composable fun RegisterScreen( authController: AuthController, onNavigateToLogin: () -&gt; Unit, onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:RootComponent.kt$DefaultRootComponent$private fun createChild( config: RootComponent.Config, componentContext: ComponentContext ): RootComponent.Child</ID>
+    <ID>LongMethod:RouteMapView.kt$@Composable fun RouteMapView( tripRoute: TripRoute, mapStyle: MapStyle, shouldRecenterCamera: Boolean, selectedPhotoMarker: PhotoMarker?, onPhotoMarkerClick: (PhotoMarker) -&gt; Unit, onCameraRecentered: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:RouteReplayScreen.kt$@Composable fun RouteReplayScreen( tripId: String, controller: RouteReplayController, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:RouteReplayScreen.kt$@Composable private fun ReplayControlPanel( isPlaying: Boolean, progress: Float, playbackSpeed: PlaybackSpeed, onPlayPauseClick: () -&gt; Unit, onProgressChange: (Float) -&gt; Unit, onSpeedClick: () -&gt; Unit, onRestartClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:RouteSummaryCard.kt$@Composable fun RouteSummaryCard( tripRoute: TripRoute, onPlayClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:RouteViewScreen.kt$@Composable private fun MapStyleOption( style: MapStyle, isSelected: Boolean, onClick: () -&gt; Unit )</ID>
+    <ID>LongMethod:RouteViewScreen.kt$@Composable private fun PrivacyWarningDialog( exportResult: com.po4yka.trailglass.feature.route.export.ExportResult, onConfirm: () -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:RouteViewScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun RouteViewScreen( tripId: String, controller: RouteViewController, onNavigateToReplay: (String) -&gt; Unit = {}, onNavigateToStatistics: (String) -&gt; Unit = {}, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SettingsScreen.kt$@Composable fun SettingsScreen( trackingController: LocationTrackingController, onNavigateToDeviceManagement: () -&gt; Unit = {}, onNavigateToAlgorithmSettings: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SettingsScreen.kt$@Composable private fun PermissionsCard( hasPermissions: Boolean, hasBackgroundPermission: Boolean, onRequestPermissions: () -&gt; Unit, onRequestBackgroundPermission: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SettingsScreen.kt$@Composable private fun TrackingStatusCard( isTracking: Boolean, mode: TrackingMode, samplesRecorded: Int, hasPermissions: Boolean, onStartTracking: () -&gt; Unit, onStopTracking: () -&gt; Unit, onRequestPermissions: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SplitButtonLayout.kt$@Composable fun SplitButton( primaryText: String, primaryIcon: ImageVector?, onPrimaryClick: () -&gt; Unit, secondaryIcon: ImageVector = Icons.Default.MoreVert, onSecondaryClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, colors: ButtonColors = ButtonDefaults.buttonColors(), variant: SplitButtonVariant = SplitButtonVariant.Filled )</ID>
+    <ID>LongMethod:StatisticsMetricCards.kt$@Composable fun StatisticsMetricCards( statistics: RouteStatistics, visitCount: Int, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SyncStatusIndicator.kt$@Composable fun SyncStatusCard( syncStatus: SyncStatusUiModel, onSyncClick: () -&gt; Unit, onViewConflictsClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:SyncStatusIndicator.kt$@Composable fun SyncStatusIndicator( syncStatus: SyncStatusUiModel, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:TrackingFABMenu.kt$@Composable fun TrackingFABMenu( isTracking: Boolean, onToggleTracking: () -&gt; Unit, onAddPhoto: () -&gt; Unit, onAddNote: () -&gt; Unit, onCheckIn: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:TransportBreakdownSection.kt$@Composable fun TransportBreakdownSection( distanceByTransport: Map&lt;TransportType, Double&gt;, durationByTransport: Map&lt;TransportType, Long&gt;, isExpanded: Boolean, onToggle: () -&gt; Unit, modifier: Modifier = Modifier, selectedMode: TransportType? = null, onModeSelected: ((TransportType) -&gt; Unit)? = null )</ID>
+    <ID>LongMethod:TransportBreakdownSection.kt$@Composable private fun TransportBreakdownItem( transportType: TransportType, distanceMeters: Double, durationSeconds: Long, isHighlighted: Boolean = false, isDimmed: Boolean = false )</ID>
+    <ID>LongMethod:TransportModeSelector.kt$@Composable private fun TransportModeButton( mode: TransportType, isSelected: Boolean, onClick: () -&gt; Unit, showLabel: Boolean, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:TripDetailScreen.kt$@Composable private fun TripHeaderCard(trip: Trip)</ID>
+    <ID>LongMethod:TripDetailScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TripDetailScreen( trip: Trip, onBack: () -&gt; Unit = {}, onViewRoute: () -&gt; Unit = {}, onEdit: () -&gt; Unit = {}, onShare: () -&gt; Unit = {}, onExport: (ExportFormat) -&gt; Unit = {}, onDelete: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:TripStatisticsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun TripStatisticsScreen( tripId: String, controller: TripStatisticsController, onBack: () -&gt; Unit = {}, tripName: String? = null, primaryCountry: String? = null, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:TripsScreen.kt$@Composable private fun TripCard( trip: Trip, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:AlgorithmSettingsScreen.kt$( icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, currentValue: String, description: String, onClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:AlgorithmSettingsScreen.kt$( title: String, options: List&lt;T&gt;, selectedOption: T, getOptionLabel: (T) -&gt; String, getOptionDescription: (T) -&gt; String, onDismiss: () -&gt; Unit, onSelect: (T) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:ConflictResolutionScreen.kt$( state: ConflictResolutionController.ConflictResolutionState, onKeepLocal: () -&gt; Unit, onKeepRemote: () -&gt; Unit, onMerge: () -&gt; Unit, onSkip: () -&gt; Unit, onPrevious: () -&gt; Unit, onNext: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:EnhancedMapView.kt$( mapData: EnhancedMapDisplayData, selectedMarker: EnhancedMapMarker?, selectedCluster: MarkerCluster?, selectedRoute: MapRoute?, onMarkerClick: (EnhancedMapMarker) -&gt; Unit, onClusterClick: (MarkerCluster) -&gt; Unit, onRouteClick: (MapRoute) -&gt; Unit, onZoomChange: (Float) -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:EnhancedTimelineScreen.kt$( controller: EnhancedTimelineController, modifier: Modifier = Modifier, trackingController: com.po4yka.trailglass.feature.tracking.LocationTrackingController? = null, onAddPhoto: () -&gt; Unit = {}, onAddNote: () -&gt; Unit = {}, onCheckIn: () -&gt; Unit = {} )</ID>
+    <ID>LongParameterList:EnhancedTimelineScreen.kt$( selectedDate: LocalDate, zoomLevel: TimelineZoomLevel, onPrevious: () -&gt; Unit, onNext: () -&gt; Unit, onToday: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:FlexibleTopAppBar.kt$( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null )</ID>
+    <ID>LongParameterList:FlexibleTopAppBar.kt$( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, subtitle: (@Composable () -&gt; Unit)? = null, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, leadingIcon: @Composable (() -&gt; Unit)? = null, titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start, collapsedHeight: Dp = TopAppBarDefaults.MediumAppBarCollapsedHeight, expandedHeight: Dp = 128.dp, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null )</ID>
+    <ID>LongParameterList:FlexibleTopAppBar.kt$( title: @Composable () -&gt; Unit, modifier: Modifier = Modifier, subtitle: (@Composable () -&gt; Unit)? = null, navigationIcon: @Composable () -&gt; Unit = {}, actions: @Composable RowScope.() -&gt; Unit = {}, titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start, collapsedHeight: Dp = TopAppBarDefaults.LargeAppBarCollapsedHeight, expandedHeight: Dp = 180.dp, windowInsets: WindowInsets = TopAppBarDefaults.windowInsets, colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(), scrollBehavior: TopAppBarScrollBehavior? = null, backgroundContent: @Composable (BoxScope.() -&gt; Unit)? = null )</ID>
+    <ID>LongParameterList:PlacesScreen.kt$( places: List&lt;FrequentPlace&gt;, onPlaceClick: (FrequentPlace) -&gt; Unit, onRefresh: () -&gt; Unit, showSearchButton: Boolean = true, onShowSearch: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:PlacesScreen.kt$( places: List&lt;FrequentPlace&gt;, searchQuery: String = "", onPlaceClick: (FrequentPlace) -&gt; Unit = {}, onRefresh: () -&gt; Unit = {}, onSearch: (String) -&gt; Unit = {}, onClearSearch: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:RouteMapView.kt$( tripRoute: TripRoute, mapStyle: MapStyle, shouldRecenterCamera: Boolean, selectedPhotoMarker: PhotoMarker?, onPhotoMarkerClick: (PhotoMarker) -&gt; Unit, onCameraRecentered: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:RouteReplayMapView.kt$( tripRoute: TripRoute, vehicleState: VehicleState, cameraPosition: Coordinate, cameraBearing: Double, cameraTilt: Double, cameraZoom: Float, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:RouteReplayScreen.kt$( isPlaying: Boolean, progress: Float, playbackSpeed: PlaybackSpeed, onPlayPauseClick: () -&gt; Unit, onProgressChange: (Float) -&gt; Unit, onSpeedClick: () -&gt; Unit, onRestartClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:RouteViewScreen.kt$( tripId: String, controller: RouteViewController, onNavigateToReplay: (String) -&gt; Unit = {}, onNavigateToStatistics: (String) -&gt; Unit = {}, onBack: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:RouteViewScreen.kt$( tripRoute: TripRoute, mapStyle: MapStyle, shouldRecenterCamera: Boolean, selectedPhotoMarker: PhotoMarker?, onPhotoMarkerClick: (PhotoMarker) -&gt; Unit, onCameraRecentered: () -&gt; Unit, onPlayClick: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( isTracking: Boolean, mode: TrackingMode, samplesRecorded: Int, hasPermissions: Boolean, onStartTracking: () -&gt; Unit, onStopTracking: () -&gt; Unit, onRequestPermissions: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:SplitButtonLayout.kt$( primaryText: String, onPrimaryClick: () -&gt; Unit, menuItems: List&lt;SplitButtonMenuItem&gt;, modifier: Modifier = Modifier, primaryIcon: ImageVector? = null, enabled: Boolean = true, colors: ButtonColors = ButtonDefaults.buttonColors(), variant: SplitButtonVariant = SplitButtonVariant.Filled )</ID>
+    <ID>LongParameterList:SplitButtonLayout.kt$( primaryText: String, primaryIcon: ImageVector?, onPrimaryClick: () -&gt; Unit, secondaryIcon: ImageVector = Icons.Default.MoreVert, onSecondaryClick: () -&gt; Unit, modifier: Modifier = Modifier, enabled: Boolean = true, colors: ButtonColors = ButtonDefaults.buttonColors(), variant: SplitButtonVariant = SplitButtonVariant.Filled )</ID>
+    <ID>LongParameterList:TrackingFABMenu.kt$( isTracking: Boolean, onToggleTracking: () -&gt; Unit, onAddPhoto: () -&gt; Unit, onAddNote: () -&gt; Unit, onCheckIn: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:TransportBreakdownSection.kt$( distanceByTransport: Map&lt;TransportType, Double&gt;, durationByTransport: Map&lt;TransportType, Long&gt;, isExpanded: Boolean, onToggle: () -&gt; Unit, modifier: Modifier = Modifier, selectedMode: TransportType? = null, onModeSelected: ((TransportType) -&gt; Unit)? = null )</ID>
+    <ID>LongParameterList:TripDetailScreen.kt$( trip: Trip, onBack: () -&gt; Unit = {}, onViewRoute: () -&gt; Unit = {}, onEdit: () -&gt; Unit = {}, onShare: () -&gt; Unit = {}, onExport: (ExportFormat) -&gt; Unit = {}, onDelete: () -&gt; Unit = {}, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:TripStatisticsScreen.kt$( tripId: String, controller: TripStatisticsController, onBack: () -&gt; Unit = {}, tripName: String? = null, primaryCountry: String? = null, modifier: Modifier = Modifier )</ID>
+    <ID>LongParameterList:TripStatisticsScreen.kt$( tripRoute: TripRoute, tripName: String?, primaryCountry: String?, showTransportBreakdown: Boolean, onToggleTransportBreakdown: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
+    <ID>MagicNumber:ActivityHeatmap.kt$3</ID>
+    <ID>MagicNumber:ActivityHeatmap.kt$4f</ID>
+    <ID>MagicNumber:BackgroundLocationEducation.kt$3</ID>
+    <ID>MagicNumber:ConflictResolutionScreen.kt$0.4f</ID>
+    <ID>MagicNumber:ConflictResolutionScreen.kt$0.6f</ID>
+    <ID>MagicNumber:EnhancedLocationTrackingService.kt$EnhancedLocationTrackingService$3600</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.01</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.025</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.05</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.1</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.25</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.5</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$0.6</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$10.0</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$10f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$11f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$12f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$13f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$14f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$15f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$16f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$20.0</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$3f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$40.0</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$4f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$5.0</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$50</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$5f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$6f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$7f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$8f</ID>
+    <ID>MagicNumber:EnhancedMapView.kt$9f</ID>
+    <ID>MagicNumber:EnhancedStatsScreen.kt$3</ID>
+    <ID>MagicNumber:EnhancedStatsScreen.kt$4</ID>
+    <ID>MagicNumber:EnhancedStatsScreen.kt$5</ID>
+    <ID>MagicNumber:EnhancedStatsScreen.kt$6</ID>
+    <ID>MagicNumber:EnhancedTimelineScreen.kt$0.7f</ID>
+    <ID>MagicNumber:EnhancedTimelineScreen.kt$0.8f</ID>
+    <ID>MagicNumber:EnhancedTimelineScreen.kt$3</ID>
+    <ID>MagicNumber:FlexibleTopAppBar.kt$0.1f</ID>
+    <ID>MagicNumber:FlexibleTopAppBar.kt$0.3f</ID>
+    <ID>MagicNumber:FlexibleTopAppBar.kt$0.5f</ID>
+    <ID>MagicNumber:LocationProcessingWorker.kt$LocationProcessingWorker$3</ID>
+    <ID>MagicNumber:LocationTrackingWorker.kt$LocationTrackingWorker$3</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.35f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.3f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.45f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.4f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.5f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.6f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.7f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0.8f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$0xFF</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$1.15f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$1.2f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$1.5f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$10</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$10000</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$10f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$16</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$3f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$4f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$50</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$6f</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$8</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$80</ID>
+    <ID>MagicNumber:MapMarkerBitmapGenerator.kt$MapMarkerBitmapGenerator$8f</ID>
+    <ID>MagicNumber:MapView.kt$10f</ID>
+    <ID>MagicNumber:MapView.kt$12f</ID>
+    <ID>MagicNumber:MapView.kt$14f</ID>
+    <ID>MagicNumber:MapView.kt$16f</ID>
+    <ID>MagicNumber:MapView.kt$8f</ID>
+    <ID>MagicNumber:PermissionDialogs.kt$3</ID>
+    <ID>MagicNumber:PhotoDetailScreen.kt$1024.0</ID>
+    <ID>MagicNumber:PhotoDetailScreen.kt$3f</ID>
+    <ID>MagicNumber:PhotoDetailScreen.kt$4f</ID>
+    <ID>MagicNumber:PhotoDetailScreen.kt$8</ID>
+    <ID>MagicNumber:PhotoGalleryScreen.kt$3</ID>
+    <ID>MagicNumber:PieChart.kt$0.3f</ID>
+    <ID>MagicNumber:PieChart.kt$360f</ID>
+    <ID>MagicNumber:PieChart.kt$90f</ID>
+    <ID>MagicNumber:PlaceDetailScreen.kt$6</ID>
+    <ID>MagicNumber:PlaceDetailScreen.kt$7</ID>
+    <ID>MagicNumber:PlaceVisitDetailScreen.kt$6</ID>
+    <ID>MagicNumber:RegisterScreen.kt$8</ID>
+    <ID>MagicNumber:RouteMapView.kt$10f</ID>
+    <ID>MagicNumber:RouteMapView.kt$12f</ID>
+    <ID>MagicNumber:RouteMapView.kt$5f</ID>
+    <ID>MagicNumber:RouteMapView.kt$6f</ID>
+    <ID>MagicNumber:RouteMapView.kt$8f</ID>
+    <ID>MagicNumber:RouteReplayMapView.kt$3.6</ID>
+    <ID>MagicNumber:RouteSummaryCard.kt$10.0</ID>
+    <ID>MagicNumber:RouteSummaryCard.kt$3</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$0.12f</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$0.15f</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$0.20f</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$3</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$3f</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$4</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$5f</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphableShapes$6</ID>
+    <ID>MagicNumber:ShapeMorphing.kt$MorphingShape$0.9f</ID>
+    <ID>MagicNumber:StatisticsMetricCards.kt$10.0</ID>
+    <ID>MagicNumber:SyncLoadingIndicator.kt$0.5f</ID>
+    <ID>MagicNumber:SyncLoadingIndicator.kt$1500</ID>
+    <ID>MagicNumber:SyncLoadingIndicator.kt$180f</ID>
+    <ID>MagicNumber:SyncLoadingIndicator.kt$2000</ID>
+    <ID>MagicNumber:SyncLoadingIndicator.kt$3000</ID>
+    <ID>MagicNumber:SyncLoadingIndicator.kt$3f</ID>
+    <ID>MagicNumber:TrackingFABMenu.kt$200</ID>
+    <ID>MagicNumber:TransportBreakdownSection.kt$0.4f</ID>
+    <ID>MagicNumber:TransportBreakdownSection.kt$10.0</ID>
+    <ID>MagicNumber:TransportBreakdownSection.kt$3600</ID>
+    <ID>MagicNumber:TransportBreakdownSection.kt$3600.0</ID>
+    <ID>MagicNumber:TransportBreakdownSection.kt$4</ID>
+    <ID>MagicNumber:TripDetailScreen.kt$10</ID>
+    <ID>MagicNumber:TripStatisticsScreen.kt$10</ID>
+    <ID>MagicNumber:TripsScreen.kt$3</ID>
+    <ID>MatchingDeclarationName:ColorExtensions.kt$ExtendedColors</ID>
+    <ID>MatchingDeclarationName:Navigation.kt$Screen</ID>
+    <ID>MaxLineLength:AlgorithmSettingsScreen.kt$"Most accurate (~0.5mm error) but slower. Use for precise measurements. Accounts for Earth's ellipsoidal shape."</ID>
+    <ID>MaxLineLength:BackgroundLocationEducation.kt$text = "Note: You may need to navigate through app settings to find the location permission option."</ID>
+    <ID>MaxLineLength:BackgroundLocationEducation.kt$text = "To automatically track your trips and visits, TrailGlass needs access to your location even when the app is closed or not in use."</ID>
+    <ID>MaxLineLength:BackgroundLocationEducation.kt$text = "Your location data stays on your device. You can turn off background tracking anytime in Settings."</ID>
+    <ID>MaxLineLength:ComponentShowcaseScreen.kt$description = "Material 3 Expressive ButtonGroup for selecting transport mode with spring animations"</ID>
+    <ID>MaxLineLength:EnhancedSettingsScreen.kt$"This will permanently delete all your data including trips, locations, photos, and settings. This action cannot be undone.\n\nAre you sure you want to continue?"</ID>
+    <ID>MaxLineLength:PermissionDialogs.kt$text = "You've previously denied ${requestState.rationale.title.lowercase()}. To use this feature, you'll need to enable it in Settings."</ID>
+    <ID>MaxLineLength:PhotoAttachmentDialog.kt$// when (val result = attachPhotoUseCase.execute(photoId, placeVisitId, caption.ifBlank { null })) {</ID>
+    <ID>MaxLineLength:PlaceDetailScreen.kt$contentDescription = if (place.isFavorite) "Remove from favorites" else "Add to favorites"</ID>
+    <ID>MaxLineLength:PlaceDetailScreen.kt$tint = if (place.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$imageVector = if (hasBackgroundPermission) Icons.Default.CheckCircle else Icons.Default.LocationOn</ID>
+    <ID>MaxLineLength:SettingsScreen.kt$text = "Enable background location to automatically track trips and visits even when the app is closed."</ID>
+    <ID>MaximumLineLength:AlgorithmSettingsScreen.kt$ </ID>
+    <ID>MaximumLineLength:BackgroundLocationEducation.kt$ </ID>
+    <ID>MaximumLineLength:ComponentShowcaseScreen.kt$ </ID>
+    <ID>MaximumLineLength:EnhancedSettingsScreen.kt$ </ID>
+    <ID>MaximumLineLength:PermissionDialogs.kt$ </ID>
+    <ID>MaximumLineLength:PlaceDetailScreen.kt$ </ID>
+    <ID>MaximumLineLength:SettingsScreen.kt$ </ID>
+    <ID>NoWildcardImports:ActivityHeatmap.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:AlgorithmSettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:AlgorithmSettingsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:AlgorithmSettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:BackgroundLocationEducation.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:BackgroundLocationEducation.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:BackgroundLocationEducation.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:BackgroundLocationEducation.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:BackgroundLocationEducation.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:BarChart.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:CategoryBadge.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:CategoryBadge.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ComponentShowcaseScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:ComponentShowcaseScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ComponentShowcaseScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:ComponentShowcaseScreen.kt$import com.po4yka.trailglass.ui.components.*</ID>
+    <ID>NoWildcardImports:ConflictResolutionScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:ConflictResolutionScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ConflictResolutionScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:ConflictResolutionUI.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:ConflictResolutionUI.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ConflictResolutionUI.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:CreateTripDialog.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:CreateTripDialog.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:CreateTripDialog.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:DeviceManagementScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:DeviceManagementScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:DeviceManagementScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:EnhancedMapView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:EnhancedMapView.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:EnhancedMapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:EnhancedMapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>NoWildcardImports:EnhancedMapView.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>NoWildcardImports:EnhancedSettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:EnhancedSettingsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:EnhancedSettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:EnhancedSettingsScreen.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>NoWildcardImports:EnhancedStatsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:EnhancedStatsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:EnhancedStatsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:EnhancedStatsScreen.kt$import com.po4yka.trailglass.ui.components.charts.*</ID>
+    <ID>NoWildcardImports:EnhancedTimelineScreen.kt$import androidx.compose.animation.*</ID>
+    <ID>NoWildcardImports:EnhancedTimelineScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:EnhancedTimelineScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:EnhancedTimelineScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:ErrorView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:ErrorView.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:FlexibleTopAppBar.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:FlexibleTopAppBar.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ForgotPasswordScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:ForgotPasswordScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:ForgotPasswordScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:ForgotPasswordScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ForgotPasswordScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:LocationPermissionHandler.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:LocationProcessingWorker.kt$import androidx.work.*</ID>
+    <ID>NoWildcardImports:LocationTrackingService.kt$import kotlinx.coroutines.*</ID>
+    <ID>NoWildcardImports:LocationTrackingWorker.kt$import androidx.work.*</ID>
+    <ID>NoWildcardImports:LoginScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:LoginScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:LoginScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:LoginScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:LoginScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:MapScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:MapScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:MapScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:MapScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:MapScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:MapView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:MapView.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:MapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:MapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>NoWildcardImports:MapView.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>NoWildcardImports:Navigation.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:Navigation.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:Navigation.kt$import com.po4yka.trailglass.ui.screens.*</ID>
+    <ID>NoWildcardImports:NetworkStatusBanner.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:NetworkStatusBanner.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:NetworkStatusBanner.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PermissionDialogs.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PermissionDialogs.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PhotoAttachmentDialog.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PhotoAttachmentDialog.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PhotoAttachmentDialog.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PhotoCarousel.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PhotoCarousel.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PhotoDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PhotoDetailScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:PhotoDetailScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:PhotoDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PhotoDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PhotoGalleryScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PhotoGalleryScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:PhotoGalleryScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:PhotoGalleryScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PhotoGalleryScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PhotoGrid.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PhotoGrid.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PieChart.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PlaceDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PlaceDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PlaceDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PlaceVisitDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PlaceVisitDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PlaceVisitDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PlacesScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:PlacesScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:PlacesScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:PlacesScreen.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>NoWildcardImports:RegisterScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:RegisterScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:RegisterScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:RegisterScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:RegisterScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:RouteMapView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:RouteMapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:RouteMapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>NoWildcardImports:RouteReplayMapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:RouteReplayMapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>NoWildcardImports:RouteReplayScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:RouteReplayScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:RouteReplayScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:RouteReplayScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:RouteReplayScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:RouteSummaryCard.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:RouteSummaryCard.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:RouteViewScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:RouteViewScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:RouteViewScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:SettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:SettingsScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:SettingsScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:SettingsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:SettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:ShapeMorphingExamples.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:ShapeMorphingExamples.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:ShapeMorphingExamples.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:ShapeMorphingExamples.kt$import com.po4yka.trailglass.ui.theme.*</ID>
+    <ID>NoWildcardImports:StatisticsMetricCards.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:StatisticsMetricCards.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:StatisticsMetricCards.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:StatisticsMetricCards.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:SummaryTimerDisplay.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:SummaryTimerDisplay.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:SyncLoadingIndicator.kt$import androidx.compose.animation.core.*</ID>
+    <ID>NoWildcardImports:SyncLoadingIndicator.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:SyncLoadingIndicator.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:SyncLoadingIndicator.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:SyncStatusIndicator.kt$import androidx.compose.animation.core.*</ID>
+    <ID>NoWildcardImports:SyncStatusIndicator.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:SyncStatusIndicator.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:SyncStatusIndicator.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:SyncWorker.kt$import androidx.work.*</ID>
+    <ID>NoWildcardImports:Theme.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TrackingFABMenu.kt$import androidx.compose.animation.*</ID>
+    <ID>NoWildcardImports:TrackingFABMenu.kt$import androidx.compose.animation.core.*</ID>
+    <ID>NoWildcardImports:TrackingFABMenu.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:TrackingFABMenu.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:TrackingFABMenu.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TrackingFABMenu.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:TransportBreakdownSection.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:TransportBreakdownSection.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TransportModeSelector.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:TransportModeSelector.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TripDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:TripDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TripDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:TripStatisticsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:TripStatisticsScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>NoWildcardImports:TripStatisticsScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>NoWildcardImports:TripStatisticsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TripStatisticsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:TripsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:TripsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TripsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>PrintStackTrace:TrailGlassApplication.kt$TrailGlassApplication$e</ID>
+    <ID>SwallowedException:DeviceManagementScreen.kt$e: Exception</ID>
+    <ID>SwallowedException:EnhancedLocationTrackingService.kt$EnhancedLocationTrackingService$e: IllegalArgumentException</ID>
+    <ID>SwallowedException:LocationTrackingWorker.kt$LocationTrackingWorker$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:AndroidRouteShareHandler.kt$AndroidRouteShareHandler$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DeviceManagementScreen.kt$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:EnhancedLocationTrackingService.kt$EnhancedLocationTrackingService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LocationProcessingWorker.kt$LocationProcessingWorker$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LocationTrackingService.kt$LocationTrackingService$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:LocationTrackingWorker.kt$LocationTrackingWorker$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:SyncWorker.kt$SyncWorker$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:TrailGlassApplication.kt$TrailGlassApplication$e: Exception</ID>
+    <ID>TooManyFunctions:EnhancedMapView.kt$com.po4yka.trailglass.ui.components.EnhancedMapView.kt</ID>
+    <ID>TooManyFunctions:EnhancedStatsScreen.kt$com.po4yka.trailglass.ui.screens.EnhancedStatsScreen.kt</ID>
+    <ID>TooManyFunctions:EnhancedTimelineScreen.kt$com.po4yka.trailglass.ui.screens.EnhancedTimelineScreen.kt</ID>
+    <ID>UnusedParameter:AlgorithmSettingsScreen.kt$modifier: Modifier = Modifier</ID>
+    <ID>UnusedParameter:ConflictResolutionScreen.kt$onNext: () -&gt; Unit</ID>
+    <ID>UnusedParameter:EnhancedStatsScreen.kt$selectedPeriod: GetStatsUseCase.Period?</ID>
+    <ID>UnusedParameter:EnhancedTimelineScreen.kt$zoomLevel: TimelineZoomLevel</ID>
+    <ID>UnusedParameter:FlexibleTopAppBar.kt$colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors()</ID>
+    <ID>UnusedParameter:LocationTrackingService.kt$LocationTrackingService$text: String</ID>
+    <ID>UnusedParameter:MapView.kt$onRouteClick: (MapRoute) -&gt; Unit = {}</ID>
+    <ID>UnusedParameter:PhotoAttachmentDialog.kt$attachPhotoUseCase: AttachPhotoToVisitUseCase</ID>
+    <ID>UnusedParameter:PhotoAttachmentDialog.kt$onPhotoAttached: () -&gt; Unit</ID>
+    <ID>UnusedParameter:PhotoAttachmentDialog.kt$placeVisitId: String</ID>
+    <ID>UnusedParameter:PhotoDetailScreen.kt$onViewOnRoute: ((String) -&gt; Unit)?</ID>
+    <ID>UnusedParameter:RegisterScreen.kt$onNavigateBack: () -&gt; Unit</ID>
+    <ID>UnusedParameter:RouteMapView.kt$isSelected: Boolean</ID>
+    <ID>UnusedParameter:RouteMapView.kt$type: TransportType</ID>
+    <ID>UnusedParameter:RouteReplayScreen.kt$onBack: () -&gt; Unit</ID>
+    <ID>UnusedParameter:StatisticsMetricCards.kt$visitCount: Int</ID>
+    <ID>UnusedPrivateMember:ShapeMorphingExamples.kt$@Preview(showBackground = true) @Composable private fun ShapeMorphingExamplesPreview()</ID>
+    <ID>UnusedPrivateMember:TripDetailScreen.kt$@Composable private fun TripHeaderCard(trip: Trip)</ID>
+    <ID>UnusedPrivateProperty:EnhancedMapView.kt$val scope = rememberCoroutineScope()</ID>
+    <ID>UnusedPrivateProperty:FlexibleTopAppBar.kt$val maxOffset = expandedHeight - collapsedHeight</ID>
+    <ID>WildcardImport:ActivityHeatmap.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:AlgorithmSettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:AlgorithmSettingsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:AlgorithmSettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:BackgroundLocationEducation.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:BackgroundLocationEducation.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:BackgroundLocationEducation.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:BackgroundLocationEducation.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:BackgroundLocationEducation.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:BarChart.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:CategoryBadge.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:CategoryBadge.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ComponentShowcaseScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ComponentShowcaseScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ComponentShowcaseScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ComponentShowcaseScreen.kt$import com.po4yka.trailglass.ui.components.*</ID>
+    <ID>WildcardImport:ConflictResolutionScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ConflictResolutionScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ConflictResolutionScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ConflictResolutionUI.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ConflictResolutionUI.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ConflictResolutionUI.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:CreateTripDialog.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:CreateTripDialog.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:CreateTripDialog.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:DeviceManagementScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:DeviceManagementScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:DeviceManagementScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:EnhancedMapView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:EnhancedMapView.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:EnhancedMapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:EnhancedMapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>WildcardImport:EnhancedMapView.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>WildcardImport:EnhancedSettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:EnhancedSettingsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:EnhancedSettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:EnhancedSettingsScreen.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>WildcardImport:EnhancedStatsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:EnhancedStatsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:EnhancedStatsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:EnhancedStatsScreen.kt$import com.po4yka.trailglass.ui.components.charts.*</ID>
+    <ID>WildcardImport:EnhancedTimelineScreen.kt$import androidx.compose.animation.*</ID>
+    <ID>WildcardImport:EnhancedTimelineScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:EnhancedTimelineScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:EnhancedTimelineScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ErrorView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ErrorView.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:FlexibleTopAppBar.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:FlexibleTopAppBar.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ForgotPasswordScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ForgotPasswordScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:ForgotPasswordScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:ForgotPasswordScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ForgotPasswordScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:LocationPermissionHandler.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:LocationProcessingWorker.kt$import androidx.work.*</ID>
+    <ID>WildcardImport:LocationTrackingService.kt$import kotlinx.coroutines.*</ID>
+    <ID>WildcardImport:LocationTrackingWorker.kt$import androidx.work.*</ID>
+    <ID>WildcardImport:LoginScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:LoginScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:LoginScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:LoginScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:LoginScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:MapScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:MapScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:MapScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:MapScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:MapScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:MapView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:MapView.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:MapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:MapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>WildcardImport:MapView.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>WildcardImport:Navigation.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:Navigation.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:Navigation.kt$import com.po4yka.trailglass.ui.screens.*</ID>
+    <ID>WildcardImport:NetworkStatusBanner.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:NetworkStatusBanner.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:NetworkStatusBanner.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PermissionDialogs.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PermissionDialogs.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PhotoAttachmentDialog.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PhotoAttachmentDialog.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PhotoAttachmentDialog.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PhotoCarousel.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PhotoCarousel.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PhotoDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PhotoDetailScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:PhotoDetailScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:PhotoDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PhotoDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PhotoGalleryScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PhotoGalleryScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:PhotoGalleryScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:PhotoGalleryScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PhotoGalleryScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PhotoGrid.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PhotoGrid.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PieChart.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PlaceDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PlaceDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PlaceDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PlaceVisitDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PlaceVisitDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PlaceVisitDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PlacesScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:PlacesScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:PlacesScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:PlacesScreen.kt$import com.po4yka.trailglass.domain.model.*</ID>
+    <ID>WildcardImport:RegisterScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:RegisterScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:RegisterScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:RegisterScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:RegisterScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:RouteMapView.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:RouteMapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:RouteMapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>WildcardImport:RouteReplayMapView.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:RouteReplayMapView.kt$import com.google.maps.android.compose.*</ID>
+    <ID>WildcardImport:RouteReplayScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:RouteReplayScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:RouteReplayScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:RouteReplayScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:RouteReplayScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:RouteSummaryCard.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:RouteSummaryCard.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:RouteViewScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:RouteViewScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:RouteViewScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:SettingsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ShapeMorphingExamples.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:ShapeMorphingExamples.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:ShapeMorphingExamples.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:ShapeMorphingExamples.kt$import com.po4yka.trailglass.ui.theme.*</ID>
+    <ID>WildcardImport:StatisticsMetricCards.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:StatisticsMetricCards.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:StatisticsMetricCards.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:StatisticsMetricCards.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:SummaryTimerDisplay.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:SummaryTimerDisplay.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:SyncLoadingIndicator.kt$import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:SyncLoadingIndicator.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:SyncLoadingIndicator.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:SyncLoadingIndicator.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:SyncStatusIndicator.kt$import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:SyncStatusIndicator.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:SyncStatusIndicator.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:SyncStatusIndicator.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:SyncWorker.kt$import androidx.work.*</ID>
+    <ID>WildcardImport:Theme.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TrackingFABMenu.kt$import androidx.compose.animation.*</ID>
+    <ID>WildcardImport:TrackingFABMenu.kt$import androidx.compose.animation.core.*</ID>
+    <ID>WildcardImport:TrackingFABMenu.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TrackingFABMenu.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:TrackingFABMenu.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TrackingFABMenu.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:TransportBreakdownSection.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TransportBreakdownSection.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TransportModeSelector.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TransportModeSelector.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TripDetailScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TripDetailScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TripDetailScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:TripStatisticsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TripStatisticsScreen.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
+    <ID>WildcardImport:TripStatisticsScreen.kt$import androidx.compose.material.icons.filled.*</ID>
+    <ID>WildcardImport:TripStatisticsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TripStatisticsScreen.kt$import androidx.compose.runtime.*</ID>
+    <ID>WildcardImport:TripsScreen.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:TripsScreen.kt$import androidx.compose.material3.*</ID>
+    <ID>WildcardImport:TripsScreen.kt$import androidx.compose.runtime.*</ID>
+  </CurrentIssues>
+</SmellBaseline>

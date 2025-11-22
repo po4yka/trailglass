@@ -15,7 +15,6 @@ class GetStatsUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {
-
     private val logger = logger()
 
     /**
@@ -36,15 +35,28 @@ class GetStatsUseCase(
      * Time period for statistics.
      */
     sealed class Period {
-        data class Year(val year: Int) : Period()
-        data class Month(val year: Int, val month: Int) : Period()
-        data class Custom(val startDate: LocalDate, val endDate: LocalDate) : Period()
+        data class Year(
+            val year: Int
+        ) : Period()
+
+        data class Month(
+            val year: Int,
+            val month: Int
+        ) : Period()
+
+        data class Custom(
+            val startDate: LocalDate,
+            val endDate: LocalDate
+        ) : Period()
     }
 
     /**
      * Get statistics for a time period.
      */
-    suspend fun execute(period: Period, userId: String): Stats {
+    suspend fun execute(
+        period: Period,
+        userId: String
+    ): Stats {
         logger.info { "Getting stats for period: $period, user: $userId" }
 
         val (startTime, endTime) = getTimeRange(period)
@@ -62,40 +74,43 @@ class GetStatsUseCase(
         val cities = visits.mapNotNull { it.city }.toSet()
 
         // Count visits per country
-        val countryVisitCounts = visits
-            .mapNotNull { it.countryCode }
-            .groupingBy { it }
-            .eachCount()
-            .toList()
-            .sortedByDescending { it.second }
-            .take(5)
+        val countryVisitCounts =
+            visits
+                .mapNotNull { it.countryCode }
+                .groupingBy { it }
+                .eachCount()
+                .toList()
+                .sortedByDescending { it.second }
+                .take(5)
 
         // Count visits per city
-        val cityVisitCounts = visits
-            .mapNotNull { it.city }
-            .groupingBy { it }
-            .eachCount()
-            .toList()
-            .sortedByDescending { it.second }
-            .take(5)
+        val cityVisitCounts =
+            visits
+                .mapNotNull { it.city }
+                .groupingBy { it }
+                .eachCount()
+                .toList()
+                .sortedByDescending { it.second }
+                .take(5)
 
         // Calculate total days
         val totalDays = calculateTotalDays(trips, period)
 
-        val stats = Stats(
-            period = period,
-            countriesVisited = countries,
-            citiesVisited = cities,
-            totalTrips = trips.size,
-            totalDays = totalDays,
-            totalVisits = visits.size,
-            topCountries = countryVisitCounts,
-            topCities = cityVisitCounts
-        )
+        val stats =
+            Stats(
+                period = period,
+                countriesVisited = countries,
+                citiesVisited = cities,
+                totalTrips = trips.size,
+                totalDays = totalDays,
+                totalVisits = visits.size,
+                topCountries = countryVisitCounts,
+                topCities = cityVisitCounts
+            )
 
         logger.info {
             "Stats for $period: ${stats.countriesVisited.size} countries, " +
-            "${stats.citiesVisited.size} cities, ${stats.totalTrips} trips"
+                "${stats.citiesVisited.size} cities, ${stats.totalTrips} trips"
         }
 
         return stats
@@ -104,8 +119,8 @@ class GetStatsUseCase(
     /**
      * Get time range for a period.
      */
-    private fun getTimeRange(period: Period): Pair<Instant, Instant> {
-        return when (period) {
+    private fun getTimeRange(period: Period): Pair<Instant, Instant> =
+        when (period) {
             is Period.Year -> {
                 val start = LocalDate(period.year, 1, 1).atStartOfDayIn(timeZone)
                 val end = LocalDate(period.year, 12, 31).atTime(23, 59, 59).toInstant(timeZone)
@@ -113,9 +128,12 @@ class GetStatsUseCase(
             }
             is Period.Month -> {
                 val start = LocalDate(period.year, period.month, 1).atStartOfDayIn(timeZone)
-                val lastDay = start.toLocalDateTime(timeZone).date
-                    .plus(1, DateTimeUnit.MONTH)
-                    .minus(1, DateTimeUnit.DAY)
+                val lastDay =
+                    start
+                        .toLocalDateTime(timeZone)
+                        .date
+                        .plus(1, DateTimeUnit.MONTH)
+                        .minus(1, DateTimeUnit.DAY)
                 val end = lastDay.atTime(23, 59, 59).toInstant(timeZone)
                 start to end
             }
@@ -125,12 +143,14 @@ class GetStatsUseCase(
                 start to end
             }
         }
-    }
 
     /**
      * Calculate total days covered by trips.
      */
-    private fun calculateTotalDays(trips: List<com.po4yka.trailglass.domain.model.Trip>, period: Period): Int {
+    private fun calculateTotalDays(
+        trips: List<com.po4yka.trailglass.domain.model.Trip>,
+        period: Period
+    ): Int {
         if (trips.isEmpty()) return 0
 
         // Sum up all unique days covered by trips

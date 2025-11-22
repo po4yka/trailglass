@@ -14,7 +14,10 @@ interface ReverseGeocoder {
      * @param longitude The longitude coordinate
      * @return GeocodedLocation with address details, or null if geocoding fails
      */
-    suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation?
+    suspend fun reverseGeocode(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation?
 }
 
 /**

@@ -24,13 +24,15 @@ class GetComprehensiveStatsUseCase(
     private val geoCalculator: GeographicStatisticsCalculator,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {
-
     private val logger = logger()
 
     /**
      * Get comprehensive statistics for a time period.
      */
-    suspend fun execute(period: GetStatsUseCase.Period, userId: String): ComprehensiveStatistics {
+    suspend fun execute(
+        period: GetStatsUseCase.Period,
+        userId: String
+    ): ComprehensiveStatistics {
         logger.info { "Getting comprehensive stats for period: $period, user: $userId" }
 
         val (startTime, endTime) = getTimeRange(period)
@@ -56,20 +58,21 @@ class GetComprehensiveStatsUseCase(
         // Calculate total tracking time
         val totalTrackingTime = calculateTotalTrackingTime(visits, routes)
 
-        val stats = ComprehensiveStatistics(
-            period = formatPeriod(period),
-            distanceStats = distanceStats,
-            placeStats = placeStats,
-            travelPatterns = travelPatterns,
-            geographicStats = geoStats,
-            totalTrips = trips.size,
-            activeDays = activeDays,
-            totalTimeTracking = totalTrackingTime
-        )
+        val stats =
+            ComprehensiveStatistics(
+                period = formatPeriod(period),
+                distanceStats = distanceStats,
+                placeStats = placeStats,
+                travelPatterns = travelPatterns,
+                geographicStats = geoStats,
+                totalTrips = trips.size,
+                activeDays = activeDays,
+                totalTimeTracking = totalTrackingTime
+            )
 
         logger.info {
             "Comprehensive stats for $period: ${stats.distanceStats.totalDistanceKm.toInt()} km, " +
-            "${stats.geographicStats.countries.size} countries, ${stats.activeDays} active days"
+                "${stats.geographicStats.countries.size} countries, ${stats.activeDays} active days"
         }
 
         return stats
@@ -78,8 +81,8 @@ class GetComprehensiveStatsUseCase(
     /**
      * Get time range for a period.
      */
-    private fun getTimeRange(period: GetStatsUseCase.Period): Pair<Instant, Instant> {
-        return when (period) {
+    private fun getTimeRange(period: GetStatsUseCase.Period): Pair<Instant, Instant> =
+        when (period) {
             is GetStatsUseCase.Period.Year -> {
                 val start = LocalDate(period.year, 1, 1).atStartOfDayIn(timeZone)
                 val end = LocalDate(period.year, 12, 31).atTime(23, 59, 59).toInstant(timeZone)
@@ -87,9 +90,12 @@ class GetComprehensiveStatsUseCase(
             }
             is GetStatsUseCase.Period.Month -> {
                 val start = LocalDate(period.year, period.month, 1).atStartOfDayIn(timeZone)
-                val lastDay = start.toLocalDateTime(timeZone).date
-                    .plus(1, DateTimeUnit.MONTH)
-                    .minus(1, DateTimeUnit.DAY)
+                val lastDay =
+                    start
+                        .toLocalDateTime(timeZone)
+                        .date
+                        .plus(1, DateTimeUnit.MONTH)
+                        .minus(1, DateTimeUnit.DAY)
                 val end = lastDay.atTime(23, 59, 59).toInstant(timeZone)
                 start to end
             }
@@ -99,7 +105,6 @@ class GetComprehensiveStatsUseCase(
                 start to end
             }
         }
-    }
 
     /**
      * Calculate number of unique active days.
@@ -129,26 +134,29 @@ class GetComprehensiveStatsUseCase(
         routes: List<com.po4yka.trailglass.domain.model.RouteSegment>
     ): Duration {
         val visitTime = visits.fold(Duration.ZERO) { acc, visit -> acc + visit.duration }
-        val routeTime = routes.fold(Duration.ZERO) { acc, route ->
-            acc + (route.endTime - route.startTime)
-        }
+        val routeTime =
+            routes.fold(Duration.ZERO) { acc, route ->
+                acc + (route.endTime - route.startTime)
+            }
         return visitTime + routeTime
     }
 
     /**
      * Format period as string.
      */
-    private fun formatPeriod(period: GetStatsUseCase.Period): String {
-        return when (period) {
+    private fun formatPeriod(period: GetStatsUseCase.Period): String =
+        when (period) {
             is GetStatsUseCase.Period.Year -> "${period.year}"
             is GetStatsUseCase.Period.Month -> {
-                val month = Month(period.month).name.lowercase()
-                    .replaceFirstChar { it.uppercase() }
+                val month =
+                    Month(period.month)
+                        .name
+                        .lowercase()
+                        .replaceFirstChar { it.uppercase() }
                 "$month ${period.year}"
             }
             is GetStatsUseCase.Period.Custom -> {
                 "${period.startDate} to ${period.endDate}"
             }
         }
-    }
 }

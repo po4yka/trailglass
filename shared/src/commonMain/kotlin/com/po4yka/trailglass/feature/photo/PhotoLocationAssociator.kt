@@ -4,16 +4,15 @@ import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
+import me.tatarka.inject.annotations.Inject
 import kotlin.math.*
 import kotlin.time.Duration.Companion.hours
-import me.tatarka.inject.annotations.Inject
 
 /**
  * Associates photos with place visits based on location and time.
  */
 @Inject
 class PhotoLocationAssociator {
-
     private val logger = logger()
 
     /**
@@ -37,13 +36,18 @@ class PhotoLocationAssociator {
         val photoTime = metadata?.exifTimestampOriginal ?: photo.timestamp
 
         // Score each visit
-        val scoredVisits = visits.map { visit ->
-            val score = calculateMatchScore(
-                photoLat, photoLon, photoTime,
-                visit
-            )
-            visit to score
-        }.filter { it.second > 0.0 }
+        val scoredVisits =
+            visits
+                .map { visit ->
+                    val score =
+                        calculateMatchScore(
+                            photoLat,
+                            photoLon,
+                            photoTime,
+                            visit
+                        )
+                    visit to score
+                }.filter { it.second > 0.0 }
 
         if (scoredVisits.isEmpty()) return null
 
@@ -52,7 +56,7 @@ class PhotoLocationAssociator {
 
         logger.debug {
             "Best match for photo ${photo.id}: visit ${bestMatch?.first?.id} " +
-            "with score ${bestMatch?.second}"
+                "with score ${bestMatch?.second}"
         }
 
         // Only return if score is above threshold (0.5 = 50% confidence)
@@ -82,10 +86,11 @@ class PhotoLocationAssociator {
         val photoLon = metadata?.exifLongitude ?: photo.longitude ?: return emptyList()
         val photoTime = metadata?.exifTimestampOriginal ?: photo.timestamp
 
-        return visits.mapNotNull { visit ->
-            val score = calculateMatchScore(photoLat, photoLon, photoTime, visit)
-            if (score >= minScore) visit to score else null
-        }.sortedByDescending { it.second }
+        return visits
+            .mapNotNull { visit ->
+                val score = calculateMatchScore(photoLat, photoLon, photoTime, visit)
+                if (score >= minScore) visit to score else null
+            }.sortedByDescending { it.second }
     }
 
     /**
@@ -99,10 +104,13 @@ class PhotoLocationAssociator {
         visit: PlaceVisit
     ): Double {
         // Distance score (0.0 to 1.0, decays with distance)
-        val distance = calculateDistance(
-            photoLat, photoLon,
-            visit.centerLatitude, visit.centerLongitude
-        )
+        val distance =
+            calculateDistance(
+                photoLat,
+                photoLon,
+                visit.centerLatitude,
+                visit.centerLongitude
+            )
         val distanceScore = calculateDistanceScore(distance)
 
         // Time score (0.0 to 1.0, based on overlap and proximity)
@@ -116,8 +124,8 @@ class PhotoLocationAssociator {
 
         logger.trace {
             "Match score for visit ${visit.id}: " +
-            "distance=${distance.toInt()}m (score=$distanceScore), " +
-            "time score=$timeScore, total=$totalScore"
+                "distance=${distance.toInt()}m (score=$distanceScore), " +
+                "time score=$timeScore, total=$totalScore"
         }
 
         return totalScore
@@ -130,14 +138,13 @@ class PhotoLocationAssociator {
      * - 200m to 1km: score 0.5 to 0.2 (fair)
      * - 1km+: score < 0.2 (poor)
      */
-    private fun calculateDistanceScore(meters: Double): Double {
-        return when {
+    private fun calculateDistanceScore(meters: Double): Double =
+        when {
             meters <= 50 -> 1.0
             meters <= 200 -> 0.8 - ((meters - 50) / 150) * 0.3 // 0.8 to 0.5
             meters <= 1000 -> 0.5 - ((meters - 200) / 800) * 0.3 // 0.5 to 0.2
             else -> max(0.0, 0.2 - ((meters - 1000) / 5000) * 0.2) // 0.2 to 0.0
         }
-    }
 
     /**
      * Calculate time score based on photo time vs visit time.
@@ -156,10 +163,11 @@ class PhotoLocationAssociator {
         }
 
         // Calculate time difference (minimum distance to visit window)
-        val timeDiff = minOf(
-            abs((photoTime - visit.startTime).inWholeSeconds),
-            abs((photoTime - visit.endTime).inWholeSeconds)
-        )
+        val timeDiff =
+            minOf(
+                abs((photoTime - visit.startTime).inWholeSeconds),
+                abs((photoTime - visit.endTime).inWholeSeconds)
+            )
 
         val hours = timeDiff / 3600.0
 
@@ -175,15 +183,18 @@ class PhotoLocationAssociator {
      * Returns distance in meters.
      */
     private fun calculateDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusKm = 6371.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2) * sin(dLat / 2) +
+        val a =
+            sin(dLat / 2) * sin(dLat / 2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2) * sin(dLon / 2)
 

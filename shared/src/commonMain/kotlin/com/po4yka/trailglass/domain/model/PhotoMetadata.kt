@@ -7,32 +7,26 @@ import kotlinx.datetime.Instant
  */
 data class PhotoMetadata(
     val photoId: String,
-
     // EXIF Location data
     val exifLatitude: Double? = null,
     val exifLongitude: Double? = null,
     val exifAltitude: Double? = null,
-
     // EXIF Camera data
     val cameraMake: String? = null,
     val cameraModel: String? = null,
     val lens: String? = null,
-
     // EXIF Settings
     val focalLength: Double? = null, // mm
     val aperture: Double? = null, // f-number
     val iso: Int? = null,
     val shutterSpeed: String? = null,
     val flash: Boolean? = null,
-
     // EXIF Date/Time
     val exifTimestamp: Instant? = null,
     val exifTimestampOriginal: Instant? = null,
-
     // Image properties
     val orientation: Int? = null, // EXIF orientation (1-8)
     val colorSpace: String? = null,
-
     // Computed metadata
     val computedLocation: Location? = null,
     val locationSource: LocationSource = LocationSource.NONE

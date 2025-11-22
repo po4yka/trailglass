@@ -17,7 +17,6 @@ class GetTimelineForDayUseCase(
     private val routeSegmentRepository: RouteSegmentRepository,
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {
-
     private val logger = logger()
 
     /**
@@ -57,7 +56,10 @@ class GetTimelineForDayUseCase(
      * @param userId User ID
      * @return List of timeline items sorted chronologically
      */
-    suspend fun execute(date: LocalDate, userId: String): List<TimelineItemUI> {
+    suspend fun execute(
+        date: LocalDate,
+        userId: String
+    ): List<TimelineItemUI> {
         logger.debug { "Getting timeline for $date, user: $userId" }
 
         val dayStart = date.atStartOfDayIn(timeZone)

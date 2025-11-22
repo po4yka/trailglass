@@ -240,7 +240,9 @@ fun PermissionPermanentlyDeniedDialog(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "You've previously denied ${requestState.rationale.title.lowercase()}. To use this feature, you'll need to enable it in Settings.",
+                    text =
+                        "You've previously denied ${requestState.rationale.title.lowercase()}. " +
+                            "To use this feature, you'll need to enable it in Settings.",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
@@ -371,8 +373,8 @@ fun PermissionRequestBanner(
 /**
  * Get icon for permission type.
  */
-private fun getPermissionIcon(permissionType: PermissionType): ImageVector {
-    return when (permissionType) {
+private fun getPermissionIcon(permissionType: PermissionType): ImageVector =
+    when (permissionType) {
         PermissionType.LOCATION_FINE,
         PermissionType.LOCATION_COARSE,
         PermissionType.LOCATION_BACKGROUND -> Icons.Default.LocationOn
@@ -381,4 +383,3 @@ private fun getPermissionIcon(permissionType: PermissionType): ImageVector {
         PermissionType.PHOTO_LIBRARY -> Icons.Default.PhotoLibrary
         PermissionType.NOTIFICATIONS -> Icons.Default.Notifications
     }
-}

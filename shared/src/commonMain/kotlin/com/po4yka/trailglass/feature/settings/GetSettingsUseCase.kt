@@ -15,14 +15,10 @@ class GetSettingsUseCase(
     /**
      * Get settings as a Flow.
      */
-    fun execute(): Flow<AppSettings> {
-        return settingsRepository.getSettings()
-    }
+    fun execute(): Flow<AppSettings> = settingsRepository.getSettings()
 
     /**
      * Get current settings value.
      */
-    suspend fun getCurrentSettings(): AppSettings {
-        return settingsRepository.getCurrentSettings()
-    }
+    suspend fun getCurrentSettings(): AppSettings = settingsRepository.getCurrentSettings()
 }

@@ -16,6 +16,7 @@ import me.tatarka.inject.annotations.Inject
  */
 interface SyncStateRepository {
     suspend fun getSyncState(): SyncState
+
     suspend fun updateSyncState(state: SyncState)
 }
 
@@ -59,15 +60,16 @@ class SyncCoordinator(
         val startTime = Clock.System.now()
 
         return try {
-            val request = DeltaSyncRequest(
-                deviceId = deviceId,
-                lastSyncVersion = _syncState.value.lastSyncVersion,
-                localChanges = localChanges
-            )
+            val request =
+                DeltaSyncRequest(
+                    deviceId = deviceId,
+                    lastSyncVersion = _syncState.value.lastSyncVersion,
+                    localChanges = localChanges
+                )
 
             logger.info {
                 "Starting delta sync from version ${request.lastSyncVersion} " +
-                        "with ${countLocalChanges(localChanges)} local changes"
+                    "with ${countLocalChanges(localChanges)} local changes"
             }
 
             val result = apiClient.performDeltaSync(request)
@@ -75,19 +77,20 @@ class SyncCoordinator(
             result.onSuccess { response ->
                 logger.info {
                     "Sync completed successfully to version ${response.syncVersion}. " +
-                            "Conflicts: ${response.conflicts.size}, " +
-                            "Accepted: ${countAccepted(response.accepted)}, " +
-                            "Rejected: ${countRejected(response.rejected)}"
+                        "Conflicts: ${response.conflicts.size}, " +
+                        "Accepted: ${countAccepted(response.accepted)}, " +
+                        "Rejected: ${countRejected(response.rejected)}"
                 }
 
                 // Update sync state
-                val newState = _syncState.value.copy(
-                    lastSyncTimestamp = Instant.parse(response.syncTimestamp),
-                    lastSyncVersion = response.syncVersion,
-                    isSyncing = false,
-                    pendingChanges = response.conflicts.size,
-                    error = null
-                )
+                val newState =
+                    _syncState.value.copy(
+                        lastSyncTimestamp = Instant.parse(response.syncTimestamp),
+                        lastSyncVersion = response.syncVersion,
+                        isSyncing = false,
+                        pendingChanges = response.conflicts.size,
+                        error = null
+                    )
 
                 _syncState.value = newState
                 syncStateRepository.updateSyncState(newState)
@@ -114,13 +117,14 @@ class SyncCoordinator(
         resolution: ConflictResolution,
         resolvedEntity: Map<String, String>
     ): Result<ResolveConflictResponse> {
-        logger.info { "Resolving conflict $conflictId with strategy ${resolution}" }
+        logger.info { "Resolving conflict $conflictId with strategy $resolution" }
 
-        val request = ResolveConflictRequest(
-            conflictId = conflictId,
-            resolution = resolution,
-            resolvedEntity = resolvedEntity
-        )
+        val request =
+            ResolveConflictRequest(
+                conflictId = conflictId,
+                resolution = resolution,
+                resolvedEntity = resolvedEntity
+            )
 
         val result = apiClient.resolveConflict(request)
 
@@ -157,9 +161,10 @@ class SyncCoordinator(
                 it.copy(
                     lastSyncTimestamp = Instant.parse(response.lastSyncTimestamp),
                     lastSyncVersion = response.syncVersion,
-                    pendingChanges = with(response.pendingChanges) {
-                        locations + placeVisits + trips + photos
-                    }
+                    pendingChanges =
+                        with(response.pendingChanges) {
+                            locations + placeVisits + trips + photos
+                        }
                 )
             }
         }
@@ -183,7 +188,10 @@ class SyncCoordinator(
         _syncState.update { it.copy(error = null) }
     }
 
-    private suspend fun updateSyncingState(isSyncing: Boolean, error: String?) {
+    private suspend fun updateSyncingState(
+        isSyncing: Boolean,
+        error: String?
+    ) {
         _syncState.update {
             it.copy(isSyncing = isSyncing, error = error)
         }
@@ -193,27 +201,24 @@ class SyncCoordinator(
         }
     }
 
-    private fun countLocalChanges(changes: LocalChanges): Int {
-        return changes.locations.size +
-                changes.placeVisits.size +
-                changes.trips.size +
-                changes.photos.size +
-                (if (changes.settings != null) 1 else 0)
-    }
+    private fun countLocalChanges(changes: LocalChanges): Int =
+        changes.locations.size +
+            changes.placeVisits.size +
+            changes.trips.size +
+            changes.photos.size +
+            (if (changes.settings != null) 1 else 0)
 
-    private fun countAccepted(accepted: AcceptedEntities): Int {
-        return accepted.locations.size +
-                accepted.placeVisits.size +
-                accepted.trips.size +
-                accepted.photos.size
-    }
+    private fun countAccepted(accepted: AcceptedEntities): Int =
+        accepted.locations.size +
+            accepted.placeVisits.size +
+            accepted.trips.size +
+            accepted.photos.size
 
-    private fun countRejected(rejected: RejectedEntities): Int {
-        return rejected.locations.size +
-                rejected.placeVisits.size +
-                rejected.trips.size +
-                rejected.photos.size
-    }
+    private fun countRejected(rejected: RejectedEntities): Int =
+        rejected.locations.size +
+            rejected.placeVisits.size +
+            rejected.trips.size +
+            rejected.photos.size
 }
 
 /**
@@ -221,5 +226,6 @@ class SyncCoordinator(
  */
 expect class SyncStateRepositoryImpl : SyncStateRepository {
     override suspend fun getSyncState(): SyncState
+
     override suspend fun updateSyncState(state: SyncState)
 }

@@ -20,7 +20,9 @@ data class AuthTokens(
  */
 expect class SecureTokenStorage {
     suspend fun saveTokens(tokens: AuthTokens)
+
     suspend fun getTokens(): AuthTokens?
+
     suspend fun clearTokens()
 }
 
@@ -30,7 +32,6 @@ expect class SecureTokenStorage {
 class TokenStorageProvider(
     private val secureStorage: SecureTokenStorage
 ) : TokenProvider {
-
     private val _authState = MutableStateFlow<AuthTokens?>(null)
     val authState: StateFlow<AuthTokens?> = _authState.asStateFlow()
 
@@ -52,7 +53,11 @@ class TokenStorageProvider(
         return tokens?.refreshToken
     }
 
-    override suspend fun saveTokens(accessToken: String, refreshToken: String, expiresIn: Long) {
+    override suspend fun saveTokens(
+        accessToken: String,
+        refreshToken: String,
+        expiresIn: Long
+    ) {
         val expiresAt = Clock.System.now().toEpochMilliseconds() + (expiresIn * 1000)
         val tokens = AuthTokens(accessToken, refreshToken, expiresAt)
         secureStorage.saveTokens(tokens)

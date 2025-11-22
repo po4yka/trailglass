@@ -10,22 +10,16 @@ data class TripRoute(
     val tripId: String,
     val startTime: Instant,
     val endTime: Instant,
-
     // Unified path combining all segments
     val fullPath: List<RoutePoint>,
-
     // Individual route segments for detailed analysis
     val segments: List<RouteSegment>,
-
     // Place visits along the route
     val visits: List<PlaceVisit>,
-
     // Photos associated with this route
     val photoMarkers: List<PhotoMarker>,
-
     // Bounding box for camera fitting
     val bounds: RouteBounds,
-
     // Aggregated statistics
     val statistics: RouteStatistics
 )
@@ -37,10 +31,10 @@ data class RoutePoint(
     val latitude: Double,
     val longitude: Double,
     val timestamp: Instant,
-    val bearing: Double? = null,          // Direction of movement in degrees (0-360)
-    val speed: Double? = null,            // Speed in m/s at this point
-    val accuracy: Double? = null,         // GPS accuracy in meters
-    val segmentId: String? = null,        // Which route segment this belongs to
+    val bearing: Double? = null, // Direction of movement in degrees (0-360)
+    val speed: Double? = null, // Speed in m/s at this point
+    val accuracy: Double? = null, // GPS accuracy in meters
+    val segmentId: String? = null, // Which route segment this belongs to
     val transportType: TransportType = TransportType.UNKNOWN
 )
 
@@ -53,7 +47,7 @@ data class PhotoMarker(
     val longitude: Double,
     val timestamp: Instant,
     val thumbnailUri: String? = null,
-    val placeVisitId: String? = null,     // Associated place visit if any
+    val placeVisitId: String? = null, // Associated place visit if any
     val caption: String? = null
 )
 
@@ -134,11 +128,9 @@ data class RouteStatistics(
     val numberOfVideos: Int = 0,
     val countriesVisited: List<String> = emptyList(),
     val citiesVisited: List<String> = emptyList(),
-
     // Transport breakdown
     val distanceByTransport: Map<TransportType, Double> = emptyMap(),
     val durationByTransport: Map<TransportType, Long> = emptyMap(),
-
     // Speed metrics
     val averageSpeedMps: Double? = null,
     val maxSpeedMps: Double? = null

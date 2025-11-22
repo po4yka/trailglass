@@ -61,9 +61,10 @@ fun DeviceManagementScreen(
         modifier = modifier
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
         ) {
             when {
                 state.isLoading && state.devices.isEmpty() -> {
@@ -170,9 +171,10 @@ fun DeviceManagementScreen(
             // Error snackbar (when devices are loaded but operation failed)
             if (state.error != null && state.devices.isNotEmpty()) {
                 Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp),
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp),
                     action = {
                         TextButton(onClick = { controller.clearError() }) {
                             Text("Dismiss")
@@ -199,7 +201,7 @@ fun DeviceManagementScreen(
                 text = {
                     Text(
                         "Are you sure you want to remove \"${deviceToDelete?.deviceName}\" from your devices? " +
-                        "This will revoke access for this device."
+                            "This will revoke access for this device."
                     )
                 },
                 confirmButton = {
@@ -211,9 +213,10 @@ fun DeviceManagementScreen(
                                 }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error
-                        )
+                        colors =
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error
+                            )
                     ) {
                         Text("Delete")
                     }
@@ -243,9 +246,10 @@ private fun DeviceCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -256,18 +260,20 @@ private fun DeviceCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = when (device.platform.lowercase()) {
-                        "android" -> Icons.Default.PhoneAndroid
-                        "ios" -> Icons.Default.PhoneIphone
-                        else -> Icons.Default.Devices
-                    },
+                    imageVector =
+                        when (device.platform.lowercase()) {
+                            "android" -> Icons.Default.PhoneAndroid
+                            "ios" -> Icons.Default.PhoneIphone
+                            else -> Icons.Default.Devices
+                        },
                     contentDescription = null,
                     modifier = Modifier.size(40.dp),
-                    tint = if (device.isActive) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    tint =
+                        if (device.isActive) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                 )
 
                 Column(
@@ -344,12 +350,11 @@ private fun DeviceCard(
 /**
  * Format timestamp for display.
  */
-private fun formatTimestamp(timestamp: String): String {
-    return try {
+private fun formatTimestamp(timestamp: String): String =
+    try {
         val instant = Instant.parse(timestamp)
         val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         "${localDateTime.date} ${localDateTime.time.hour}:${localDateTime.time.minute.toString().padStart(2, '0')}"
     } catch (e: Exception) {
         timestamp
     }
-}

@@ -1,7 +1,14 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertDoesNotExist
+import androidx.compose.ui.test.assertExists
+import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.waitForIdle
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.MapDisplayData
 import com.po4yka.trailglass.domain.model.MapMarker
@@ -22,7 +29,6 @@ import org.junit.Test
  * UI tests for MapScreen.
  */
 class MapScreenTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -32,52 +38,58 @@ class MapScreenTest {
     @Before
     fun setup() {
         // Create a mock controller with test data
-        val mockUseCase = object : GetMapDataUseCase(null, null) {
-            override suspend fun execute(
-                userId: String,
-                startTime: Instant,
-                endTime: Instant
-            ): MapDisplayData {
-                val marker1 = MapMarker(
-                    id = "marker1",
-                    coordinate = Coordinate(48.8566, 2.3522),
-                    title = "Paris",
-                    snippet = "Eiffel Tower, Avenue Anatole France",
-                    placeVisitId = "visit1"
-                )
+        val mockUseCase =
+            object : GetMapDataUseCase(null, null) {
+                override suspend fun execute(
+                    userId: String,
+                    startTime: Instant,
+                    endTime: Instant
+                ): MapDisplayData {
+                    val marker1 =
+                        MapMarker(
+                            id = "marker1",
+                            coordinate = Coordinate(48.8566, 2.3522),
+                            title = "Paris",
+                            snippet = "Eiffel Tower, Avenue Anatole France",
+                            placeVisitId = "visit1"
+                        )
 
-                val marker2 = MapMarker(
-                    id = "marker2",
-                    coordinate = Coordinate(51.5074, -0.1278),
-                    title = "London",
-                    snippet = "Big Ben, Westminster",
-                    placeVisitId = "visit2"
-                )
+                    val marker2 =
+                        MapMarker(
+                            id = "marker2",
+                            coordinate = Coordinate(51.5074, -0.1278),
+                            title = "London",
+                            snippet = "Big Ben, Westminster",
+                            placeVisitId = "visit2"
+                        )
 
-                val route1 = MapRoute(
-                    id = "route1",
-                    coordinates = listOf(
-                        Coordinate(48.8566, 2.3522),
-                        Coordinate(51.5074, -0.1278)
-                    ),
-                    transportType = TransportType.TRAIN,
-                    color = 0xFF9C27B0.toInt(), // Purple
-                    routeSegmentId = "route1"
-                )
+                    val route1 =
+                        MapRoute(
+                            id = "route1",
+                            coordinates =
+                                listOf(
+                                    Coordinate(48.8566, 2.3522),
+                                    Coordinate(51.5074, -0.1278)
+                                ),
+                            transportType = TransportType.TRAIN,
+                            color = 0xFF9C27B0.toInt(), // Purple
+                            routeSegmentId = "route1"
+                        )
 
-                val region = MapRegion(
-                    center = Coordinate(50.0, 1.0),
-                    latitudeDelta = 5.0,
-                    longitudeDelta = 3.0
-                )
+                    val region =
+                        MapRegion(
+                            center = Coordinate(50.0, 1.0),
+                            latitudeDelta = 5.0,
+                            longitudeDelta = 3.0
+                        )
 
-                return MapDisplayData(
-                    markers = listOf(marker1, marker2),
-                    routes = listOf(route1),
-                    region = region
-                )
+                    return MapDisplayData(
+                        markers = listOf(marker1, marker2),
+                        routes = listOf(route1),
+                        region = region
+                    )
+                }
             }
-        }
 
         controller = MapController(mockUseCase, scope, "test_user")
     }
@@ -109,19 +121,21 @@ class MapScreenTest {
         composeTestRule.waitForIdle()
 
         // When - select a marker
-        val marker = MapMarker(
-            id = "marker1",
-            coordinate = Coordinate(48.8566, 2.3522),
-            title = "Paris",
-            snippet = "Eiffel Tower, Avenue Anatole France",
-            placeVisitId = "visit1"
-        )
+        val marker =
+            MapMarker(
+                id = "marker1",
+                coordinate = Coordinate(48.8566, 2.3522),
+                title = "Paris",
+                snippet = "Eiffel Tower, Avenue Anatole France",
+                placeVisitId = "visit1"
+            )
         controller.selectMarker(marker)
         composeTestRule.waitForIdle()
 
         // Then - marker info card should be displayed
         composeTestRule.onNodeWithText("Paris").assertExists()
-        composeTestRule.onNodeWithText("Eiffel Tower, Avenue Anatole France")
+        composeTestRule
+            .onNodeWithText("Eiffel Tower, Avenue Anatole France")
             .assertExists()
         composeTestRule.onNodeWithText("Details").assertExists()
         composeTestRule.onNodeWithText("Photos").assertExists()
@@ -135,13 +149,14 @@ class MapScreenTest {
         }
 
         // Select a marker
-        val marker = MapMarker(
-            id = "marker1",
-            coordinate = Coordinate(48.8566, 2.3522),
-            title = "Paris",
-            snippet = "Eiffel Tower",
-            placeVisitId = "visit1"
-        )
+        val marker =
+            MapMarker(
+                id = "marker1",
+                coordinate = Coordinate(48.8566, 2.3522),
+                title = "Paris",
+                snippet = "Eiffel Tower",
+                placeVisitId = "visit1"
+            )
         controller.selectMarker(marker)
         composeTestRule.waitForIdle()
 
@@ -161,18 +176,20 @@ class MapScreenTest {
         }
 
         // Select a marker
-        val marker = MapMarker(
-            id = "marker1",
-            coordinate = Coordinate(48.8566, 2.3522),
-            title = "Paris",
-            snippet = "Eiffel Tower",
-            placeVisitId = "visit1"
-        )
+        val marker =
+            MapMarker(
+                id = "marker1",
+                coordinate = Coordinate(48.8566, 2.3522),
+                title = "Paris",
+                snippet = "Eiffel Tower",
+                placeVisitId = "visit1"
+            )
         controller.selectMarker(marker)
         composeTestRule.waitForIdle()
 
         // Then - Details button should be clickable
-        composeTestRule.onNodeWithText("Details")
+        composeTestRule
+            .onNodeWithText("Details")
             .assertExists()
             .assertHasClickAction()
     }
@@ -185,18 +202,20 @@ class MapScreenTest {
         }
 
         // Select a marker
-        val marker = MapMarker(
-            id = "marker1",
-            coordinate = Coordinate(48.8566, 2.3522),
-            title = "Paris",
-            snippet = "Eiffel Tower",
-            placeVisitId = "visit1"
-        )
+        val marker =
+            MapMarker(
+                id = "marker1",
+                coordinate = Coordinate(48.8566, 2.3522),
+                title = "Paris",
+                snippet = "Eiffel Tower",
+                placeVisitId = "visit1"
+            )
         controller.selectMarker(marker)
         composeTestRule.waitForIdle()
 
         // Then - Photos button should be clickable
-        composeTestRule.onNodeWithText("Photos")
+        composeTestRule
+            .onNodeWithText("Photos")
             .assertExists()
             .assertHasClickAction()
     }
@@ -204,19 +223,19 @@ class MapScreenTest {
     @Test
     fun mapScreen_displaysEmptyState() {
         // Given - controller with no data
-        val emptyUseCase = object : GetMapDataUseCase(null, null) {
-            override suspend fun execute(
-                userId: String,
-                startTime: Instant,
-                endTime: Instant
-            ): MapDisplayData {
-                return MapDisplayData(
-                    markers = emptyList(),
-                    routes = emptyList(),
-                    region = null
-                )
+        val emptyUseCase =
+            object : GetMapDataUseCase(null, null) {
+                override suspend fun execute(
+                    userId: String,
+                    startTime: Instant,
+                    endTime: Instant
+                ): MapDisplayData =
+                    MapDisplayData(
+                        markers = emptyList(),
+                        routes = emptyList(),
+                        region = null
+                    )
             }
-        }
         val emptyController = MapController(emptyUseCase, scope, "test_user")
 
         composeTestRule.setContent {

@@ -41,8 +41,9 @@ class ExportTripUseCase(
     ): Result<String> {
         return try {
             // Get trip
-            val trip = tripRepository.getTripById(tripId)
-                ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
+            val trip =
+                tripRepository.getTripById(tripId)
+                    ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
 
             // Get location samples for the trip
             val locationsResult = locationRepository.getSamplesForTrip(tripId)
@@ -51,21 +52,24 @@ class ExportTripUseCase(
             logger.info { "Exporting trip $tripId with ${locationSamples.size} location samples" }
 
             // Get place visits if needed
-            val placeVisits = if (includeWaypoints) {
-                placeVisitRepository.getVisits(
-                    trip.userId,
-                    trip.startTime,
-                    trip.endTime ?: kotlinx.datetime.Clock.System.now()
-                )
-            } else {
-                emptyList()
-            }
+            val placeVisits =
+                if (includeWaypoints) {
+                    placeVisitRepository.getVisits(
+                        trip.userId,
+                        trip.startTime,
+                        trip.endTime ?: kotlinx.datetime.Clock.System
+                            .now()
+                    )
+                } else {
+                    emptyList()
+                }
 
             // Export based on format
-            val exportedData = when (format) {
-                ExportFormat.GPX -> gpxExporter.export(trip, locationSamples, placeVisits)
-                ExportFormat.KML -> kmlExporter.export(trip, locationSamples, placeVisits)
-            }
+            val exportedData =
+                when (format) {
+                    ExportFormat.GPX -> gpxExporter.export(trip, locationSamples, placeVisits)
+                    ExportFormat.KML -> kmlExporter.export(trip, locationSamples, placeVisits)
+                }
 
             logger.info { "Successfully exported trip $tripId as ${format.name}" }
 

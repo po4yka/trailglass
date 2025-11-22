@@ -18,7 +18,6 @@ class ImportPhotoUseCase(
     private val photoRepository: PhotoRepository,
     private val metadataExtractor: PhotoMetadataExtractor
 ) {
-
     private val logger = logger()
 
     /**
@@ -33,8 +32,8 @@ class ImportPhotoUseCase(
         uri: String,
         userId: String,
         timestamp: Instant? = null
-    ): ImportResult {
-        return try {
+    ): ImportResult =
+        try {
             logger.info { "Importing photo from URI: $uri" }
 
             val photoId = UuidGenerator.randomUUID()
@@ -44,28 +43,30 @@ class ImportPhotoUseCase(
             logger.debug { "Extracted metadata: $metadata" }
 
             // Determine timestamp (EXIF > provided > current time)
-            val photoTimestamp = metadata?.exifTimestampOriginal
-                ?: timestamp
-                ?: Clock.System.now()
+            val photoTimestamp =
+                metadata?.exifTimestampOriginal
+                    ?: timestamp
+                    ?: Clock.System.now()
 
             // Get location from EXIF if available
             val latitude = metadata?.exifLatitude
             val longitude = metadata?.exifLongitude
 
             // Create photo record
-            val photo = Photo(
-                id = photoId,
-                uri = uri,
-                timestamp = photoTimestamp,
-                latitude = latitude,
-                longitude = longitude,
-                width = null, // Would need platform-specific extraction
-                height = null,
-                sizeBytes = null,
-                mimeType = null, // Would need platform-specific extraction
-                userId = userId,
-                addedAt = Clock.System.now()
-            )
+            val photo =
+                Photo(
+                    id = photoId,
+                    uri = uri,
+                    timestamp = photoTimestamp,
+                    latitude = latitude,
+                    longitude = longitude,
+                    width = null, // Would need platform-specific extraction
+                    height = null,
+                    sizeBytes = null,
+                    mimeType = null, // Would need platform-specific extraction
+                    userId = userId,
+                    addedAt = Clock.System.now()
+                )
 
             // Store photo
             photoRepository.insertPhoto(photo)
@@ -77,7 +78,6 @@ class ImportPhotoUseCase(
             logger.error(e) { "Failed to import photo from $uri" }
             ImportResult.Error(e.message ?: "Unknown error")
         }
-    }
 
     sealed class ImportResult {
         data class Success(
@@ -85,6 +85,8 @@ class ImportPhotoUseCase(
             val metadata: com.po4yka.trailglass.domain.model.PhotoMetadata?
         ) : ImportResult()
 
-        data class Error(val message: String) : ImportResult()
+        data class Error(
+            val message: String
+        ) : ImportResult()
     }
 }

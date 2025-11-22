@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
  * - Low battery impact with efficient updates
  */
 class EnhancedLocationTrackingService : Service() {
-
     companion object {
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "location_tracking_channel"
@@ -45,11 +44,15 @@ class EnhancedLocationTrackingService : Service() {
         const val ACTION_STOP_TRACKING = "com.po4yka.trailglass.STOP_TRACKING"
         const val EXTRA_TRACKING_MODE = "tracking_mode"
 
-        fun startService(context: Context, mode: TrackingMode = TrackingMode.ACTIVE) {
-            val intent = Intent(context, EnhancedLocationTrackingService::class.java).apply {
-                action = ACTION_START_TRACKING
-                putExtra(EXTRA_TRACKING_MODE, mode.name)
-            }
+        fun startService(
+            context: Context,
+            mode: TrackingMode = TrackingMode.ACTIVE
+        ) {
+            val intent =
+                Intent(context, EnhancedLocationTrackingService::class.java).apply {
+                    action = ACTION_START_TRACKING
+                    putExtra(EXTRA_TRACKING_MODE, mode.name)
+                }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -59,9 +62,10 @@ class EnhancedLocationTrackingService : Service() {
         }
 
         fun stopService(context: Context) {
-            val intent = Intent(context, EnhancedLocationTrackingService::class.java).apply {
-                action = ACTION_STOP_TRACKING
-            }
+            val intent =
+                Intent(context, EnhancedLocationTrackingService::class.java).apply {
+                    action = ACTION_STOP_TRACKING
+                }
             context.startService(intent)
         }
     }
@@ -81,15 +85,20 @@ class EnhancedLocationTrackingService : Service() {
         createNotificationChannel()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         when (intent?.action) {
             ACTION_START_TRACKING -> {
                 val modeName = intent.getStringExtra(EXTRA_TRACKING_MODE) ?: TrackingMode.ACTIVE.name
-                val mode = try {
-                    TrackingMode.valueOf(modeName)
-                } catch (e: IllegalArgumentException) {
-                    TrackingMode.ACTIVE
-                }
+                val mode =
+                    try {
+                        TrackingMode.valueOf(modeName)
+                    } catch (e: IllegalArgumentException) {
+                        TrackingMode.ACTIVE
+                    }
                 startLocationTracking(mode)
             }
             ACTION_STOP_TRACKING -> {
@@ -112,10 +121,11 @@ class EnhancedLocationTrackingService : Service() {
         if (isTracking) return
 
         startTime = System.currentTimeMillis()
-        val notification = createNotification(
-            duration = 0,
-            sampleCount = 0
-        )
+        val notification =
+            createNotification(
+                duration = 0,
+                sampleCount = 0
+            )
         startForeground(NOTIFICATION_ID, notification)
 
         serviceScope.launch {
@@ -133,9 +143,7 @@ class EnhancedLocationTrackingService : Service() {
                             duration = duration,
                             sampleCount = sampleCount
                         )
-                    }
-                    .launchIn(serviceScope)
-
+                    }.launchIn(serviceScope)
             } catch (e: Exception) {
                 android.util.Log.e("EnhancedTrackingService", "Failed to start tracking", e)
                 stopSelf()
@@ -157,15 +165,16 @@ class EnhancedLocationTrackingService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Shows real-time location tracking updates"
-                setShowBadge(false)
-                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-            }
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Shows real-time location tracking updates"
+                    setShowBadge(false)
+                    lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+                }
 
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
@@ -180,45 +189,51 @@ class EnhancedLocationTrackingService : Service() {
         val durationText = formatDuration(duration)
 
         // Create intent to stop tracking
-        val stopIntent = Intent(this, EnhancedLocationTrackingService::class.java).apply {
-            action = ACTION_STOP_TRACKING
-        }
-        val stopPendingIntent = PendingIntent.getService(
-            this,
-            2,
-            stopIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val stopIntent =
+            Intent(this, EnhancedLocationTrackingService::class.java).apply {
+                action = ACTION_STOP_TRACKING
+            }
+        val stopPendingIntent =
+            PendingIntent.getService(
+                this,
+                2,
+                stopIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
 
         // Create intent to open app
-        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        val contentIntent = PendingIntent.getActivity(
-            this,
-            0,
-            launchIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        val launchIntent =
+            packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
+        val contentIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                launchIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat
+            .Builder(this, CHANNEL_ID)
             .setContentTitle("TrailGlass - Tracking")
             .setContentText("$durationText  •  $sampleCount points")
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentIntent(contentIntent)
             .setStyle(
-                NotificationCompat.BigTextStyle()
-                    .bigText(buildString {
-                        append("Duration: $durationText\n")
-                        append("Location samples: $sampleCount")
-                    })
-            )
-            .addAction(
+                NotificationCompat
+                    .BigTextStyle()
+                    .bigText(
+                        buildString {
+                            append("Duration: $durationText\n")
+                            append("Location samples: $sampleCount")
+                        }
+                    )
+            ).addAction(
                 android.R.drawable.ic_media_pause,
                 "Stop",
                 stopPendingIntent
-            )
-            .setOngoing(true)
+            ).setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

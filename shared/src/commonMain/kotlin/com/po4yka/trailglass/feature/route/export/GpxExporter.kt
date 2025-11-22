@@ -1,15 +1,12 @@
 package com.po4yka.trailglass.feature.route.export
 
 import com.po4yka.trailglass.domain.model.TripRoute
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 /**
  * GPX (GPS Exchange Format) exporter for trip routes.
  * Exports route data to standard GPX 1.1 XML format.
  */
 class GpxExporter {
-
     /**
      * Export trip route to GPX format.
      *
@@ -17,21 +14,30 @@ class GpxExporter {
      * @param tripName Optional trip name for metadata
      * @return GPX XML string
      */
-    fun export(tripRoute: TripRoute, tripName: String? = null): String {
-        return buildString {
+    fun export(
+        tripRoute: TripRoute,
+        tripName: String? = null
+    ): String =
+        buildString {
             // XML header
             appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
             appendLine("<gpx version=\"1.1\" creator=\"TrailGlass\"")
             appendLine("  xmlns=\"http://www.topografix.com/GPX/1/1\"")
             appendLine("  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"")
-            appendLine("  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">")
+            appendLine(
+                "  xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">"
+            )
 
             // Metadata
             appendLine("  <metadata>")
             appendLine("    <name>${escapeXml(tripName ?: "Trip Route")}</name>")
             appendLine("    <time>${formatGpxTime(tripRoute.startTime)}</time>")
-            appendLine("    <bounds minlat=\"${tripRoute.bounds.minLatitude}\" minlon=\"${tripRoute.bounds.minLongitude}\"")
-            appendLine("            maxlat=\"${tripRoute.bounds.maxLatitude}\" maxlon=\"${tripRoute.bounds.maxLongitude}\"/>")
+            appendLine(
+                "    <bounds minlat=\"${tripRoute.bounds.minLatitude}\" minlon=\"${tripRoute.bounds.minLongitude}\""
+            )
+            appendLine(
+                "            maxlat=\"${tripRoute.bounds.maxLatitude}\" maxlon=\"${tripRoute.bounds.maxLongitude}\"/>"
+            )
             appendLine("  </metadata>")
 
             // Waypoints for place visits
@@ -69,10 +75,11 @@ class GpxExporter {
             appendLine("    <type>trip</type>")
 
             // Create track segments by transport type
-            val segmentsByType = tripRoute.fullPath
-                .groupBy { it.transportType }
-                .entries
-                .sortedBy { tripRoute.fullPath.indexOf(it.value.first()) }
+            val segmentsByType =
+                tripRoute.fullPath
+                    .groupBy { it.transportType }
+                    .entries
+                    .sortedBy { tripRoute.fullPath.indexOf(it.value.first()) }
 
             segmentsByType.forEach { (transportType, points) ->
                 if (points.isNotEmpty()) {
@@ -92,7 +99,6 @@ class GpxExporter {
             appendLine("  </trk>")
             appendLine("</gpx>")
         }
-    }
 
     /**
      * Format instant to GPX time format (ISO 8601).
@@ -104,12 +110,11 @@ class GpxExporter {
     /**
      * Escape XML special characters.
      */
-    private fun escapeXml(text: String): String {
-        return text
+    private fun escapeXml(text: String): String =
+        text
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
             .replace("\"", "&quot;")
             .replace("'", "&apos;")
-    }
 }

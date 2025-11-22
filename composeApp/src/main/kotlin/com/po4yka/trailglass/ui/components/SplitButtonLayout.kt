@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.ui.theme.MotionConfig
 import com.po4yka.trailglass.ui.theme.scaleSpring
@@ -99,20 +98,23 @@ fun SplitButton(
     )
 
     Surface(
-        modifier = modifier
-            .height(48.dp)
-            .semantics {
-                contentDescription = "Split button: $primaryText with options"
-            },
+        modifier =
+            modifier
+                .height(48.dp)
+                .semantics {
+                    contentDescription = "Split button: $primaryText with options"
+                },
         shape = RoundedCornerShape(24.dp),
-        color = when (variant) {
-            SplitButtonVariant.Filled -> colors.containerColor
-            SplitButtonVariant.Outlined, SplitButtonVariant.Text -> Color.Transparent
-        },
-        border = when (variant) {
-            SplitButtonVariant.Outlined -> BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-            else -> null
-        }
+        color =
+            when (variant) {
+                SplitButtonVariant.Filled -> colors.containerColor
+                SplitButtonVariant.Outlined, SplitButtonVariant.Text -> Color.Transparent
+            },
+        border =
+            when (variant) {
+                SplitButtonVariant.Outlined -> BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                else -> null
+            }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -126,16 +128,18 @@ fun SplitButton(
                         enabled = enabled,
                         colors = colors,
                         interactionSource = primaryInteractionSource,
-                        shape = RoundedCornerShape(
-                            topStart = 24.dp,
-                            bottomStart = 24.dp,
-                            topEnd = 0.dp,
-                            bottomEnd = 0.dp
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .scale(primaryScale)
+                        shape =
+                            RoundedCornerShape(
+                                topStart = 24.dp,
+                                bottomStart = 24.dp,
+                                topEnd = 0.dp,
+                                bottomEnd = 0.dp
+                            ),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                                .scale(primaryScale)
                     ) {
                         PrimaryButtonContent(primaryIcon, primaryText)
                     }
@@ -147,16 +151,18 @@ fun SplitButton(
                         colors = colors,
                         interactionSource = primaryInteractionSource,
                         border = null, // Border handled by parent Surface
-                        shape = RoundedCornerShape(
-                            topStart = 24.dp,
-                            bottomStart = 24.dp,
-                            topEnd = 0.dp,
-                            bottomEnd = 0.dp
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .scale(primaryScale)
+                        shape =
+                            RoundedCornerShape(
+                                topStart = 24.dp,
+                                bottomStart = 24.dp,
+                                topEnd = 0.dp,
+                                bottomEnd = 0.dp
+                            ),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                                .scale(primaryScale)
                     ) {
                         PrimaryButtonContent(primaryIcon, primaryText)
                     }
@@ -167,16 +173,18 @@ fun SplitButton(
                         enabled = enabled,
                         colors = colors,
                         interactionSource = primaryInteractionSource,
-                        shape = RoundedCornerShape(
-                            topStart = 24.dp,
-                            bottomStart = 24.dp,
-                            topEnd = 0.dp,
-                            bottomEnd = 0.dp
-                        ),
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .scale(primaryScale)
+                        shape =
+                            RoundedCornerShape(
+                                topStart = 24.dp,
+                                bottomStart = 24.dp,
+                                topEnd = 0.dp,
+                                bottomEnd = 0.dp
+                            ),
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .height(48.dp)
+                                .scale(primaryScale)
                     ) {
                         PrimaryButtonContent(primaryIcon, primaryText)
                     }
@@ -185,13 +193,15 @@ fun SplitButton(
 
             // Divider between sections (1dp with 20% opacity)
             HorizontalDivider(
-                modifier = Modifier
-                    .size(width = 1.dp, height = 24.dp),
-                color = when (variant) {
-                    SplitButtonVariant.Filled -> colors.contentColor.copy(alpha = 0.2f)
-                    SplitButtonVariant.Outlined, SplitButtonVariant.Text ->
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
-                }
+                modifier =
+                    Modifier
+                        .size(width = 1.dp, height = 24.dp),
+                color =
+                    when (variant) {
+                        SplitButtonVariant.Filled -> colors.contentColor.copy(alpha = 0.2f)
+                        SplitButtonVariant.Outlined, SplitButtonVariant.Text ->
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                    }
             )
 
             // Secondary action button (icon only)
@@ -199,22 +209,24 @@ fun SplitButton(
                 onClick = onSecondaryClick,
                 enabled = enabled,
                 interactionSource = secondaryInteractionSource,
-                modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    .size(40.dp)
-                    .scale(secondaryScale)
-                    .semantics {
-                        contentDescription = "More options for $primaryText"
-                    }
+                modifier =
+                    Modifier
+                        .padding(horizontal = 4.dp)
+                        .size(40.dp)
+                        .scale(secondaryScale)
+                        .semantics {
+                            contentDescription = "More options for $primaryText"
+                        }
             ) {
                 Icon(
                     imageVector = secondaryIcon,
                     contentDescription = null,
-                    tint = when (variant) {
-                        SplitButtonVariant.Filled -> colors.contentColor
-                        SplitButtonVariant.Outlined, SplitButtonVariant.Text ->
-                            MaterialTheme.colorScheme.onSurface
-                    },
+                    tint =
+                        when (variant) {
+                            SplitButtonVariant.Filled -> colors.contentColor
+                            SplitButtonVariant.Outlined, SplitButtonVariant.Text ->
+                                MaterialTheme.colorScheme.onSurface
+                        },
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -319,15 +331,16 @@ fun SplitButtonWithMenu(
                     item.onClick()
                     expanded = false
                 },
-                leadingIcon = item.icon?.let { icon ->
-                    {
-                        Icon(
-                            imageVector = icon,
-                            contentDescription = null,
-                            modifier = Modifier.size(20.dp)
-                        )
+                leadingIcon =
+                    item.icon?.let { icon ->
+                        {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
-                }
             )
         }
     }
@@ -391,12 +404,13 @@ fun SplitButtonExamples() {
     SplitButtonWithMenu(
         primaryText = "Export All Data",
         onPrimaryClick = { /* Export with default settings */ },
-        menuItems = listOf(
-            SplitButtonMenuItem("Export GPX only") { /* Export GPX */ },
-            SplitButtonMenuItem("Export JSON") { /* Export JSON */ },
-            SplitButtonMenuItem("Export Photos") { /* Export photos */ },
-            SplitButtonMenuItem("Custom...") { /* Show custom dialog */ }
-        )
+        menuItems =
+            listOf(
+                SplitButtonMenuItem("Export GPX only") { /* Export GPX */ },
+                SplitButtonMenuItem("Export JSON") { /* Export JSON */ },
+                SplitButtonMenuItem("Export Photos") { /* Export photos */ },
+                SplitButtonMenuItem("Custom...") { /* Show custom dialog */ }
+            )
     )
 
     // Example 3: Outlined variant with route colors

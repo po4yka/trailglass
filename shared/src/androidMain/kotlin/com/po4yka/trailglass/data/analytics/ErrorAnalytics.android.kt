@@ -15,6 +15,7 @@ actual object ErrorAnalyticsFactory {
 }
 
 // Example Firebase Crashlytics implementation (commented out):
+
 /*
 class FirebaseCrashlyticsErrorAnalytics : ErrorAnalytics {
     private val crashlytics = Firebase.crashlytics

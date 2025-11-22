@@ -1,13 +1,13 @@
 package com.po4yka.trailglass.feature.trips
 
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.Trip
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import kotlin.random.Random
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
-import com.po4yka.trailglass.domain.error.TrailGlassError
 
 /**
  * Use case for creating a new trip (manual or from detection).
@@ -35,23 +35,24 @@ class CreateTripUseCase(
         description: String? = null,
         isAutoDetected: Boolean = false,
         detectionConfidence: Float = 0f
-    ): TrailGlassResult<Trip> {
-        return try {
+    ): TrailGlassResult<Trip> =
+        try {
             val now = Clock.System.now()
 
-            val trip = Trip(
-                id = generateTripId(),
-                name = name,
-                startTime = startTime,
-                endTime = endTime,
-                isOngoing = endTime == null,
-                userId = userId,
-                description = description,
-                isAutoDetected = isAutoDetected,
-                detectionConfidence = detectionConfidence,
-                createdAt = now,
-                updatedAt = now
-            )
+            val trip =
+                Trip(
+                    id = generateTripId(),
+                    name = name,
+                    startTime = startTime,
+                    endTime = endTime,
+                    isOngoing = endTime == null,
+                    userId = userId,
+                    description = description,
+                    isAutoDetected = isAutoDetected,
+                    detectionConfidence = detectionConfidence,
+                    createdAt = now,
+                    updatedAt = now
+                )
 
             tripRepository.upsertTrip(trip)
 
@@ -59,9 +60,6 @@ class CreateTripUseCase(
         } catch (e: Exception) {
             TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }
-    }
 
-    private fun generateTripId(): String {
-        return "trip_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}"
-    }
+    private fun generateTripId(): String = "trip_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(10000)}"
 }

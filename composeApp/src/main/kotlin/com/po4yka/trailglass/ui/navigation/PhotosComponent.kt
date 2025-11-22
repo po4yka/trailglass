@@ -16,4 +16,5 @@ interface PhotosComponent {
 class DefaultPhotosComponent(
     componentContext: ComponentContext,
     override val photoGalleryController: PhotoGalleryController
-) : PhotosComponent, ComponentContext by componentContext
+) : PhotosComponent,
+    ComponentContext by componentContext

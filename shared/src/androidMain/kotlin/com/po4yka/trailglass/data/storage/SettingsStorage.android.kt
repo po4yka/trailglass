@@ -16,8 +16,9 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 /**
  * Android implementation of SettingsStorage using DataStore.
  */
-actual class SettingsStorage(private val context: Context) {
-
+actual class SettingsStorage(
+    private val context: Context
+) {
     private val logger = logger()
 
     // Preference keys
@@ -59,26 +60,22 @@ actual class SettingsStorage(private val context: Context) {
         val DATA_STORAGE_MB = doublePreferencesKey("data_storage_mb")
     }
 
-    actual fun getSettingsFlow(): Flow<AppSettings> {
-        return context.dataStore.data
+    actual fun getSettingsFlow(): Flow<AppSettings> =
+        context.dataStore.data
             .catch { exception ->
                 logger.error(exception) { "Error reading settings" }
                 emit(emptyPreferences())
-            }
-            .map { preferences ->
+            }.map { preferences ->
                 preferences.toAppSettings()
             }
-    }
 
-    actual suspend fun getSettings(): AppSettings {
-        return context.dataStore.data
+    actual suspend fun getSettings(): AppSettings =
+        context.dataStore.data
             .catch { exception ->
                 logger.error(exception) { "Error reading settings" }
                 emit(emptyPreferences())
-            }
-            .map { it.toAppSettings() }
+            }.map { it.toAppSettings() }
             .first()
-    }
 
     actual suspend fun saveSettings(settings: AppSettings) {
         context.dataStore.edit { preferences ->
@@ -130,64 +127,78 @@ actual class SettingsStorage(private val context: Context) {
         context.dataStore.edit { it.clear() }
     }
 
-    private fun Preferences.toAppSettings(): AppSettings {
-        return AppSettings(
-            trackingPreferences = TrackingPreferences(
-                accuracy = this[Keys.TRACKING_ACCURACY]?.let {
-                    TrackingAccuracy.valueOf(it)
-                } ?: TrackingAccuracy.BALANCED,
-                updateInterval = this[Keys.TRACKING_UPDATE_INTERVAL]?.let {
-                    UpdateInterval.valueOf(it)
-                } ?: UpdateInterval.NORMAL,
-                batteryOptimization = this[Keys.TRACKING_BATTERY_OPT] ?: true,
-                trackWhenStationary = this[Keys.TRACKING_WHEN_STATIONARY] ?: false,
-                minimumDistance = this[Keys.TRACKING_MIN_DISTANCE] ?: 10
-            ),
-            privacySettings = PrivacySettings(
-                dataRetentionDays = this[Keys.PRIVACY_RETENTION_DAYS] ?: 365,
-                shareAnalytics = this[Keys.PRIVACY_SHARE_ANALYTICS] ?: false,
-                shareCrashReports = this[Keys.PRIVACY_SHARE_CRASH] ?: true,
-                autoBackup = this[Keys.PRIVACY_AUTO_BACKUP] ?: true,
-                encryptBackups = this[Keys.PRIVACY_ENCRYPT_BACKUPS] ?: true
-            ),
-            unitPreferences = UnitPreferences(
-                distanceUnit = this[Keys.UNIT_DISTANCE]?.let {
-                    DistanceUnit.valueOf(it)
-                } ?: DistanceUnit.METRIC,
-                temperatureUnit = this[Keys.UNIT_TEMPERATURE]?.let {
-                    TemperatureUnit.valueOf(it)
-                } ?: TemperatureUnit.CELSIUS,
-                timeFormat = this[Keys.UNIT_TIME_FORMAT]?.let {
-                    TimeFormat.valueOf(it)
-                } ?: TimeFormat.TWENTY_FOUR_HOUR
-            ),
-            appearanceSettings = AppearanceSettings(
-                theme = this[Keys.APPEARANCE_THEME]?.let {
-                    AppTheme.valueOf(it)
-                } ?: AppTheme.SYSTEM,
-                useDeviceWallpaper = this[Keys.APPEARANCE_DEVICE_WALLPAPER] ?: false,
-                showMapInTimeline = this[Keys.APPEARANCE_MAP_IN_TIMELINE] ?: true,
-                compactView = this[Keys.APPEARANCE_COMPACT_VIEW] ?: false
-            ),
-            accountSettings = AccountSettings(
-                email = this[Keys.ACCOUNT_EMAIL],
-                autoSync = this[Keys.ACCOUNT_AUTO_SYNC] ?: true,
-                syncOnWifiOnly = this[Keys.ACCOUNT_SYNC_WIFI_ONLY] ?: true,
-                lastSyncTime = this[Keys.ACCOUNT_LAST_SYNC]?.let {
-                    Instant.fromEpochSeconds(it)
-                }
-            ),
-            dataManagement = DataManagement(
-                lastExportTime = this[Keys.DATA_LAST_EXPORT]?.let {
-                    Instant.fromEpochSeconds(it)
-                },
-                lastBackupTime = this[Keys.DATA_LAST_BACKUP]?.let {
-                    Instant.fromEpochSeconds(it)
-                },
-                storageUsedMb = this[Keys.DATA_STORAGE_MB] ?: 0.0
-            )
+    private fun Preferences.toAppSettings(): AppSettings =
+        AppSettings(
+            trackingPreferences =
+                TrackingPreferences(
+                    accuracy =
+                        this[Keys.TRACKING_ACCURACY]?.let {
+                            TrackingAccuracy.valueOf(it)
+                        } ?: TrackingAccuracy.BALANCED,
+                    updateInterval =
+                        this[Keys.TRACKING_UPDATE_INTERVAL]?.let {
+                            UpdateInterval.valueOf(it)
+                        } ?: UpdateInterval.NORMAL,
+                    batteryOptimization = this[Keys.TRACKING_BATTERY_OPT] ?: true,
+                    trackWhenStationary = this[Keys.TRACKING_WHEN_STATIONARY] ?: false,
+                    minimumDistance = this[Keys.TRACKING_MIN_DISTANCE] ?: 10
+                ),
+            privacySettings =
+                PrivacySettings(
+                    dataRetentionDays = this[Keys.PRIVACY_RETENTION_DAYS] ?: 365,
+                    shareAnalytics = this[Keys.PRIVACY_SHARE_ANALYTICS] ?: false,
+                    shareCrashReports = this[Keys.PRIVACY_SHARE_CRASH] ?: true,
+                    autoBackup = this[Keys.PRIVACY_AUTO_BACKUP] ?: true,
+                    encryptBackups = this[Keys.PRIVACY_ENCRYPT_BACKUPS] ?: true
+                ),
+            unitPreferences =
+                UnitPreferences(
+                    distanceUnit =
+                        this[Keys.UNIT_DISTANCE]?.let {
+                            DistanceUnit.valueOf(it)
+                        } ?: DistanceUnit.METRIC,
+                    temperatureUnit =
+                        this[Keys.UNIT_TEMPERATURE]?.let {
+                            TemperatureUnit.valueOf(it)
+                        } ?: TemperatureUnit.CELSIUS,
+                    timeFormat =
+                        this[Keys.UNIT_TIME_FORMAT]?.let {
+                            TimeFormat.valueOf(it)
+                        } ?: TimeFormat.TWENTY_FOUR_HOUR
+                ),
+            appearanceSettings =
+                AppearanceSettings(
+                    theme =
+                        this[Keys.APPEARANCE_THEME]?.let {
+                            AppTheme.valueOf(it)
+                        } ?: AppTheme.SYSTEM,
+                    useDeviceWallpaper = this[Keys.APPEARANCE_DEVICE_WALLPAPER] ?: false,
+                    showMapInTimeline = this[Keys.APPEARANCE_MAP_IN_TIMELINE] ?: true,
+                    compactView = this[Keys.APPEARANCE_COMPACT_VIEW] ?: false
+                ),
+            accountSettings =
+                AccountSettings(
+                    email = this[Keys.ACCOUNT_EMAIL],
+                    autoSync = this[Keys.ACCOUNT_AUTO_SYNC] ?: true,
+                    syncOnWifiOnly = this[Keys.ACCOUNT_SYNC_WIFI_ONLY] ?: true,
+                    lastSyncTime =
+                        this[Keys.ACCOUNT_LAST_SYNC]?.let {
+                            Instant.fromEpochSeconds(it)
+                        }
+                ),
+            dataManagement =
+                DataManagement(
+                    lastExportTime =
+                        this[Keys.DATA_LAST_EXPORT]?.let {
+                            Instant.fromEpochSeconds(it)
+                        },
+                    lastBackupTime =
+                        this[Keys.DATA_LAST_BACKUP]?.let {
+                            Instant.fromEpochSeconds(it)
+                        },
+                    storageUsedMb = this[Keys.DATA_STORAGE_MB] ?: 0.0
+                )
         )
-    }
 }
 
 // Extension to get first value from Flow

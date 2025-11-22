@@ -42,7 +42,6 @@ class ExportRouteUseCase(
     private val gpxExporter: GpxExporter = GpxExporter(),
     private val kmlExporter: KmlExporter = KmlExporter()
 ) {
-
     private val logger = logger()
 
     /**
@@ -57,25 +56,28 @@ class ExportRouteUseCase(
         tripRoute: TripRoute,
         tripName: String,
         format: ExportFormat
-    ): Result<ExportResult> {
-        return try {
+    ): Result<ExportResult> =
+        try {
             logger.info { "Exporting route to $format format" }
 
-            val content = when (format) {
-                ExportFormat.GPX -> gpxExporter.export(tripRoute, tripName)
-                ExportFormat.KML -> kmlExporter.export(tripRoute, tripName)
-            }
+            val content =
+                when (format) {
+                    ExportFormat.GPX -> gpxExporter.export(tripRoute, tripName)
+                    ExportFormat.KML -> kmlExporter.export(tripRoute, tripName)
+                }
 
             val sanitizedName = sanitizeFileName(tripName)
-            val fileName = when (format) {
-                ExportFormat.GPX -> "$sanitizedName.gpx"
-                ExportFormat.KML -> "$sanitizedName.kml"
-            }
+            val fileName =
+                when (format) {
+                    ExportFormat.GPX -> "$sanitizedName.gpx"
+                    ExportFormat.KML -> "$sanitizedName.kml"
+                }
 
-            val mimeType = when (format) {
-                ExportFormat.GPX -> "application/gpx+xml"
-                ExportFormat.KML -> "application/vnd.google-earth.kml+xml"
-            }
+            val mimeType =
+                when (format) {
+                    ExportFormat.GPX -> "application/gpx+xml"
+                    ExportFormat.KML -> "application/vnd.google-earth.kml+xml"
+                }
 
             // Generate privacy information
             val privacyInfo = generatePrivacyInfo(tripRoute)
@@ -95,7 +97,6 @@ class ExportRouteUseCase(
             logger.error(e) { "Failed to export route to $format" }
             Result.failure(e)
         }
-    }
 
     /**
      * Generate privacy information for the export.
@@ -105,18 +106,20 @@ class ExportRouteUseCase(
         val hasPhotos = tripRoute.photoMarkers.isNotEmpty()
         val hasTimestamps = true // Always included in exports
 
-        val warningParts = buildList {
-            if (hasGps) add("precise GPS coordinates (${tripRoute.fullPath.size} points)")
-            if (hasPhotos) add("photo locations (${tripRoute.photoMarkers.size} photos)")
-            if (hasTimestamps) add("timestamps")
-        }
+        val warningParts =
+            buildList {
+                if (hasGps) add("precise GPS coordinates (${tripRoute.fullPath.size} points)")
+                if (hasPhotos) add("photo locations (${tripRoute.photoMarkers.size} photos)")
+                if (hasTimestamps) add("timestamps")
+            }
 
-        val warningMessage = if (warningParts.isNotEmpty()) {
-            "This file contains ${warningParts.joinToString(", ")}. " +
-            "Be careful when sharing, as it reveals your exact movements and locations."
-        } else {
-            "This file contains location data."
-        }
+        val warningMessage =
+            if (warningParts.isNotEmpty()) {
+                "This file contains ${warningParts.joinToString(", ")}. " +
+                    "Be careful when sharing, as it reveals your exact movements and locations."
+            } else {
+                "This file contains location data."
+            }
 
         return PrivacyInfo(
             containsGpsData = hasGps,
@@ -131,10 +134,9 @@ class ExportRouteUseCase(
     /**
      * Sanitize file name by removing invalid characters.
      */
-    private fun sanitizeFileName(name: String): String {
-        return name
+    private fun sanitizeFileName(name: String): String =
+        name
             .replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
             .take(50) // Limit length
             .ifEmpty { "route" }
-    }
 }

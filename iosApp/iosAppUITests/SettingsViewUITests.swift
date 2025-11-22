@@ -2,7 +2,6 @@ import XCTest
 
 /// UI tests for Settings screen
 final class SettingsViewUITests: XCTestCase {
-
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -46,7 +45,7 @@ final class SettingsViewUITests: XCTestCase {
         let passiveModeButton = app.buttons["Passive"]
 
         // At least one mode should be available
-        XCTAssertTrue(activeModeButton.exists || passiveModeButton.exists || app.segmentedControls.count > 0)
+        XCTAssertTrue(activeModeButton.exists || passiveModeButton.exists || !app.segmentedControls.isEmpty)
     }
 
     func testSyncSettings() throws {
@@ -144,7 +143,7 @@ final class SettingsViewUITests: XCTestCase {
             clearCacheButton.tap()
 
             // May show confirmation alert
-            if app.alerts.count > 0 {
+            if !app.alerts.isEmpty {
                 let confirmButton = app.alerts.buttons["Confirm"]
                 if confirmButton.exists {
                     confirmButton.tap()

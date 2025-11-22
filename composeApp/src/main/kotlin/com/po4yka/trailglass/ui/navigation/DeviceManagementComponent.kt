@@ -18,4 +18,5 @@ class DefaultDeviceManagementComponent(
     componentContext: ComponentContext,
     override val deviceManagementController: DeviceManagementController,
     override val onBack: () -> Unit
-) : DeviceManagementComponent, ComponentContext by componentContext
+) : DeviceManagementComponent,
+    ComponentContext by componentContext

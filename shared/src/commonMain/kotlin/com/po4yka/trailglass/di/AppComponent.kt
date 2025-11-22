@@ -5,23 +5,22 @@ import com.po4yka.trailglass.feature.auth.AuthController
 import com.po4yka.trailglass.feature.devices.DeviceManagementController
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.feature.photo.PhotoController
-import com.po4yka.trailglass.feature.photo.PhotoGalleryController
 import com.po4yka.trailglass.feature.photo.PhotoDetailController
+import com.po4yka.trailglass.feature.photo.PhotoGalleryController
 import com.po4yka.trailglass.feature.places.PlacesController
 import com.po4yka.trailglass.feature.route.RouteReplayController
 import com.po4yka.trailglass.feature.route.RouteViewController
 import com.po4yka.trailglass.feature.route.TripStatisticsController
-import com.po4yka.trailglass.feature.stats.StatsController
-import com.po4yka.trailglass.feature.stats.EnhancedStatsController
-import com.po4yka.trailglass.feature.timeline.TimelineController
-import com.po4yka.trailglass.feature.timeline.EnhancedTimelineController
 import com.po4yka.trailglass.feature.settings.SettingsController
+import com.po4yka.trailglass.feature.stats.EnhancedStatsController
+import com.po4yka.trailglass.feature.stats.StatsController
 import com.po4yka.trailglass.feature.sync.ConflictResolutionController
+import com.po4yka.trailglass.feature.timeline.EnhancedTimelineController
+import com.po4yka.trailglass.feature.timeline.TimelineController
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
 import com.po4yka.trailglass.feature.trips.TripsController
 import com.po4yka.trailglass.location.LocationProcessor
 import me.tatarka.inject.annotations.Component
-import me.tatarka.inject.annotations.Provides
 
 /**
  * Main application dependency injection component.
@@ -40,8 +39,11 @@ import me.tatarka.inject.annotations.Provides
 @Component
 abstract class AppComponent(
     @Component val platformModule: PlatformModule
-) : DataModule, LocationModule, SyncModule, PermissionModule, AuthModule {
-
+) : DataModule,
+    LocationModule,
+    SyncModule,
+    PermissionModule,
+    AuthModule {
     /**
      * Provides a CoroutineScope for application-level background work.
      * Platform-specific implementation should provide this.

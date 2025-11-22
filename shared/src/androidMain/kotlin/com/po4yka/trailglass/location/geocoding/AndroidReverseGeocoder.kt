@@ -16,11 +16,13 @@ import kotlin.coroutines.resume
 class AndroidReverseGeocoder(
     private val context: Context
 ) : ReverseGeocoder {
-
     private val geocoder = Geocoder(context)
     private val logger = logger()
 
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation? {
+    override suspend fun reverseGeocode(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         if (!Geocoder.isPresent()) {
             logger.warn { "Android Geocoder is not present on this device" }
             return null
@@ -29,15 +31,16 @@ class AndroidReverseGeocoder(
         logger.trace { "Reverse geocoding ($latitude, $longitude) using Android Geocoder" }
 
         return try {
-            val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                // Use new async API on API 33+
-                logger.trace { "Using Android Geocoder async API (SDK ${Build.VERSION.SDK_INT})" }
-                reverseGeocodeAsync(latitude, longitude)
-            } else {
-                // Use legacy blocking API on older versions
-                logger.trace { "Using Android Geocoder legacy API (SDK ${Build.VERSION.SDK_INT})" }
-                reverseGeocodeLegacy(latitude, longitude)
-            }
+            val result =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    // Use new async API on API 33+
+                    logger.trace { "Using Android Geocoder async API (SDK ${Build.VERSION.SDK_INT})" }
+                    reverseGeocodeAsync(latitude, longitude)
+                } else {
+                    // Use legacy blocking API on older versions
+                    logger.trace { "Using Android Geocoder legacy API (SDK ${Build.VERSION.SDK_INT})" }
+                    reverseGeocodeLegacy(latitude, longitude)
+                }
 
             if (result != null) {
                 logger.debug { "Android Geocoder success: ${result.city ?: result.formattedAddress}" }
@@ -55,12 +58,18 @@ class AndroidReverseGeocoder(
     }
 
     @Suppress("DEPRECATION")
-    private fun reverseGeocodeLegacy(latitude: Double, longitude: Double): GeocodedLocation? {
+    private fun reverseGeocodeLegacy(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         val addresses = geocoder.getFromLocation(latitude, longitude, 1)
         return addresses?.firstOrNull()?.toGeocodedLocation(latitude, longitude)
     }
 
-    private suspend fun reverseGeocodeAsync(latitude: Double, longitude: Double): GeocodedLocation? {
+    private suspend fun reverseGeocodeAsync(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return reverseGeocodeLegacy(latitude, longitude)
         }
@@ -81,8 +90,11 @@ class AndroidReverseGeocoder(
         }
     }
 
-    private fun Address.toGeocodedLocation(lat: Double, lon: Double): GeocodedLocation {
-        return GeocodedLocation(
+    private fun Address.toGeocodedLocation(
+        lat: Double,
+        lon: Double
+    ): GeocodedLocation =
+        GeocodedLocation(
             latitude = lat,
             longitude = lon,
             formattedAddress = getAddressLine(0),
@@ -95,23 +107,19 @@ class AndroidReverseGeocoder(
             street = thoroughfare,
             streetNumber = subThoroughfare
         )
-    }
 }
 
 /**
  * Factory function to create AndroidReverseGeocoder.
  * Requires Android Context.
  */
-actual fun createReverseGeocoder(): ReverseGeocoder {
+actual fun createReverseGeocoder(): ReverseGeocoder =
     throw IllegalStateException(
         "createReverseGeocoder() requires Android Context. " +
-        "Use createAndroidReverseGeocoder(context) instead."
+            "Use createAndroidReverseGeocoder(context) instead."
     )
-}
 
 /**
  * Android-specific factory function that accepts Context.
  */
-fun createAndroidReverseGeocoder(context: Context): ReverseGeocoder {
-    return AndroidReverseGeocoder(context)
-}
+fun createAndroidReverseGeocoder(context: Context): ReverseGeocoder = AndroidReverseGeocoder(context)

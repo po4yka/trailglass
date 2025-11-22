@@ -2,8 +2,8 @@ package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -13,8 +13,6 @@ import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.ui.components.MapView
 import com.po4yka.trailglass.ui.dialogs.PhotoAttachmentInfoDialog
 import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration.Companion.days
 
 /**
@@ -51,9 +49,10 @@ fun MapScreen(
                 // Navigate to visit detail
                 onNavigateToPlaceVisitDetail(marker.placeVisitId)
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
         )
 
         // Selected marker info
@@ -79,15 +78,17 @@ private fun MarkerInfoCard(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

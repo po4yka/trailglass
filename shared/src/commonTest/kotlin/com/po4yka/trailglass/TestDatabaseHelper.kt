@@ -1,22 +1,17 @@
 package com.po4yka.trailglass
 
-import app.cash.sqldelight.db.SqlDriver
 import com.po4yka.trailglass.data.db.Database
-import com.po4yka.trailglass.db.TrailGlassDatabase
 
 /**
  * Helper for creating in-memory test databases.
  * Uses expect/actual pattern for platform-specific drivers.
  */
 object TestDatabaseHelper {
-
     /**
      * Creates an in-memory Database for testing.
      * Uses platform-specific driver (JDBC for JVM, Native for iOS).
      */
-    fun createTestDatabase(): Database {
-        return createTestDatabaseImpl()
-    }
+    fun createTestDatabase(): Database = createTestDatabaseImpl()
 
     /**
      * Clears all tables in the database that have deleteAll methods.

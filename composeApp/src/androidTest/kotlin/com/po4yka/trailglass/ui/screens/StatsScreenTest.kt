@@ -1,7 +1,12 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertExists
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.waitForIdle
 import com.po4yka.trailglass.feature.stats.GetStatsUseCase
 import com.po4yka.trailglass.feature.stats.StatsController
 import com.po4yka.trailglass.feature.stats.StatsPeriod
@@ -16,7 +21,6 @@ import org.junit.Test
  * UI tests for StatsScreen.
  */
 class StatsScreenTest {
-
     @get:Rule
     val composeTestRule = createComposeRule()
 
@@ -27,30 +31,32 @@ class StatsScreenTest {
     fun setup() {
         // Create a mock controller with test data
         // In a real implementation, you'd use a test repository
-        val mockUseCase = object : GetStatsUseCase(null) {
-            override suspend fun execute(
-                userId: String,
-                period: StatsPeriod
-            ): GetStatsUseCase.StatsData {
-                return GetStatsUseCase.StatsData(
-                    totalCountries = 5,
-                    totalCities = 12,
-                    totalTrips = 3,
-                    totalVisits = 25,
-                    totalDays = 45,
-                    topCountries = listOf(
-                        "France" to 8,
-                        "Spain" to 6,
-                        "Italy" to 5
-                    ),
-                    topCities = listOf(
-                        "Paris" to 4,
-                        "Barcelona" to 3,
-                        "Rome" to 3
+        val mockUseCase =
+            object : GetStatsUseCase(null) {
+                override suspend fun execute(
+                    userId: String,
+                    period: StatsPeriod
+                ): GetStatsUseCase.StatsData =
+                    GetStatsUseCase.StatsData(
+                        totalCountries = 5,
+                        totalCities = 12,
+                        totalTrips = 3,
+                        totalVisits = 25,
+                        totalDays = 45,
+                        topCountries =
+                            listOf(
+                                "France" to 8,
+                                "Spain" to 6,
+                                "Italy" to 5
+                            ),
+                        topCities =
+                            listOf(
+                                "Paris" to 4,
+                                "Barcelona" to 3,
+                                "Rome" to 3
+                            )
                     )
-                )
             }
-        }
 
         controller = StatsController(mockUseCase, scope, "test_user")
     }
@@ -144,7 +150,8 @@ class StatsScreenTest {
         composeTestRule.waitForIdle()
 
         // When - scroll to bottom
-        composeTestRule.onNodeWithText("Top Cities")
+        composeTestRule
+            .onNodeWithText("Top Cities")
             .performScrollTo()
 
         // Then - bottom content is visible

@@ -7,97 +7,102 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 
 class NetworkConnectivityMonitorTest {
-
     @Test
-    fun `initial state should be connected`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
+    fun `initial state should be connected`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
 
-        monitor.isConnected() shouldBe true
-        monitor.networkState.value.shouldBeInstanceOf<NetworkState.Connected>()
-    }
-
-    @Test
-    fun `should detect disconnection`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
-
-        monitor.networkState.test {
-            // Initial state
-            awaitItem().shouldBeInstanceOf<NetworkState.Connected>()
-
-            // Simulate disconnect
-            monitor.simulateDisconnect()
-
-            // Should emit disconnected state
-            awaitItem().shouldBeInstanceOf<NetworkState.Disconnected>()
-            monitor.isConnected() shouldBe false
-        }
-    }
-
-    @Test
-    fun `should detect reconnection`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
-
-        monitor.networkState.test {
-            awaitItem() // Initial connected
-
-            // Disconnect
-            monitor.simulateDisconnect()
-            awaitItem().shouldBeInstanceOf<NetworkState.Disconnected>()
-
-            // Reconnect
-            monitor.simulateConnect()
-            awaitItem().shouldBeInstanceOf<NetworkState.Connected>()
             monitor.isConnected() shouldBe true
+            monitor.networkState.value.shouldBeInstanceOf<NetworkState.Connected>()
         }
-    }
 
     @Test
-    fun `should detect network type changes`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
+    fun `should detect disconnection`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
 
-        monitor.networkInfo.test {
-            // Initial WiFi
-            awaitItem().type shouldBe NetworkType.WIFI
+            monitor.networkState.test {
+                // Initial state
+                awaitItem().shouldBeInstanceOf<NetworkState.Connected>()
 
-            // Switch to cellular
-            monitor.setNetworkType(NetworkType.CELLULAR)
-            awaitItem().type shouldBe NetworkType.CELLULAR
+                // Simulate disconnect
+                monitor.simulateDisconnect()
 
-            // Switch to ethernet
-            monitor.setNetworkType(NetworkType.ETHERNET)
-            awaitItem().type shouldBe NetworkType.ETHERNET
+                // Should emit disconnected state
+                awaitItem().shouldBeInstanceOf<NetworkState.Disconnected>()
+                monitor.isConnected() shouldBe false
+            }
         }
-    }
 
     @Test
-    fun `should detect metered connection`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
+    fun `should detect reconnection`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
 
-        monitor.networkInfo.test {
-            // Initial not metered
-            awaitItem().isMetered shouldBe false
+            monitor.networkState.test {
+                awaitItem() // Initial connected
 
-            // Switch to metered
-            monitor.setMetered(true)
-            awaitItem().isMetered shouldBe true
-            monitor.isMetered() shouldBe true
+                // Disconnect
+                monitor.simulateDisconnect()
+                awaitItem().shouldBeInstanceOf<NetworkState.Disconnected>()
+
+                // Reconnect
+                monitor.simulateConnect()
+                awaitItem().shouldBeInstanceOf<NetworkState.Connected>()
+                monitor.isConnected() shouldBe true
+            }
         }
-    }
 
     @Test
-    fun `should detect limited connectivity`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
+    fun `should detect network type changes`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
 
-        monitor.networkState.test {
-            awaitItem() // Initial connected
+            monitor.networkInfo.test {
+                // Initial WiFi
+                awaitItem().type shouldBe NetworkType.WIFI
 
-            // Simulate limited connection
-            monitor.simulateLimitedConnection("No internet access")
-            val limited = awaitItem()
-            limited.shouldBeInstanceOf<NetworkState.Limited>()
-            limited.reason shouldBe "No internet access"
+                // Switch to cellular
+                monitor.setNetworkType(NetworkType.CELLULAR)
+                awaitItem().type shouldBe NetworkType.CELLULAR
+
+                // Switch to ethernet
+                monitor.setNetworkType(NetworkType.ETHERNET)
+                awaitItem().type shouldBe NetworkType.ETHERNET
+            }
         }
-    }
+
+    @Test
+    fun `should detect metered connection`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
+
+            monitor.networkInfo.test {
+                // Initial not metered
+                awaitItem().isMetered shouldBe false
+
+                // Switch to metered
+                monitor.setMetered(true)
+                awaitItem().isMetered shouldBe true
+                monitor.isMetered() shouldBe true
+            }
+        }
+
+    @Test
+    fun `should detect limited connectivity`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
+
+            monitor.networkState.test {
+                awaitItem() // Initial connected
+
+                // Simulate limited connection
+                monitor.simulateLimitedConnection("No internet access")
+                val limited = awaitItem()
+                limited.shouldBeInstanceOf<NetworkState.Limited>()
+                limited.reason shouldBe "No internet access"
+            }
+        }
 
     @Test
     fun `allowsSync extension should work correctly`() {
@@ -120,24 +125,26 @@ class NetworkConnectivityMonitorTest {
     }
 
     @Test
-    fun `cellular connection should be metered by default`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
+    fun `cellular connection should be metered by default`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
 
-        monitor.simulateConnect(type = NetworkType.CELLULAR, isMetered = true)
+            monitor.simulateConnect(type = NetworkType.CELLULAR, isMetered = true)
 
-        monitor.networkInfo.value.type shouldBe NetworkType.CELLULAR
-        monitor.networkInfo.value.isMetered shouldBe true
-        monitor.isMetered() shouldBe true
-    }
+            monitor.networkInfo.value.type shouldBe NetworkType.CELLULAR
+            monitor.networkInfo.value.isMetered shouldBe true
+            monitor.isMetered() shouldBe true
+        }
 
     @Test
-    fun `wifi connection should not be metered`() = runTest {
-        val monitor = MockNetworkConnectivityMonitor()
+    fun `wifi connection should not be metered`() =
+        runTest {
+            val monitor = MockNetworkConnectivityMonitor()
 
-        monitor.simulateConnect(type = NetworkType.WIFI, isMetered = false)
+            monitor.simulateConnect(type = NetworkType.WIFI, isMetered = false)
 
-        monitor.networkInfo.value.type shouldBe NetworkType.WIFI
-        monitor.networkInfo.value.isMetered shouldBe false
-        monitor.isMetered() shouldBe false
-    }
+            monitor.networkInfo.value.type shouldBe NetworkType.WIFI
+            monitor.networkInfo.value.isMetered shouldBe false
+            monitor.isMetered() shouldBe false
+        }
 }

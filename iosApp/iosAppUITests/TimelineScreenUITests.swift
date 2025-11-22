@@ -4,7 +4,6 @@ import XCTest
  * UI tests for Timeline screen in TrailGlass iOS app.
  */
 final class TimelineScreenUITests: XCTestCase {
-
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -56,7 +55,7 @@ final class TimelineScreenUITests: XCTestCase {
             app.buttons["Select date"].tap()
 
             // Calendar should appear
-            let calendarExists = app.datePickers.count > 0 || app.collectionViews.count > 0
+            let calendarExists = !app.datePickers.isEmpty || !app.collectionViews.isEmpty
             XCTAssertTrue(calendarExists, "Calendar picker should appear")
         }
     }
@@ -72,7 +71,7 @@ final class TimelineScreenUITests: XCTestCase {
 
         // Then - timeline items should be displayed
         // Could be visits, routes, or day markers
-        let hasCells = app.cells.count > 0 || app.staticTexts["Day Start"].exists
+        let hasCells = !app.cells.isEmpty || app.staticTexts["Day Start"].exists
         XCTAssertTrue(hasCells, "Timeline should display items or day markers")
     }
 
@@ -85,10 +84,10 @@ final class TimelineScreenUITests: XCTestCase {
 
         // Then - if visits exist, they should show location info
         let cells = app.cells
-        if cells.count > 0 {
+        if !cells.isEmpty {
             // Check if any cell contains location-like text
             // This is a generic check since exact data depends on test fixtures
-            XCTAssertTrue(cells.count > 0, "Should have timeline items")
+            XCTAssertTrue(!cells.isEmpty, "Should have timeline items")
         }
     }
 
@@ -112,8 +111,8 @@ final class TimelineScreenUITests: XCTestCase {
         }
 
         // Or check for distance labels
-        let hasDistance = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'km'")).count > 0
-        XCTAssertTrue(foundTransport || hasDistance || app.cells.count == 0,
+        let hasDistance = !app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'km'")).isEmpty
+        XCTAssertTrue(foundTransport || hasDistance || app.cells.isEmpty,
                      "Routes should show transport info or no data")
     }
 
@@ -146,7 +145,7 @@ final class TimelineScreenUITests: XCTestCase {
 
         // When - tap on a visit card (if exists)
         let cells = app.cells
-        if cells.count > 0 {
+        if !cells.isEmpty {
             cells.firstMatch.tap()
 
             // Then - should navigate to visit detail or show action
@@ -207,7 +206,7 @@ final class TimelineScreenUITests: XCTestCase {
         // Then - should show empty state
         sleep(2)
         let emptyMessage = app.staticTexts["No timeline data"]
-        XCTAssertTrue(emptyMessage.exists || app.cells.count == 0,
+        XCTAssertTrue(emptyMessage.exists || app.cells.isEmpty,
                      "Should show empty state or no items")
     }
 
@@ -251,7 +250,7 @@ final class TimelineScreenUITests: XCTestCase {
 
         // Then - visit cards should have accessibility labels
         let cells = app.cells
-        if cells.count > 0 {
+        if !cells.isEmpty {
             let firstCell = cells.firstMatch
             XCTAssertTrue(firstCell.isAccessibilityElement ||
                          firstCell.descendants(matching: .any).element.isAccessibilityElement,

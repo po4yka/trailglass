@@ -3,7 +3,6 @@ import BackgroundTasks
 import shared
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
     // Application DI component
     lazy var appComponent: AppComponent = {
         return CreateKt.createIOSAppComponent()
@@ -13,7 +12,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-
         print("TrailGlass iOS app starting up...")
 
         // Initialize sync coordinator

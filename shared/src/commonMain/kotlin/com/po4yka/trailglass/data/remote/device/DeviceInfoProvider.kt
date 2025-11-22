@@ -8,8 +8,12 @@ import com.po4yka.trailglass.data.remote.DeviceInfoProvider
  */
 expect class PlatformDeviceInfoProvider : DeviceInfoProvider {
     override fun getDeviceId(): String
+
     override fun getDeviceName(): String
+
     override fun getPlatform(): String
+
     override fun getOsVersion(): String
+
     override fun getAppVersion(): String
 }

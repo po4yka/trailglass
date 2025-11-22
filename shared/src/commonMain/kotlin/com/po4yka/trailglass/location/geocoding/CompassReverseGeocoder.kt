@@ -24,8 +24,10 @@ import com.po4yka.trailglass.domain.model.GeocodedLocation
  * TODO: Complete Compass integration with proper platform setup
  */
 class CompassReverseGeocoder : ReverseGeocoder {
-
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation? {
+    override suspend fun reverseGeocode(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         // Placeholder implementation
         // TODO: Implement Compass geocoding with proper platform configuration
         return null
@@ -39,6 +41,4 @@ class CompassReverseGeocoder : ReverseGeocoder {
  * - Android: createAndroidReverseGeocoder(context)
  * - iOS: createIOSReverseGeocoder()
  */
-fun createCompassReverseGeocoder(): ReverseGeocoder {
-    return CompassReverseGeocoder()
-}
+fun createCompassReverseGeocoder(): ReverseGeocoder = CompassReverseGeocoder()

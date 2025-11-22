@@ -5,7 +5,6 @@ package com.po4yka.trailglass.feature.route.export
  * Implementations should use platform-specific sharing mechanisms.
  */
 interface RouteShareHandler {
-
     /**
      * Share a route file (GPX or KML).
      *

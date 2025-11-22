@@ -57,9 +57,10 @@ fun BarChart(
 
                     // Bar
                     Canvas(
-                        modifier = Modifier
-                            .width(32.dp)
-                            .height((maxBarHeight * (item.value / maxValue)).dp)
+                        modifier =
+                            Modifier
+                                .width(32.dp)
+                                .height((maxBarHeight * (item.value / maxValue)).dp)
                     ) {
                         drawRect(
                             color = item.color ?: barColor,

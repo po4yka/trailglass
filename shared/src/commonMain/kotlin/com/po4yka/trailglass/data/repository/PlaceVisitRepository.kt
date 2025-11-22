@@ -8,7 +8,6 @@ import kotlinx.datetime.Instant
  * Repository for managing place visits.
  */
 interface PlaceVisitRepository {
-
     /**
      * Insert a new place visit.
      */
@@ -45,12 +44,18 @@ interface PlaceVisitRepository {
     /**
      * Link location samples to a place visit.
      */
-    suspend fun linkSamples(visitId: String, sampleIds: List<String>)
+    suspend fun linkSamples(
+        visitId: String,
+        sampleIds: List<String>
+    )
 
     /**
      * Unlink a location sample from a place visit.
      */
-    suspend fun unlinkSample(visitId: String, sampleId: String)
+    suspend fun unlinkSample(
+        visitId: String,
+        sampleId: String
+    )
 
     /**
      * Get all location samples linked to a place visit.

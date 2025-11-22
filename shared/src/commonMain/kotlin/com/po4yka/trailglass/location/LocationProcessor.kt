@@ -15,7 +15,6 @@ class LocationProcessor(
     private val tripDetector: TripDetector = TripDetector(),
     private val tripDayAggregator: TripDayAggregator = TripDayAggregator()
 ) {
-
     private val logger = logger()
 
     /**
@@ -74,21 +73,23 @@ class LocationProcessor(
 
         // Step 4: Aggregate daily timelines for each trip
         logger.info { "Step 4/4: Building daily timelines" }
-        val tripDays = trips.flatMap { trip ->
-            tripDayAggregator.aggregateTripDays(trip, visits, routes)
-        }
+        val tripDays =
+            trips.flatMap { trip ->
+                tripDayAggregator.aggregateTripDays(trip, visits, routes)
+            }
         logger.info { "Built ${tripDays.size} trip days across ${trips.size} trips" }
 
-        val result = ProcessingResult(
-            visits = visits,
-            routes = routes,
-            trips = trips,
-            tripDays = tripDays
-        )
+        val result =
+            ProcessingResult(
+                visits = visits,
+                routes = routes,
+                trips = trips,
+                tripDays = tripDays
+            )
 
         logger.info {
             "Processing complete: ${visits.size} visits, ${routes.size} routes, " +
-            "${trips.size} trips, ${tripDays.size} days"
+                "${trips.size} trips, ${tripDays.size} days"
         }
 
         return result
@@ -118,9 +119,10 @@ class LocationProcessor(
         val newVisits = placeVisitProcessor.detectPlaceVisits(allSamples)
 
         // Combine with existing visits and deduplicate
-        val allVisits = (existingVisits + newVisits)
-            .distinctBy { it.id }
-            .sortedBy { it.startTime }
+        val allVisits =
+            (existingVisits + newVisits)
+                .distinctBy { it.id }
+                .sortedBy { it.startTime }
 
         // Build routes
         val routes = routeSegmentBuilder.buildSegments(allSamples, allVisits)
@@ -129,13 +131,14 @@ class LocationProcessor(
         val trips = tripDetector.detectTrips(allVisits, userId)
 
         // Build timelines
-        val tripDays = trips.flatMap { trip ->
-            tripDayAggregator.aggregateTripDays(trip, allVisits, routes)
-        }
+        val tripDays =
+            trips.flatMap { trip ->
+                tripDayAggregator.aggregateTripDays(trip, allVisits, routes)
+            }
 
         logger.info {
             "Reprocessing complete: ${newVisits.size} new visits, " +
-            "${routes.size} routes, ${trips.size} trips"
+                "${routes.size} routes, ${trips.size} trips"
         }
 
         return ProcessingResult(

@@ -7,9 +7,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
@@ -50,7 +49,6 @@ data class MorphableShape(
  * Predefined morphable shapes for common use cases.
  */
 object MorphableShapes {
-
     /**
      * Perfect circle shape.
      * Use for: Default FAB state, loading indicators, badges.
@@ -61,72 +59,82 @@ object MorphableShapes {
      * Triangle pointing up.
      * Use for: Active tracking indicator, navigation arrows, direction indicators.
      */
-    val Triangle = MorphableShape(60) { angle, baseRadius ->
-        val normalizedAngle = (angle % (2 * PI.toFloat()))
-        val triangleAngle = (normalizedAngle - PI.toFloat() / 2) % (2 * PI.toFloat() / 3)
+    val Triangle =
+        MorphableShape(60) { angle, baseRadius ->
+            val normalizedAngle = (angle % (2 * PI.toFloat()))
+            val triangleAngle = (normalizedAngle - PI.toFloat() / 2) % (2 * PI.toFloat() / 3)
 
-        // Create triangle with rounded corners
-        val cornerRadius = 0.15f
-        val distToCorner = if (triangleAngle < PI.toFloat() / 3) {
-            triangleAngle / (PI.toFloat() / 3)
-        } else {
-            (2 * PI.toFloat() / 3 - triangleAngle) / (PI.toFloat() / 3)
+            // Create triangle with rounded corners
+            val cornerRadius = 0.15f
+            val distToCorner =
+                if (triangleAngle < PI.toFloat() / 3) {
+                    triangleAngle / (PI.toFloat() / 3)
+                } else {
+                    (2 * PI.toFloat() / 3 - triangleAngle) / (PI.toFloat() / 3)
+                }
+
+            baseRadius * (1.0f + cornerRadius * (1.0f - distToCorner))
         }
-
-        baseRadius * (1.0f + cornerRadius * (1.0f - distToCorner))
-    }
 
     /**
      * Hexagon shape.
      * Use for: Category badges, transport mode indicators, status chips.
      */
-    val Hexagon = MorphableShape(60) { angle, baseRadius ->
-        val normalizedAngle = (angle % (PI.toFloat() / 3))
-        val distToCorner = (PI.toFloat() / 6 - kotlin.math.abs(normalizedAngle - PI.toFloat() / 6)) / (PI.toFloat() / 6)
-        baseRadius * (0.95f + 0.05f * distToCorner)
-    }
+    val Hexagon =
+        MorphableShape(60) { angle, baseRadius ->
+            val normalizedAngle = (angle % (PI.toFloat() / 3))
+            val distToCorner =
+                (PI.toFloat() / 6 - kotlin.math.abs(normalizedAngle - PI.toFloat() / 6)) / (PI.toFloat() / 6)
+            baseRadius * (0.95f + 0.05f * distToCorner)
+        }
 
     /**
      * Diamond (rotated square) shape.
      * Use for: Loading indicator states, emphasis markers.
      */
-    val Diamond = MorphableShape(60) { angle, baseRadius ->
-        val normalizedAngle = (angle % (PI.toFloat() / 2))
-        val distToCorner = (PI.toFloat() / 4 - kotlin.math.abs(normalizedAngle - PI.toFloat() / 4)) / (PI.toFloat() / 4)
-        baseRadius * (0.92f + 0.08f * distToCorner) * 1.15f
-    }
+    val Diamond =
+        MorphableShape(60) { angle, baseRadius ->
+            val normalizedAngle = (angle % (PI.toFloat() / 2))
+            val distToCorner =
+                (PI.toFloat() / 4 - kotlin.math.abs(normalizedAngle - PI.toFloat() / 4)) / (PI.toFloat() / 4)
+            baseRadius * (0.92f + 0.08f * distToCorner) * 1.15f
+        }
 
     /**
      * Square with rounded corners.
      * Use for: Work category, formal contexts, grid layouts.
      */
-    val RoundedSquare = MorphableShape(60) { angle, baseRadius ->
-        val normalizedAngle = (angle % (PI.toFloat() / 2))
-        val distToCorner = (PI.toFloat() / 4 - kotlin.math.abs(normalizedAngle - PI.toFloat() / 4)) / (PI.toFloat() / 4)
-        baseRadius * (0.90f + 0.10f * distToCorner)
-    }
+    val RoundedSquare =
+        MorphableShape(60) { angle, baseRadius ->
+            val normalizedAngle = (angle % (PI.toFloat() / 2))
+            val distToCorner =
+                (PI.toFloat() / 4 - kotlin.math.abs(normalizedAngle - PI.toFloat() / 4)) / (PI.toFloat() / 4)
+            baseRadius * (0.90f + 0.10f * distToCorner)
+        }
 
     /**
      * Organic wave-like shape.
      * Use for: Water category, fluid animations, nature-themed elements.
      */
-    val Wave = MorphableShape(60) { angle, baseRadius ->
-        val waveCount = 3f
-        val waveAmplitude = 0.12f
-        val wave = sin(angle * waveCount) * waveAmplitude
-        baseRadius * (1.0f + wave)
-    }
+    val Wave =
+        MorphableShape(60) { angle, baseRadius ->
+            val waveCount = 3f
+            val waveAmplitude = 0.12f
+            val wave = sin(angle * waveCount) * waveAmplitude
+            baseRadius * (1.0f + wave)
+        }
 
     /**
      * Petal/flower-like organic shape.
      * Use for: Food category, organic content, nature elements.
      */
-    val Petal = MorphableShape(60) { angle, baseRadius ->
-        val petalCount = 5f
-        val petalAmplitude = 0.20f
-        val petal = (1.0f + cos(angle * petalCount)) / 2.0f
-        baseRadius * (0.85f + petal * petalAmplitude)
-    }
+    val Petal =
+        MorphableShape(60) { angle, baseRadius ->
+            val petalCount = 5f
+            val petalAmplitude = 0.20f
+            val petal = (1.0f + cos(angle * petalCount)) / 2.0f
+            baseRadius * (0.85f + petal * petalAmplitude)
+        }
 }
 
 /**
@@ -141,7 +149,6 @@ class MorphingShape(
     private val toShape: MorphableShape,
     private val progress: Float
 ) : Shape {
-
     override fun createOutline(
         size: androidx.compose.ui.geometry.Size,
         layoutDirection: LayoutDirection,
@@ -194,10 +201,11 @@ class MorphingShape(
 fun animateShapeMorph(
     targetShape: MorphableShape,
     currentShape: MorphableShape = MorphableShapes.Circle,
-    animationSpec: AnimationSpec<Float> = spring(
-        dampingRatio = Spring.DampingRatioMediumBouncy,
-        stiffness = Spring.StiffnessMediumLow
-    )
+    animationSpec: AnimationSpec<Float> =
+        spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        )
 ): State<Shape> {
     val progress = remember { Animatable(0f) }
     val previousShape = remember { mutableStateOf(currentShape) }
@@ -213,12 +221,13 @@ fun animateShapeMorph(
     return remember(targetShape, progress.value) {
         object : State<Shape> {
             override val value: Shape
-                get() = if (progress.value >= 1f) {
-                    // Use static shape when animation is complete for better performance
-                    MorphingShape(targetShape, targetShape, 1f)
-                } else {
-                    MorphingShape(previousShape.value, targetShape, progress.value)
-                }
+                get() =
+                    if (progress.value >= 1f) {
+                        // Use static shape when animation is complete for better performance
+                        MorphingShape(targetShape, targetShape, 1f)
+                    } else {
+                        MorphingShape(previousShape.value, targetShape, progress.value)
+                    }
         }
     }
 }
@@ -227,31 +236,34 @@ fun animateShapeMorph(
  * Spring animation spec optimized for shape morphing.
  * Uses Material 3 Expressive motion timing.
  */
-fun shapeMorphSpring() = spring<Float>(
-    dampingRatio = Spring.DampingRatioMediumBouncy,
-    stiffness = Spring.StiffnessMediumLow,
-    visibilityThreshold = 0.001f
-)
+fun shapeMorphSpring() =
+    spring<Float>(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessMediumLow,
+        visibilityThreshold = 0.001f
+    )
 
 /**
  * Quick spring animation for rapid shape transitions.
  * Use for immediate feedback interactions.
  */
-fun quickShapeMorphSpring() = spring<Float>(
-    dampingRatio = Spring.DampingRatioMediumBouncy,
-    stiffness = Spring.StiffnessMedium,
-    visibilityThreshold = 0.001f
-)
+fun quickShapeMorphSpring() =
+    spring<Float>(
+        dampingRatio = Spring.DampingRatioMediumBouncy,
+        stiffness = Spring.StiffnessMedium,
+        visibilityThreshold = 0.001f
+    )
 
 /**
  * Expressive spring with more bounce for emphasis.
  * Use for attention-grabbing morphs.
  */
-fun expressiveShapeMorphSpring() = spring<Float>(
-    dampingRatio = Spring.DampingRatioLowBouncy,
-    stiffness = Spring.StiffnessLow,
-    visibilityThreshold = 0.001f
-)
+fun expressiveShapeMorphSpring() =
+    spring<Float>(
+        dampingRatio = Spring.DampingRatioLowBouncy,
+        stiffness = Spring.StiffnessLow,
+        visibilityThreshold = 0.001f
+    )
 
 /**
  * Category-specific shape mappings for semantic shape morphing.
@@ -285,13 +297,12 @@ object CategoryShapes {
     /**
      * Get shape for a category name.
      */
-    fun forCategory(category: String?): MorphableShape {
-        return when (category?.lowercase()) {
+    fun forCategory(category: String?): MorphableShape =
+        when (category?.lowercase()) {
             "water", "swimming", "beach", "ocean" -> Water
             "transport", "car", "bus", "train", "flight", "bike" -> Transport
             "food", "restaurant", "dining", "cafe" -> Food
             "work", "office", "meeting" -> Work
             else -> Default
         }
-    }
 }

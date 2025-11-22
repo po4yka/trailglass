@@ -21,9 +21,10 @@ fun AuthNavigation(
     modifier: Modifier = Modifier
 ) {
     val childStack by authRootComponent.childStack.subscribeAsState()
-    val authController = (childStack.active.instance as? AuthRootComponent.Child.Login)?.component?.authController
-        ?: (childStack.active.instance as? AuthRootComponent.Child.Register)?.component?.authController
-        ?: (childStack.active.instance as? AuthRootComponent.Child.ForgotPassword)?.component?.authController
+    val authController =
+        (childStack.active.instance as? AuthRootComponent.Child.Login)?.component?.authController
+            ?: (childStack.active.instance as? AuthRootComponent.Child.Register)?.component?.authController
+            ?: (childStack.active.instance as? AuthRootComponent.Child.ForgotPassword)?.component?.authController
 
     // Watch for authentication success and trigger navigation
     val authState by authController!!.state.collectAsState()

@@ -16,12 +16,12 @@ class AlgorithmProvider(
      * Get the currently configured distance algorithm as a Flow.
      * Updates automatically when settings change.
      */
-    fun getDistanceAlgorithm(): Flow<DistanceAlgorithm> {
-        return settingsRepository.getSettings()
+    fun getDistanceAlgorithm(): Flow<DistanceAlgorithm> =
+        settingsRepository
+            .getSettings()
             .map { settings ->
                 DistanceAlgorithmFactory.create(settings.algorithmPreferences.distanceAlgorithm)
             }
-    }
 
     /**
      * Get the currently configured distance algorithm (non-reactive).
@@ -35,12 +35,12 @@ class AlgorithmProvider(
      * Get the currently configured bearing algorithm as a Flow.
      * Updates automatically when settings change.
      */
-    fun getBearingAlgorithm(): Flow<BearingAlgorithm> {
-        return settingsRepository.getSettings()
+    fun getBearingAlgorithm(): Flow<BearingAlgorithm> =
+        settingsRepository
+            .getSettings()
             .map { settings ->
                 BearingAlgorithmFactory.create(settings.algorithmPreferences.bearingAlgorithm)
             }
-    }
 
     /**
      * Get the currently configured bearing algorithm (non-reactive).
@@ -54,12 +54,12 @@ class AlgorithmProvider(
      * Get the currently configured interpolation algorithm as a Flow.
      * Updates automatically when settings change.
      */
-    fun getInterpolationAlgorithm(): Flow<InterpolationAlgorithm> {
-        return settingsRepository.getSettings()
+    fun getInterpolationAlgorithm(): Flow<InterpolationAlgorithm> =
+        settingsRepository
+            .getSettings()
             .map { settings ->
                 InterpolationAlgorithmFactory.create(settings.algorithmPreferences.interpolationAlgorithm)
             }
-    }
 
     /**
      * Get the currently configured interpolation algorithm (non-reactive).

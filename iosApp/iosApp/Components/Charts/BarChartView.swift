@@ -9,7 +9,7 @@ struct BarChartView: View {
     let showValues: Bool
     let maxBarHeight: CGFloat
     @State private var animatedHeights: [CGFloat]
-    @State private var hoveredIndex: Int? = nil
+    @State private var hoveredIndex: Int?
 
     init(data: [BarData], showValues: Bool = true, maxBarHeight: CGFloat = 200) {
         self.data = data

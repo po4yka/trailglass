@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -41,9 +41,10 @@ fun LoginScreen(
     val errorMessage = (authState as? AuthController.AuthState.Error)?.message
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -76,9 +77,10 @@ fun LoginScreen(
         if (errorMessage != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -109,13 +111,15 @@ fun LoginScreen(
             leadingIcon = {
                 Icon(Icons.Default.Email, contentDescription = "Email")
             },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
             singleLine = true,
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()
@@ -135,27 +139,41 @@ fun LoginScreen(
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility
-                        else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password"
-                        else "Show password"
+                        imageVector =
+                            if (passwordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                        contentDescription =
+                            if (passwordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
+                            }
                     )
                 }
             },
-            visualTransformation = if (passwordVisible) VisualTransformation.None
-            else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    if (email.isNotBlank() && password.isNotBlank()) {
-                        authController.login(email, password)
+            visualTransformation =
+                if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        if (email.isNotBlank() && password.isNotBlank()) {
+                            authController.login(email, password)
+                        }
                     }
-                }
-            ),
+                ),
             singleLine = true,
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()

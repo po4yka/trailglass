@@ -22,7 +22,6 @@ import me.tatarka.inject.annotations.Inject
 actual class PermissionManager(
     private val context: Context
 ) {
-
     private val permissionStates = mutableMapOf<PermissionType, MutableStateFlow<PermissionState>>()
 
     /**
@@ -71,8 +70,9 @@ actual class PermissionManager(
      * 5. Update permission state via updatePermissionState() after result
      */
     actual suspend fun requestPermission(permissionType: PermissionType): PermissionResult {
-        val androidPermission = getAndroidPermission(permissionType)
-            ?: return PermissionResult.Error("Unknown permission type: $permissionType")
+        val androidPermission =
+            getAndroidPermission(permissionType)
+                ?: return PermissionResult.Error("Unknown permission type: $permissionType")
 
         // Check if already granted
         val currentStatus = ContextCompat.checkSelfPermission(context, androidPermission)
@@ -109,27 +109,27 @@ actual class PermissionManager(
      * Open system settings for the app.
      */
     actual suspend fun openAppSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
+        val intent =
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
         context.startActivity(intent)
     }
 
     /**
      * Observable state for permission changes.
      */
-    actual fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> {
-        return permissionStates.getOrPut(permissionType) {
+    actual fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
+        permissionStates.getOrPut(permissionType) {
             MutableStateFlow(PermissionState.NotDetermined)
         }
-    }
 
     /**
      * Map PermissionType to Android permission string.
      */
-    private fun getAndroidPermission(permissionType: PermissionType): String? {
-        return when (permissionType) {
+    private fun getAndroidPermission(permissionType: PermissionType): String? =
+        when (permissionType) {
             PermissionType.LOCATION_FINE -> Manifest.permission.ACCESS_FINE_LOCATION
 
             PermissionType.LOCATION_COARSE -> Manifest.permission.ACCESS_COARSE_LOCATION
@@ -160,7 +160,6 @@ actual class PermissionManager(
                 }
             }
         }
-    }
 
     /**
      * Check if should show rationale using Activity.
@@ -174,9 +173,13 @@ actual class PermissionManager(
     /**
      * Update the cached permission state.
      */
-    private fun updatePermissionState(permissionType: PermissionType, state: PermissionState) {
-        permissionStates.getOrPut(permissionType) {
-            MutableStateFlow(PermissionState.NotDetermined)
-        }.value = state
+    private fun updatePermissionState(
+        permissionType: PermissionType,
+        state: PermissionState
+    ) {
+        permissionStates
+            .getOrPut(permissionType) {
+                MutableStateFlow(PermissionState.NotDetermined)
+            }.value = state
     }
 }

@@ -16,8 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.sync.SyncProgress
 import com.po4yka.trailglass.data.sync.SyncStatusUiModel
@@ -35,24 +33,27 @@ fun SyncStatusIndicator(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val icon = when (syncStatus.progress) {
-        is SyncProgress.Idle -> Icons.Default.CloudOff
-        is SyncProgress.InProgress -> Icons.Default.CloudSync
-        is SyncProgress.Completed -> Icons.Default.CloudDone
-        is SyncProgress.Failed -> Icons.Default.CloudOff
-    }
+    val icon =
+        when (syncStatus.progress) {
+            is SyncProgress.Idle -> Icons.Default.CloudOff
+            is SyncProgress.InProgress -> Icons.Default.CloudSync
+            is SyncProgress.Completed -> Icons.Default.CloudDone
+            is SyncProgress.Failed -> Icons.Default.CloudOff
+        }
 
-    val tint = when (syncStatus.progress) {
-        is SyncProgress.Idle -> MaterialTheme.colorScheme.extended.disabled
-        is SyncProgress.InProgress -> MaterialTheme.colorScheme.primary
-        is SyncProgress.Completed -> MaterialTheme.colorScheme.extended.success
-        is SyncProgress.Failed -> MaterialTheme.colorScheme.error
-    }
+    val tint =
+        when (syncStatus.progress) {
+            is SyncProgress.Idle -> MaterialTheme.colorScheme.extended.disabled
+            is SyncProgress.InProgress -> MaterialTheme.colorScheme.primary
+            is SyncProgress.Completed -> MaterialTheme.colorScheme.extended.success
+            is SyncProgress.Failed -> MaterialTheme.colorScheme.error
+        }
 
     Box(
-        modifier = modifier
-            .clickable(onClick = onClick)
-            .padding(8.dp)
+        modifier =
+            modifier
+                .clickable(onClick = onClick)
+                .padding(8.dp)
     ) {
         // Use wavy loading indicator for active sync
         if (syncStatus.isActive) {
@@ -73,11 +74,12 @@ fun SyncStatusIndicator(
         // Badge for pending count
         if (syncStatus.pendingCount > 0 && !syncStatus.isActive) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(12.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.error),
+                modifier =
+                    Modifier
+                        .align(Alignment.TopEnd)
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.error),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
@@ -92,11 +94,12 @@ fun SyncStatusIndicator(
         // Badge for conflicts
         if (syncStatus.conflictCount > 0) {
             Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .size(12.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.extended.warning),
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .size(12.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.extended.warning),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -122,12 +125,14 @@ fun SyncStatusCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = when (syncStatus.progress) {
-                is SyncProgress.Failed -> MaterialTheme.colorScheme.errorContainer
-                else -> MaterialTheme.colorScheme.surfaceVariant
-            }
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    when (syncStatus.progress) {
+                        is SyncProgress.Failed -> MaterialTheme.colorScheme.errorContainer
+                        else -> MaterialTheme.colorScheme.surfaceVariant
+                    }
+            )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -181,8 +186,9 @@ fun SyncStatusCard(
                             color = MaterialTheme.colorScheme.extended.success
                         )
                         Text(
-                            text = "↑ ${progress.result.uploaded} uploaded, " +
-                                   "↓ ${progress.result.downloaded} downloaded",
+                            text =
+                                "↑ ${progress.result.uploaded} uploaded, " +
+                                    "↓ ${progress.result.downloaded} downloaded",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

@@ -20,4 +20,5 @@ class DefaultRouteReplayComponent(
     override val tripId: String,
     override val routeReplayController: RouteReplayController,
     override val onBack: () -> Unit
-) : RouteReplayComponent, ComponentContext by componentContext
+) : RouteReplayComponent,
+    ComponentContext by componentContext

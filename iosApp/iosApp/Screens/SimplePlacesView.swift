@@ -503,8 +503,6 @@ struct FrequentPlaceItem: Identifiable {
 }
 
 // Import Combine for subscriptions
-import Combine
-
 #Preview {
     Text("SimplePlacesView Preview - Requires DI setup")
 }

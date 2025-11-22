@@ -42,15 +42,17 @@ open class LocationPermissionState(
      * Check if all required location permissions are granted.
      */
     fun checkPermissions(): Boolean {
-        val fineLocation = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        val fineLocation =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
-        val coarseLocation = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
+        val coarseLocation =
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
         return fineLocation || coarseLocation
     }
@@ -58,8 +60,8 @@ open class LocationPermissionState(
     /**
      * Check if background location permission is granted (Android 10+).
      */
-    fun checkBackgroundPermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+    fun checkBackgroundPermission(): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
@@ -67,7 +69,6 @@ open class LocationPermissionState(
         } else {
             true // Not required on older versions
         }
-    }
 
     fun onPermissionGranted() {
         permissionsGranted = true
@@ -109,9 +110,10 @@ open class LocationPermissionState(
     }
 
     fun openAppSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", context.packageName, null)
-        }
+        val intent =
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+            }
         context.startActivity(intent)
     }
 
@@ -140,32 +142,32 @@ open class LocationPermissionState(
  * @return LocationPermissionState that can be used to request permissions
  */
 @Composable
-fun rememberLocationPermissionState(
-    onPermissionResult: (Boolean) -> Unit = {}
-): LocationPermissionState {
+fun rememberLocationPermissionState(onPermissionResult: (Boolean) -> Unit = {}): LocationPermissionState {
     val context = LocalContext.current
     val state = remember { LocationPermissionState(context, onPermissionResult) }
 
     // Launcher for basic location permissions
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = permissions.values.any { it }
-        if (granted) {
-            state.onPermissionGranted()
-        } else {
-            state.onPermissionDenied()
+    val locationPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val granted = permissions.values.any { it }
+            if (granted) {
+                state.onPermissionGranted()
+            } else {
+                state.onPermissionDenied()
+            }
         }
-    }
 
     // Launcher for background location permission (Android 10+)
-    val backgroundPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        if (granted) {
-            state.onPermissionGranted()
+    val backgroundPermissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            if (granted) {
+                state.onPermissionGranted()
+            }
         }
-    }
 
     // Update state when composition is active
     LaunchedEffect(Unit) {
@@ -221,7 +223,8 @@ fun rememberLocationPermissionState(
                     )
                 )
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q &&
-                !state.checkBackgroundPermission()) {
+                !state.checkBackgroundPermission()
+            ) {
                 // Request background permission separately
                 backgroundPermissionLauncher.launch(
                     Manifest.permission.ACCESS_BACKGROUND_LOCATION
@@ -263,7 +266,7 @@ private fun LocationPermissionRationaleDialog(
         text = {
             Text(
                 "TrailGlass needs location permission to track your travels and show your position on the map. " +
-                "Please grant location permission in app settings."
+                    "Please grant location permission in app settings."
             )
         },
         confirmButton = {
@@ -297,18 +300,17 @@ private fun LocationPermissionRationaleDialog(
  * ```
  */
 @Composable
-fun rememberLocationPermissionLauncher(
-    onResult: (Boolean) -> Unit
-): LocationPermissionLauncher {
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = permissions.values.any { it }
-        onResult(granted)
-    }
+fun rememberLocationPermissionLauncher(onResult: (Boolean) -> Unit): LocationPermissionLauncher {
+    val launcher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            val granted = permissions.values.any { it }
+            onResult(granted)
+        }
 
     return remember {
-        LocationPermissionLauncher { ->
+        LocationPermissionLauncher {
             launcher.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -319,6 +321,8 @@ fun rememberLocationPermissionLauncher(
     }
 }
 
-class LocationPermissionLauncher(private val launchFn: () -> Unit) {
+class LocationPermissionLauncher(
+    private val launchFn: () -> Unit
+) {
     fun launch() = launchFn()
 }

@@ -16,10 +16,9 @@ import kotlin.math.sqrt
  * - Pre-simplified path for initial display
  */
 class TripRouteBuilder(
-    private val maxFullPathPoints: Int = 50000,  // Limit for very large routes
-    private val maxDisplayPoints: Int = 5000     // Optimal for smooth rendering
+    private val maxFullPathPoints: Int = 50000, // Limit for very large routes
+    private val maxDisplayPoints: Int = 5000 // Optimal for smooth rendering
 ) {
-
     private val logger = logger()
 
     /**
@@ -42,14 +41,15 @@ class TripRouteBuilder(
         logger.info { "Building trip route for trip ${trip.id} with ${locationSamples.size} samples" }
 
         // Performance optimization: Limit points for very large routes
-        val optimizedSamples = if (locationSamples.size > maxFullPathPoints) {
-            logger.warn {
-                "Route has ${locationSamples.size} points, downsampling to $maxFullPathPoints for performance"
+        val optimizedSamples =
+            if (locationSamples.size > maxFullPathPoints) {
+                logger.warn {
+                    "Route has ${locationSamples.size} points, downsampling to $maxFullPathPoints for performance"
+                }
+                downsampleLocations(locationSamples, maxFullPathPoints)
+            } else {
+                locationSamples
             }
-            downsampleLocations(locationSamples, maxFullPathPoints)
-        } else {
-            locationSamples
-        }
 
         // Sort data chronologically
         val sortedSamples = optimizedSamples.sortedBy { it.timestamp }
@@ -64,21 +64,23 @@ class TripRouteBuilder(
         val photoMarkers = buildPhotoMarkers(sortedPhotos, placeVisits)
 
         // Calculate bounding box
-        val bounds = calculateBounds(fullPath, placeVisits, photoMarkers)
-            ?: RouteBounds(-90.0, 90.0, -180.0, 180.0) // Fallback to world bounds
+        val bounds =
+            calculateBounds(fullPath, placeVisits, photoMarkers)
+                ?: RouteBounds(-90.0, 90.0, -180.0, 180.0) // Fallback to world bounds
 
         // Calculate statistics
-        val statistics = calculateStatistics(
-            trip = trip,
-            segments = sortedSegments,
-            visits = sortedVisits,
-            photos = sortedPhotos,
-            samples = sortedSamples
-        )
+        val statistics =
+            calculateStatistics(
+                trip = trip,
+                segments = sortedSegments,
+                visits = sortedVisits,
+                photos = sortedPhotos,
+                samples = sortedSamples
+            )
 
         logger.info {
             "Built trip route: ${fullPath.size} points, ${photoMarkers.size} photos, " +
-            "${statistics.totalDistanceKilometers.toInt()}km"
+                "${statistics.totalDistanceKilometers.toInt()}km"
         }
 
         return TripRoute(
@@ -115,19 +117,20 @@ class TripRouteBuilder(
         }
 
         // Convert samples to route points
-        val routePoints = samples.map { sample ->
-            val segment = sampleToSegment[sample.id]
-            RoutePoint(
-                latitude = sample.latitude,
-                longitude = sample.longitude,
-                timestamp = sample.timestamp,
-                bearing = sample.bearing,
-                speed = sample.speed,
-                accuracy = sample.accuracy,
-                segmentId = segment?.id,
-                transportType = segment?.transportType ?: TransportType.UNKNOWN
-            )
-        }
+        val routePoints =
+            samples.map { sample ->
+                val segment = sampleToSegment[sample.id]
+                RoutePoint(
+                    latitude = sample.latitude,
+                    longitude = sample.longitude,
+                    timestamp = sample.timestamp,
+                    bearing = sample.bearing,
+                    speed = sample.speed,
+                    accuracy = sample.accuracy,
+                    segmentId = segment?.id,
+                    transportType = segment?.transportType ?: TransportType.UNKNOWN
+                )
+            }
 
         logger.debug { "Built full path with ${routePoints.size} route points" }
         return routePoints
@@ -145,25 +148,27 @@ class TripRouteBuilder(
 
         logger.debug { "Building photo markers from ${photosWithLocation.size} geotagged photos" }
 
-        val markers = photosWithLocation.map { photo ->
-            // Find associated place visit (if photo was taken during a visit)
-            val associatedVisit = findNearestPlaceVisit(
-                photo.latitude!!,
-                photo.longitude!!,
-                photo.timestamp,
-                placeVisits
-            )
+        val markers =
+            photosWithLocation.map { photo ->
+                // Find associated place visit (if photo was taken during a visit)
+                val associatedVisit =
+                    findNearestPlaceVisit(
+                        photo.latitude!!,
+                        photo.longitude!!,
+                        photo.timestamp,
+                        placeVisits
+                    )
 
-            PhotoMarker(
-                photoId = photo.id,
-                latitude = photo.latitude,
-                longitude = photo.longitude,
-                timestamp = photo.timestamp,
-                thumbnailUri = photo.uri,
-                placeVisitId = associatedVisit?.id,
-                caption = null // Will be populated from PhotoAttachment if available
-            )
-        }
+                PhotoMarker(
+                    photoId = photo.id,
+                    latitude = photo.latitude,
+                    longitude = photo.longitude,
+                    timestamp = photo.timestamp,
+                    thumbnailUri = photo.uri,
+                    placeVisitId = associatedVisit?.id,
+                    caption = null // Will be populated from PhotoAttachment if available
+                )
+            }
 
         logger.debug { "Built ${markers.size} photo markers" }
         return markers
@@ -185,19 +190,21 @@ class TripRouteBuilder(
             .filter { visit ->
                 // Check if photo timestamp is within visit time range
                 photoTime >= visit.startTime && photoTime <= visit.endTime
-            }
-            .minByOrNull { visit ->
+            }.minByOrNull { visit ->
                 // Find closest visit by distance
                 haversineDistance(
-                    photoLat, photoLon,
-                    visit.centerLatitude, visit.centerLongitude
+                    photoLat,
+                    photoLon,
+                    visit.centerLatitude,
+                    visit.centerLongitude
                 )
-            }
-            ?.takeIf { visit ->
+            }?.takeIf { visit ->
                 // Only return if distance is within threshold
                 haversineDistance(
-                    photoLat, photoLon,
-                    visit.centerLatitude, visit.centerLongitude
+                    photoLat,
+                    photoLon,
+                    visit.centerLatitude,
+                    visit.centerLongitude
                 ) <= maxDistanceMeters
             }
     }
@@ -263,15 +270,17 @@ class TripRouteBuilder(
         val cities = visits.mapNotNull { it.city }.distinct()
 
         // Transport breakdown
-        val distanceByTransport = segments
-            .groupBy { it.transportType }
-            .mapValues { (_, segs) -> segs.sumOf { it.distanceMeters } }
+        val distanceByTransport =
+            segments
+                .groupBy { it.transportType }
+                .mapValues { (_, segs) -> segs.sumOf { it.distanceMeters } }
 
-        val durationByTransport = segments
-            .groupBy { it.transportType }
-            .mapValues { (_, segs) ->
-                segs.sumOf { (it.endTime - it.startTime).inWholeSeconds }
-            }
+        val durationByTransport =
+            segments
+                .groupBy { it.transportType }
+                .mapValues { (_, segs) ->
+                    segs.sumOf { (it.endTime - it.startTime).inWholeSeconds }
+                }
 
         // Speed metrics
         val speeds = samples.mapNotNull { it.speed }
@@ -297,15 +306,18 @@ class TripRouteBuilder(
      * Calculate Haversine distance between two coordinates.
      */
     private fun haversineDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
+        val a =
+            kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
                 kotlin.math.cos(lat1 * PI / 180.0) * kotlin.math.cos(lat2 * PI / 180.0) *
                 kotlin.math.sin(dLon / 2) * kotlin.math.sin(dLon / 2)
 

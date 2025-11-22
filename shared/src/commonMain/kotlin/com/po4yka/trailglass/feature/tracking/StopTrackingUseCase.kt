@@ -11,7 +11,6 @@ import me.tatarka.inject.annotations.Inject
 class StopTrackingUseCase(
     private val locationTracker: LocationTracker
 ) {
-
     private val logger = logger()
 
     /**

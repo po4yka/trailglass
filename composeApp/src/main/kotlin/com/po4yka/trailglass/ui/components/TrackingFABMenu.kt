@@ -15,11 +15,10 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.po4yka.trailglass.ui.theme.extended
 import com.po4yka.trailglass.ui.theme.MorphableShapes
 import com.po4yka.trailglass.ui.theme.animateShapeMorph
 import com.po4yka.trailglass.ui.theme.expressiveShapeMorphSpring
-import androidx.compose.ui.draw.clip
+import com.po4yka.trailglass.ui.theme.extended
 
 /**
  * Expandable Floating Action Button Menu for tracking actions.
@@ -52,9 +51,10 @@ fun TrackingFABMenu(
             exit = fadeOut(animationSpec = tween(200))
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.4f))
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.4f))
             )
         }
 
@@ -67,20 +67,24 @@ fun TrackingFABMenu(
             // Menu items (shown when expanded)
             AnimatedVisibility(
                 visible = expanded,
-                enter = expandVertically(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    ),
-                    expandFrom = Alignment.Bottom
-                ) + fadeIn(),
-                exit = shrinkVertically(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessLow
-                    ),
-                    shrinkTowards = Alignment.Bottom
-                ) + fadeOut()
+                enter =
+                    expandVertically(
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                        expandFrom = Alignment.Bottom
+                    ) + fadeIn(),
+                exit =
+                    shrinkVertically(
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                        shrinkTowards = Alignment.Bottom
+                    ) + fadeOut()
             ) {
                 Column(
                     horizontalAlignment = Alignment.End,
@@ -124,11 +128,12 @@ fun TrackingFABMenu(
                             onToggleTracking()
                             expanded = false
                         },
-                        containerColor = if (isTracking) {
-                            MaterialTheme.colorScheme.errorContainer
-                        } else {
-                            MaterialTheme.colorScheme.extended.activeRoute
-                        }
+                        containerColor =
+                            if (isTracking) {
+                                MaterialTheme.colorScheme.errorContainer
+                            } else {
+                                MaterialTheme.colorScheme.extended.activeRoute
+                            }
                     )
                 }
             }
@@ -136,10 +141,11 @@ fun TrackingFABMenu(
             // Main FAB with shape morphing
             val rotation by animateFloatAsState(
                 targetValue = if (expanded) 45f else 0f,
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessMedium
-                ),
+                animationSpec =
+                    spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    ),
                 label = "fab_rotation"
             )
 
@@ -151,11 +157,12 @@ fun TrackingFABMenu(
 
             FloatingActionButton(
                 onClick = { expanded = !expanded },
-                containerColor = if (isTracking && !expanded) {
-                    MaterialTheme.colorScheme.extended.activeRoute
-                } else {
-                    MaterialTheme.colorScheme.primaryContainer
-                },
+                containerColor =
+                    if (isTracking && !expanded) {
+                        MaterialTheme.colorScheme.extended.activeRoute
+                    } else {
+                        MaterialTheme.colorScheme.primaryContainer
+                    },
                 contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 shape = fabShape
             ) {
@@ -182,10 +189,11 @@ private fun FABMenuItem(
 ) {
     val scale by animateFloatAsState(
         targetValue = 1f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
         label = "fab_menu_item_scale"
     )
 

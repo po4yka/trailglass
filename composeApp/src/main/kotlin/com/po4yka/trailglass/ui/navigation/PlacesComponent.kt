@@ -16,4 +16,5 @@ interface PlacesComponent {
 class DefaultPlacesComponent(
     componentContext: ComponentContext,
     override val placesController: PlacesController
-) : PlacesComponent, ComponentContext by componentContext
+) : PlacesComponent,
+    ComponentContext by componentContext

@@ -1,6 +1,5 @@
 package com.po4yka.trailglass.location
 
-import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.RouteSegment
@@ -16,7 +15,6 @@ import kotlin.math.*
 class RouteSegmentBuilder(
     private val pathSimplifier: PathSimplifier = PathSimplifier()
 ) {
-
     private val logger = logger()
 
     /**
@@ -101,9 +99,10 @@ class RouteSegmentBuilder(
     /**
      * Find which visit contains a given sample ID.
      */
-    private fun findVisitContainingSample(sampleId: String, visits: List<PlaceVisit>): PlaceVisit? {
-        return visits.find { it.locationSampleIds.contains(sampleId) }
-    }
+    private fun findVisitContainingSample(
+        sampleId: String,
+        visits: List<PlaceVisit>
+    ): PlaceVisit? = visits.find { it.locationSampleIds.contains(sampleId) }
 
     /**
      * Create a route segment from movement samples.
@@ -131,7 +130,7 @@ class RouteSegmentBuilder(
 
         logger.debug {
             "Created route segment: ${fromVisit?.city ?: "?"} → ${toVisit?.city ?: "?"}, " +
-            "distance: ${distance.toInt()}m, transport: $transportType"
+                "distance: ${distance.toInt()}m, transport: $transportType"
         }
 
         return RouteSegment(
@@ -154,10 +153,13 @@ class RouteSegmentBuilder(
     private fun calculateTotalDistance(samples: List<LocationSample>): Double {
         var totalDistance = 0.0
         for (i in 0 until samples.lastIndex) {
-            val distance = haversineDistance(
-                samples[i].latitude, samples[i].longitude,
-                samples[i + 1].latitude, samples[i + 1].longitude
-            )
+            val distance =
+                haversineDistance(
+                    samples[i].latitude,
+                    samples[i].longitude,
+                    samples[i + 1].latitude,
+                    samples[i + 1].longitude
+                )
             totalDistance += distance
         }
         return totalDistance
@@ -167,15 +169,18 @@ class RouteSegmentBuilder(
      * Calculate Haversine distance between two coordinates.
      */
     private fun haversineDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 
@@ -187,7 +192,9 @@ class RouteSegmentBuilder(
     /**
      * Generate a deterministic ID for a route segment.
      */
-    private fun generateSegmentId(time: Instant, fromId: String?, toId: String?): String {
-        return "route_${time.toEpochMilliseconds()}_${fromId?.hashCode() ?: 0}_${toId?.hashCode() ?: 0}"
-    }
+    private fun generateSegmentId(
+        time: Instant,
+        fromId: String?,
+        toId: String?
+    ): String = "route_${time.toEpochMilliseconds()}_${fromId?.hashCode() ?: 0}_${toId?.hashCode() ?: 0}"
 }

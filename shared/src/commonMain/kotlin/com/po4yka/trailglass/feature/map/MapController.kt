@@ -36,14 +36,15 @@ class MapController(
     private val permissionFlow: PermissionFlowController,
     coroutineScope: CoroutineScope,
     private val userId: String
-) : MapEventSink, Lifecycle {
-
+) : MapEventSink,
+    Lifecycle {
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     private var locationTrackingJob: Job? = null
     private var pendingFollowModeParams: FollowModeParams? = null
@@ -125,7 +126,10 @@ class MapController(
     /**
      * Load map data for a time range.
      */
-    fun loadMapData(startTime: Instant, endTime: Instant) {
+    fun loadMapData(
+        startTime: Instant,
+        endTime: Instant
+    ) {
         logger.debug { "Loading map data from $startTime to $endTime" }
 
         _state.update { it.copy(isLoading = true, error = null) }
@@ -135,15 +139,17 @@ class MapController(
                 val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
 
                 // Set camera to region center with smooth animation if available
-                val cameraMove = mapData.region?.let { region ->
-                    CameraMove.Ease(
-                        position = CameraPosition(
-                            target = region.center,
-                            zoom = calculateZoomLevel(region)
-                        ),
-                        durationMs = 1500
-                    )
-                }
+                val cameraMove =
+                    mapData.region?.let { region ->
+                        CameraMove.Ease(
+                            position =
+                                CameraPosition(
+                                    target = region.center,
+                                    zoom = calculateZoomLevel(region)
+                                ),
+                            durationMs = 1500
+                        )
+                    }
 
                 _state.update {
                     it.copy(
@@ -155,7 +161,7 @@ class MapController(
 
                 logger.info {
                     "Loaded map data: ${mapData.markers.size} markers, " +
-                    "${mapData.routes.size} routes"
+                        "${mapData.routes.size} routes"
                 }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load map data" }
@@ -218,11 +224,12 @@ class MapController(
         durationMs: Int = 1000
     ) {
         val position = CameraPosition(target = coordinate, zoom = zoom)
-        val cameraMove = if (animated) {
-            CameraMove.Ease(position, durationMs)
-        } else {
-            CameraMove.Instant(position)
-        }
+        val cameraMove =
+            if (animated) {
+                CameraMove.Ease(position, durationMs)
+            } else {
+                CameraMove.Instant(position)
+            }
         applyCameraMove(cameraMove)
     }
 
@@ -232,18 +239,23 @@ class MapController(
      * @param animated If true, uses smooth easing animation, otherwise instant (default: true)
      * @param durationMs Animation duration in milliseconds (default: 1200ms)
      */
-    fun fitToData(animated: Boolean = true, durationMs: Int = 1200) {
+    fun fitToData(
+        animated: Boolean = true,
+        durationMs: Int = 1200
+    ) {
         val region = _state.value.mapData.region
         if (region != null) {
-            val position = CameraPosition(
-                target = region.center,
-                zoom = calculateZoomLevel(region)
-            )
-            val cameraMove = if (animated) {
-                CameraMove.Ease(position, durationMs)
-            } else {
-                CameraMove.Instant(position)
-            }
+            val position =
+                CameraPosition(
+                    target = region.center,
+                    zoom = calculateZoomLevel(region)
+                )
+            val cameraMove =
+                if (animated) {
+                    CameraMove.Ease(position, durationMs)
+                } else {
+                    CameraMove.Instant(position)
+                }
             applyCameraMove(cameraMove)
         }
     }
@@ -318,30 +330,32 @@ class MapController(
         controllerScope.launch {
             // Get last known location and move camera there first
             locationService.getLastKnownLocation()?.let { coordinate ->
-                val position = CameraPosition(
-                    target = coordinate,
-                    zoom = zoom,
-                    tilt = tilt,
-                    bearing = bearing
-                )
-                applyCameraMove(CameraMove.Ease(position, durationMs = 800))
-            }
-
-            // Start tracking location updates
-            locationTrackingJob = locationService.locationUpdates
-                .onEach { coordinate ->
-                    logger.debug { "Location update: ${coordinate.latitude}, ${coordinate.longitude}" }
-
-                    // Update camera to follow user
-                    val position = CameraPosition(
+                val position =
+                    CameraPosition(
                         target = coordinate,
                         zoom = zoom,
                         tilt = tilt,
                         bearing = bearing
                     )
-                    applyCameraMove(CameraMove.Ease(position, durationMs = 500))
-                }
-                .launchIn(controllerScope)
+                applyCameraMove(CameraMove.Ease(position, durationMs = 800))
+            }
+
+            // Start tracking location updates
+            locationTrackingJob =
+                locationService.locationUpdates
+                    .onEach { coordinate ->
+                        logger.debug { "Location update: ${coordinate.latitude}, ${coordinate.longitude}" }
+
+                        // Update camera to follow user
+                        val position =
+                            CameraPosition(
+                                target = coordinate,
+                                zoom = zoom,
+                                tilt = tilt,
+                                bearing = bearing
+                            )
+                        applyCameraMove(CameraMove.Ease(position, durationMs = 500))
+                    }.launchIn(controllerScope)
 
             _state.update { it.copy(isFollowModeEnabled = true) }
         }
@@ -352,9 +366,7 @@ class MapController(
      *
      * @return true if permission is granted, false otherwise
      */
-    suspend fun hasLocationPermission(): Boolean {
-        return permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
-    }
+    suspend fun hasLocationPermission(): Boolean = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
 
     /**
      * Check permissions.
@@ -379,7 +391,9 @@ class MapController(
         when (event) {
             is MapEvent.MarkerTapped -> {
                 // Find and select the marker
-                val marker = _state.value.mapData.markers.find { it.id == event.markerId }
+                val marker =
+                    _state.value.mapData.markers
+                        .find { it.id == event.markerId }
                 if (marker != null) {
                     selectMarker(marker)
                 } else {
@@ -388,7 +402,9 @@ class MapController(
             }
             is MapEvent.RouteTapped -> {
                 // Find and select the route
-                val route = _state.value.mapData.routes.find { it.id == event.routeId }
+                val route =
+                    _state.value.mapData.routes
+                        .find { it.id == event.routeId }
                 if (route != null) {
                     selectRoute(route)
                 } else {
@@ -406,7 +422,7 @@ class MapController(
                 // to avoid feedback loops
                 logger.debug {
                     "Camera moved to: ${event.position.target.latitude}, " +
-                    "${event.position.target.longitude}"
+                        "${event.position.target.longitude}"
                 }
             }
             is MapEvent.MapReady -> {
@@ -425,13 +441,13 @@ class MapController(
         val delta = maxOf(region.latitudeDelta, region.longitudeDelta)
 
         return when {
-            delta > 10.0 -> 5f    // Country level
-            delta > 5.0 -> 7f     // Large region
-            delta > 1.0 -> 9f     // City level
-            delta > 0.5 -> 11f    // District
-            delta > 0.1 -> 13f    // Neighborhood
-            delta > 0.05 -> 15f   // Street level
-            else -> 17f           // Building level
+            delta > 10.0 -> 5f // Country level
+            delta > 5.0 -> 7f // Large region
+            delta > 1.0 -> 9f // City level
+            delta > 0.5 -> 11f // District
+            delta > 0.1 -> 13f // Neighborhood
+            delta > 0.05 -> 15f // Street level
+            else -> 17f // Building level
         }
     }
 

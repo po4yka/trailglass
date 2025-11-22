@@ -92,7 +92,10 @@ interface PhotoRepository {
     /**
      * Check if a photo is attached to a visit.
      */
-    suspend fun isPhotoAttachedToVisit(photoId: String, visitId: String): Boolean
+    suspend fun isPhotoAttachedToVisit(
+        photoId: String,
+        visitId: String
+    ): Boolean
 
     /**
      * Delete an attachment.

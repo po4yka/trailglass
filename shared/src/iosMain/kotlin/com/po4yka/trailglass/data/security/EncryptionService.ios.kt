@@ -26,52 +26,53 @@ import kotlin.random.Random
 @Inject
 @OptIn(ExperimentalForeignApi::class)
 actual class EncryptionService actual constructor() {
+    actual suspend fun encrypt(plaintext: String): Result<EncryptedData> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                // Ensure key exists
+                if (!hasEncryptionKey()) {
+                    generateKey().getOrThrow()
+                }
 
-    actual suspend fun encrypt(plaintext: String): Result<EncryptedData> = withContext(Dispatchers.IO) {
-        runCatching {
-            // Ensure key exists
-            if (!hasEncryptionKey()) {
-                generateKey().getOrThrow()
+                // Generate random IV (12 bytes for GCM)
+                val iv = Random.nextBytes(IV_LENGTH)
+                val ivBase64 = iv.toNSData().base64EncodedStringWithOptions(0u)
+
+                // NOTE: Actual AES-256-GCM encryption would happen here
+                // Since CommonCrypto is not available, we store data encrypted by Keychain protection
+                // This provides at-rest encryption but not end-to-end encryption for sync
+                val plaintextData = plaintext.encodeToByteArray()
+                val ciphertextBase64 = plaintextData.toNSData().base64EncodedStringWithOptions(0u)
+
+                // Generate placeholder tag (in real impl, this would be GCM auth tag)
+                val tag = Random.nextBytes(TAG_LENGTH)
+                val tagBase64 = tag.toNSData().base64EncodedStringWithOptions(0u)
+
+                EncryptedData(
+                    ciphertext = ciphertextBase64,
+                    iv = ivBase64,
+                    tag = tagBase64
+                )
             }
-
-            // Generate random IV (12 bytes for GCM)
-            val iv = Random.nextBytes(IV_LENGTH)
-            val ivBase64 = iv.toNSData().base64EncodedStringWithOptions(0u)
-
-            // NOTE: Actual AES-256-GCM encryption would happen here
-            // Since CommonCrypto is not available, we store data encrypted by Keychain protection
-            // This provides at-rest encryption but not end-to-end encryption for sync
-            val plaintextData = plaintext.encodeToByteArray()
-            val ciphertextBase64 = plaintextData.toNSData().base64EncodedStringWithOptions(0u)
-
-            // Generate placeholder tag (in real impl, this would be GCM auth tag)
-            val tag = Random.nextBytes(TAG_LENGTH)
-            val tagBase64 = tag.toNSData().base64EncodedStringWithOptions(0u)
-
-            EncryptedData(
-                ciphertext = ciphertextBase64,
-                iv = ivBase64,
-                tag = tagBase64
-            )
         }
-    }
 
-    actual suspend fun decrypt(encryptedData: EncryptedData): Result<String> = withContext(Dispatchers.IO) {
-        runCatching {
-            // Ensure key exists
-            if (!hasEncryptionKey()) {
-                throw EncryptionException("Encryption key not found")
+    actual suspend fun decrypt(encryptedData: EncryptedData): Result<String> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                // Ensure key exists
+                if (!hasEncryptionKey()) {
+                    throw EncryptionException("Encryption key not found")
+                }
+
+                // NOTE: Actual AES-256-GCM decryption would happen here
+                // For now, just decode the base64 data
+                val decoded = encryptedData.ciphertext.fromBase64()
+                decoded.decodeToString()
             }
-
-            // NOTE: Actual AES-256-GCM decryption would happen here
-            // For now, just decode the base64 data
-            val decoded = encryptedData.ciphertext.fromBase64()
-            decoded.decodeToString()
         }
-    }
 
-    actual suspend fun hasEncryptionKey(): Boolean {
-        return withContext(Dispatchers.Default) {
+    actual suspend fun hasEncryptionKey(): Boolean =
+        withContext(Dispatchers.Default) {
             memScoped {
                 val query = createKeychainQuery()
                 CFDictionarySetValue(query, kSecReturnData, kCFBooleanFalse)
@@ -88,124 +89,134 @@ actual class EncryptionService actual constructor() {
                 status == errSecSuccess
             }
         }
-    }
 
-    actual suspend fun generateKey(): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
-            // Generate 256-bit (32 bytes) random key
-            val keyData = Random.nextBytes(32)
-            val nsKeyData = keyData.toNSData()
+    actual suspend fun generateKey(): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                // Generate 256-bit (32 bytes) random key
+                val keyData = Random.nextBytes(32)
+                val nsKeyData = keyData.toNSData()
 
-            memScoped {
-                // Create add query
-                val query = createKeychainQuery()
-                CFDictionarySetValue(query, kSecValueData, CFBridgingRetain(nsKeyData))
-                CFDictionarySetValue(query, kSecAttrAccessible, kSecAttrAccessibleAfterFirstUnlock)
+                memScoped {
+                    // Create add query
+                    val query = createKeychainQuery()
+                    CFDictionarySetValue(query, kSecValueData, CFBridgingRetain(nsKeyData))
+                    CFDictionarySetValue(query, kSecAttrAccessible, kSecAttrAccessibleAfterFirstUnlock)
 
-                // Try to add the key
-                var status = SecItemAdd(query, null)
+                    // Try to add the key
+                    var status = SecItemAdd(query, null)
 
-                // If key already exists, update it
-                if (status == errSecDuplicateItem) {
-                    val updateQuery = createKeychainQuery()
-                    val attributesToUpdate = CFDictionaryCreateMutable(
-                        null, 1,
-                        null, null
-                    )
-                    CFDictionarySetValue(attributesToUpdate, kSecValueData, CFBridgingRetain(nsKeyData))
+                    // If key already exists, update it
+                    if (status == errSecDuplicateItem) {
+                        val updateQuery = createKeychainQuery()
+                        val attributesToUpdate =
+                            CFDictionaryCreateMutable(
+                                null,
+                                1,
+                                null,
+                                null
+                            )
+                        CFDictionarySetValue(attributesToUpdate, kSecValueData, CFBridgingRetain(nsKeyData))
 
-                    status = SecItemUpdate(updateQuery, attributesToUpdate)
+                        status = SecItemUpdate(updateQuery, attributesToUpdate)
 
-                    CFRelease(updateQuery)
-                    CFRelease(attributesToUpdate)
-                }
+                        CFRelease(updateQuery)
+                        CFRelease(attributesToUpdate)
+                    }
 
-                CFRelease(query)
+                    CFRelease(query)
 
-                if (status != errSecSuccess) {
-                    throw EncryptionException("Failed to generate key: status=$status")
-                }
-            }
-        }
-    }
-
-    actual suspend fun exportKey(password: String): Result<String> = withContext(Dispatchers.IO) {
-        runCatching {
-            // Retrieve key from Keychain
-            val keyData = getKeyData()
-                ?: throw EncryptionException("Encryption key not found")
-
-            // Derive encryption key from password using PBKDF2
-            val salt = Random.nextBytes(16)
-            val iterations = 100000
-            val derivedKey = deriveKey(password, salt, iterations)
-
-            // Simple XOR encryption with derived key (in production, use proper AEAD)
-            val encrypted = ByteArray(keyData.size)
-            for (i in keyData.indices) {
-                encrypted[i] = (keyData[i].toInt() xor derivedKey[i % derivedKey.size].toInt()).toByte()
-            }
-
-            // Combine salt + iterations + encrypted key
-            val exportData = salt + iterations.toByteArray() + encrypted
-            exportData.toNSData().base64EncodedStringWithOptions(0u)
-        }
-    }
-
-    actual suspend fun importKey(encryptedKeyBackup: String, password: String): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
-            val backupData = encryptedKeyBackup.fromBase64()
-
-            // Extract components
-            val salt = backupData.sliceArray(0 until 16)
-            val iterations = backupData.sliceArray(16 until 20).toInt()
-            val encryptedKey = backupData.sliceArray(20 until backupData.size)
-
-            // Derive decryption key from password
-            val derivedKey = deriveKey(password, salt, iterations)
-
-            // Decrypt the key
-            val keyData = ByteArray(encryptedKey.size)
-            for (i in encryptedKey.indices) {
-                keyData[i] = (encryptedKey[i].toInt() xor derivedKey[i % derivedKey.size].toInt()).toByte()
-            }
-
-            // Store in Keychain
-            val nsKeyData = keyData.toNSData()
-            memScoped {
-                // Delete existing key first
-                val deleteQuery = createKeychainQuery()
-                SecItemDelete(deleteQuery)
-                CFRelease(deleteQuery)
-
-                // Add imported key
-                val addQuery = createKeychainQuery()
-                CFDictionarySetValue(addQuery, kSecValueData, CFBridgingRetain(nsKeyData))
-                CFDictionarySetValue(addQuery, kSecAttrAccessible, kSecAttrAccessibleAfterFirstUnlock)
-
-                val status = SecItemAdd(addQuery, null)
-                CFRelease(addQuery)
-
-                if (status != errSecSuccess) {
-                    throw EncryptionException("Failed to import key: status=$status")
+                    if (status != errSecSuccess) {
+                        throw EncryptionException("Failed to generate key: status=$status")
+                    }
                 }
             }
         }
-    }
 
-    actual suspend fun deleteKey(): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
-            memScoped {
-                val query = createKeychainQuery()
-                val status = SecItemDelete(query)
-                CFRelease(query)
+    actual suspend fun exportKey(password: String): Result<String> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                // Retrieve key from Keychain
+                val keyData =
+                    getKeyData()
+                        ?: throw EncryptionException("Encryption key not found")
 
-                if (status != errSecSuccess && status != errSecItemNotFound) {
-                    throw EncryptionException("Failed to delete key: status=$status")
+                // Derive encryption key from password using PBKDF2
+                val salt = Random.nextBytes(16)
+                val iterations = 100000
+                val derivedKey = deriveKey(password, salt, iterations)
+
+                // Simple XOR encryption with derived key (in production, use proper AEAD)
+                val encrypted = ByteArray(keyData.size)
+                for (i in keyData.indices) {
+                    encrypted[i] = (keyData[i].toInt() xor derivedKey[i % derivedKey.size].toInt()).toByte()
+                }
+
+                // Combine salt + iterations + encrypted key
+                val exportData = salt + iterations.toByteArray() + encrypted
+                exportData.toNSData().base64EncodedStringWithOptions(0u)
+            }
+        }
+
+    actual suspend fun importKey(
+        encryptedKeyBackup: String,
+        password: String
+    ): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val backupData = encryptedKeyBackup.fromBase64()
+
+                // Extract components
+                val salt = backupData.sliceArray(0 until 16)
+                val iterations = backupData.sliceArray(16 until 20).toInt()
+                val encryptedKey = backupData.sliceArray(20 until backupData.size)
+
+                // Derive decryption key from password
+                val derivedKey = deriveKey(password, salt, iterations)
+
+                // Decrypt the key
+                val keyData = ByteArray(encryptedKey.size)
+                for (i in encryptedKey.indices) {
+                    keyData[i] = (encryptedKey[i].toInt() xor derivedKey[i % derivedKey.size].toInt()).toByte()
+                }
+
+                // Store in Keychain
+                val nsKeyData = keyData.toNSData()
+                memScoped {
+                    // Delete existing key first
+                    val deleteQuery = createKeychainQuery()
+                    SecItemDelete(deleteQuery)
+                    CFRelease(deleteQuery)
+
+                    // Add imported key
+                    val addQuery = createKeychainQuery()
+                    CFDictionarySetValue(addQuery, kSecValueData, CFBridgingRetain(nsKeyData))
+                    CFDictionarySetValue(addQuery, kSecAttrAccessible, kSecAttrAccessibleAfterFirstUnlock)
+
+                    val status = SecItemAdd(addQuery, null)
+                    CFRelease(addQuery)
+
+                    if (status != errSecSuccess) {
+                        throw EncryptionException("Failed to import key: status=$status")
+                    }
                 }
             }
         }
-    }
+
+    actual suspend fun deleteKey(): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                memScoped {
+                    val query = createKeychainQuery()
+                    val status = SecItemDelete(query)
+                    CFRelease(query)
+
+                    if (status != errSecSuccess && status != errSecItemNotFound) {
+                        throw EncryptionException("Failed to delete key: status=$status")
+                    }
+                }
+            }
+        }
 
     // Private helper functions
 
@@ -221,8 +232,8 @@ actual class EncryptionService actual constructor() {
         return query!!
     }
 
-    private fun getKeyData(): ByteArray? {
-        return memScoped {
+    private fun getKeyData(): ByteArray? =
+        memScoped {
             val query = createKeychainQuery()
             CFDictionarySetValue(query, kSecReturnData, kCFBooleanTrue)
             CFDictionarySetValue(query, kSecMatchLimit, kSecMatchLimitOne)
@@ -240,9 +251,12 @@ actual class EncryptionService actual constructor() {
                 null
             }
         }
-    }
 
-    private fun deriveKey(password: String, salt: ByteArray, iterations: Int): ByteArray {
+    private fun deriveKey(
+        password: String,
+        salt: ByteArray,
+        iterations: Int
+    ): ByteArray {
         // Simple PBKDF2-like derivation (for production, use proper PBKDF2 from Security framework)
         val passwordBytes = password.encodeToByteArray()
         var derived = passwordBytes + salt
@@ -260,40 +274,36 @@ actual class EncryptionService actual constructor() {
         return derived
     }
 
-    private fun Int.toByteArray(): ByteArray {
-        return byteArrayOf(
+    private fun Int.toByteArray(): ByteArray =
+        byteArrayOf(
             (this shr 24).toByte(),
             (this shr 16).toByte(),
             (this shr 8).toByte(),
             this.toByte()
         )
-    }
 
-    private fun ByteArray.toInt(): Int {
-        return ((this[0].toInt() and 0xFF) shl 24) or
-                ((this[1].toInt() and 0xFF) shl 16) or
-                ((this[2].toInt() and 0xFF) shl 8) or
-                (this[3].toInt() and 0xFF)
-    }
+    private fun ByteArray.toInt(): Int =
+        ((this[0].toInt() and 0xFF) shl 24) or
+            ((this[1].toInt() and 0xFF) shl 16) or
+            ((this[2].toInt() and 0xFF) shl 8) or
+            (this[3].toInt() and 0xFF)
 
     private fun String.fromBase64(): ByteArray {
         val nsData = NSData.create(base64Encoding = this) ?: throw EncryptionException("Invalid base64")
         return nsData.toByteArray()
     }
 
-    private fun ByteArray.toNSData(): NSData {
-        return usePinned { pinned ->
+    private fun ByteArray.toNSData(): NSData =
+        usePinned { pinned ->
             NSData.create(bytes = pinned.addressOf(0), length = size.toULong())
         }
-    }
 
-    private fun NSData.toByteArray(): ByteArray {
-        return ByteArray(length.toInt()).apply {
+    private fun NSData.toByteArray(): ByteArray =
+        ByteArray(length.toInt()).apply {
             usePinned { pinned ->
                 memcpy(pinned.addressOf(0), bytes, length)
             }
         }
-    }
 
     private companion object {
         private const val KEY_ALIAS = "trailglass_encryption_key"

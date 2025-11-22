@@ -12,22 +12,16 @@ import kotlinx.serialization.Serializable
 data class AppSettings(
     // Tracking preferences
     val trackingPreferences: TrackingPreferences = TrackingPreferences(),
-
     // Privacy settings
     val privacySettings: PrivacySettings = PrivacySettings(),
-
     // Unit preferences
     val unitPreferences: UnitPreferences = UnitPreferences(),
-
     // Appearance settings
     val appearanceSettings: AppearanceSettings = AppearanceSettings(),
-
     // Account settings
     val accountSettings: AccountSettings = AccountSettings(),
-
     // Data management
     val dataManagement: DataManagement = DataManagement(),
-
     // Algorithm preferences
     val algorithmPreferences: AlgorithmPreferences = AlgorithmPreferences()
 )
@@ -46,15 +40,15 @@ data class TrackingPreferences(
 
 @Serializable
 enum class TrackingAccuracy {
-    HIGH,      // GPS only, most accurate
-    BALANCED,  // GPS + Network, good balance
-    LOW        // Network only, battery saver
+    HIGH, // GPS only, most accurate
+    BALANCED, // GPS + Network, good balance
+    LOW // Network only, battery saver
 }
 
 @Serializable
 enum class UpdateInterval {
-    FREQUENT,  // Every 30 seconds
-    NORMAL,    // Every 2 minutes
+    FREQUENT, // Every 30 seconds
+    NORMAL, // Every 2 minutes
     BATTERY_SAVER // Every 10 minutes
 }
 
@@ -83,8 +77,8 @@ data class UnitPreferences(
 
 @Serializable
 enum class DistanceUnit {
-    METRIC,    // km, m
-    IMPERIAL   // mi, ft
+    METRIC, // km, m
+    IMPERIAL // mi, ft
 }
 
 @Serializable
@@ -151,7 +145,6 @@ data class AlgorithmPreferences(
      * - SIMPLE: Fastest but only accurate for short distances (<1km)
      */
     val distanceAlgorithm: DistanceAlgorithmType = DistanceAlgorithmType.HAVERSINE,
-
     /**
      * Bearing calculation algorithm.
      * - INITIAL: Direction at start point (most common for navigation)
@@ -159,7 +152,6 @@ data class AlgorithmPreferences(
      * - RHUMB_LINE: Constant compass bearing (loxodrome, not shortest path)
      */
     val bearingAlgorithm: BearingAlgorithmType = BearingAlgorithmType.INITIAL,
-
     /**
      * Interpolation algorithm for paths and animations.
      * - LINEAR: Simple straight line, fast but not geographically accurate

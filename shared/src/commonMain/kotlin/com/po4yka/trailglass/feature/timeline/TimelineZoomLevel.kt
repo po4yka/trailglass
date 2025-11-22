@@ -28,10 +28,11 @@ enum class TimelineZoomLevel {
      * Get display name for the zoom level.
      */
     val displayName: String
-        get() = when (this) {
-            DAY -> "Day"
-            WEEK -> "Week"
-            MONTH -> "Month"
-            YEAR -> "Year"
-        }
+        get() =
+            when (this) {
+                DAY -> "Day"
+                WEEK -> "Week"
+                MONTH -> "Month"
+                YEAR -> "Year"
+            }
 }

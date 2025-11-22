@@ -20,4 +20,5 @@ class DefaultPlaceDetailComponent(
     override val placeId: String,
     override val placesController: PlacesController,
     override val onBack: () -> Unit
-) : PlaceDetailComponent, ComponentContext by componentContext
+) : PlaceDetailComponent,
+    ComponentContext by componentContext

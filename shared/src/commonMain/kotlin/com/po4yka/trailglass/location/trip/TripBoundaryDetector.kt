@@ -14,7 +14,6 @@ class TripBoundaryDetector(
     private val tripDistanceThresholdMeters: Double = 100_000.0, // 100km from home
     private val minTripDurationHours: Int = 4
 ) {
-
     private val logger = logger()
 
     /**
@@ -52,16 +51,20 @@ class TripBoundaryDetector(
                     startTime = visits.first().startTime,
                     endTime = visits.last().endTime,
                     visitIds = visits.map { it.id },
-                    primaryCountry = visits.mapNotNull { it.countryCode }
-                        .groupingBy { it }
-                        .eachCount()
-                        .maxByOrNull { it.value }
-                        ?.key
+                    primaryCountry =
+                        visits
+                            .mapNotNull { it.countryCode }
+                            .groupingBy { it }
+                            .eachCount()
+                            .maxByOrNull { it.value }
+                            ?.key
                 )
             )
         }
 
-        logger.info { "Detecting trips from ${visits.size} visits with home at (${homeLocation.latitude}, ${homeLocation.longitude})" }
+        logger.info {
+            "Detecting trips from ${visits.size} visits with home at (${homeLocation.latitude}, ${homeLocation.longitude})"
+        }
 
         val sortedVisits = visits.sortedBy { it.startTime }
         val trips = mutableListOf<TripSegment>()
@@ -70,10 +73,13 @@ class TripBoundaryDetector(
         var tripStartTime: Instant? = null
 
         for (visit in sortedVisits) {
-            val distanceFromHome = haversineDistance(
-                homeLocation.latitude, homeLocation.longitude,
-                visit.centerLatitude, visit.centerLongitude
-            )
+            val distanceFromHome =
+                haversineDistance(
+                    homeLocation.latitude,
+                    homeLocation.longitude,
+                    visit.centerLatitude,
+                    visit.centerLongitude
+                )
 
             val isAwayFromHome = distanceFromHome > tripDistanceThresholdMeters
 
@@ -94,12 +100,13 @@ class TripBoundaryDetector(
 
                     if (durationHours >= minTripDurationHours) {
                         // Valid trip - add it
-                        val primaryCountry = currentTripVisits
-                            .mapNotNull { it.countryCode }
-                            .groupingBy { it }
-                            .eachCount()
-                            .maxByOrNull { it.value }
-                            ?.key
+                        val primaryCountry =
+                            currentTripVisits
+                                .mapNotNull { it.countryCode }
+                                .groupingBy { it }
+                                .eachCount()
+                                .maxByOrNull { it.value }
+                                ?.key
 
                         trips.add(
                             TripSegment(
@@ -112,7 +119,7 @@ class TripBoundaryDetector(
 
                         logger.debug {
                             "Trip ended at ${currentTripVisits.last().city ?: "unknown"}, " +
-                            "duration: ${durationHours}h, visits: ${currentTripVisits.size}, country: $primaryCountry"
+                                "duration: ${durationHours}h, visits: ${currentTripVisits.size}, country: $primaryCountry"
                         }
                     } else {
                         logger.trace { "Discarding short trip segment (${durationHours}h < ${minTripDurationHours}h)" }
@@ -131,12 +138,13 @@ class TripBoundaryDetector(
             val durationHours = (tripEndTime - tripStartTime).inWholeHours
 
             if (durationHours >= minTripDurationHours) {
-                val primaryCountry = currentTripVisits
-                    .mapNotNull { it.countryCode }
-                    .groupingBy { it }
-                    .eachCount()
-                    .maxByOrNull { it.value }
-                    ?.key
+                val primaryCountry =
+                    currentTripVisits
+                        .mapNotNull { it.countryCode }
+                        .groupingBy { it }
+                        .eachCount()
+                        .maxByOrNull { it.value }
+                        ?.key
 
                 trips.add(
                     TripSegment(
@@ -159,15 +167,18 @@ class TripBoundaryDetector(
      * Calculate Haversine distance between two coordinates.
      */
     private fun haversineDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 

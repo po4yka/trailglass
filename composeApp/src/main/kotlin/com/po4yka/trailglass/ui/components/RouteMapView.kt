@@ -1,25 +1,18 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.RoutePoint
-import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.domain.model.TransportType
+import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.feature.route.MapStyle
 import com.po4yka.trailglass.ui.theme.extended
 
@@ -43,10 +36,11 @@ fun RouteMapView(
     LaunchedEffect(shouldRecenterCamera) {
         if (shouldRecenterCamera && tripRoute.fullPath.isNotEmpty()) {
             val bounds = tripRoute.bounds
-            val latLngBounds = LatLngBounds(
-                LatLng(bounds.minLatitude, bounds.minLongitude),
-                LatLng(bounds.maxLatitude, bounds.maxLongitude)
-            )
+            val latLngBounds =
+                LatLngBounds(
+                    LatLng(bounds.minLatitude, bounds.minLongitude),
+                    LatLng(bounds.maxLatitude, bounds.maxLongitude)
+                )
             cameraPositionState.animate(
                 CameraUpdateFactory.newLatLngBounds(latLngBounds, 100) // 100px padding
             )
@@ -55,27 +49,30 @@ fun RouteMapView(
     }
 
     // Map properties based on style
-    val mapProperties = remember(mapStyle) {
-        MapProperties(
-            mapType = when (mapStyle) {
-                MapStyle.STANDARD -> MapType.NORMAL
-                MapStyle.SATELLITE -> MapType.SATELLITE
-                MapStyle.TERRAIN -> MapType.TERRAIN
-                MapStyle.DARK -> MapType.NORMAL // Apply dark style separately
-            }
-        )
-    }
+    val mapProperties =
+        remember(mapStyle) {
+            MapProperties(
+                mapType =
+                    when (mapStyle) {
+                        MapStyle.STANDARD -> MapType.NORMAL
+                        MapStyle.SATELLITE -> MapType.SATELLITE
+                        MapStyle.TERRAIN -> MapType.TERRAIN
+                        MapStyle.DARK -> MapType.NORMAL // Apply dark style separately
+                    }
+            )
+        }
 
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
         properties = mapProperties,
-        uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,
-            myLocationButtonEnabled = false,
-            compassEnabled = true,
-            mapToolbarEnabled = false
-        )
+        uiSettings =
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = false,
+                compassEnabled = true,
+                mapToolbarEnabled = false
+            )
     ) {
         // Draw route polyline
         if (tripRoute.fullPath.isNotEmpty()) {
@@ -114,9 +111,10 @@ fun RouteMapView(
         // Place visit markers
         tripRoute.visits.forEach { visit ->
             Marker(
-                state = MarkerState(
-                    position = LatLng(visit.centerLatitude, visit.centerLongitude)
-                ),
+                state =
+                    MarkerState(
+                        position = LatLng(visit.centerLatitude, visit.centerLongitude)
+                    ),
                 title = visit.poiName ?: visit.city ?: "Place",
                 snippet = "${visit.startTime} - ${visit.endTime}"
             )
@@ -130,9 +128,10 @@ fun RouteMapView(
 @Composable
 private fun RoutePolyline(routePoints: List<RoutePoint>) {
     // Group consecutive points by transport type
-    val segments = remember(routePoints) {
-        groupByTransportType(routePoints)
-    }
+    val segments =
+        remember(routePoints) {
+            groupByTransportType(routePoints)
+        }
 
     // Get route color from theme
     val routeColor = getTransportColor(TransportType.UNKNOWN) // Same color for all
@@ -158,9 +157,10 @@ private fun PhotoMarkerIcon(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val markerState = MarkerState(
-        position = LatLng(photoMarker.latitude, photoMarker.longitude)
-    )
+    val markerState =
+        MarkerState(
+            position = LatLng(photoMarker.latitude, photoMarker.longitude)
+        )
 
     // Custom photo marker (for now using standard marker, can be customized later)
     Marker(
@@ -177,9 +177,7 @@ private fun PhotoMarkerIcon(
 /**
  * Group route points by consecutive transport type for colored segments.
  */
-private fun groupByTransportType(
-    points: List<RoutePoint>
-): List<Pair<TransportType, List<RoutePoint>>> {
+private fun groupByTransportType(points: List<RoutePoint>): List<Pair<TransportType, List<RoutePoint>>> {
     if (points.isEmpty()) return emptyList()
 
     val segments = mutableListOf<Pair<TransportType, List<RoutePoint>>>()
@@ -220,8 +218,8 @@ private fun getTransportColor(type: TransportType): Color {
 /**
  * Get polyline width based on transport type.
  */
-private fun getTransportWidth(type: TransportType): Float {
-    return when (type) {
+private fun getTransportWidth(type: TransportType): Float =
+    when (type) {
         TransportType.WALK -> 5f
         TransportType.BIKE -> 6f
         TransportType.CAR -> 8f
@@ -230,4 +228,3 @@ private fun getTransportWidth(type: TransportType): Float {
         TransportType.BOAT -> 8f
         TransportType.UNKNOWN -> 5f
     }
-}

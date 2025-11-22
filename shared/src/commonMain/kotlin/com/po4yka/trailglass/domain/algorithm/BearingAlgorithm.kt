@@ -5,6 +5,7 @@ import kotlin.math.*
 
 // Extension functions for degrees/radians conversion
 private fun Double.toRadians(): Double = this * PI / 180.0
+
 private fun Double.toDegrees(): Double = this * 180.0 / PI
 
 /**
@@ -15,12 +16,20 @@ interface BearingAlgorithm {
      * Calculate bearing from one coordinate to another in degrees (0-360).
      * 0° = North, 90° = East, 180° = South, 270° = West
      */
-    fun calculate(from: Coordinate, to: Coordinate): Double
+    fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double
 
     /**
      * Calculate bearing between two lat/lon pairs in degrees (0-360).
      */
-    fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double
+    fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double
 }
 
 /**
@@ -52,17 +61,24 @@ enum class BearingAlgorithmType {
  * Most commonly used for navigation and visualization.
  */
 class InitialBearing : BearingAlgorithm {
-    override fun calculate(from: Coordinate, to: Coordinate): Double {
-        return calculate(from.latitude, from.longitude, to.latitude, to.longitude)
-    }
+    override fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double = calculate(from.latitude, from.longitude, to.latitude, to.longitude)
 
-    override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    override fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         val phi1 = lat1.toRadians()
         val phi2 = lat2.toRadians()
         val deltaLambda = (lon2 - lon1).toRadians()
 
         val y = sin(deltaLambda) * cos(phi2)
-        val x = cos(phi1) * sin(phi2) -
+        val x =
+            cos(phi1) * sin(phi2) -
                 sin(phi1) * cos(phi2) * cos(deltaLambda)
 
         val theta = atan2(y, x)
@@ -75,11 +91,17 @@ class InitialBearing : BearingAlgorithm {
  * Useful for determining arrival heading.
  */
 class FinalBearing : BearingAlgorithm {
-    override fun calculate(from: Coordinate, to: Coordinate): Double {
-        return calculate(from.latitude, from.longitude, to.latitude, to.longitude)
-    }
+    override fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double = calculate(from.latitude, from.longitude, to.latitude, to.longitude)
 
-    override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    override fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         // Final bearing from A to B is the reverse of initial bearing from B to A
         val initialBearing = InitialBearing().calculate(lat2, lon2, lat1, lon1)
         return (initialBearing + 180) % 360
@@ -92,22 +114,29 @@ class FinalBearing : BearingAlgorithm {
  * Easier for navigation but longer distance than great circle.
  */
 class RhumbLineBearing : BearingAlgorithm {
-    override fun calculate(from: Coordinate, to: Coordinate): Double {
-        return calculate(from.latitude, from.longitude, to.latitude, to.longitude)
-    }
+    override fun calculate(
+        from: Coordinate,
+        to: Coordinate
+    ): Double = calculate(from.latitude, from.longitude, to.latitude, to.longitude)
 
-    override fun calculate(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    override fun calculate(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         val phi1 = (lat1).toRadians()
         val phi2 = (lat2).toRadians()
         var deltaLambda = (lon2 - lon1).toRadians()
 
         // Normalize longitude difference
         if (abs(deltaLambda) > PI) {
-            deltaLambda = if (deltaLambda > 0) {
-                -(2 * PI - deltaLambda)
-            } else {
-                (2 * PI + deltaLambda)
-            }
+            deltaLambda =
+                if (deltaLambda > 0) {
+                    -(2 * PI - deltaLambda)
+                } else {
+                    (2 * PI + deltaLambda)
+                }
         }
 
         val deltaPsi = ln(tan(phi2 / 2 + PI / 4) / tan(phi1 / 2 + PI / 4))
@@ -121,11 +150,10 @@ class RhumbLineBearing : BearingAlgorithm {
  * Factory for creating bearing algorithm instances.
  */
 object BearingAlgorithmFactory {
-    fun create(type: BearingAlgorithmType): BearingAlgorithm {
-        return when (type) {
+    fun create(type: BearingAlgorithmType): BearingAlgorithm =
+        when (type) {
             BearingAlgorithmType.INITIAL -> InitialBearing()
             BearingAlgorithmType.FINAL -> FinalBearing()
             BearingAlgorithmType.RHUMB_LINE -> RhumbLineBearing()
         }
-    }
 }

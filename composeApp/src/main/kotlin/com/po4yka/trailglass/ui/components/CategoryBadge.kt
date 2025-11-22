@@ -40,10 +40,11 @@ fun CategoryBadge(
     // Determine shape based on category
     val badgeShape by animateShapeMorph(
         targetShape = CategoryShapes.forCategory(category),
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        )
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
     )
 
     // Get category icon
@@ -57,15 +58,18 @@ fun CategoryBadge(
                 style = MaterialTheme.typography.labelSmall
             )
         },
-        leadingIcon = if (icon != null) {
-            {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-        } else null,
+        leadingIcon =
+            if (icon != null) {
+                {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+            } else {
+                null
+            },
         shape = badgeShape,
         enabled = enabled,
         modifier = modifier
@@ -86,10 +90,11 @@ fun CompactCategoryBadge(
 ) {
     val badgeShape by animateShapeMorph(
         targetShape = CategoryShapes.forCategory(category),
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        )
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
     )
 
     val icon = getCategoryIcon(category)
@@ -141,8 +146,8 @@ fun CategoryBadgeGroup(
  * Get icon for category type.
  * Maps common category names to appropriate Material Icons.
  */
-private fun getCategoryIcon(category: String): ImageVector? {
-    return when (category.lowercase()) {
+private fun getCategoryIcon(category: String): ImageVector? =
+    when (category.lowercase()) {
         "water", "swimming", "beach", "ocean" -> Icons.Default.WaterDrop
         "transport", "car", "bus", "train" -> Icons.Default.DirectionsCar
         "flight", "plane", "airport" -> Icons.Default.Flight
@@ -158,15 +163,14 @@ private fun getCategoryIcon(category: String): ImageVector? {
         "fitness", "gym", "exercise" -> Icons.Default.FitnessCenter
         else -> Icons.Default.Place
     }
-}
 
 /**
  * Category color mapping for additional visual differentiation.
  * Returns appropriate color scheme based on category.
  */
 @Composable
-fun getCategoryColors(category: String): Pair<androidx.compose.ui.graphics.Color, androidx.compose.ui.graphics.Color> {
-    return when (category.lowercase()) {
+fun getCategoryColors(category: String): Pair<androidx.compose.ui.graphics.Color, androidx.compose.ui.graphics.Color> =
+    when (category.lowercase()) {
         "water", "swimming", "beach", "ocean" ->
             MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
         "transport", "car", "bus", "train", "flight", "bike" ->
@@ -178,4 +182,3 @@ fun getCategoryColors(category: String): Pair<androidx.compose.ui.graphics.Color
         else ->
             MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
     }
-}

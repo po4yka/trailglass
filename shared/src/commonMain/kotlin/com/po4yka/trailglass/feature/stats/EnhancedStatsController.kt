@@ -24,13 +24,13 @@ class EnhancedStatsController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Enhanced stats UI state.
@@ -59,7 +59,7 @@ class EnhancedStatsController(
                 _state.update { it.copy(stats = stats, isLoading = false) }
                 logger.info {
                     "Loaded comprehensive stats for $period: ${stats.distanceStats.totalDistanceKm.toInt()} km, " +
-                    "${stats.geographicStats.countries.size} countries"
+                        "${stats.geographicStats.countries.size} countries"
                 }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load comprehensive stats for $period" }

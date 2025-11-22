@@ -2,23 +2,22 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GpsNotFixed
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
 import com.po4yka.trailglass.domain.model.*
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.ui.theme.extended
+import kotlinx.coroutines.launch
 
 /**
  * Google Maps view with markers and routes.
@@ -60,26 +59,30 @@ fun MapView(
                         controller.toggleFollowMode()
                     }
                 },
-                containerColor = if (state.isFollowModeEnabled) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 88.dp, end = 16.dp)
+                containerColor =
+                    if (state.isFollowModeEnabled) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    },
+                modifier =
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 88.dp, end = 16.dp)
             ) {
                 Icon(
-                    imageVector = if (state.isFollowModeEnabled) {
-                        Icons.Default.GpsFixed
-                    } else {
-                        Icons.Default.GpsNotFixed
-                    },
-                    contentDescription = if (state.isFollowModeEnabled) {
-                        "Disable follow mode"
-                    } else {
-                        "Enable follow mode"
-                    }
+                    imageVector =
+                        if (state.isFollowModeEnabled) {
+                            Icons.Default.GpsFixed
+                        } else {
+                            Icons.Default.GpsNotFixed
+                        },
+                    contentDescription =
+                        if (state.isFollowModeEnabled) {
+                            "Disable follow mode"
+                        } else {
+                            "Enable follow mode"
+                        }
                 )
             }
 
@@ -87,9 +90,10 @@ fun MapView(
             if (state.mapData.markers.isNotEmpty() || state.mapData.routes.isNotEmpty()) {
                 FloatingActionButton(
                     onClick = { controller.fitToData() },
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp)
+                    modifier =
+                        Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
                 ) {
                     Icon(Icons.Default.MyLocation, contentDescription = "Fit to data")
                 }
@@ -107,9 +111,10 @@ private fun GoogleMapContent(
     modifier: Modifier = Modifier
 ) {
     // Initialize camera position state
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
-    }
+    val cameraPositionState =
+        rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 2f)
+        }
 
     // Apply camera movements with appropriate animations
     LaunchedEffect(cameraMove) {
@@ -122,9 +127,10 @@ private fun GoogleMapContent(
                 is CameraMove.Ease -> {
                     // Smooth easing animation
                     cameraPositionState.animate(
-                        update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
-                            move.position.toGmsCameraPosition()
-                        ),
+                        update =
+                            com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
+                                move.position.toGmsCameraPosition()
+                            ),
                         durationMs = move.durationMs
                     )
                 }
@@ -134,11 +140,12 @@ private fun GoogleMapContent(
                     val currentPosition = cameraPositionState.position.toDomainCameraPosition()
 
                     // Calculate arc trajectory waypoints
-                    val arcWaypoints = ArcTrajectoryCalculator.calculateArcTrajectory(
-                        start = currentPosition,
-                        end = move.position,
-                        steps = 20 // 20 intermediate steps for smooth arc
-                    )
+                    val arcWaypoints =
+                        ArcTrajectoryCalculator.calculateArcTrajectory(
+                            start = currentPosition,
+                            end = move.position,
+                            steps = 20 // 20 intermediate steps for smooth arc
+                        )
 
                     // Animate through each waypoint
                     // Each segment gets a fraction of the total duration
@@ -146,9 +153,10 @@ private fun GoogleMapContent(
 
                     for (waypoint in arcWaypoints.drop(1)) { // Skip first (current position)
                         cameraPositionState.animate(
-                            update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
-                                waypoint.toGmsCameraPosition()
-                            ),
+                            update =
+                                com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(
+                                    waypoint.toGmsCameraPosition()
+                                ),
                             durationMs = segmentDuration
                         )
                     }
@@ -173,15 +181,19 @@ private fun GoogleMapContent(
                     // This is a simplified implementation that applies zoom/tilt/bearing
                     // Full implementation would track user location continuously
                     val currentTarget = cameraPositionState.position.target
-                    val followPosition = CameraPosition.Builder()
-                        .target(currentTarget) // Keep current target for now
-                        .zoom(move.zoom)
-                        .tilt(move.tilt)
-                        .bearing(move.bearing)
-                        .build()
+                    val followPosition =
+                        CameraPosition
+                            .Builder()
+                            .target(currentTarget) // Keep current target for now
+                            .zoom(move.zoom)
+                            .tilt(move.tilt)
+                            .bearing(move.bearing)
+                            .build()
 
                     cameraPositionState.animate(
-                        update = com.google.android.gms.maps.CameraUpdateFactory.newCameraPosition(followPosition),
+                        update =
+                            com.google.android.gms.maps.CameraUpdateFactory
+                                .newCameraPosition(followPosition),
                         durationMs = 500
                     )
                 }
@@ -204,22 +216,25 @@ private fun GoogleMapContent(
             // Send map ready event
             eventSink.send(MapEvent.MapReady)
         },
-        uiSettings = MapUiSettings(
-            zoomControlsEnabled = false,
-            myLocationButtonEnabled = true,
-            compassEnabled = true
-        )
+        uiSettings =
+            MapUiSettings(
+                zoomControlsEnabled = false,
+                myLocationButtonEnabled = true,
+                compassEnabled = true
+            )
     ) {
         // Draw routes (polylines)
         mapData.routes.forEach { route ->
-            val points = route.coordinates.map { coord ->
-                LatLng(coord.latitude, coord.longitude)
-            }
+            val points =
+                route.coordinates.map { coord ->
+                    LatLng(coord.latitude, coord.longitude)
+                }
 
             // Determine route color: use explicit color if set, otherwise use historical route color
-            val routeColor = route.color?.let { colorValue ->
-                Color(colorValue)
-            } ?: MaterialTheme.colorScheme.extended.historicalRoute
+            val routeColor =
+                route.color?.let { colorValue ->
+                    Color(colorValue)
+                } ?: MaterialTheme.colorScheme.extended.historicalRoute
 
             // Draw outline for better visibility
             Polyline(
@@ -247,9 +262,10 @@ private fun GoogleMapContent(
         // Draw markers
         mapData.markers.forEach { marker ->
             Marker(
-                state = MarkerState(
-                    position = LatLng(marker.coordinate.latitude, marker.coordinate.longitude)
-                ),
+                state =
+                    MarkerState(
+                        position = LatLng(marker.coordinate.latitude, marker.coordinate.longitude)
+                    ),
                 title = marker.title,
                 snippet = marker.snippet,
                 onClick = {
@@ -290,8 +306,8 @@ private fun MapErrorView(
 /**
  * Get route width based on transport type.
  */
-private fun getRouteWidth(transportType: TransportType): Float {
-    return when (transportType) {
+private fun getRouteWidth(transportType: TransportType): Float =
+    when (transportType) {
         TransportType.WALK -> 8f
         TransportType.BIKE -> 10f
         TransportType.CAR -> 12f
@@ -300,31 +316,30 @@ private fun getRouteWidth(transportType: TransportType): Float {
         TransportType.BOAT -> 12f
         TransportType.UNKNOWN -> 8f
     }
-}
 
 /**
  * Convert domain CameraPosition to Google Maps CameraPosition.
  */
-private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPosition(): CameraPosition {
-    return CameraPosition.Builder()
+private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPosition(): CameraPosition =
+    CameraPosition
+        .Builder()
         .target(LatLng(target.latitude, target.longitude))
         .zoom(zoom)
         .tilt(tilt)
         .bearing(bearing)
         .build()
-}
 
 /**
  * Convert Google Maps CameraPosition to domain CameraPosition.
  */
-private fun CameraPosition.toDomainCameraPosition(): com.po4yka.trailglass.domain.model.CameraPosition {
-    return com.po4yka.trailglass.domain.model.CameraPosition(
-        target = Coordinate(
-            latitude = target.latitude,
-            longitude = target.longitude
-        ),
+private fun CameraPosition.toDomainCameraPosition(): com.po4yka.trailglass.domain.model.CameraPosition =
+    com.po4yka.trailglass.domain.model.CameraPosition(
+        target =
+            Coordinate(
+                latitude = target.latitude,
+                longitude = target.longitude
+            ),
         zoom = zoom,
         tilt = tilt,
         bearing = bearing
     )
-}

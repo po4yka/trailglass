@@ -32,7 +32,6 @@ class DefaultLocationTracker(
     private val userId: String,
     private val deviceId: String
 ) : LocationTracker {
-
     private val logger = logger()
 
     // Detectors
@@ -64,11 +63,12 @@ class DefaultLocationTracker(
         stopTracking()
 
         // Start location updates
-        trackingJob = coroutineScope.launch {
-            locationService.locationUpdates.collect { coordinate ->
-                processLocation(coordinate, mode)
+        trackingJob =
+            coroutineScope.launch {
+                locationService.locationUpdates.collect { coordinate ->
+                    processLocation(coordinate, mode)
+                }
             }
-        }
 
         // Update state
         _trackingState.update {
@@ -103,13 +103,9 @@ class DefaultLocationTracker(
         logger.info { "Location tracking stopped" }
     }
 
-    override suspend fun getCurrentState(): TrackingState {
-        return _trackingState.value
-    }
+    override suspend fun getCurrentState(): TrackingState = _trackingState.value
 
-    override suspend fun hasPermissions(): Boolean {
-        return locationService.hasLocationPermission()
-    }
+    override suspend fun hasPermissions(): Boolean = locationService.hasLocationPermission()
 
     override suspend fun requestPermissions(): Boolean {
         // Request location permission from the platform-specific service
@@ -127,20 +123,24 @@ class DefaultLocationTracker(
     /**
      * Process a new location update.
      */
-    private suspend fun processLocation(coordinate: Coordinate, mode: TrackingMode) {
+    private suspend fun processLocation(
+        coordinate: Coordinate,
+        mode: TrackingMode
+    ) {
         val now = Clock.System.now()
 
         // Create Location object for detectors
         // Create Location object for detectors
-        val location = Location(
-            latitude = coordinate.latitude,
-            longitude = coordinate.longitude,
-            time = now.toEpochMilliseconds(),
-            accuracy = null,
-            altitude = null,
-            speed = null,
-            bearing = null
-        )
+        val location =
+            Location(
+                latitude = coordinate.latitude,
+                longitude = coordinate.longitude,
+                time = now.toEpochMilliseconds(),
+                accuracy = null,
+                altitude = null,
+                speed = null,
+                bearing = null
+            )
 
         // Detect trip state changes
         val tripEvent = tripDetector.processLocation(location)
@@ -154,20 +154,21 @@ class DefaultLocationTracker(
         val transportMode = transportModeDetector.detectTransportMode(location)
 
         // Create and save location sample
-        val sample = LocationSample(
-            id = generateLocationId(),
-            timestamp = now,
-            latitude = coordinate.latitude,
-            longitude = coordinate.longitude,
-            accuracy = 10.0, // Would come from actual location provider
-            speed = null,
-            bearing = null,
-            source = if (mode == TrackingMode.ACTIVE) LocationSource.GPS else LocationSource.NETWORK,
-            tripId = currentTripId,
-            uploadedAt = null,
-            deviceId = deviceId,
-            userId = userId
-        )
+        val sample =
+            LocationSample(
+                id = generateLocationId(),
+                timestamp = now,
+                latitude = coordinate.latitude,
+                longitude = coordinate.longitude,
+                accuracy = 10.0, // Would come from actual location provider
+                speed = null,
+                bearing = null,
+                source = if (mode == TrackingMode.ACTIVE) LocationSource.GPS else LocationSource.NETWORK,
+                tripId = currentTripId,
+                uploadedAt = null,
+                deviceId = deviceId,
+                userId = userId
+            )
 
         // Save to repository
         locationRepository.insertSample(sample)
@@ -190,7 +191,11 @@ class DefaultLocationTracker(
     /**
      * Handle trip events (start/end).
      */
-    private suspend fun handleTripEvent(event: TripEvent?, coordinate: Coordinate, now: Instant) {
+    private suspend fun handleTripEvent(
+        event: TripEvent?,
+        coordinate: Coordinate,
+        now: Instant
+    ) {
         when (event) {
             is TripEvent.TripStarted -> {
                 // Create new trip
@@ -235,14 +240,10 @@ class DefaultLocationTracker(
     /**
      * Generate unique location ID.
      */
-    private fun generateLocationId(): String {
-        return "loc_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(1000)}"
-    }
+    private fun generateLocationId(): String = "loc_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(1000)}"
 
     /**
      * Generate unique trip ID.
      */
-    private fun generateTripId(): String {
-        return "trip_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(1000)}"
-    }
+    private fun generateTripId(): String = "trip_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(1000)}"
 }

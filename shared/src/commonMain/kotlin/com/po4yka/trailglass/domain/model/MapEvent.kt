@@ -12,28 +12,36 @@ sealed class MapEvent {
      *
      * @param markerId The ID of the tapped marker
      */
-    data class MarkerTapped(val markerId: String) : MapEvent()
+    data class MarkerTapped(
+        val markerId: String
+    ) : MapEvent()
 
     /**
      * User tapped on a route.
      *
      * @param routeId The ID of the tapped route
      */
-    data class RouteTapped(val routeId: String) : MapEvent()
+    data class RouteTapped(
+        val routeId: String
+    ) : MapEvent()
 
     /**
      * User tapped on the map (not on any marker or route).
      *
      * @param coordinate The coordinate where the user tapped
      */
-    data class MapTapped(val coordinate: Coordinate) : MapEvent()
+    data class MapTapped(
+        val coordinate: Coordinate
+    ) : MapEvent()
 
     /**
      * Camera position changed (either by user gesture or programmatic movement).
      *
      * @param position The new camera position
      */
-    data class CameraMoved(val position: CameraPosition) : MapEvent()
+    data class CameraMoved(
+        val position: CameraPosition
+    ) : MapEvent()
 
     /**
      * Map has finished loading and is ready for interaction.

@@ -9,8 +9,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -111,11 +111,12 @@ fun RouteReplayScreen(
         // Close button (always visible)
         IconButton(
             onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
+            modifier =
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.9f))
         ) {
             Icon(
                 Icons.Default.Close,
@@ -164,9 +165,10 @@ private fun RouteReplayContent(
                 onProgressChange = { controller.seekTo(it) },
                 onSpeedClick = { controller.cyclePlaybackSpeed() },
                 onRestartClick = { controller.restart() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
             )
         }
 
@@ -196,14 +198,16 @@ private fun ReplayControlPanel(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+            )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             // Progress slider
             Row(
@@ -276,6 +280,4 @@ private fun ReplayControlPanel(
 /**
  * Format progress as percentage.
  */
-private fun formatProgress(progress: Float): String {
-    return "${(progress * 100).toInt()}%"
-}
+private fun formatProgress(progress: Float): String = "${(progress * 100).toInt()}%"

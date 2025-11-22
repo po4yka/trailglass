@@ -1,0 +1,17 @@
+# All generated code in build directories
+**/build/**
+
+# KSP generated code
+**/generated/**
+
+# SQLDelight generated code
+**/db/**/*.kt
+
+# kotlin-inject generated code
+**/*_Factory.kt
+**/InjectAppComponent.kt
+
+# Moko-resources generated code
+**/moko-resources/**
+**/SharedRes.kt
+**/resources/SharedRes.kt

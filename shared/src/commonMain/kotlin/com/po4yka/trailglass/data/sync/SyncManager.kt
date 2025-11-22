@@ -13,8 +13,8 @@ import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.SettingsRepository
 import com.po4yka.trailglass.data.repository.TripRepository
-import com.po4yka.trailglass.data.sync.mapper.toDto
 import com.po4yka.trailglass.data.sync.mapper.toDomain
+import com.po4yka.trailglass.data.sync.mapper.toDto
 import com.po4yka.trailglass.data.sync.mapper.toMetadataDto
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
@@ -24,7 +24,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
@@ -139,8 +138,8 @@ class SyncManager(
 
             logger.debug {
                 "Collected local changes: " +
-                        "${localChanges.placeVisits.size} place visits, " +
-                        "${localChanges.trips.size} trips"
+                    "${localChanges.placeVisits.size} place visits, " +
+                    "${localChanges.trips.size} trips"
             }
 
             _syncProgress.value = SyncProgress.InProgress(30, "Uploading changes...")
@@ -165,21 +164,22 @@ class SyncManager(
                     // 5. Handle conflicts
                     val conflictsResolved = handleConflicts(response.conflicts)
 
-                    _syncProgress.value = SyncProgress.Completed(
-                        SyncResultSummary(
-                            uploaded = response.accepted.placeVisits.size + response.accepted.trips.size,
-                            downloaded = response.remoteChanges.placeVisits.size + response.remoteChanges.trips.size,
-                            conflicts = response.conflicts.size,
-                            conflictsResolved = conflictsResolved,
-                            errors = response.rejected.placeVisits.size + response.rejected.trips.size
+                    _syncProgress.value =
+                        SyncProgress.Completed(
+                            SyncResultSummary(
+                                uploaded = response.accepted.placeVisits.size + response.accepted.trips.size,
+                                downloaded = response.remoteChanges.placeVisits.size + response.remoteChanges.trips.size,
+                                conflicts = response.conflicts.size,
+                                conflictsResolved = conflictsResolved,
+                                errors = response.rejected.placeVisits.size + response.rejected.trips.size
+                            )
                         )
-                    )
 
                     logger.info {
                         "Sync completed successfully: " +
-                                "uploaded ${response.accepted.placeVisits.size + response.accepted.trips.size}, " +
-                                "downloaded ${response.remoteChanges.placeVisits.size + response.remoteChanges.trips.size}, " +
-                                "${response.conflicts.size} conflicts"
+                            "uploaded ${response.accepted.placeVisits.size + response.accepted.trips.size}, " +
+                            "downloaded ${response.remoteChanges.placeVisits.size + response.remoteChanges.trips.size}, " +
+                            "${response.conflicts.size} conflicts"
                     }
 
                     Result.success(
@@ -288,10 +288,11 @@ class SyncManager(
         if (pendingSettings.isNotEmpty()) {
             val settings = settingsRepository.getCurrentSettings()
             val metadata = pendingSettings.first()
-            settingsDto = settings.toDto(
-                serverVersion = metadata.serverVersion,
-                lastModified = metadata.lastModified
-            )
+            settingsDto =
+                settings.toDto(
+                    serverVersion = metadata.serverVersion,
+                    lastModified = metadata.lastModified
+                )
         }
 
         return LocalChanges(
@@ -409,29 +410,29 @@ class SyncManager(
      * Handle sync conflicts.
      * Stores conflicts for manual resolution through UI.
      */
-    private suspend fun handleConflicts(
-        conflicts: List<com.po4yka.trailglass.data.remote.dto.SyncConflictDto>
-    ): Int {
+    private suspend fun handleConflicts(conflicts: List<com.po4yka.trailglass.data.remote.dto.SyncConflictDto>): Int {
         var resolved = 0
 
         for (conflict in conflicts) {
             try {
                 // Check if suggested resolution is automatic
                 if (conflict.suggestedResolution == com.po4yka.trailglass.data.remote.dto.ConflictResolution.MERGE ||
-                    conflict.suggestedResolution == com.po4yka.trailglass.data.remote.dto.ConflictResolution.KEEP_REMOTE) {
+                    conflict.suggestedResolution == com.po4yka.trailglass.data.remote.dto.ConflictResolution.KEEP_REMOTE
+                ) {
                     // Apply automatic resolution
-                    val resolution = when (conflict.suggestedResolution) {
-                        com.po4yka.trailglass.data.remote.dto.ConflictResolution.KEEP_REMOTE -> ConflictResolutionChoice.KEEP_REMOTE
-                        com.po4yka.trailglass.data.remote.dto.ConflictResolution.MERGE -> ConflictResolutionChoice.MERGE
-                        else -> ConflictResolutionChoice.KEEP_REMOTE
-                    }
+                    val resolution =
+                        when (conflict.suggestedResolution) {
+                            com.po4yka.trailglass.data.remote.dto.ConflictResolution.KEEP_REMOTE -> ConflictResolutionChoice.KEEP_REMOTE
+                            com.po4yka.trailglass.data.remote.dto.ConflictResolution.MERGE -> ConflictResolutionChoice.MERGE
+                            else -> ConflictResolutionChoice.KEEP_REMOTE
+                        }
 
                     resolveConflictAutomatically(conflict, resolution)
                     resolved++
 
                     logger.info {
                         "Automatically resolved conflict for ${conflict.entityType}:${conflict.entityId} " +
-                                "using ${conflict.suggestedResolution}"
+                            "using ${conflict.suggestedResolution}"
                     }
                 } else {
                     // Store conflict for manual resolution
@@ -460,11 +461,12 @@ class SyncManager(
             ConflictResolutionChoice.KEEP_REMOTE -> {
                 // Remote wins - data will be applied in applyRemoteChanges
                 // Just mark local as synced with remote version
-                val entityType = when (conflict.entityType) {
-                    com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
-                    com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
-                    else -> return
-                }
+                val entityType =
+                    when (conflict.entityType) {
+                        com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
+                        com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
+                        else -> return
+                    }
 
                 syncMetadataRepository.markAsSynced(
                     entityId = conflict.entityId,
@@ -475,11 +477,12 @@ class SyncManager(
             ConflictResolutionChoice.KEEP_LOCAL -> {
                 // Local wins - force upload local version
                 // Mark for re-sync
-                val entityType = when (conflict.entityType) {
-                    com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
-                    com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
-                    else -> return
-                }
+                val entityType =
+                    when (conflict.entityType) {
+                        com.po4yka.trailglass.data.remote.dto.EntityType.PLACE_VISIT -> EntityType.PLACE_VISIT
+                        com.po4yka.trailglass.data.remote.dto.EntityType.TRIP -> EntityType.TRIP
+                        else -> return
+                    }
 
                 val metadata = syncMetadataRepository.getMetadata(conflict.entityId, entityType)
                 metadata?.let {
@@ -510,23 +513,27 @@ class SyncManager(
     /**
      * Mark an entity as needing sync.
      */
-    suspend fun markForSync(entityId: String, entityType: EntityType) {
+    suspend fun markForSync(
+        entityId: String,
+        entityType: EntityType
+    ) {
         val existing = syncMetadataRepository.getMetadata(entityId, entityType)
 
-        val metadata = if (existing != null) {
-            existing.copy(
-                isPendingSync = true,
-                lastModified = Clock.System.now(),
-                localVersion = existing.localVersion + 1
-            )
-        } else {
-            SyncMetadata(
-                entityId = entityId,
-                entityType = entityType,
-                lastModified = Clock.System.now(),
-                deviceId = deviceId
-            )
-        }
+        val metadata =
+            if (existing != null) {
+                existing.copy(
+                    isPendingSync = true,
+                    lastModified = Clock.System.now(),
+                    localVersion = existing.localVersion + 1
+                )
+            } else {
+                SyncMetadata(
+                    entityId = entityId,
+                    entityType = entityType,
+                    lastModified = Clock.System.now(),
+                    deviceId = deviceId
+                )
+            }
 
         syncMetadataRepository.upsertMetadata(metadata)
         syncCoordinator.markSyncNeeded()
@@ -535,9 +542,7 @@ class SyncManager(
     /**
      * Get count of pending sync items.
      */
-    suspend fun getPendingSyncCount(): Int {
-        return syncMetadataRepository.getPendingSyncCount()
-    }
+    suspend fun getPendingSyncCount(): Int = syncMetadataRepository.getPendingSyncCount()
 
     /**
      * Get current sync status for UI display.
@@ -564,26 +569,26 @@ class SyncManager(
     /**
      * Get list of unresolved conflicts for UI.
      */
-    suspend fun getUnresolvedConflicts(): List<ConflictUiModel> {
-        return conflictRepository.getPendingConflicts().map { conflict ->
+    suspend fun getUnresolvedConflicts(): List<ConflictUiModel> =
+        conflictRepository.getPendingConflicts().map { conflict ->
             convertToUiModel(conflict)
         }
-    }
 
     /**
      * Convert StoredConflict to UI-friendly ConflictUiModel.
      */
     private suspend fun convertToUiModel(conflict: StoredConflict): ConflictUiModel {
         // Get entity name based on type
-        val entityName = when (conflict.entityType) {
-            EntityType.PLACE_VISIT -> {
-                placeVisitRepository.getVisitById(conflict.entityId)?.displayName ?: conflict.entityId
+        val entityName =
+            when (conflict.entityType) {
+                EntityType.PLACE_VISIT -> {
+                    placeVisitRepository.getVisitById(conflict.entityId)?.displayName ?: conflict.entityId
+                }
+                EntityType.TRIP -> {
+                    tripRepository.getTripById(conflict.entityId)?.name ?: conflict.entityId
+                }
+                else -> conflict.entityId
             }
-            EntityType.TRIP -> {
-                tripRepository.getTripById(conflict.entityId)?.name ?: conflict.entityId
-            }
-            else -> conflict.entityId
-        }
 
         return ConflictUiModel(
             conflictId = conflict.conflictId,
@@ -603,7 +608,7 @@ class SyncManager(
     private fun buildConflictDescription(conflict: StoredConflict): String {
         val fields = conflict.conflictedFields.joinToString(", ")
         return "Conflicting changes in: $fields. " +
-               "Local version ${conflict.localVersion} vs Remote version ${conflict.remoteVersion}."
+            "Local version ${conflict.localVersion} vs Remote version ${conflict.remoteVersion}."
     }
 
     private fun formatDataPreview(data: String): String {
@@ -624,18 +629,20 @@ class SyncManager(
         choice: ConflictResolutionChoice
     ): Result<Unit> {
         return try {
-            val conflict = conflictRepository.getConflict(conflictId)
-                ?: return Result.failure(Exception("Conflict not found: $conflictId"))
+            val conflict =
+                conflictRepository.getConflict(conflictId)
+                    ?: return Result.failure(Exception("Conflict not found: $conflictId"))
 
             logger.info { "Resolving conflict $conflictId with choice $choice" }
 
             when (choice) {
                 ConflictResolutionChoice.KEEP_LOCAL -> {
                     // Local wins - mark entity for re-upload
-                    val metadata = syncMetadataRepository.getMetadata(
-                        conflict.entityId,
-                        conflict.entityType
-                    )
+                    val metadata =
+                        syncMetadataRepository.getMetadata(
+                            conflict.entityId,
+                            conflict.entityType
+                        )
                     metadata?.let {
                         syncMetadataRepository.upsertMetadata(
                             it.copy(
@@ -710,9 +717,19 @@ class SyncManager(
  */
 sealed class SyncProgress {
     data object Idle : SyncProgress()
-    data class InProgress(val percentage: Int, val message: String) : SyncProgress()
-    data class Completed(val result: SyncResultSummary) : SyncProgress()
-    data class Failed(val error: String) : SyncProgress()
+
+    data class InProgress(
+        val percentage: Int,
+        val message: String
+    ) : SyncProgress()
+
+    data class Completed(
+        val result: SyncResultSummary
+    ) : SyncProgress()
+
+    data class Failed(
+        val error: String
+    ) : SyncProgress()
 }
 
 /**

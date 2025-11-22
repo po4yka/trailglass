@@ -14,14 +14,34 @@ struct FlexibleNavigationBar<Title: View, Subtitle: View, Background: View>: Vie
         variant: NavigationBarVariant = .large,
         scrollOffset: CGFloat,
         @ViewBuilder title: () -> Title,
-        @ViewBuilder subtitle: () -> Subtitle = { EmptyView() as! Subtitle },
-        @ViewBuilder backgroundContent: () -> Background = { EmptyView() as! Background }
+        @ViewBuilder subtitle: @escaping () -> Subtitle,
+        @ViewBuilder backgroundContent: @escaping () -> Background
     ) {
         self.variant = variant
         self.scrollOffset = scrollOffset
         self.title = title()
         self.subtitle = subtitle()
         self.backgroundContent = backgroundContent()
+    }
+
+    init(
+        variant: NavigationBarVariant = .large,
+        scrollOffset: CGFloat,
+        @ViewBuilder title: () -> Title
+    ) where Subtitle == EmptyView, Background == EmptyView {
+        self.variant = variant
+        self.scrollOffset = scrollOffset
+        self.title = title()
+        if let emptyView = EmptyView() as? Subtitle {
+            self.subtitle = emptyView
+        } else {
+            self.subtitle = nil
+        }
+        if let emptyView = EmptyView() as? Background {
+            self.backgroundContent = emptyView
+        } else {
+            self.backgroundContent = nil
+        }
     }
 
     private var maxHeight: CGFloat {
@@ -151,14 +171,34 @@ struct LargeFlexibleNavigationBar<Subtitle: View, Background: View>: View {
         title: String,
         scrollOffset: CGFloat,
         actions: [NavigationAction]? = nil,
-        @ViewBuilder subtitle: () -> Subtitle = { EmptyView() as! Subtitle },
-        @ViewBuilder backgroundContent: () -> Background = { EmptyView() as! Background }
+        @ViewBuilder subtitle: @escaping () -> Subtitle,
+        @ViewBuilder backgroundContent: @escaping () -> Background
     ) {
         self.title = title
         self.scrollOffset = scrollOffset
         self.actions = actions
         self.subtitle = subtitle()
         self.backgroundContent = backgroundContent()
+    }
+
+    init(
+        title: String,
+        scrollOffset: CGFloat,
+        actions: [NavigationAction]? = nil
+    ) where Subtitle == EmptyView, Background == EmptyView {
+        self.title = title
+        self.scrollOffset = scrollOffset
+        self.actions = actions
+        if let emptyView = EmptyView() as? Subtitle {
+            self.subtitle = emptyView
+        } else {
+            self.subtitle = nil
+        }
+        if let emptyView = EmptyView() as? Background {
+            self.backgroundContent = emptyView
+        } else {
+            self.backgroundContent = nil
+        }
     }
 
     var body: some View {
@@ -204,12 +244,27 @@ struct MediumFlexibleNavigationBar<Subtitle: View>: View {
         title: String,
         scrollOffset: CGFloat,
         actions: [NavigationAction]? = nil,
-        @ViewBuilder subtitle: () -> Subtitle = { EmptyView() as! Subtitle }
+        @ViewBuilder subtitle: @escaping () -> Subtitle
     ) {
         self.title = title
         self.scrollOffset = scrollOffset
         self.actions = actions
         self.subtitle = subtitle()
+    }
+
+    init(
+        title: String,
+        scrollOffset: CGFloat,
+        actions: [NavigationAction]? = nil
+    ) where Subtitle == EmptyView {
+        self.title = title
+        self.scrollOffset = scrollOffset
+        self.actions = actions
+        if let emptyView = EmptyView() as? Subtitle {
+            self.subtitle = emptyView
+        } else {
+            self.subtitle = nil
+        }
     }
 
     var body: some View {

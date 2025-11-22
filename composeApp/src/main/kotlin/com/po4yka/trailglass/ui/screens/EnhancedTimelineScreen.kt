@@ -6,6 +6,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.automirrored.filled.EventNote
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.StickyNote2
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CalendarToday
@@ -15,15 +20,11 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Church
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
-import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Flight
-import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.NightsStay
@@ -37,7 +38,6 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.automirrored.filled.StickyNote2
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material.icons.filled.Today
@@ -104,10 +104,12 @@ fun EnhancedTimelineScreen(
                         }
                         IconButton(onClick = { showFilterSheet = true }) {
                             Badge(
-                                containerColor = if (state.filter.isActive)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.surfaceVariant
+                                containerColor =
+                                    if (state.filter.isActive) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                    }
                             ) {
                                 if (state.filter.activeFilterCount > 0) {
                                     Text("${state.filter.activeFilterCount}")
@@ -130,7 +132,9 @@ fun EnhancedTimelineScreen(
                         if (isTracking) {
                             trackingController.stopTracking()
                         } else {
-                            trackingController.startTracking(com.po4yka.trailglass.location.tracking.TrackingMode.ACTIVE)
+                            trackingController.startTracking(
+                                com.po4yka.trailglass.location.tracking.TrackingMode.ACTIVE
+                            )
                         }
                     },
                     onAddPhoto = onAddPhoto,
@@ -217,9 +221,10 @@ private fun ZoomLevelSelector(
         tonalElevation = 2.dp
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TimelineZoomLevel.entries.forEach { zoom ->
@@ -227,9 +232,12 @@ private fun ZoomLevelSelector(
                     selected = currentZoom == zoom,
                     onClick = { onZoomChanged(zoom) },
                     label = { Text(zoom.displayName) },
-                    leadingIcon = if (currentZoom == zoom) {
-                        { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                    } else null
+                    leadingIcon =
+                        if (currentZoom == zoom) {
+                            { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                        } else {
+                            null
+                        }
                 )
             }
         }
@@ -250,9 +258,10 @@ private fun DateNavigationBar(
         tonalElevation = 1.dp
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 8.dp, vertical = 8.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -284,14 +293,16 @@ private fun DateNavigationBar(
     }
 }
 
-private fun formatDateForZoom(date: LocalDate, zoom: TimelineZoomLevel): String {
-    return when (zoom) {
+private fun formatDateForZoom(
+    date: LocalDate,
+    zoom: TimelineZoomLevel
+): String =
+    when (zoom) {
         TimelineZoomLevel.DAY -> date.toString()
         TimelineZoomLevel.WEEK -> "Week of $date"
         TimelineZoomLevel.MONTH -> "${date.month.name} ${date.year}"
         TimelineZoomLevel.YEAR -> "${date.year}"
     }
-}
 
 @Composable
 private fun ActiveFiltersChips(
@@ -304,9 +315,10 @@ private fun ActiveFiltersChips(
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 8.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -349,10 +361,11 @@ private fun TimelineSearchBar(
             }
         },
         singleLine = true,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface
-        )
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface
+            )
     )
 }
 
@@ -370,9 +383,10 @@ private fun TimelineFilterBottomSheet(
         modifier = Modifier.fillMaxHeight(0.8f)
     ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .padding(bottom = 24.dp)
+            modifier =
+                Modifier
+                    .padding(horizontal = 24.dp)
+                    .padding(bottom = 24.dp)
         ) {
             Text(
                 "Filter Timeline",
@@ -391,11 +405,12 @@ private fun TimelineFilterBottomSheet(
                                 FilterChip(
                                     selected = type in localFilter.transportTypes,
                                     onClick = {
-                                        localFilter = if (type in localFilter.transportTypes) {
-                                            localFilter.copy(transportTypes = localFilter.transportTypes - type)
-                                        } else {
-                                            localFilter.copy(transportTypes = localFilter.transportTypes + type)
-                                        }
+                                        localFilter =
+                                            if (type in localFilter.transportTypes) {
+                                                localFilter.copy(transportTypes = localFilter.transportTypes - type)
+                                            } else {
+                                                localFilter.copy(transportTypes = localFilter.transportTypes + type)
+                                            }
                                     },
                                     label = { Text(type.name) },
                                     leadingIcon = {
@@ -419,11 +434,18 @@ private fun TimelineFilterBottomSheet(
                                 FilterChip(
                                     selected = category in localFilter.placeCategories,
                                     onClick = {
-                                        localFilter = if (category in localFilter.placeCategories) {
-                                            localFilter.copy(placeCategories = localFilter.placeCategories - category)
-                                        } else {
-                                            localFilter.copy(placeCategories = localFilter.placeCategories + category)
-                                        }
+                                        localFilter =
+                                            if (category in localFilter.placeCategories) {
+                                                localFilter.copy(
+                                                    placeCategories =
+                                                        localFilter.placeCategories - category
+                                                )
+                                            } else {
+                                                localFilter.copy(
+                                                    placeCategories =
+                                                        localFilter.placeCategories + category
+                                                )
+                                            }
                                     },
                                     label = { Text(category.name.lowercase().replaceFirstChar { it.uppercase() }) },
                                     leadingIcon = {
@@ -556,9 +578,10 @@ private fun DayMarkerCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -582,9 +605,10 @@ private fun EnhancedVisitCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header
@@ -643,9 +667,10 @@ private fun EnhancedVisitCard(
             // User notes
             if (visit.userNotes != null) {
                 Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
                     shape = MaterialTheme.shapes.small,
                     color = MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)
                 ) {
@@ -697,7 +722,9 @@ private fun EnhancedVisitCard(
                         onClick = { },
                         label = {
                             Text(
-                                visit.category.name.lowercase().replaceFirstChar { it.uppercase() },
+                                visit.category.name
+                                    .lowercase()
+                                    .replaceFirstChar { it.uppercase() },
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -715,9 +742,10 @@ private fun EnhancedRouteCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
@@ -733,7 +761,10 @@ private fun EnhancedRouteCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = route.transportType.name.lowercase().replaceFirstChar { it.uppercase() },
+                    text =
+                        route.transportType.name
+                            .lowercase()
+                            .replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -777,9 +808,10 @@ private fun DaySummaryCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -832,9 +864,10 @@ private fun WeekSummaryCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -894,9 +927,10 @@ private fun MonthSummaryCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -1012,8 +1046,8 @@ private fun SummaryStatItem(
     }
 }
 
-private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector {
-    return when (category) {
+private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector =
+    when (category) {
         PlaceCategory.HOME -> Icons.Default.Home
         PlaceCategory.WORK -> Icons.Default.Work
         PlaceCategory.FOOD -> Icons.Default.Restaurant
@@ -1029,7 +1063,6 @@ private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphi
         PlaceCategory.SERVICE -> Icons.Default.Build
         PlaceCategory.OTHER -> Icons.Default.Place
     }
-}
 
 private fun getTransportIcon(transportType: TransportType) =
     when (transportType) {

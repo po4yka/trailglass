@@ -40,9 +40,7 @@ object ResourceHelper {
      * @param resource The string resource to get
      * @return StringDesc that can be converted to platform-specific string
      */
-    fun getString(resource: StringResource): StringDesc {
-        return resource.desc()
-    }
+    fun getString(resource: StringResource): StringDesc = resource.desc()
 
     /**
      * Get a StringDesc with formatted arguments.
@@ -53,7 +51,5 @@ object ResourceHelper {
      * @param resource The string resource
      * @return StringDesc for the resource
      */
-    fun getFormattedString(resource: StringResource): StringDesc {
-        return resource.desc()
-    }
+    fun getFormattedString(resource: StringResource): StringDesc = resource.desc()
 }

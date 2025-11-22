@@ -56,8 +56,9 @@ class PlaceVisitDetector {
             if (duration >= MIN_VISIT_DURATION_MS) {
                 // Check if this is far enough from last visit
                 if (lastConfirmedVisitLocation == null ||
-                    calculateDistance(lastConfirmedVisitLocation!!, potentialVisitLocation!!) >= MIN_DISTANCE_FROM_LAST_VISIT) {
-
+                    calculateDistance(lastConfirmedVisitLocation!!, potentialVisitLocation!!) >=
+                    MIN_DISTANCE_FROM_LAST_VISIT
+                ) {
                     // Place visit detected!
                     lastConfirmedVisitLocation = potentialVisitLocation
                     val visitLocation = potentialVisitLocation!!
@@ -67,7 +68,7 @@ class PlaceVisitDetector {
                     potentialVisitLocation = location.coordinate
                     potentialVisitStartTime = now
 
-                    logger.info { "Place visit detected at ${visitLocation}" }
+                    logger.info { "Place visit detected at $visitLocation" }
                     return PlaceVisitEvent.VisitDetected(
                         location = visitLocation,
                         arrivalTime = visitStartTime,
@@ -98,7 +99,10 @@ class PlaceVisitDetector {
     /**
      * Calculate distance between two coordinates in meters.
      */
-    private fun calculateDistance(start: Coordinate, end: Coordinate): Double {
+    private fun calculateDistance(
+        start: Coordinate,
+        end: Coordinate
+    ): Double {
         val earthRadiusMeters = 6371000.0
 
         val lat1 = (start.latitude * PI / 180.0)
@@ -106,7 +110,8 @@ class PlaceVisitDetector {
         val dLat = (end.latitude - start.latitude * PI / 180.0)
         val dLon = (end.longitude - start.longitude * PI / 180.0)
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))
 

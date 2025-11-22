@@ -17,7 +17,6 @@ import me.tatarka.inject.annotations.Inject
 class TravelPatternAnalyzer(
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {
-
     /**
      * Analyze travel patterns from visits and routes.
      */
@@ -59,14 +58,16 @@ class TravelPatternAnalyzer(
         // Add visit starts
         visits.forEach { visit ->
             val hour = visit.startTime.toLocalDateTime(timeZone).hour
-            activityByHour.getOrPut(hour) { mutableListOf() }
+            activityByHour
+                .getOrPut(hour) { mutableListOf() }
                 .add(ActivityEvent.Visit)
         }
 
         // Add route starts
         routes.forEach { route ->
             val hour = route.startTime.toLocalDateTime(timeZone).hour
-            activityByHour.getOrPut(hour) { mutableListOf() }
+            activityByHour
+                .getOrPut(hour) { mutableListOf() }
                 .add(ActivityEvent.Route(route.distanceMeters))
         }
 
@@ -77,8 +78,10 @@ class TravelPatternAnalyzer(
                 totalEvents = events.size,
                 visits = events.count { it is ActivityEvent.Visit },
                 routes = events.count { it is ActivityEvent.Route },
-                totalDistance = events.filterIsInstance<ActivityEvent.Route>()
-                    .sumOf { it.distance }
+                totalDistance =
+                    events
+                        .filterIsInstance<ActivityEvent.Route>()
+                        .sumOf { it.distance }
             )
         }
     }
@@ -95,14 +98,16 @@ class TravelPatternAnalyzer(
         // Add visit starts
         visits.forEach { visit ->
             val dayOfWeek = visit.startTime.toLocalDateTime(timeZone).dayOfWeek
-            activityByDay.getOrPut(dayOfWeek) { mutableListOf() }
+            activityByDay
+                .getOrPut(dayOfWeek) { mutableListOf() }
                 .add(ActivityEvent.Visit)
         }
 
         // Add route starts
         routes.forEach { route ->
             val dayOfWeek = route.startTime.toLocalDateTime(timeZone).dayOfWeek
-            activityByDay.getOrPut(dayOfWeek) { mutableListOf() }
+            activityByDay
+                .getOrPut(dayOfWeek) { mutableListOf() }
                 .add(ActivityEvent.Route(route.distanceMeters))
         }
 
@@ -113,8 +118,10 @@ class TravelPatternAnalyzer(
                 totalEvents = events.size,
                 visits = events.count { it is ActivityEvent.Visit },
                 routes = events.count { it is ActivityEvent.Route },
-                totalDistance = events.filterIsInstance<ActivityEvent.Route>()
-                    .sumOf { it.distance }
+                totalDistance =
+                    events
+                        .filterIsInstance<ActivityEvent.Route>()
+                        .sumOf { it.distance }
             )
         }
     }
@@ -126,13 +133,14 @@ class TravelPatternAnalyzer(
         visits: List<PlaceVisit>,
         routes: List<RouteSegment>
     ): WeekdaySplit {
-        val weekdays = setOf(
-            DayOfWeek.MONDAY,
-            DayOfWeek.TUESDAY,
-            DayOfWeek.WEDNESDAY,
-            DayOfWeek.THURSDAY,
-            DayOfWeek.FRIDAY
-        )
+        val weekdays =
+            setOf(
+                DayOfWeek.MONDAY,
+                DayOfWeek.TUESDAY,
+                DayOfWeek.WEDNESDAY,
+                DayOfWeek.THURSDAY,
+                DayOfWeek.FRIDAY
+            )
 
         // Count trips (visits + routes)
         var weekdayTrips = 0
@@ -171,7 +179,10 @@ class TravelPatternAnalyzer(
     /**
      * Get most active time range.
      */
-    fun getMostActiveTimeRange(visits: List<PlaceVisit>, routes: List<RouteSegment>): String {
+    fun getMostActiveTimeRange(
+        visits: List<PlaceVisit>,
+        routes: List<RouteSegment>
+    ): String {
         val hourlyActivity = analyzeHourlyActivity(visits, routes)
         val peakHour = hourlyActivity.maxByOrNull { it.value.totalEvents }?.key ?: return "Unknown"
 
@@ -188,6 +199,9 @@ class TravelPatternAnalyzer(
      */
     private sealed class ActivityEvent {
         object Visit : ActivityEvent()
-        data class Route(val distance: Double) : ActivityEvent()
+
+        data class Route(
+            val distance: Double
+        ) : ActivityEvent()
     }
 }

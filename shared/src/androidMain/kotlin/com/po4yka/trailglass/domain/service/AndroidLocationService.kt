@@ -22,60 +22,64 @@ import me.tatarka.inject.annotations.Inject
 class AndroidLocationService(
     private val context: Context
 ) : LocationService {
-
     private val fusedLocationClient: FusedLocationProviderClient =
         LocationServices.getFusedLocationProviderClient(context)
 
     @Volatile
     private var isCurrentlyTracking = false
 
-    override val locationUpdates: Flow<Coordinate> = callbackFlow {
-        val locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                locationResult.lastLocation?.let { location ->
-                    val coordinate = Coordinate(
-                        latitude = location.latitude,
-                        longitude = location.longitude
-                    )
-                    trySend(coordinate)
+    override val locationUpdates: Flow<Coordinate> =
+        callbackFlow {
+            val locationCallback =
+                object : LocationCallback() {
+                    override fun onLocationResult(locationResult: LocationResult) {
+                        locationResult.lastLocation?.let { location ->
+                            val coordinate =
+                                Coordinate(
+                                    latitude = location.latitude,
+                                    longitude = location.longitude
+                                )
+                            trySend(coordinate)
+                        }
+                    }
                 }
+
+            // Check permissions before starting
+            if (!hasLocationPermission()) {
+                close(SecurityException("Location permission not granted"))
+                return@callbackFlow
+            }
+
+            // Create location request
+            val locationRequest =
+                LocationRequest
+                    .Builder(
+                        Priority.PRIORITY_HIGH_ACCURACY,
+                        5000L // 5 seconds default interval
+                    ).apply {
+                        setMinUpdateIntervalMillis(2000L) // 2 seconds fastest interval
+                        setMaxUpdateDelayMillis(10000L) // 10 seconds max delay
+                    }.build()
+
+            // Request location updates
+            try {
+                fusedLocationClient.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    Looper.getMainLooper()
+                )
+                isCurrentlyTracking = true
+            } catch (e: SecurityException) {
+                close(e)
+                return@callbackFlow
+            }
+
+            // Clean up when flow is cancelled
+            awaitClose {
+                fusedLocationClient.removeLocationUpdates(locationCallback)
+                isCurrentlyTracking = false
             }
         }
-
-        // Check permissions before starting
-        if (!hasLocationPermission()) {
-            close(SecurityException("Location permission not granted"))
-            return@callbackFlow
-        }
-
-        // Create location request
-        val locationRequest = LocationRequest.Builder(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            5000L // 5 seconds default interval
-        ).apply {
-            setMinUpdateIntervalMillis(2000L) // 2 seconds fastest interval
-            setMaxUpdateDelayMillis(10000L) // 10 seconds max delay
-        }.build()
-
-        // Request location updates
-        try {
-            fusedLocationClient.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                Looper.getMainLooper()
-            )
-            isCurrentlyTracking = true
-        } catch (e: SecurityException) {
-            close(e)
-            return@callbackFlow
-        }
-
-        // Clean up when flow is cancelled
-        awaitClose {
-            fusedLocationClient.removeLocationUpdates(locationCallback)
-            isCurrentlyTracking = false
-        }
-    }
 
     override suspend fun getLastKnownLocation(): Coordinate? {
         if (!hasLocationPermission()) {
@@ -95,7 +99,10 @@ class AndroidLocationService(
         }
     }
 
-    override suspend fun startTracking(intervalMs: Long, fastestIntervalMs: Long) {
+    override suspend fun startTracking(
+        intervalMs: Long,
+        fastestIntervalMs: Long
+    ) {
         if (!hasLocationPermission()) {
             throw SecurityException("Location permission not granted")
         }
@@ -110,16 +117,15 @@ class AndroidLocationService(
         // The Flow will handle cleanup when collectors are cancelled
     }
 
-    override suspend fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
+    override suspend fun hasLocationPermission(): Boolean =
+        ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED ||
-        ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-    }
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
 
     override suspend fun requestLocationPermission(background: Boolean): Boolean {
         // Android requires Activity context to request permissions.
@@ -134,7 +140,7 @@ class AndroidLocationService(
         android.util.Log.w(
             "AndroidLocationService",
             "Permission request attempted from service. " +
-            "Permissions must be requested from Activity/Compose UI layer."
+                "Permissions must be requested from Activity/Compose UI layer."
         )
 
         return false

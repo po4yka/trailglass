@@ -8,13 +8,12 @@ import kotlin.math.abs
 import kotlin.test.Test
 
 class BearingAlgorithmTest {
-
     @Test
     fun `initial bearing should calculate north correctly`() {
         val algorithm = InitialBearing()
 
         val start = Coordinate(40.0, -74.0)
-        val end = Coordinate(41.0, -74.0)  // 1 degree north
+        val end = Coordinate(41.0, -74.0) // 1 degree north
 
         val bearing = algorithm.calculate(start, end)
 
@@ -27,7 +26,7 @@ class BearingAlgorithmTest {
         val algorithm = InitialBearing()
 
         val start = Coordinate(40.0, -74.0)
-        val end = Coordinate(40.0, -73.0)  // 1 degree east
+        val end = Coordinate(40.0, -73.0) // 1 degree east
 
         val bearing = algorithm.calculate(start, end)
 
@@ -40,7 +39,7 @@ class BearingAlgorithmTest {
         val algorithm = InitialBearing()
 
         val start = Coordinate(40.0, -74.0)
-        val end = Coordinate(39.0, -74.0)  // 1 degree south
+        val end = Coordinate(39.0, -74.0) // 1 degree south
 
         val bearing = algorithm.calculate(start, end)
 
@@ -53,7 +52,7 @@ class BearingAlgorithmTest {
         val algorithm = InitialBearing()
 
         val start = Coordinate(40.0, -74.0)
-        val end = Coordinate(40.0, -75.0)  // 1 degree west
+        val end = Coordinate(40.0, -75.0) // 1 degree west
 
         val bearing = algorithm.calculate(start, end)
 
@@ -130,7 +129,7 @@ class BearingAlgorithmTest {
 
         // Long east-west journey where rhumb line differs from great circle
         val start = Coordinate(40.0, -74.0)
-        val end = Coordinate(40.0, 74.0)  // Halfway around world at same latitude
+        val end = Coordinate(40.0, 74.0) // Halfway around world at same latitude
 
         val rhumbBearing = rhumb.calculate(start, end)
         val greatCircleBearing = initial.calculate(start, end)
@@ -138,15 +137,15 @@ class BearingAlgorithmTest {
         // Rhumb line at constant latitude goes east (90°)
         // Great circle would arc north then south
         abs(rhumbBearing - 90.0) shouldBeLessThan 1.0
-        abs(greatCircleBearing - 90.0) shouldBeGreaterThan 1.0  // Should differ
+        abs(greatCircleBearing - 90.0) shouldBeGreaterThan 1.0 // Should differ
     }
 
     @Test
     fun `rhumb line should handle dateline crossing`() {
         val algorithm = RhumbLineBearing()
 
-        val west = Coordinate(40.0, 170.0)   // Just west of dateline
-        val east = Coordinate(40.0, -170.0)  // Just east of dateline
+        val west = Coordinate(40.0, 170.0) // Just west of dateline
+        val east = Coordinate(40.0, -170.0) // Just east of dateline
 
         val bearing = algorithm.calculate(west, east)
 

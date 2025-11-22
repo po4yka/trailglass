@@ -7,7 +7,7 @@ import SwiftUI
 struct PieChartView: View {
     let data: [PieData]
     let showLegend: Bool
-    @State private var selectedIndex: Int? = nil
+    @State private var selectedIndex: Int?
     @State private var animatedValues: [Float]
 
     init(data: [PieData], showLegend: Bool = true) {

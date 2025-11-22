@@ -15,11 +15,14 @@ import me.tatarka.inject.annotations.Inject
  */
 @Suppress("DEPRECATION")
 @Inject
-actual class SecureTokenStorage(private val context: Context) {
-
-    private val masterKey = MasterKey.Builder(context)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
+actual class SecureTokenStorage(
+    private val context: Context
+) {
+    private val masterKey =
+        MasterKey
+            .Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
 
     private val sharedPreferences: SharedPreferences by lazy {
         EncryptedSharedPreferences.create(
@@ -31,37 +34,40 @@ actual class SecureTokenStorage(private val context: Context) {
         )
     }
 
-    actual suspend fun saveTokens(tokens: AuthTokens): Unit = withContext(Dispatchers.IO) {
-        sharedPreferences.edit().apply {
-            putString(KEY_ACCESS_TOKEN, tokens.accessToken)
-            putString(KEY_REFRESH_TOKEN, tokens.refreshToken)
-            putLong(KEY_EXPIRES_AT, tokens.expiresAt)
-            apply()
+    actual suspend fun saveTokens(tokens: AuthTokens): Unit =
+        withContext(Dispatchers.IO) {
+            sharedPreferences.edit().apply {
+                putString(KEY_ACCESS_TOKEN, tokens.accessToken)
+                putString(KEY_REFRESH_TOKEN, tokens.refreshToken)
+                putLong(KEY_EXPIRES_AT, tokens.expiresAt)
+                apply()
+            }
+            Unit
         }
-        Unit
-    }
 
-    actual suspend fun getTokens(): AuthTokens? = withContext(Dispatchers.IO) {
-        val accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
-        val refreshToken = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
-        val expiresAt = sharedPreferences.getLong(KEY_EXPIRES_AT, 0)
+    actual suspend fun getTokens(): AuthTokens? =
+        withContext(Dispatchers.IO) {
+            val accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
+            val refreshToken = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
+            val expiresAt = sharedPreferences.getLong(KEY_EXPIRES_AT, 0)
 
-        if (accessToken != null && refreshToken != null && expiresAt > 0) {
-            AuthTokens(accessToken, refreshToken, expiresAt)
-        } else {
-            null
+            if (accessToken != null && refreshToken != null && expiresAt > 0) {
+                AuthTokens(accessToken, refreshToken, expiresAt)
+            } else {
+                null
+            }
         }
-    }
 
-    actual suspend fun clearTokens(): Unit = withContext(Dispatchers.IO) {
-        sharedPreferences.edit().apply {
-            remove(KEY_ACCESS_TOKEN)
-            remove(KEY_REFRESH_TOKEN)
-            remove(KEY_EXPIRES_AT)
-            apply()
+    actual suspend fun clearTokens(): Unit =
+        withContext(Dispatchers.IO) {
+            sharedPreferences.edit().apply {
+                remove(KEY_ACCESS_TOKEN)
+                remove(KEY_REFRESH_TOKEN)
+                remove(KEY_EXPIRES_AT)
+                apply()
+            }
+            Unit
         }
-        Unit
-    }
 
     companion object {
         private const val KEY_ACCESS_TOKEN = "access_token"

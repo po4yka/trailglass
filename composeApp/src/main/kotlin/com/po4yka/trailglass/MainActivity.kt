@@ -13,7 +13,6 @@ import com.po4yka.trailglass.ui.navigation.AppRootComponent
 import com.po4yka.trailglass.ui.navigation.DefaultAppRootComponent
 
 class MainActivity : ComponentActivity() {
-
     /**
      * Access to the application-level DI component.
      * Use this to get dependencies like controllers and repositories.
@@ -29,10 +28,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         // Create the app root component with authentication support
-        appRootComponent = DefaultAppRootComponent(
-            componentContext = defaultComponentContext(),
-            appComponent = appComponent
-        )
+        appRootComponent =
+            DefaultAppRootComponent(
+                componentContext = defaultComponentContext(),
+                appComponent = appComponent
+            )
 
         // Handle deep link if present in launch intent
         handleIntent(intent)

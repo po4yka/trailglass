@@ -17,7 +17,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -43,20 +42,22 @@ fun TransportModeSelector(
     selectedMode: TransportType?,
     onModeSelected: (TransportType) -> Unit,
     modifier: Modifier = Modifier,
-    modes: List<TransportType> = listOf(
-        TransportType.WALK,
-        TransportType.BIKE,
-        TransportType.CAR,
-        TransportType.TRAIN,
-        TransportType.BOAT,
-        TransportType.PLANE
-    ),
+    modes: List<TransportType> =
+        listOf(
+            TransportType.WALK,
+            TransportType.BIKE,
+            TransportType.CAR,
+            TransportType.TRAIN,
+            TransportType.BOAT,
+            TransportType.PLANE
+        ),
     showLabels: Boolean = true
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         modes.forEach { mode ->
@@ -84,61 +85,70 @@ private fun TransportModeButton(
     modifier: Modifier = Modifier
 ) {
     val containerColor by animateColorAsState(
-        targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
+        targetValue =
+            if (isSelected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
         label = "container_color"
     )
 
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.onPrimaryContainer
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant
-        },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
+        targetValue =
+            if (isSelected) {
+                MaterialTheme.colorScheme.onPrimaryContainer
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
         label = "content_color"
     )
 
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) {
-            MaterialTheme.colorScheme.primary
-        } else {
-            MaterialTheme.colorScheme.outline
-        },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
+        targetValue =
+            if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.outline
+            },
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
         label = "border_color"
     )
 
     Surface(
         onClick = onClick,
-        modifier = modifier
-            .semantics { role = Role.Button }
-            .heightIn(min = if (showLabel) 72.dp else 48.dp),
+        modifier =
+            modifier
+                .semantics { role = Role.Button }
+                .heightIn(min = if (showLabel) 72.dp else 48.dp),
         shape = RoundedCornerShape(12.dp),
         color = containerColor,
         contentColor = contentColor,
-        border = BorderStroke(
-            width = if (isSelected) 2.dp else 1.dp,
-            color = borderColor
-        )
+        border =
+            BorderStroke(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = borderColor
+            )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 4.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 4.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
         ) {
@@ -172,12 +182,13 @@ fun CompactTransportModeSelector(
     selectedMode: TransportType?,
     onModeSelected: (TransportType) -> Unit,
     modifier: Modifier = Modifier,
-    modes: List<TransportType> = listOf(
-        TransportType.WALK,
-        TransportType.BIKE,
-        TransportType.CAR,
-        TransportType.TRAIN
-    )
+    modes: List<TransportType> =
+        listOf(
+            TransportType.WALK,
+            TransportType.BIKE,
+            TransportType.CAR,
+            TransportType.TRAIN
+        )
 ) {
     TransportModeSelector(
         selectedMode = selectedMode,
@@ -191,8 +202,8 @@ fun CompactTransportModeSelector(
 /**
  * Get Material icon for transport type.
  */
-private fun getTransportIcon(type: TransportType): ImageVector {
-    return when (type) {
+private fun getTransportIcon(type: TransportType): ImageVector =
+    when (type) {
         TransportType.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
         TransportType.BIKE -> Icons.AutoMirrored.Filled.DirectionsBike
         TransportType.CAR -> Icons.Default.DirectionsCar
@@ -201,13 +212,12 @@ private fun getTransportIcon(type: TransportType): ImageVector {
         TransportType.BOAT -> Icons.Default.DirectionsBoat
         TransportType.UNKNOWN -> Icons.Default.DirectionsCar
     }
-}
 
 /**
  * Get display label for transport type.
  */
-private fun getTransportLabel(type: TransportType): String {
-    return when (type) {
+private fun getTransportLabel(type: TransportType): String =
+    when (type) {
         TransportType.WALK -> "Walk"
         TransportType.BIKE -> "Bike"
         TransportType.CAR -> "Car"
@@ -216,4 +226,3 @@ private fun getTransportLabel(type: TransportType): String {
         TransportType.BOAT -> "Boat"
         TransportType.UNKNOWN -> "Other"
     }
-}

@@ -12,7 +12,6 @@ import me.tatarka.inject.annotations.Inject
 class GetPhotosForVisitUseCase(
     private val photoRepository: PhotoRepository
 ) {
-
     private val logger = logger()
 
     /**

@@ -17,7 +17,6 @@ import me.tatarka.inject.annotations.Provides
  * - UserSession for tracking the current user
  */
 interface AuthModule {
-
     /**
      * Provides UserSession for tracking authenticated user.
      */

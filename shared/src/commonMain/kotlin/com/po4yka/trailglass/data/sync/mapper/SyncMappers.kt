@@ -8,7 +8,7 @@ import kotlinx.datetime.Instant
  * Mappers for converting between domain models and sync DTOs.
  */
 
-// ========== PlaceVisit Mappers ==========
+// PlaceVisit Mappers
 
 fun PlaceVisit.toDto(
     syncAction: SyncAction = SyncAction.CREATE,
@@ -17,24 +17,26 @@ fun PlaceVisit.toDto(
     deviceId: String,
     photoIds: List<String> = emptyList(),
     tripId: String? = null
-): PlaceVisitDto {
-    return PlaceVisitDto(
+): PlaceVisitDto =
+    PlaceVisitDto(
         id = id,
-        location = CoordinateDto(
-            latitude = centerLatitude,
-            longitude = centerLongitude
-        ),
+        location =
+            CoordinateDto(
+                latitude = centerLatitude,
+                longitude = centerLongitude
+            ),
         placeName = poiName ?: userLabel,
         address = approximateAddress,
         category = category.name,
         arrivalTime = startTime.toString(),
         departureTime = endTime.toString(),
         durationMinutes = ((endTime - startTime).inWholeMinutes).toInt(),
-        confidence = when (categoryConfidence) {
-            CategoryConfidence.HIGH -> 0.9
-            CategoryConfidence.MEDIUM -> 0.7
-            CategoryConfidence.LOW -> 0.5
-        },
+        confidence =
+            when (categoryConfidence) {
+                CategoryConfidence.HIGH -> 0.9
+                CategoryConfidence.MEDIUM -> 0.7
+                CategoryConfidence.LOW -> 0.5
+            },
         isFavorite = isFavorite,
         notes = userNotes,
         photos = photoIds,
@@ -45,10 +47,9 @@ fun PlaceVisit.toDto(
         lastModified = updatedAt?.toString() ?: createdAt?.toString(),
         deviceId = deviceId
     )
-}
 
-fun PlaceVisitDto.toDomain(): PlaceVisit {
-    return PlaceVisit(
+fun PlaceVisitDto.toDomain(): PlaceVisit =
+    PlaceVisit(
         id = id,
         startTime = Instant.parse(arrivalTime),
         endTime = departureTime?.let { Instant.parse(it) } ?: Instant.parse(arrivalTime),
@@ -58,12 +59,18 @@ fun PlaceVisitDto.toDomain(): PlaceVisit {
         poiName = placeName,
         city = null, // Not in DTO
         countryCode = null, // Not in DTO
-        category = try { PlaceCategory.valueOf(category) } catch (e: Exception) { PlaceCategory.OTHER },
-        categoryConfidence = when {
-            confidence >= 0.8 -> CategoryConfidence.HIGH
-            confidence >= 0.6 -> CategoryConfidence.MEDIUM
-            else -> CategoryConfidence.LOW
-        },
+        category =
+            try {
+                PlaceCategory.valueOf(category)
+            } catch (e: Exception) {
+                PlaceCategory.OTHER
+            },
+        categoryConfidence =
+            when {
+                confidence >= 0.8 -> CategoryConfidence.HIGH
+                confidence >= 0.6 -> CategoryConfidence.MEDIUM
+                else -> CategoryConfidence.LOW
+            },
         significance = PlaceSignificance.RARE, // Default
         userLabel = if (placeName != null && placeName != address) placeName else null,
         userNotes = notes,
@@ -73,7 +80,6 @@ fun PlaceVisitDto.toDomain(): PlaceVisit {
         createdAt = lastModified?.let { Instant.parse(it) },
         updatedAt = lastModified?.let { Instant.parse(it) }
     )
-}
 
 // ========== Trip Mappers ==========
 
@@ -84,8 +90,8 @@ fun Trip.toDto(
     deviceId: String,
     visitIds: List<String> = emptyList(),
     photoIds: List<String> = emptyList()
-): TripDto {
-    return TripDto(
+): TripDto =
+    TripDto(
         id = id,
         name = name ?: "Unnamed Trip",
         startDate = startTime.toString(),
@@ -101,10 +107,9 @@ fun Trip.toDto(
         lastModified = updatedAt?.toString() ?: createdAt?.toString(),
         deviceId = deviceId
     )
-}
 
-fun TripDto.toDomain(): Trip {
-    return Trip(
+fun TripDto.toDomain(): Trip =
+    Trip(
         id = id,
         name = name,
         startTime = Instant.parse(startDate),
@@ -119,7 +124,6 @@ fun TripDto.toDomain(): Trip {
         createdAt = lastModified?.let { Instant.parse(it) },
         updatedAt = lastModified?.let { Instant.parse(it) }
     )
-}
 
 // ========== Photo Mappers ==========
 
@@ -128,13 +132,16 @@ fun Photo.toMetadataDto(
     localVersion: Long = 1,
     serverVersion: Long? = null,
     deviceId: String
-): PhotoMetadataDto {
-    return PhotoMetadataDto(
+): PhotoMetadataDto =
+    PhotoMetadataDto(
         id = id,
         timestamp = timestamp.toString(),
-        location = if (latitude != null && longitude != null) {
-            CoordinateDto(latitude, longitude)
-        } else null,
+        location =
+            if (latitude != null && longitude != null) {
+                CoordinateDto(latitude, longitude)
+            } else {
+                null
+            },
         placeVisitId = null, // Not stored in Photo, use PhotoAttachment instead
         tripId = null, // Not stored in Photo
         caption = null, // Not stored in Photo, use PhotoAttachment instead
@@ -147,10 +154,9 @@ fun Photo.toMetadataDto(
         lastModified = addedAt.toString(),
         deviceId = deviceId
     )
-}
 
-fun PhotoMetadataDto.toDomain(localPath: String): Photo {
-    return Photo(
+fun PhotoMetadataDto.toDomain(localPath: String): Photo =
+    Photo(
         id = id,
         uri = url ?: localPath,
         timestamp = Instant.parse(timestamp),
@@ -159,7 +165,6 @@ fun PhotoMetadataDto.toDomain(localPath: String): Photo {
         userId = deviceId ?: "unknown",
         addedAt = lastModified?.let { Instant.parse(it) } ?: Instant.parse(timestamp)
     )
-}
 
 // ========== Location Mappers ==========
 
@@ -168,8 +173,8 @@ fun LocationSample.toDto(
     localVersion: Long = 1,
     serverVersion: Long? = null,
     deviceId: String
-): LocationDto {
-    return LocationDto(
+): LocationDto =
+    LocationDto(
         id = id,
         timestamp = timestamp.toString(),
         latitude = latitude,
@@ -186,10 +191,9 @@ fun LocationSample.toDto(
         serverVersion = serverVersion,
         deviceId = deviceId
     )
-}
 
-fun LocationDto.toDomain(userId: String): LocationSample {
-    return LocationSample(
+fun LocationDto.toDomain(userId: String): LocationSample =
+    LocationSample(
         id = id,
         timestamp = Instant.parse(timestamp),
         latitude = latitude,
@@ -197,103 +201,138 @@ fun LocationDto.toDomain(userId: String): LocationSample {
         accuracy = accuracy,
         speed = speed,
         bearing = bearing,
-        source = try { LocationSource.valueOf(provider) } catch (e: Exception) { LocationSource.GPS },
+        source =
+            try {
+                LocationSource.valueOf(provider)
+            } catch (e: Exception) {
+                LocationSource.GPS
+            },
         tripId = null,
         uploadedAt = serverVersion?.let { Instant.parse(timestamp) },
         deviceId = deviceId ?: "unknown",
         userId = userId
     )
-}
 
 // ========== Settings Mappers ==========
 
 fun AppSettings.toDto(
     serverVersion: Long? = null,
     lastModified: Instant
-): SettingsDto {
-    return SettingsDto(
-        trackingPreferences = TrackingPreferencesDto(
-            accuracy = trackingPreferences.accuracy.name,
-            updateInterval = trackingPreferences.updateInterval.name,
-            batteryOptimization = trackingPreferences.batteryOptimization,
-            trackWhenStationary = trackingPreferences.trackWhenStationary,
-            minimumDistance = trackingPreferences.minimumDistance
-        ),
-        privacySettings = PrivacySettingsDto(
-            dataRetentionDays = privacySettings.dataRetentionDays,
-            allowAnonymousAnalytics = privacySettings.shareAnalytics,
-            shareLocation = accountSettings.autoSync,
-            requireAuthentication = true,
-            autoBackup = privacySettings.autoBackup
-        ),
-        unitPreferences = UnitPreferencesDto(
-            distanceUnit = unitPreferences.distanceUnit.name,
-            temperatureUnit = unitPreferences.temperatureUnit.name,
-            timeFormat = unitPreferences.timeFormat.name,
-            firstDayOfWeek = "MONDAY" // Default
-        ),
-        appearanceSettings = AppearanceSettingsDto(
-            theme = appearanceSettings.theme.name,
-            accentColor = "#6200EE", // Default material purple
-            mapStyle = "STANDARD",
-            enableAnimations = !appearanceSettings.compactView
-        ),
+): SettingsDto =
+    SettingsDto(
+        trackingPreferences =
+            TrackingPreferencesDto(
+                accuracy = trackingPreferences.accuracy.name,
+                updateInterval = trackingPreferences.updateInterval.name,
+                batteryOptimization = trackingPreferences.batteryOptimization,
+                trackWhenStationary = trackingPreferences.trackWhenStationary,
+                minimumDistance = trackingPreferences.minimumDistance
+            ),
+        privacySettings =
+            PrivacySettingsDto(
+                dataRetentionDays = privacySettings.dataRetentionDays,
+                allowAnonymousAnalytics = privacySettings.shareAnalytics,
+                shareLocation = accountSettings.autoSync,
+                requireAuthentication = true,
+                autoBackup = privacySettings.autoBackup
+            ),
+        unitPreferences =
+            UnitPreferencesDto(
+                distanceUnit = unitPreferences.distanceUnit.name,
+                temperatureUnit = unitPreferences.temperatureUnit.name,
+                timeFormat = unitPreferences.timeFormat.name,
+                firstDayOfWeek = "MONDAY" // Default
+            ),
+        appearanceSettings =
+            AppearanceSettingsDto(
+                theme = appearanceSettings.theme.name,
+                accentColor = "#6200EE", // Default material purple
+                mapStyle = "STANDARD",
+                enableAnimations = !appearanceSettings.compactView
+            ),
         serverVersion = serverVersion,
         lastModified = lastModified.toString()
     )
-}
 
-fun SettingsDto.toDomain(): AppSettings {
-    return AppSettings(
-        trackingPreferences = TrackingPreferences(
-            accuracy = trackingPreferences?.let {
-                try { TrackingAccuracy.valueOf(it.accuracy) }
-                catch (e: Exception) { TrackingAccuracy.BALANCED }
-            } ?: TrackingAccuracy.BALANCED,
-            updateInterval = trackingPreferences?.let {
-                try { UpdateInterval.valueOf(it.updateInterval) }
-                catch (e: Exception) { UpdateInterval.NORMAL }
-            } ?: UpdateInterval.NORMAL,
-            batteryOptimization = trackingPreferences?.batteryOptimization ?: true,
-            trackWhenStationary = trackingPreferences?.trackWhenStationary ?: false,
-            minimumDistance = trackingPreferences?.minimumDistance ?: 10
-        ),
-        privacySettings = PrivacySettings(
-            dataRetentionDays = privacySettings?.dataRetentionDays ?: 365,
-            shareAnalytics = privacySettings?.allowAnonymousAnalytics ?: false,
-            shareCrashReports = true,
-            autoBackup = privacySettings?.autoBackup ?: true,
-            encryptBackups = true
-        ),
-        unitPreferences = UnitPreferences(
-            distanceUnit = unitPreferences?.let {
-                try { DistanceUnit.valueOf(it.distanceUnit) }
-                catch (e: Exception) { DistanceUnit.METRIC }
-            } ?: DistanceUnit.METRIC,
-            temperatureUnit = unitPreferences?.let {
-                try { TemperatureUnit.valueOf(it.temperatureUnit) }
-                catch (e: Exception) { TemperatureUnit.CELSIUS }
-            } ?: TemperatureUnit.CELSIUS,
-            timeFormat = unitPreferences?.let {
-                try { TimeFormat.valueOf(it.timeFormat) }
-                catch (e: Exception) { TimeFormat.TWENTY_FOUR_HOUR }
-            } ?: TimeFormat.TWENTY_FOUR_HOUR
-        ),
-        appearanceSettings = AppearanceSettings(
-            theme = appearanceSettings?.let {
-                try { AppTheme.valueOf(it.theme) }
-                catch (e: Exception) { AppTheme.SYSTEM }
-            } ?: AppTheme.SYSTEM,
-            useDeviceWallpaper = false,
-            showMapInTimeline = true,
-            compactView = appearanceSettings?.enableAnimations?.not() ?: false
-        ),
-        accountSettings = AccountSettings(
-            email = null,
-            autoSync = privacySettings?.shareLocation ?: true,
-            syncOnWifiOnly = true,
-            lastSyncTime = lastModified?.let { Instant.parse(it) }
-        ),
+fun SettingsDto.toDomain(): AppSettings =
+    AppSettings(
+        trackingPreferences =
+            TrackingPreferences(
+                accuracy =
+                    trackingPreferences?.let {
+                        try {
+                            TrackingAccuracy.valueOf(it.accuracy)
+                        } catch (e: Exception) {
+                            TrackingAccuracy.BALANCED
+                        }
+                    } ?: TrackingAccuracy.BALANCED,
+                updateInterval =
+                    trackingPreferences?.let {
+                        try {
+                            UpdateInterval.valueOf(it.updateInterval)
+                        } catch (e: Exception) {
+                            UpdateInterval.NORMAL
+                        }
+                    } ?: UpdateInterval.NORMAL,
+                batteryOptimization = trackingPreferences?.batteryOptimization ?: true,
+                trackWhenStationary = trackingPreferences?.trackWhenStationary ?: false,
+                minimumDistance = trackingPreferences?.minimumDistance ?: 10
+            ),
+        privacySettings =
+            PrivacySettings(
+                dataRetentionDays = privacySettings?.dataRetentionDays ?: 365,
+                shareAnalytics = privacySettings?.allowAnonymousAnalytics ?: false,
+                shareCrashReports = true,
+                autoBackup = privacySettings?.autoBackup ?: true,
+                encryptBackups = true
+            ),
+        unitPreferences =
+            UnitPreferences(
+                distanceUnit =
+                    unitPreferences?.let {
+                        try {
+                            DistanceUnit.valueOf(it.distanceUnit)
+                        } catch (e: Exception) {
+                            DistanceUnit.METRIC
+                        }
+                    } ?: DistanceUnit.METRIC,
+                temperatureUnit =
+                    unitPreferences?.let {
+                        try {
+                            TemperatureUnit.valueOf(it.temperatureUnit)
+                        } catch (e: Exception) {
+                            TemperatureUnit.CELSIUS
+                        }
+                    } ?: TemperatureUnit.CELSIUS,
+                timeFormat =
+                    unitPreferences?.let {
+                        try {
+                            TimeFormat.valueOf(it.timeFormat)
+                        } catch (e: Exception) {
+                            TimeFormat.TWENTY_FOUR_HOUR
+                        }
+                    } ?: TimeFormat.TWENTY_FOUR_HOUR
+            ),
+        appearanceSettings =
+            AppearanceSettings(
+                theme =
+                    appearanceSettings?.let {
+                        try {
+                            AppTheme.valueOf(it.theme)
+                        } catch (e: Exception) {
+                            AppTheme.SYSTEM
+                        }
+                    } ?: AppTheme.SYSTEM,
+                useDeviceWallpaper = false,
+                showMapInTimeline = true,
+                compactView = appearanceSettings?.enableAnimations?.not() ?: false
+            ),
+        accountSettings =
+            AccountSettings(
+                email = null,
+                autoSync = privacySettings?.shareLocation ?: true,
+                syncOnWifiOnly = true,
+                lastSyncTime = lastModified?.let { Instant.parse(it) }
+            ),
         dataManagement = DataManagement()
     )
-}

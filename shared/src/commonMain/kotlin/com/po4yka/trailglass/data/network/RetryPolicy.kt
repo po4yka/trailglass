@@ -20,27 +20,22 @@ data class RetryPolicy(
      * Maximum number of retry attempts.
      */
     val maxAttempts: Int = 3,
-
     /**
      * Initial delay before first retry.
      */
     val initialDelay: Duration = 1.seconds,
-
     /**
      * Maximum delay between retries.
      */
     val maxDelay: Duration = 30.seconds,
-
     /**
      * Multiplier for exponential backoff.
      */
     val multiplier: Double = 2.0,
-
     /**
      * Whether to retry on all errors or only specific types.
      */
     val retryOnAllErrors: Boolean = false,
-
     /**
      * Custom predicate to determine if an error should be retried.
      */
@@ -55,20 +50,22 @@ data class RetryPolicy(
         /**
          * Aggressive retry policy for critical operations.
          */
-        val AGGRESSIVE = RetryPolicy(
-            maxAttempts = 5,
-            initialDelay = 500.milliseconds,
-            multiplier = 1.5
-        )
+        val AGGRESSIVE =
+            RetryPolicy(
+                maxAttempts = 5,
+                initialDelay = 500.milliseconds,
+                multiplier = 1.5
+            )
 
         /**
          * Conservative retry policy for non-critical operations.
          */
-        val CONSERVATIVE = RetryPolicy(
-            maxAttempts = 2,
-            initialDelay = 2.seconds,
-            multiplier = 2.0
-        )
+        val CONSERVATIVE =
+            RetryPolicy(
+                maxAttempts = 2,
+                initialDelay = 2.seconds,
+                multiplier = 2.0
+            )
 
         /**
          * No retry policy.
@@ -78,36 +75,39 @@ data class RetryPolicy(
         /**
          * Network-specific retry policy.
          */
-        val NETWORK = RetryPolicy(
-            maxAttempts = 3,
-            initialDelay = 2.seconds,
-            shouldRetry = { error ->
-                error is TrailGlassError.NetworkError.Timeout ||
-                error is TrailGlassError.NetworkError.RequestFailed ||
-                error is TrailGlassError.NetworkError.ServerError
-            }
-        )
+        val NETWORK =
+            RetryPolicy(
+                maxAttempts = 3,
+                initialDelay = 2.seconds,
+                shouldRetry = { error ->
+                    error is TrailGlassError.NetworkError.Timeout ||
+                        error is TrailGlassError.NetworkError.RequestFailed ||
+                        error is TrailGlassError.NetworkError.ServerError
+                }
+            )
     }
 
     /**
      * Calculate delay for a specific attempt.
      */
     fun getDelay(attempt: Int): Duration {
-        val exponentialDelay = (initialDelay.inWholeMilliseconds *
-                multiplier.pow(attempt.toDouble())).toLong().milliseconds
+        val exponentialDelay =
+            (
+                initialDelay.inWholeMilliseconds *
+                    multiplier.pow(attempt.toDouble())
+            ).toLong().milliseconds
         return min(exponentialDelay.inWholeMilliseconds, maxDelay.inWholeMilliseconds).milliseconds
     }
 
     /**
      * Determine if an error should be retried.
      */
-    fun shouldRetry(error: TrailGlassError): Boolean {
-        return when {
+    fun shouldRetry(error: TrailGlassError): Boolean =
+        when {
             shouldRetry != null -> shouldRetry.invoke(error)
             retryOnAllErrors -> true
             else -> error.isRetryable()
         }
-    }
 }
 
 /**
@@ -216,10 +216,11 @@ suspend fun <T> retryWithNetwork(
                 logger.debug { "Network error detected, waiting for network connection..." }
 
                 // Wait for network connection with a timeout (max 30 seconds)
-                val connected = withTimeoutOrNull(30.seconds) {
-                    // Wait until we receive a 'true' value from the isConnected flow
-                    networkConnectivity.isConnected.first { it }
-                }
+                val connected =
+                    withTimeoutOrNull(30.seconds) {
+                        // Wait until we receive a 'true' value from the isConnected flow
+                        networkConnectivity.isConnected.first { it }
+                    }
 
                 if (connected == true) {
                     logger.info { "Network connection restored, proceeding with retry" }
@@ -238,8 +239,8 @@ suspend fun <T> retryWithNetwork(
 suspend fun <T> (suspend () -> T).withRetry(
     policy: RetryPolicy = RetryPolicy.DEFAULT,
     onRetry: ((RetryState) -> Unit)? = null
-): Result<T> {
-    return retryWithPolicy(
+): Result<T> =
+    retryWithPolicy(
         policy = policy,
         onRetry = onRetry
     ) {
@@ -254,4 +255,3 @@ suspend fun <T> (suspend () -> T).withRetry(
             )
         }
     }
-}

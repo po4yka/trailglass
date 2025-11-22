@@ -16,4 +16,5 @@ interface StatsComponent {
 class DefaultStatsComponent(
     componentContext: ComponentContext,
     override val enhancedStatsController: EnhancedStatsController
-) : StatsComponent, ComponentContext by componentContext
+) : StatsComponent,
+    ComponentContext by componentContext

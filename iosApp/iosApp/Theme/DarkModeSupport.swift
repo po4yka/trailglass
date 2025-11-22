@@ -5,7 +5,6 @@ import SwiftUI
 // Ensures consistent visual quality across light and dark appearances
 
 struct DarkModeConfig {
-
     // MARK: - Glass Material Opacity
 
     /// Returns appropriate glass opacity based on color scheme

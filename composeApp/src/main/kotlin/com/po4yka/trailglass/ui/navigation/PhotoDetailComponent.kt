@@ -20,4 +20,5 @@ class DefaultPhotoDetailComponent(
     override val photoDetailController: PhotoDetailController,
     override val photoId: String,
     override val onBack: () -> Unit
-) : PhotoDetailComponent, ComponentContext by componentContext
+) : PhotoDetailComponent,
+    ComponentContext by componentContext

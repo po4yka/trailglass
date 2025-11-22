@@ -3,20 +3,18 @@ package com.po4yka.trailglass.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
+import androidx.compose.material.icons.filled.SettingsEthernet
+import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.SignalCellularAlt
-import androidx.compose.material.icons.filled.SettingsEthernet
-import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.network.NetworkState
 import com.po4yka.trailglass.data.network.NetworkType
@@ -53,37 +51,39 @@ private fun NetworkBannerContent(
     networkType: NetworkType,
     isMetered: Boolean
 ) {
-    val (icon, text, backgroundColor, contentColor) = when (networkState) {
-        is NetworkState.Disconnected -> {
-            Tuple4(
-                Icons.Default.CloudOff,
-                "No internet connection",
-                MaterialTheme.colorScheme.errorContainer,
-                MaterialTheme.colorScheme.onErrorContainer
-            )
+    val (icon, text, backgroundColor, contentColor) =
+        when (networkState) {
+            is NetworkState.Disconnected -> {
+                Tuple4(
+                    Icons.Default.CloudOff,
+                    "No internet connection",
+                    MaterialTheme.colorScheme.errorContainer,
+                    MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+            is NetworkState.Limited -> {
+                Tuple4(
+                    Icons.Default.Warning,
+                    "Limited connectivity: ${networkState.reason}",
+                    MaterialTheme.colorScheme.extended.warning,
+                    MaterialTheme.colorScheme.extended.onWarning
+                )
+            }
+            is NetworkState.Connected -> {
+                // Should not be visible when connected
+                return
+            }
         }
-        is NetworkState.Limited -> {
-            Tuple4(
-                Icons.Default.Warning,
-                "Limited connectivity: ${networkState.reason}",
-                MaterialTheme.colorScheme.extended.warning,
-                MaterialTheme.colorScheme.extended.onWarning
-            )
-        }
-        is NetworkState.Connected -> {
-            // Should not be visible when connected
-            return
-        }
-    }
 
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = backgroundColor
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -122,32 +122,35 @@ fun NetworkStatusIndicatorCompact(
     networkType: NetworkType,
     modifier: Modifier = Modifier
 ) {
-    val (icon, tint) = when (networkState) {
-        is NetworkState.Connected -> {
-            val networkIcon = when (networkType) {
-                NetworkType.WIFI -> Icons.Default.Wifi
-                NetworkType.CELLULAR -> Icons.Default.SignalCellularAlt
-                NetworkType.ETHERNET -> Icons.Default.SettingsEthernet
-                NetworkType.NONE -> Icons.Default.CloudDone
-                else -> Icons.Default.CloudDone
+    val (icon, tint) =
+        when (networkState) {
+            is NetworkState.Connected -> {
+                val networkIcon =
+                    when (networkType) {
+                        NetworkType.WIFI -> Icons.Default.Wifi
+                        NetworkType.CELLULAR -> Icons.Default.SignalCellularAlt
+                        NetworkType.ETHERNET -> Icons.Default.SettingsEthernet
+                        NetworkType.NONE -> Icons.Default.CloudDone
+                        else -> Icons.Default.CloudDone
+                    }
+                networkIcon to MaterialTheme.colorScheme.primary
             }
-            networkIcon to MaterialTheme.colorScheme.primary
+            is NetworkState.Disconnected -> {
+                Icons.Default.CloudOff to MaterialTheme.colorScheme.error
+            }
+            is NetworkState.Limited -> {
+                Icons.Default.Warning to MaterialTheme.colorScheme.extended.warningEmphasis
+            }
         }
-        is NetworkState.Disconnected -> {
-            Icons.Default.CloudOff to MaterialTheme.colorScheme.error
-        }
-        is NetworkState.Limited -> {
-            Icons.Default.Warning to MaterialTheme.colorScheme.extended.warningEmphasis
-        }
-    }
 
     Icon(
         imageVector = icon,
-        contentDescription = when (networkState) {
-            is NetworkState.Connected -> "Connected via ${networkType.name}"
-            is NetworkState.Disconnected -> "Disconnected"
-            is NetworkState.Limited -> "Limited connection"
-        },
+        contentDescription =
+            when (networkState) {
+                is NetworkState.Connected -> "Connected via ${networkType.name}"
+                is NetworkState.Disconnected -> "Disconnected"
+                is NetworkState.Limited -> "Limited connection"
+            },
         tint = tint,
         modifier = modifier.size(20.dp)
     )

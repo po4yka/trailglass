@@ -8,13 +8,13 @@ import com.po4yka.trailglass.data.network.AndroidNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
-import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.data.security.EncryptionService
-import com.po4yka.trailglass.photo.PhotoMetadataExtractor
-import com.po4yka.trailglass.photo.AndroidPhotoMetadataExtractor
+import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.AndroidLocationService
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.photo.AndroidPhotoMetadataExtractor
+import com.po4yka.trailglass.photo.PhotoMetadataExtractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -37,22 +37,17 @@ import me.tatarka.inject.annotations.Provides
 class AndroidPlatformModule(
     private val context: Context
 ) : PlatformModule {
+    @Provides
+    override fun databaseDriverFactory(): DatabaseDriverFactory = AndroidDatabaseDriverFactory(context)
 
     @Provides
-    override fun databaseDriverFactory(): DatabaseDriverFactory =
-        AndroidDatabaseDriverFactory(context)
+    override fun locationService(): LocationService = AndroidLocationService(context)
 
     @Provides
-    override fun locationService(): LocationService =
-        AndroidLocationService(context)
+    override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
-    override fun applicationScope(): CoroutineScope =
-        CoroutineScope(SupervisorJob() + Dispatchers.Default)
-
-    @Provides
-    override fun userId(): String =
-        DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
+    override fun userId(): String = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
 
     @Provides
     override fun deviceId(): String =
@@ -64,71 +59,50 @@ class AndroidPlatformModule(
     /**
      * Provides Android-specific secure token storage.
      */
-    /**
-     * Provides Android-specific secure token storage.
-     */
     @Provides
-    override fun secureTokenStorage(): SecureTokenStorage =
-        SecureTokenStorage(context)
+    override fun secureTokenStorage(): SecureTokenStorage = SecureTokenStorage(context)
 
     /**
      * Provides Android-specific device info provider.
      */
-    /**
-     * Provides Android-specific device info provider.
-     */
     @Provides
-    override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider =
-        PlatformDeviceInfoProvider(context)
+    override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider = PlatformDeviceInfoProvider(context)
 
     /**
      * Provides Android-specific sync state repository.
      */
-    /**
-     * Provides Android-specific sync state repository.
-     */
     @Provides
-    override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl =
-        SyncStateRepositoryImpl(context)
+    override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl = SyncStateRepositoryImpl(context)
 
     /**
      * Provides Android-specific network connectivity monitor.
      */
-    /**
-     * Provides Android-specific network connectivity monitor.
-     */
     @Provides
-    override fun networkConnectivityMonitor(): NetworkConnectivityMonitor =
-        AndroidNetworkConnectivityMonitor(context)
+    override fun networkConnectivityMonitor(): NetworkConnectivityMonitor = AndroidNetworkConnectivityMonitor(context)
 
     /**
      * Provides Android-specific permission manager.
      */
-    /**
-     * Provides Android-specific permission manager.
-     */
     @Provides
-    override fun permissionManager(): PermissionManager =
-        PermissionManager(context)
+    override fun permissionManager(): PermissionManager = PermissionManager(context)
 
     /**
      * Provides Android-specific encryption service.
      */
     @Provides
-    override fun encryptionService(): EncryptionService =
-        EncryptionService()
+    override fun encryptionService(): EncryptionService = EncryptionService()
 
     /**
      * Provides Android-specific photo metadata extractor.
      */
     @Provides
-    override fun photoMetadataExtractor(): PhotoMetadataExtractor =
-        AndroidPhotoMetadataExtractor(context)
+    override fun photoMetadataExtractor(): PhotoMetadataExtractor = AndroidPhotoMetadataExtractor(context)
 
     /**
      * Provides Android-specific settings storage.
      */
     @Provides
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
-        com.po4yka.trailglass.data.storage.SettingsStorage(context)
+        com.po4yka.trailglass.data.storage
+            .SettingsStorage(context)
 }

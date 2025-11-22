@@ -8,28 +8,24 @@ import kotlinx.coroutines.flow.asStateFlow
  * Mock implementation of NetworkConnectivityMonitor for testing.
  */
 class MockNetworkConnectivityMonitor : NetworkConnectivityMonitor {
-
     private val _networkState = MutableStateFlow<NetworkState>(NetworkState.Connected)
     override val networkState: StateFlow<NetworkState> = _networkState.asStateFlow()
 
-    private val _networkInfo = MutableStateFlow(
-        NetworkInfo(
-            state = NetworkState.Connected,
-            type = NetworkType.WIFI,
-            isMetered = false
+    private val _networkInfo =
+        MutableStateFlow(
+            NetworkInfo(
+                state = NetworkState.Connected,
+                type = NetworkType.WIFI,
+                isMetered = false
+            )
         )
-    )
     override val networkInfo: StateFlow<NetworkInfo> = _networkInfo.asStateFlow()
 
     private var isMonitoringActive = false
 
-    override fun isConnected(): Boolean {
-        return networkState.value is NetworkState.Connected
-    }
+    override fun isConnected(): Boolean = networkState.value is NetworkState.Connected
 
-    override fun isMetered(): Boolean {
-        return networkInfo.value.isMetered
-    }
+    override fun isMetered(): Boolean = networkInfo.value.isMetered
 
     override fun startMonitoring() {
         isMonitoringActive = true
@@ -59,7 +55,10 @@ class MockNetworkConnectivityMonitor : NetworkConnectivityMonitor {
         setNetworkType(NetworkType.NONE)
     }
 
-    fun simulateConnect(type: NetworkType = NetworkType.WIFI, isMetered: Boolean = false) {
+    fun simulateConnect(
+        type: NetworkType = NetworkType.WIFI,
+        isMetered: Boolean = false
+    ) {
         setNetworkState(NetworkState.Connected)
         setNetworkType(type)
         setMetered(isMetered)

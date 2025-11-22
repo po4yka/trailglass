@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
  * Repository for managing app settings and user preferences.
  */
 interface SettingsRepository {
-
     /**
      * Get current app settings as a Flow.
      */

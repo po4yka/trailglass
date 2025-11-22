@@ -1,6 +1,5 @@
 package com.po4yka.trailglass.ui.screens
 
-import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -191,9 +190,10 @@ fun EnhancedSettingsScreen(
         item {
             OutlinedButton(
                 onClick = { controller.resetToDefaults() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
             ) {
                 Icon(Icons.Default.RestartAlt, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
@@ -258,7 +258,13 @@ private fun TrackingPreferencesCard(
             // Accuracy
             ListItem(
                 headlineContent = { Text("Tracking Accuracy") },
-                supportingContent = { Text(preferences.accuracy.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
+                supportingContent = {
+                    Text(
+                        preferences.accuracy.name.lowercase().replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase() else it.toString()
+                        }
+                    )
+                },
                 leadingContent = { Icon(Icons.Default.MyLocation, contentDescription = null) },
                 modifier = Modifier.clickable { showAccuracyDialog = true }
             )
@@ -268,7 +274,13 @@ private fun TrackingPreferencesCard(
             // Update Interval
             ListItem(
                 headlineContent = { Text("Update Interval") },
-                supportingContent = { Text(preferences.updateInterval.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
+                supportingContent = {
+                    Text(
+                        preferences.updateInterval.name.lowercase().replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase() else it.toString()
+                        }
+                    )
+                },
                 leadingContent = { Icon(Icons.Default.Update, contentDescription = null) },
                 modifier = Modifier.clickable { showIntervalDialog = true }
             )
@@ -318,13 +330,13 @@ private fun TrackingPreferencesCard(
                 Column {
                     TrackingAccuracy.values().forEach { accuracy ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUpdate(preferences.copy(accuracy = accuracy))
-                                    showAccuracyDialog = false
-                                }
-                                .padding(vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onUpdate(preferences.copy(accuracy = accuracy))
+                                        showAccuracyDialog = false
+                                    }.padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -335,7 +347,16 @@ private fun TrackingPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(accuracy.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
+                            Text(
+                                accuracy.name.lowercase().replaceFirstChar {
+                                    if (it.isLowerCase()) {
+                                        it.titlecase()
+                                    } else {
+                                        it
+                                            .toString()
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -357,13 +378,13 @@ private fun TrackingPreferencesCard(
                 Column {
                     UpdateInterval.values().forEach { interval ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUpdate(preferences.copy(updateInterval = interval))
-                                    showIntervalDialog = false
-                                }
-                                .padding(vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onUpdate(preferences.copy(updateInterval = interval))
+                                        showIntervalDialog = false
+                                    }.padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -374,7 +395,16 @@ private fun TrackingPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(interval.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
+                            Text(
+                                interval.name.lowercase().replaceFirstChar {
+                                    if (it.isLowerCase()) {
+                                        it.titlecase()
+                                    } else {
+                                        it
+                                            .toString()
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -489,7 +519,13 @@ private fun UnitPreferencesCard(
         Column(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 headlineContent = { Text("Distance Units") },
-                supportingContent = { Text(units.distanceUnit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
+                supportingContent = {
+                    Text(
+                        units.distanceUnit.name.lowercase().replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase() else it.toString()
+                        }
+                    )
+                },
                 leadingContent = { Icon(Icons.Default.Straighten, contentDescription = null) },
                 modifier = Modifier.clickable { showDistanceDialog = true }
             )
@@ -498,7 +534,13 @@ private fun UnitPreferencesCard(
 
             ListItem(
                 headlineContent = { Text("Temperature Units") },
-                supportingContent = { Text(units.temperatureUnit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
+                supportingContent = {
+                    Text(
+                        units.temperatureUnit.name.lowercase().replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase() else it.toString()
+                        }
+                    )
+                },
                 leadingContent = { Icon(Icons.Default.Thermostat, contentDescription = null) },
                 modifier = Modifier.clickable { showTempDialog = true }
             )
@@ -523,13 +565,13 @@ private fun UnitPreferencesCard(
                 Column {
                     DistanceUnit.values().forEach { unit ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUpdate(units.copy(distanceUnit = unit))
-                                    showDistanceDialog = false
-                                }
-                                .padding(vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onUpdate(units.copy(distanceUnit = unit))
+                                        showDistanceDialog = false
+                                    }.padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -540,7 +582,16 @@ private fun UnitPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(unit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
+                            Text(
+                                unit.name.lowercase().replaceFirstChar {
+                                    if (it.isLowerCase()) {
+                                        it.titlecase()
+                                    } else {
+                                        it
+                                            .toString()
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -562,13 +613,13 @@ private fun UnitPreferencesCard(
                 Column {
                     TemperatureUnit.values().forEach { unit ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUpdate(units.copy(temperatureUnit = unit))
-                                    showTempDialog = false
-                                }
-                                .padding(vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onUpdate(units.copy(temperatureUnit = unit))
+                                        showTempDialog = false
+                                    }.padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -579,7 +630,16 @@ private fun UnitPreferencesCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(unit.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
+                            Text(
+                                unit.name.lowercase().replaceFirstChar {
+                                    if (it.isLowerCase()) {
+                                        it.titlecase()
+                                    } else {
+                                        it
+                                            .toString()
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -601,13 +661,13 @@ private fun UnitPreferencesCard(
                 Column {
                     TimeFormat.values().forEach { format ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUpdate(units.copy(timeFormat = format))
-                                    showTimeDialog = false
-                                }
-                                .padding(vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onUpdate(units.copy(timeFormat = format))
+                                        showTimeDialog = false
+                                    }.padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -643,7 +703,13 @@ private fun AppearanceSettingsCard(
         Column(modifier = Modifier.padding(16.dp)) {
             ListItem(
                 headlineContent = { Text("Theme") },
-                supportingContent = { Text(appearance.theme.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }) },
+                supportingContent = {
+                    Text(
+                        appearance.theme.name
+                            .lowercase()
+                            .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+                    )
+                },
                 leadingContent = { Icon(Icons.Default.Palette, contentDescription = null) },
                 modifier = Modifier.clickable { showThemeDialog = true }
             )
@@ -691,13 +757,13 @@ private fun AppearanceSettingsCard(
                 Column {
                     AppTheme.values().forEach { theme ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onUpdate(appearance.copy(theme = theme))
-                                    showThemeDialog = false
-                                }
-                                .padding(vertical = 12.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        onUpdate(appearance.copy(theme = theme))
+                                        showThemeDialog = false
+                                    }.padding(vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             RadioButton(
@@ -708,7 +774,16 @@ private fun AppearanceSettingsCard(
                                 }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(theme.name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() })
+                            Text(
+                                theme.name.lowercase().replaceFirstChar {
+                                    if (it.isLowerCase()) {
+                                        it.titlecase()
+                                    } else {
+                                        it
+                                            .toString()
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -728,9 +803,10 @@ private fun AccountSettingsCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             ListItem(
@@ -786,7 +862,13 @@ private fun DataManagementCard(
             ListItem(
                 headlineContent = { Text("Clear All Data") },
                 supportingContent = { Text("Delete all trips, locations, photos, and settings") },
-                leadingContent = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
+                leadingContent = {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                },
                 modifier = Modifier.clickable(onClick = onClearData)
             )
         }
@@ -794,18 +876,18 @@ private fun DataManagementCard(
 }
 
 @Composable
-private fun AlgorithmSettingsNavigationCard(
-    onClick: () -> Unit
-) {
+private fun AlgorithmSettingsNavigationCard(onClick: () -> Unit) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(

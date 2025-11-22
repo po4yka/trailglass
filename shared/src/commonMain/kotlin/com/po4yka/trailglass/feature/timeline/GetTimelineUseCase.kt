@@ -110,7 +110,9 @@ class GetTimelineUseCase(
         userId: String,
         filter: TimelineFilter = TimelineFilter()
     ): List<TimelineItemUI> {
-        logger.debug { "Getting timeline: zoom=$zoomLevel, date=$referenceDate, filter=${filter.activeFilterCount} active" }
+        logger.debug {
+            "Getting timeline: zoom=$zoomLevel, date=$referenceDate, filter=${filter.activeFilterCount} active"
+        }
 
         return when (zoomLevel) {
             TimelineZoomLevel.DAY -> getDayTimeline(referenceDate, userId, filter)
@@ -131,11 +133,15 @@ class GetTimelineUseCase(
         val dayStart = date.atStartOfDayIn(timeZone)
         val dayEnd = date.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
-        val visits = placeVisitRepository.getVisits(userId, dayStart, dayEnd)
-            .filter { visit -> matchesFilter(visit, filter) }
+        val visits =
+            placeVisitRepository
+                .getVisits(userId, dayStart, dayEnd)
+                .filter { visit -> matchesFilter(visit, filter) }
 
-        val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, dayStart, dayEnd)
-            .filter { route -> matchesFilter(route, filter) }
+        val routes =
+            routeSegmentRepository
+                .getRouteSegmentsInRange(userId, dayStart, dayEnd)
+                .filter { route -> matchesFilter(route, filter) }
 
         val items = mutableListOf<TimelineItemUI>()
 
@@ -185,11 +191,15 @@ class GetTimelineUseCase(
             val dayStart = currentDate.atStartOfDayIn(timeZone)
             val dayEnd = currentDate.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
-            val visits = placeVisitRepository.getVisits(userId, dayStart, dayEnd)
-                .filter { matchesFilter(it, filter) }
+            val visits =
+                placeVisitRepository
+                    .getVisits(userId, dayStart, dayEnd)
+                    .filter { matchesFilter(it, filter) }
 
-            val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, dayStart, dayEnd)
-                .filter { matchesFilter(it, filter) }
+            val routes =
+                routeSegmentRepository
+                    .getRouteSegmentsInRange(userId, dayStart, dayEnd)
+                    .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
                 items.add(
@@ -225,19 +235,24 @@ class GetTimelineUseCase(
         // Generate weekly summaries for the month
         var currentWeekStart = monthStart
         while (currentWeekStart < monthEnd) {
-            val weekEndDate = minOf(
-                currentWeekStart.plus(6, DateTimeUnit.DAY),
-                monthEnd.minus(1, DateTimeUnit.DAY)
-            )
+            val weekEndDate =
+                minOf(
+                    currentWeekStart.plus(6, DateTimeUnit.DAY),
+                    monthEnd.minus(1, DateTimeUnit.DAY)
+                )
 
             val weekStart = currentWeekStart.atStartOfDayIn(timeZone)
             val weekEndTime = weekEndDate.plus(1, DateTimeUnit.DAY).atStartOfDayIn(timeZone)
 
-            val visits = placeVisitRepository.getVisits(userId, weekStart, weekEndTime)
-                .filter { matchesFilter(it, filter) }
+            val visits =
+                placeVisitRepository
+                    .getVisits(userId, weekStart, weekEndTime)
+                    .filter { matchesFilter(it, filter) }
 
-            val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, weekStart, weekEndTime)
-                .filter { matchesFilter(it, filter) }
+            val routes =
+                routeSegmentRepository
+                    .getRouteSegmentsInRange(userId, weekStart, weekEndTime)
+                    .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
                 // Calculate active dates
@@ -292,11 +307,15 @@ class GetTimelineUseCase(
             val monthStartTime = monthStart.atStartOfDayIn(timeZone)
             val monthEndTime = monthEnd.atStartOfDayIn(timeZone)
 
-            val visits = placeVisitRepository.getVisits(userId, monthStartTime, monthEndTime)
-                .filter { matchesFilter(it, filter) }
+            val visits =
+                placeVisitRepository
+                    .getVisits(userId, monthStartTime, monthEndTime)
+                    .filter { matchesFilter(it, filter) }
 
-            val routes = routeSegmentRepository.getRouteSegmentsInRange(userId, monthStartTime, monthEndTime)
-                .filter { matchesFilter(it, filter) }
+            val routes =
+                routeSegmentRepository
+                    .getRouteSegmentsInRange(userId, monthStartTime, monthEndTime)
+                    .filter { matchesFilter(it, filter) }
 
             if (visits.isNotEmpty() || routes.isNotEmpty()) {
                 // Calculate active weeks (unique Monday dates that had activity)
@@ -345,7 +364,10 @@ class GetTimelineUseCase(
     /**
      * Check if a place visit matches the filter criteria.
      */
-    private fun matchesFilter(visit: PlaceVisit, filter: TimelineFilter): Boolean {
+    private fun matchesFilter(
+        visit: PlaceVisit,
+        filter: TimelineFilter
+    ): Boolean {
         // Category filter
         if (filter.placeCategories.isNotEmpty() && visit.category !in filter.placeCategories) {
             return false
@@ -393,7 +415,10 @@ class GetTimelineUseCase(
     /**
      * Check if a route segment matches the filter criteria.
      */
-    private fun matchesFilter(route: RouteSegment, filter: TimelineFilter): Boolean {
+    private fun matchesFilter(
+        route: RouteSegment,
+        filter: TimelineFilter
+    ): Boolean {
         // Transport type filter
         if (filter.transportTypes.isNotEmpty() && route.transportType !in filter.transportTypes) {
             return false

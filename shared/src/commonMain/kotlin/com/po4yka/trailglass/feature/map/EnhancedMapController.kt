@@ -29,9 +29,10 @@ class EnhancedMapController(
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Enhanced map UI state.
@@ -72,51 +73,57 @@ class EnhancedMapController(
                 val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
 
                 // Convert to enhanced markers
-                val enhancedMarkers = mapData.markers.map { marker ->
-                    // Would need to load additional data like category, visit count
-                    // For now, use placeholder values
-                    EnhancedMapMarker(
-                        id = marker.id,
-                        coordinate = marker.coordinate,
-                        title = marker.title,
-                        snippet = marker.snippet,
-                        placeVisitId = marker.placeVisitId,
-                        category = PlaceCategory.OTHER, // Would load from place visit
-                        isFavorite = false,
-                        visitCount = 1
-                    )
-                }
+                val enhancedMarkers =
+                    mapData.markers.map { marker ->
+                        // Would need to load additional data like category, visit count
+                        // For now, use placeholder values
+                        EnhancedMapMarker(
+                            id = marker.id,
+                            coordinate = marker.coordinate,
+                            title = marker.title,
+                            snippet = marker.snippet,
+                            placeVisitId = marker.placeVisitId,
+                            category = PlaceCategory.OTHER, // Would load from place visit
+                            isFavorite = false,
+                            visitCount = 1
+                        )
+                    }
 
                 // Apply clustering if enabled
-                val (clusters, singleMarkers) = if (enableClustering) {
-                    markerClusterer.cluster(
-                        markers = enhancedMarkers,
-                        zoomLevel = _state.value.zoomLevel
-                    )
-                } else {
-                    Pair(emptyList(), enhancedMarkers)
-                }
+                val (clusters, singleMarkers) =
+                    if (enableClustering) {
+                        markerClusterer.cluster(
+                            markers = enhancedMarkers,
+                            zoomLevel = _state.value.zoomLevel
+                        )
+                    } else {
+                        Pair(emptyList(), enhancedMarkers)
+                    }
 
                 // Generate heatmap if enabled
-                val heatmap = if (enableHeatmap) {
-                    heatmapGenerator.generate(
-                        markers = enhancedMarkers,
-                        intensityMode = HeatmapGenerator.IntensityMode.VISIT_COUNT
-                    )
-                } else null
+                val heatmap =
+                    if (enableHeatmap) {
+                        heatmapGenerator.generate(
+                            markers = enhancedMarkers,
+                            intensityMode = HeatmapGenerator.IntensityMode.VISIT_COUNT
+                        )
+                    } else {
+                        null
+                    }
 
                 // Update state
                 _state.update {
                     it.copy(
-                        mapData = EnhancedMapDisplayData(
-                            markers = singleMarkers,
-                            clusters = clusters,
-                            routes = mapData.routes,
-                            heatmapData = heatmap,
-                            region = mapData.region,
-                            clusteringEnabled = enableClustering,
-                            heatmapEnabled = enableHeatmap
-                        ),
+                        mapData =
+                            EnhancedMapDisplayData(
+                                markers = singleMarkers,
+                                clusters = clusters,
+                                routes = mapData.routes,
+                                heatmapData = heatmap,
+                                region = mapData.region,
+                                clusteringEnabled = enableClustering,
+                                heatmapEnabled = enableHeatmap
+                            ),
                         clusteringEnabled = enableClustering,
                         heatmapEnabled = enableHeatmap,
                         isLoading = false
@@ -125,7 +132,7 @@ class EnhancedMapController(
 
                 logger.info {
                     "Loaded enhanced map data: ${enhancedMarkers.size} markers, " +
-                    "${clusters.size} clusters, ${mapData.routes.size} routes"
+                        "${clusters.size} clusters, ${mapData.routes.size} routes"
                 }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load enhanced map data" }
@@ -149,20 +156,23 @@ class EnhancedMapController(
         // Re-cluster if clustering is enabled
         if (currentState.clusteringEnabled) {
             controllerScope.launch {
-                val allMarkers = currentState.mapData.markers +
+                val allMarkers =
+                    currentState.mapData.markers +
                         currentState.mapData.clusters.flatMap { it.markers }
 
-                val (clusters, singleMarkers) = markerClusterer.cluster(
-                    markers = allMarkers,
-                    zoomLevel = zoomLevel
-                )
+                val (clusters, singleMarkers) =
+                    markerClusterer.cluster(
+                        markers = allMarkers,
+                        zoomLevel = zoomLevel
+                    )
 
                 _state.update {
                     it.copy(
-                        mapData = it.mapData.copy(
-                            markers = singleMarkers,
-                            clusters = clusters
-                        )
+                        mapData =
+                            it.mapData.copy(
+                                markers = singleMarkers,
+                                clusters = clusters
+                            )
                     )
                 }
             }
@@ -181,15 +191,18 @@ class EnhancedMapController(
             updateZoom(_state.value.zoomLevel)
         } else {
             // Flatten all clusters back to markers
-            val allMarkers = _state.value.mapData.markers +
-                    _state.value.mapData.clusters.flatMap { it.markers }
+            val allMarkers =
+                _state.value.mapData.markers +
+                    _state.value.mapData.clusters
+                        .flatMap { it.markers }
 
             _state.update {
                 it.copy(
-                    mapData = it.mapData.copy(
-                        markers = allMarkers,
-                        clusters = emptyList()
-                    )
+                    mapData =
+                        it.mapData.copy(
+                            markers = allMarkers,
+                            clusters = emptyList()
+                        )
                 )
             }
         }
@@ -206,13 +219,16 @@ class EnhancedMapController(
         if (newValue) {
             // Generate heatmap
             controllerScope.launch {
-                val allMarkers = _state.value.mapData.markers +
-                        _state.value.mapData.clusters.flatMap { it.markers }
+                val allMarkers =
+                    _state.value.mapData.markers +
+                        _state.value.mapData.clusters
+                            .flatMap { it.markers }
 
-                val heatmap = heatmapGenerator.generate(
-                    markers = allMarkers,
-                    intensityMode = HeatmapGenerator.IntensityMode.VISIT_COUNT
-                )
+                val heatmap =
+                    heatmapGenerator.generate(
+                        markers = allMarkers,
+                        intensityMode = HeatmapGenerator.IntensityMode.VISIT_COUNT
+                    )
 
                 _state.update {
                     it.copy(

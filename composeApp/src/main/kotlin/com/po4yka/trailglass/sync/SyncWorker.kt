@@ -15,50 +15,53 @@ class SyncWorker(
     context: Context,
     params: WorkerParameters
 ) : CoroutineWorker(context, params) {
+    override suspend fun doWork(): Result =
+        withContext(Dispatchers.IO) {
+            Log.i(TAG, "SyncWorker started (attempt ${runAttemptCount + 1}/$MAX_RETRIES)")
 
-    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
-        Log.i(TAG, "SyncWorker started (attempt ${runAttemptCount + 1}/$MAX_RETRIES)")
-
-        try {
-            // Get app component from Application class
-            val application = applicationContext as? TrailGlassApplication
-            if (application == null) {
-                Log.e(TAG, "Cannot access TrailGlassApplication")
-                return@withContext Result.failure()
-            }
-
-            val syncManager = application.appComponent.syncManager
-
-            // Perform full sync
-            val result = syncManager.performFullSync()
-
-            result.fold(
-                onSuccess = { syncResult ->
-                    Log.i(TAG, "Background sync completed: " +
-                        "${syncResult.uploaded} uploaded, " +
-                        "${syncResult.downloaded} downloaded, " +
-                        "${syncResult.conflicts} conflicts")
-                    Result.success()
-                },
-                onFailure = { error ->
-                    Log.e(TAG, "Background sync failed", error)
-                    if (runAttemptCount < MAX_RETRIES) {
-                        Result.retry()
-                    } else {
-                        Result.failure()
-                    }
+            try {
+                // Get app component from Application class
+                val application = applicationContext as? TrailGlassApplication
+                if (application == null) {
+                    Log.e(TAG, "Cannot access TrailGlassApplication")
+                    return@withContext Result.failure()
                 }
-            )
-        } catch (e: Exception) {
-            Log.e(TAG, "Sync worker error", e)
 
-            if (runAttemptCount < MAX_RETRIES) {
-                Result.retry()
-            } else {
-                Result.failure()
+                val syncManager = application.appComponent.syncManager
+
+                // Perform full sync
+                val result = syncManager.performFullSync()
+
+                result.fold(
+                    onSuccess = { syncResult ->
+                        Log.i(
+                            TAG,
+                            "Background sync completed: " +
+                                "${syncResult.uploaded} uploaded, " +
+                                "${syncResult.downloaded} downloaded, " +
+                                "${syncResult.conflicts} conflicts"
+                        )
+                        Result.success()
+                    },
+                    onFailure = { error ->
+                        Log.e(TAG, "Background sync failed", error)
+                        if (runAttemptCount < MAX_RETRIES) {
+                            Result.retry()
+                        } else {
+                            Result.failure()
+                        }
+                    }
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "Sync worker error", e)
+
+                if (runAttemptCount < MAX_RETRIES) {
+                    Result.retry()
+                } else {
+                    Result.failure()
+                }
             }
         }
-    }
 
     companion object {
         private const val TAG = "SyncWorker"
@@ -73,7 +76,6 @@ class SyncWorker(
  * Utility class for scheduling background sync.
  */
 object SyncScheduler {
-
     private const val TAG = "SyncScheduler"
 
     /**
@@ -85,24 +87,25 @@ object SyncScheduler {
     ) {
         Log.i(TAG, "Scheduling periodic sync every $intervalMinutes minutes")
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresBatteryNotLow(true)
-            .build()
+        val constraints =
+            Constraints
+                .Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .setRequiresBatteryNotLow(true)
+                .build()
 
-        val syncRequest = PeriodicWorkRequestBuilder<SyncWorker>(
-            repeatInterval = intervalMinutes,
-            repeatIntervalTimeUnit = TimeUnit.MINUTES
-        )
-            .setConstraints(constraints)
-            .addTag(SyncWorker.TAG_SYNC)
-            .addTag(SyncWorker.TAG_PERIODIC)
-            .setBackoffCriteria(
-                BackoffPolicy.EXPONENTIAL,
-                WorkRequest.MIN_BACKOFF_MILLIS,
-                TimeUnit.MILLISECONDS
-            )
-            .build()
+        val syncRequest =
+            PeriodicWorkRequestBuilder<SyncWorker>(
+                repeatInterval = intervalMinutes,
+                repeatIntervalTimeUnit = TimeUnit.MINUTES
+            ).setConstraints(constraints)
+                .addTag(SyncWorker.TAG_SYNC)
+                .addTag(SyncWorker.TAG_PERIODIC)
+                .setBackoffCriteria(
+                    BackoffPolicy.EXPONENTIAL,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
+                    TimeUnit.MILLISECONDS
+                ).build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             SyncWorker.WORK_NAME,
@@ -117,15 +120,18 @@ object SyncScheduler {
     fun triggerImmediateSync(context: Context) {
         Log.i(TAG, "Triggering immediate sync")
 
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        val constraints =
+            Constraints
+                .Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
-        val syncRequest = OneTimeWorkRequestBuilder<SyncWorker>()
-            .setConstraints(constraints)
-            .addTag(SyncWorker.TAG_SYNC)
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .build()
+        val syncRequest =
+            OneTimeWorkRequestBuilder<SyncWorker>()
+                .setConstraints(constraints)
+                .addTag(SyncWorker.TAG_SYNC)
+                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                .build()
 
         WorkManager.getInstance(context).enqueue(syncRequest)
     }
@@ -141,6 +147,5 @@ object SyncScheduler {
     /**
      * Check sync work status.
      */
-    fun getSyncWorkInfo(context: Context) =
-        WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WORK_NAME)
+    fun getSyncWorkInfo(context: Context) = WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WORK_NAME)
 }

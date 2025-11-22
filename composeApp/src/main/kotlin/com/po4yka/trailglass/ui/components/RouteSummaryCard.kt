@@ -2,11 +2,11 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Commute
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.Commute
 import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Photo
@@ -36,14 +36,16 @@ fun RouteSummaryCard(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             // Header with play button
             Row(
@@ -63,7 +65,12 @@ fun RouteSummaryCard(
                     // Duration display
                     val stats = tripRoute.statistics
                     Text(
-                        text = formatDuration(stats.totalDurationDays, stats.totalDurationHours, stats.totalDurationMinutes),
+                        text =
+                            formatDuration(
+                                stats.totalDurationDays,
+                                stats.totalDurationHours,
+                                stats.totalDurationMinutes
+                            ),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -209,15 +216,16 @@ private fun TransportChip(
         },
         leadingIcon = {
             Icon(
-                imageVector = when (transportType.uppercase()) {
-                    "WALK" -> Icons.AutoMirrored.Filled.DirectionsWalk
-                    "BIKE" -> Icons.AutoMirrored.Filled.DirectionsBike
-                    "CAR" -> Icons.Default.DirectionsCar
-                    "TRAIN" -> Icons.Default.Train
-                    "PLANE" -> Icons.Default.Flight
-                    "BOAT" -> Icons.Default.DirectionsBoat
-                    else -> Icons.Default.Commute
-                },
+                imageVector =
+                    when (transportType.uppercase()) {
+                        "WALK" -> Icons.AutoMirrored.Filled.DirectionsWalk
+                        "BIKE" -> Icons.AutoMirrored.Filled.DirectionsBike
+                        "CAR" -> Icons.Default.DirectionsCar
+                        "TRAIN" -> Icons.Default.Train
+                        "PLANE" -> Icons.Default.Flight
+                        "BOAT" -> Icons.Default.DirectionsBoat
+                        else -> Icons.Default.Commute
+                    },
                 contentDescription = null,
                 modifier = Modifier.size(16.dp)
             )
@@ -228,21 +236,23 @@ private fun TransportChip(
 /**
  * Format duration for display.
  */
-private fun formatDuration(days: Int, hours: Int, minutes: Int): String {
-    return buildString {
+private fun formatDuration(
+    days: Int,
+    hours: Int,
+    minutes: Int
+): String =
+    buildString {
         if (days > 0) append("$days day${if (days > 1) "s" else ""}, ")
         if (hours > 0) append("$hours hr${if (hours > 1) "s" else ""}, ")
         append("$minutes min${if (minutes > 1) "s" else ""}")
     }
-}
 
 /**
  * Format distance for display.
  */
-private fun formatDistance(kilometers: Double): String {
-    return when {
+private fun formatDistance(kilometers: Double): String =
+    when {
         kilometers < 1.0 -> "${(kilometers * 1000).roundToInt()} m"
         kilometers < 10.0 -> "%.1f km".format(kilometers)
         else -> "${kilometers.roundToInt()} km"
     }
-}

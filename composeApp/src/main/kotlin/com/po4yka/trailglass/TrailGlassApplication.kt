@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
  * application-wide dependencies.
  */
 class TrailGlassApplication : Application() {
-
     /**
      * Application-level DI component.
      * Provides all application dependencies (repositories, controllers, etc.)

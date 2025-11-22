@@ -1,8 +1,7 @@
 package com.po4yka.trailglass.feature.settings
 
-import com.po4yka.trailglass.data.repository.SettingsRepository
-import com.po4yka.trailglass.data.storage.SettingsStorage
 import com.po4yka.trailglass.data.db.Database
+import com.po4yka.trailglass.data.storage.SettingsStorage
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -25,34 +24,35 @@ class ClearDataUseCase(
      * - Settings and preferences
      * - Cached data
      */
-    suspend fun execute() = withContext(Dispatchers.IO) {
-        logger.info { "Starting to clear all application data" }
+    suspend fun execute() =
+        withContext(Dispatchers.IO) {
+            logger.info { "Starting to clear all application data" }
 
-        try {
-            // Clear all database tables
-            logger.debug { "Clearing database tables" }
-            database.transaction {
-                database.locationSampleQueries.deleteAll()
-                database.placeVisitQueries.deleteAll()
-                database.routeSegmentsQueries.deleteAll()
-                database.tripsQueries.deleteAll()
-                database.photosQueries.deleteAll()
-                database.photosQueries.deleteAllAttachments()
-                database.geocodingCacheQueries.clearAll()
-                database.syncMetadataQueries.deleteAll()
-                database.syncConflictsQueries.deleteAll()
+            try {
+                // Clear all database tables
+                logger.debug { "Clearing database tables" }
+                database.transaction {
+                    database.locationSampleQueries.deleteAll()
+                    database.placeVisitQueries.deleteAll()
+                    database.routeSegmentsQueries.deleteAll()
+                    database.tripsQueries.deleteAll()
+                    database.photosQueries.deleteAll()
+                    database.photosQueries.deleteAllAttachments()
+                    database.geocodingCacheQueries.clearAll()
+                    database.syncMetadataQueries.deleteAll()
+                    database.syncConflictsQueries.deleteAll()
+                }
+                logger.debug { "Database tables cleared successfully" }
+
+                // Clear settings storage
+                logger.debug { "Clearing settings storage" }
+                settingsStorage.clearSettings()
+                logger.debug { "Settings storage cleared successfully" }
+
+                logger.info { "All application data cleared successfully" }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to clear application data" }
+                throw e
             }
-            logger.debug { "Database tables cleared successfully" }
-
-            // Clear settings storage
-            logger.debug { "Clearing settings storage" }
-            settingsStorage.clearSettings()
-            logger.debug { "Settings storage cleared successfully" }
-
-            logger.info { "All application data cleared successfully" }
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to clear application data" }
-            throw e
         }
-    }
 }

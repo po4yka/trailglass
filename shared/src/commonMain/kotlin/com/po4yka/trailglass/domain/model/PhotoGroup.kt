@@ -10,12 +10,10 @@ data class PhotoGroup(
      * Date for this group of photos.
      */
     val date: LocalDate,
-
     /**
      * Photos in this group, sorted by timestamp.
      */
     val photos: List<PhotoWithMetadata>,
-
     /**
      * Optional location name for this group (e.g., "New York, NY").
      */
@@ -35,21 +33,16 @@ data class PhotoWithMetadata(
      * The photo.
      */
     val photo: Photo,
-
     /**
      * Optional metadata (EXIF data, etc.).
      */
     val metadata: PhotoMetadata? = null,
-
     /**
      * Attachments to place visits.
      */
     val attachments: List<PhotoAttachment> = emptyList(),
-
     /**
      * Optional cluster ID for spatially related photos.
      */
     val clusterId: String? = null
 )
-
-

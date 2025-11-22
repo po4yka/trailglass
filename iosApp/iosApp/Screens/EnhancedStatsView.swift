@@ -299,7 +299,7 @@ private struct TransportDistributionCard: View {
             Text("Distance by Transport Type")
                 .font(.headline)
 
-            let barData = stats.distanceStats.byTransportType.map { (type, meters) in
+            let barData = stats.distanceStats.byTransportType.map { type, meters in
                 BarData(
                     label: String(transportTypeName(type).prefix(4)),
                     value: Float(meters / 1000),
@@ -363,7 +363,7 @@ private struct CategoryDistributionCard: View {
 
             let pieData = stats.placeStats.visitsByCategory
                 .filter { $0.key.name != "OTHER" || $0.value > 0 }
-                .map { (category, count) in
+                .map { category, count in
                     PieData(
                         label: categoryName(category),
                         value: Float(count),

@@ -2,9 +2,9 @@ package com.po4yka.trailglass.feature.places
 
 import com.po4yka.trailglass.domain.model.*
 import kotlinx.datetime.*
+import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
-import me.tatarka.inject.annotations.Inject
 
 /**
  * Categorizes places based on POI names, visit patterns, and temporal data.
@@ -16,7 +16,6 @@ import me.tatarka.inject.annotations.Inject
  */
 @Inject
 class PlaceCategorizer {
-
     /**
      * Categorize a place visit based on available information.
      *
@@ -28,7 +27,6 @@ class PlaceCategorizer {
         visit: PlaceVisit,
         visitHistory: List<PlaceVisit> = emptyList()
     ): Pair<PlaceCategory, CategoryConfidence> {
-
         // Try POI-based categorization first (highest confidence)
         visit.poiName?.let { poiName ->
             categorizeBPOI(poiName)?.let { category ->
@@ -56,92 +54,92 @@ class PlaceCategorizer {
         return when {
             // Food & Dining
             normalized.contains("restaurant") ||
-            normalized.contains("cafe") ||
-            normalized.contains("coffee") ||
-            normalized.contains("diner") ||
-            normalized.contains("pizzeria") ||
-            normalized.contains("burger") ||
-            normalized.contains("sushi") ||
-            normalized.contains("bakery") ||
-            normalized.contains("bar") ||
-            normalized.contains("pub") ||
-            normalized.contains("bistro") -> PlaceCategory.FOOD
+                normalized.contains("cafe") ||
+                normalized.contains("coffee") ||
+                normalized.contains("diner") ||
+                normalized.contains("pizzeria") ||
+                normalized.contains("burger") ||
+                normalized.contains("sushi") ||
+                normalized.contains("bakery") ||
+                normalized.contains("bar") ||
+                normalized.contains("pub") ||
+                normalized.contains("bistro") -> PlaceCategory.FOOD
 
             // Shopping
             normalized.contains("mall") ||
-            normalized.contains("shop") ||
-            normalized.contains("store") ||
-            normalized.contains("market") ||
-            normalized.contains("boutique") ||
-            normalized.contains("supermarket") ||
-            normalized.contains("grocery") -> PlaceCategory.SHOPPING
+                normalized.contains("shop") ||
+                normalized.contains("store") ||
+                normalized.contains("market") ||
+                normalized.contains("boutique") ||
+                normalized.contains("supermarket") ||
+                normalized.contains("grocery") -> PlaceCategory.SHOPPING
 
             // Fitness
             normalized.contains("gym") ||
-            normalized.contains("fitness") ||
-            normalized.contains("yoga") ||
-            normalized.contains("sports") ||
-            normalized.contains("pool") ||
-            normalized.contains("stadium") ||
-            normalized.contains("arena") -> PlaceCategory.FITNESS
+                normalized.contains("fitness") ||
+                normalized.contains("yoga") ||
+                normalized.contains("sports") ||
+                normalized.contains("pool") ||
+                normalized.contains("stadium") ||
+                normalized.contains("arena") -> PlaceCategory.FITNESS
 
             // Entertainment
             normalized.contains("cinema") ||
-            normalized.contains("theater") ||
-            normalized.contains("theatre") ||
-            normalized.contains("museum") ||
-            normalized.contains("gallery") ||
-            normalized.contains("concert") ||
-            normalized.contains("club") ||
-            normalized.contains("arcade") -> PlaceCategory.ENTERTAINMENT
+                normalized.contains("theater") ||
+                normalized.contains("theatre") ||
+                normalized.contains("museum") ||
+                normalized.contains("gallery") ||
+                normalized.contains("concert") ||
+                normalized.contains("club") ||
+                normalized.contains("arcade") -> PlaceCategory.ENTERTAINMENT
 
             // Travel
             normalized.contains("airport") ||
-            normalized.contains("station") ||
-            normalized.contains("terminal") ||
-            normalized.contains("hotel") ||
-            normalized.contains("motel") ||
-            normalized.contains("hostel") ||
-            normalized.contains("resort") -> PlaceCategory.TRAVEL
+                normalized.contains("station") ||
+                normalized.contains("terminal") ||
+                normalized.contains("hotel") ||
+                normalized.contains("motel") ||
+                normalized.contains("hostel") ||
+                normalized.contains("resort") -> PlaceCategory.TRAVEL
 
             // Healthcare
             normalized.contains("hospital") ||
-            normalized.contains("clinic") ||
-            normalized.contains("doctor") ||
-            normalized.contains("dentist") ||
-            normalized.contains("pharmacy") ||
-            normalized.contains("medical") -> PlaceCategory.HEALTHCARE
+                normalized.contains("clinic") ||
+                normalized.contains("doctor") ||
+                normalized.contains("dentist") ||
+                normalized.contains("pharmacy") ||
+                normalized.contains("medical") -> PlaceCategory.HEALTHCARE
 
             // Education
             normalized.contains("school") ||
-            normalized.contains("university") ||
-            normalized.contains("college") ||
-            normalized.contains("library") ||
-            normalized.contains("academy") -> PlaceCategory.EDUCATION
+                normalized.contains("university") ||
+                normalized.contains("college") ||
+                normalized.contains("library") ||
+                normalized.contains("academy") -> PlaceCategory.EDUCATION
 
             // Religious
             normalized.contains("church") ||
-            normalized.contains("mosque") ||
-            normalized.contains("temple") ||
-            normalized.contains("synagogue") ||
-            normalized.contains("chapel") -> PlaceCategory.RELIGIOUS
+                normalized.contains("mosque") ||
+                normalized.contains("temple") ||
+                normalized.contains("synagogue") ||
+                normalized.contains("chapel") -> PlaceCategory.RELIGIOUS
 
             // Outdoor
             normalized.contains("park") ||
-            normalized.contains("garden") ||
-            normalized.contains("beach") ||
-            normalized.contains("trail") ||
-            normalized.contains("nature") ||
-            normalized.contains("forest") -> PlaceCategory.OUTDOOR
+                normalized.contains("garden") ||
+                normalized.contains("beach") ||
+                normalized.contains("trail") ||
+                normalized.contains("nature") ||
+                normalized.contains("forest") -> PlaceCategory.OUTDOOR
 
             // Service
             normalized.contains("bank") ||
-            normalized.contains("atm") ||
-            normalized.contains("post office") ||
-            normalized.contains("salon") ||
-            normalized.contains("barber") ||
-            normalized.contains("laundry") ||
-            normalized.contains("gas station") -> PlaceCategory.SERVICE
+                normalized.contains("atm") ||
+                normalized.contains("post office") ||
+                normalized.contains("salon") ||
+                normalized.contains("barber") ||
+                normalized.contains("laundry") ||
+                normalized.contains("gas station") -> PlaceCategory.SERVICE
 
             else -> null
         }
@@ -154,7 +152,6 @@ class PlaceCategorizer {
         visit: PlaceVisit,
         visitHistory: List<PlaceVisit>
     ): Pair<PlaceCategory, CategoryConfidence>? {
-
         val totalVisits = visitHistory.size + 1
         val totalDuration = visitHistory.sumOf { it.duration.inWholeSeconds } + visit.duration.inWholeSeconds
         val avgDuration = Duration.parse("${totalDuration / totalVisits}s")
@@ -194,8 +191,9 @@ class PlaceCategorizer {
 
         visits.forEach { visit ->
             val startDateTime = visit.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
-            val isWeekday = startDateTime.dayOfWeek != DayOfWeek.SATURDAY &&
-                           startDateTime.dayOfWeek != DayOfWeek.SUNDAY
+            val isWeekday =
+                startDateTime.dayOfWeek != DayOfWeek.SATURDAY &&
+                    startDateTime.dayOfWeek != DayOfWeek.SUNDAY
             val hour = startDateTime.hour
 
             when {

@@ -26,13 +26,13 @@ class ConflictResolutionController(
     private val syncCoordinator: SyncCoordinator,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Conflict Resolution UI state.
@@ -80,21 +80,23 @@ class ConflictResolutionController(
         resolution: ConflictResolution,
         resolvedEntity: Map<String, String>
     ) {
-        val currentConflict = _state.value.currentConflict ?: run {
-            logger.warn { "No current conflict to resolve" }
-            return
-        }
+        val currentConflict =
+            _state.value.currentConflict ?: run {
+                logger.warn { "No current conflict to resolve" }
+                return
+            }
 
         logger.debug { "Resolving conflict ${currentConflict.entityId} with strategy $resolution" }
 
         _state.update { it.copy(isResolving = true, error = null) }
 
         controllerScope.launch {
-            val result = syncCoordinator.resolveConflict(
-                conflictId = currentConflict.entityId,
-                resolution = resolution,
-                resolvedEntity = resolvedEntity
-            )
+            val result =
+                syncCoordinator.resolveConflict(
+                    conflictId = currentConflict.entityId,
+                    resolution = resolution,
+                    resolvedEntity = resolvedEntity
+                )
 
             when {
                 result.isSuccess -> {
@@ -104,11 +106,12 @@ class ConflictResolutionController(
                         state.copy(
                             isResolving = false,
                             resolvedCount = state.resolvedCount + 1,
-                            currentConflictIndex = if (state.hasMoreConflicts) {
-                                state.currentConflictIndex + 1
-                            } else {
-                                state.currentConflictIndex
-                            }
+                            currentConflictIndex =
+                                if (state.hasMoreConflicts) {
+                                    state.currentConflictIndex + 1
+                                } else {
+                                    state.currentConflictIndex
+                                }
                         )
                     }
                 }

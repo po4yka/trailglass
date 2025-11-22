@@ -24,13 +24,13 @@ class StatsController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Stats UI state.
@@ -59,7 +59,7 @@ class StatsController(
                 _state.update { it.copy(stats = stats, isLoading = false) }
                 logger.info {
                     "Loaded stats for $period: ${stats.countriesVisited.size} countries, " +
-                    "${stats.totalTrips} trips"
+                        "${stats.totalTrips} trips"
                 }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load stats for $period" }

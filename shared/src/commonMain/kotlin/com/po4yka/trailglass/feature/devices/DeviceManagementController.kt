@@ -25,13 +25,13 @@ class DeviceManagementController(
     private val apiClient: TrailGlassApiClient,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Device Management UI state.
@@ -55,7 +55,8 @@ class DeviceManagementController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            apiClient.getUserDevices()
+            apiClient
+                .getUserDevices()
                 .onSuccess { devicesResponse ->
                     logger.info { "Loaded ${devicesResponse.devices.size} devices" }
 
@@ -65,8 +66,7 @@ class DeviceManagementController(
                             isLoading = false
                         )
                     }
-                }
-                .onFailure { error ->
+                }.onFailure { error ->
                     val errorMessage = error.message ?: "Failed to load devices"
                     logger.error { "Failed to load devices: $errorMessage" }
                     _state.update {
@@ -90,13 +90,17 @@ class DeviceManagementController(
     /**
      * Delete a device.
      */
-    fun deleteDevice(deviceId: String, onSuccess: () -> Unit = {}) {
+    fun deleteDevice(
+        deviceId: String,
+        onSuccess: () -> Unit = {}
+    ) {
         logger.debug { "Deleting device: $deviceId" }
 
         _state.update { it.copy(deletingDeviceId = deviceId, error = null) }
 
         controllerScope.launch {
-            apiClient.deleteUserDevice(deviceId)
+            apiClient
+                .deleteUserDevice(deviceId)
                 .onSuccess {
                     logger.info { "Deleted device: $deviceId" }
 
@@ -110,8 +114,7 @@ class DeviceManagementController(
 
                     // Notify caller of successful deletion
                     onSuccess()
-                }
-                .onFailure { error ->
+                }.onFailure { error ->
                     val errorMessage = error.message ?: "Failed to delete device"
                     logger.error { "Failed to delete device: $errorMessage" }
                     _state.update {

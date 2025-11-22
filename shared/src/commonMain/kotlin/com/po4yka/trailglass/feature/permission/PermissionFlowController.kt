@@ -30,13 +30,13 @@ class PermissionFlowController(
     private val rationaleProvider: PermissionRationaleProvider,
     coroutineScope: CoroutineScope
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * UI state for permission flow.
@@ -88,13 +88,14 @@ class PermissionFlowController(
                         val instructions = rationaleProvider.getSettingsInstructions(permissionType)
                         _state.update {
                             it.copy(
-                                currentRequest = PermissionRequestState(
-                                    permissionType = permissionType,
-                                    state = currentState,
-                                    rationale = rationale,
-                                    shouldShowRationale = false,
-                                    canRequest = false
-                                ),
+                                currentRequest =
+                                    PermissionRequestState(
+                                        permissionType = permissionType,
+                                        state = currentState,
+                                        rationale = rationale,
+                                        shouldShowRationale = false,
+                                        canRequest = false
+                                    ),
                                 showPermanentlyDeniedDialog = true,
                                 settingsInstructions = instructions
                             )
@@ -106,13 +107,14 @@ class PermissionFlowController(
                         logger.info { "Showing permission rationale" }
                         _state.update {
                             it.copy(
-                                currentRequest = PermissionRequestState(
-                                    permissionType = permissionType,
-                                    state = currentState,
-                                    rationale = rationale,
-                                    shouldShowRationale = true,
-                                    canRequest = true
-                                ),
+                                currentRequest =
+                                    PermissionRequestState(
+                                        permissionType = permissionType,
+                                        state = currentState,
+                                        rationale = rationale,
+                                        shouldShowRationale = true,
+                                        canRequest = true
+                                    ),
                                 showRationaleDialog = true
                             )
                         }
@@ -261,13 +263,14 @@ class PermissionFlowController(
         _state.update {
             it.copy(
                 isRequesting = true,
-                currentRequest = PermissionRequestState(
-                    permissionType = permissionType,
-                    state = PermissionState.NotDetermined,
-                    rationale = rationale,
-                    shouldShowRationale = false,
-                    canRequest = true
-                )
+                currentRequest =
+                    PermissionRequestState(
+                        permissionType = permissionType,
+                        state = PermissionState.NotDetermined,
+                        rationale = rationale,
+                        shouldShowRationale = false,
+                        canRequest = true
+                    )
             )
         }
 
@@ -344,26 +347,24 @@ class PermissionFlowController(
     /**
      * Check if a specific permission is granted.
      */
-    suspend fun isPermissionGranted(permissionType: PermissionType): Boolean {
-        return try {
+    suspend fun isPermissionGranted(permissionType: PermissionType): Boolean =
+        try {
             permissionManager.checkPermission(permissionType).isGranted
         } catch (e: Exception) {
             logger.error(e) { "Error checking permission" }
             false
         }
-    }
 
     /**
      * Get the current state of a permission without starting a flow.
      */
-    suspend fun getPermissionState(permissionType: PermissionType): PermissionState {
-        return try {
+    suspend fun getPermissionState(permissionType: PermissionType): PermissionState =
+        try {
             permissionManager.checkPermission(permissionType)
         } catch (e: Exception) {
             logger.error(e) { "Error getting permission state" }
             PermissionState.NotDetermined
         }
-    }
 
     /**
      * Cleanup method to release resources and prevent memory leaks.

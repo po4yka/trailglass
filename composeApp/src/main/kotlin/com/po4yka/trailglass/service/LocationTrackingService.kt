@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
  * a foreground service with a notification.
  */
 class LocationTrackingService : Service() {
-
     companion object {
         private const val NOTIFICATION_ID = 1001
         private const val CHANNEL_ID = "location_tracking_channel"
@@ -46,11 +45,15 @@ class LocationTrackingService : Service() {
          * @param context Android context
          * @param mode Tracking mode (CONTINUOUS or SMART)
          */
-        fun startService(context: Context, mode: TrackingMode = TrackingMode.ACTIVE) {
-            val intent = Intent(context, LocationTrackingService::class.java).apply {
-                action = ACTION_START_TRACKING
-                putExtra(EXTRA_TRACKING_MODE, mode.name)
-            }
+        fun startService(
+            context: Context,
+            mode: TrackingMode = TrackingMode.ACTIVE
+        ) {
+            val intent =
+                Intent(context, LocationTrackingService::class.java).apply {
+                    action = ACTION_START_TRACKING
+                    putExtra(EXTRA_TRACKING_MODE, mode.name)
+                }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(intent)
@@ -63,9 +66,10 @@ class LocationTrackingService : Service() {
          * Stops the location tracking service.
          */
         fun stopService(context: Context) {
-            val intent = Intent(context, LocationTrackingService::class.java).apply {
-                action = ACTION_STOP_TRACKING
-            }
+            val intent =
+                Intent(context, LocationTrackingService::class.java).apply {
+                    action = ACTION_STOP_TRACKING
+                }
             context.startService(intent)
         }
     }
@@ -96,7 +100,11 @@ class LocationTrackingService : Service() {
         createNotificationChannel()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int
+    ): Int {
         when (intent?.action) {
             ACTION_START_TRACKING -> {
                 val modeName = intent.getStringExtra(EXTRA_TRACKING_MODE) ?: TrackingMode.ACTIVE.name
@@ -156,14 +164,15 @@ class LocationTrackingService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Shows when TrailGlass is tracking your location"
-                setShowBadge(false)
-            }
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_LOW
+                ).apply {
+                    description = "Shows when TrailGlass is tracking your location"
+                    setShowBadge(false)
+                }
 
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
@@ -172,28 +181,33 @@ class LocationTrackingService : Service() {
 
     private fun createNotification(): Notification {
         // Create intent to open the app when notification is tapped
-        val launchIntent = packageManager.getLaunchIntentForPackage(packageName)?.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
+        val launchIntent =
+            packageManager.getLaunchIntentForPackage(packageName)?.apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
 
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            launchIntent,
-            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-        )
+        val pendingIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                launchIntent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
 
-        val stopIntent = Intent(this, LocationTrackingService::class.java).apply {
-            action = ACTION_STOP_TRACKING
-        }
-        val stopPendingIntent = PendingIntent.getService(
-            this,
-            1,
-            stopIntent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val stopIntent =
+            Intent(this, LocationTrackingService::class.java).apply {
+                action = ACTION_STOP_TRACKING
+            }
+        val stopPendingIntent =
+            PendingIntent.getService(
+                this,
+                1,
+                stopIntent,
+                PendingIntent.FLAG_IMMUTABLE
+            )
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
+        return NotificationCompat
+            .Builder(this, CHANNEL_ID)
             .setContentTitle("TrailGlass")
             .setContentText("Starting location tracking...")
             .setSmallIcon(R.drawable.ic_launcher_foreground) // App icon for notification
@@ -202,8 +216,7 @@ class LocationTrackingService : Service() {
                 android.R.drawable.ic_media_pause,
                 "Stop",
                 stopPendingIntent
-            )
-            .setOngoing(true)
+            ).setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .build()

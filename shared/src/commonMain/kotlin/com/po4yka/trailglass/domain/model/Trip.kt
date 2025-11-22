@@ -16,23 +16,19 @@ data class Trip(
     val primaryCountry: String? = null,
     val isOngoing: Boolean = false,
     val userId: String,
-
     // Trip statistics
     val totalDistanceMeters: Double = 0.0,
     val visitedPlaceCount: Int = 0,
     val countriesVisited: List<String> = emptyList(),
     val citiesVisited: List<String> = emptyList(),
-
     // User customization
     val description: String? = null,
     val coverPhotoUri: String? = null,
     val isPublic: Boolean = false,
     val tags: List<String> = emptyList(),
-
     // Auto-detection metadata
     val isAutoDetected: Boolean = false,
     val detectionConfidence: Float = 0f, // 0.0 to 1.0
-
     // Metadata
     val createdAt: Instant? = null,
     val updatedAt: Instant? = null
@@ -48,28 +44,30 @@ data class Trip(
      * Priority: name > primaryCountry > "Unnamed Trip"
      */
     val displayName: String
-        get() = name
-            ?: primaryCountry?.let { "$it Trip" }
-            ?: "Unnamed Trip"
+        get() =
+            name
+                ?: primaryCountry?.let { "$it Trip" }
+                ?: "Unnamed Trip"
 
     /**
      * Get a summary of the trip.
      */
     val summary: String
-        get() = buildString {
-            if (countriesVisited.isNotEmpty()) {
-                append("${countriesVisited.size} ${if (countriesVisited.size == 1) "country" else "countries"}")
+        get() =
+            buildString {
+                if (countriesVisited.isNotEmpty()) {
+                    append("${countriesVisited.size} ${if (countriesVisited.size == 1) "country" else "countries"}")
+                }
+                if (visitedPlaceCount > 0) {
+                    if (isNotEmpty()) append(" • ")
+                    append("$visitedPlaceCount ${if (visitedPlaceCount == 1) "place" else "places"}")
+                }
+                if (totalDistanceMeters > 0) {
+                    if (isNotEmpty()) append(" • ")
+                    val km = (totalDistanceMeters / 1000).toInt()
+                    append("$km km")
+                }
             }
-            if (visitedPlaceCount > 0) {
-                if (isNotEmpty()) append(" • ")
-                append("$visitedPlaceCount ${if (visitedPlaceCount == 1) "place" else "places"}")
-            }
-            if (totalDistanceMeters > 0) {
-                if (isNotEmpty()) append(" • ")
-                val km = (totalDistanceMeters / 1000).toInt()
-                append("$km km")
-            }
-        }
 }
 
 /**

@@ -5,16 +5,15 @@ import com.po4yka.trailglass.feature.stats.models.CityStats
 import com.po4yka.trailglass.feature.stats.models.CountryStats
 import com.po4yka.trailglass.feature.stats.models.GeographicStatistics
 import com.po4yka.trailglass.feature.stats.models.LocationRecord
+import me.tatarka.inject.annotations.Inject
 import kotlin.math.*
 import kotlin.time.Duration
-import me.tatarka.inject.annotations.Inject
 
 /**
  * Calculator for geographic statistics.
  */
 @Inject
 class GeographicStatisticsCalculator {
-
     /**
      * Calculate comprehensive geographic statistics.
      */
@@ -52,29 +51,28 @@ class GeographicStatisticsCalculator {
     /**
      * Calculate top countries by visit count.
      */
-    private fun calculateTopCountries(visits: List<PlaceVisit>): List<CountryStats> {
-        return visits
+    private fun calculateTopCountries(visits: List<PlaceVisit>): List<CountryStats> =
+        visits
             .filter { it.countryCode != null }
             .groupBy { it.countryCode!! }
             .map { (country, countryVisits) ->
                 CountryStats(
                     countryCode = country,
                     visitCount = countryVisits.size,
-                    totalDuration = countryVisits.fold(Duration.ZERO) { acc, visit ->
-                        acc + visit.duration
-                    },
+                    totalDuration =
+                        countryVisits.fold(Duration.ZERO) { acc, visit ->
+                            acc + visit.duration
+                        },
                     cities = countryVisits.mapNotNull { it.city }.toSet()
                 )
-            }
-            .sortedByDescending { it.visitCount }
+            }.sortedByDescending { it.visitCount }
             .take(10)
-    }
 
     /**
      * Calculate top cities by visit count.
      */
-    private fun calculateTopCities(visits: List<PlaceVisit>): List<CityStats> {
-        return visits
+    private fun calculateTopCities(visits: List<PlaceVisit>): List<CityStats> =
+        visits
             .filter { it.city != null }
             .groupBy { it.city!! }
             .map { (city, cityVisits) ->
@@ -82,14 +80,13 @@ class GeographicStatisticsCalculator {
                     city = city,
                     countryCode = cityVisits.firstOrNull()?.countryCode,
                     visitCount = cityVisits.size,
-                    totalDuration = cityVisits.fold(Duration.ZERO) { acc, visit ->
-                        acc + visit.duration
-                    }
+                    totalDuration =
+                        cityVisits.fold(Duration.ZERO) { acc, visit ->
+                            acc + visit.duration
+                        }
                 )
-            }
-            .sortedByDescending { it.visitCount }
+            }.sortedByDescending { it.visitCount }
             .take(10)
-    }
 
     /**
      * Find home base (most visited location).
@@ -121,15 +118,21 @@ class GeographicStatisticsCalculator {
     /**
      * Find furthest location from home base using Haversine formula.
      */
-    private fun findFurthestLocation(visits: List<PlaceVisit>, homeBase: LocationRecord?): LocationRecord? {
+    private fun findFurthestLocation(
+        visits: List<PlaceVisit>,
+        homeBase: LocationRecord?
+    ): LocationRecord? {
         if (visits.isEmpty() || homeBase == null) return null
 
-        val furthest = visits.maxByOrNull { visit ->
-            calculateDistance(
-                homeBase.latitude, homeBase.longitude,
-                visit.centerLatitude, visit.centerLongitude
-            )
-        } ?: return null
+        val furthest =
+            visits.maxByOrNull { visit ->
+                calculateDistance(
+                    homeBase.latitude,
+                    homeBase.longitude,
+                    visit.centerLatitude,
+                    visit.centerLongitude
+                )
+            } ?: return null
 
         return LocationRecord(
             name = furthest.displayName,
@@ -143,13 +146,19 @@ class GeographicStatisticsCalculator {
     /**
      * Calculate distance between two coordinates using Haversine formula (in meters).
      */
-    private fun calculateDistance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+    private fun calculateDistance(
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
+    ): Double {
         val earthRadiusKm = 6371.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2) * sin(dLat / 2) +
+        val a =
+            sin(dLat / 2) * sin(dLat / 2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2) * sin(dLon / 2)
 

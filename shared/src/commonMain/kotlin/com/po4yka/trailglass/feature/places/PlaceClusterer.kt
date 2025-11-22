@@ -4,10 +4,9 @@ import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import me.tatarka.inject.annotations.Inject
 import kotlin.math.*
 import kotlin.time.Duration
-import me.tatarka.inject.annotations.Inject
 
 /**
  * Clusters place visits to identify frequently visited places using DBSCAN-like algorithm.
@@ -21,7 +20,6 @@ class PlaceClusterer(
     private val clusterRadiusMeters: Double = 50.0,
     private val minVisitsForPlace: Int = 2
 ) {
-
     /**
      * Cluster place visits into frequent places.
      *
@@ -29,7 +27,10 @@ class PlaceClusterer(
      * @param userId User ID for the frequent places
      * @return List of frequent places with aggregated statistics
      */
-    fun clusterVisits(visits: List<PlaceVisit>, userId: String): List<FrequentPlace> {
+    fun clusterVisits(
+        visits: List<PlaceVisit>,
+        userId: String
+    ): List<FrequentPlace> {
         if (visits.isEmpty()) return emptyList()
 
         // Sort visits by time for easier processing
@@ -43,8 +44,7 @@ class PlaceClusterer(
             .filter { it.size >= minVisitsForPlace }
             .mapIndexed { index, cluster ->
                 createFrequentPlace(cluster, userId, index)
-            }
-            .sortedByDescending { it.visitCount }
+            }.sortedByDescending { it.visitCount }
     }
 
     /**
@@ -104,10 +104,13 @@ class PlaceClusterer(
             // Find all visits within cluster radius
             visits.forEachIndexed { otherIndex, otherVisit ->
                 if (otherIndex !in visited) {
-                    val distance = calculateDistance(
-                        visit.centerLatitude, visit.centerLongitude,
-                        otherVisit.centerLatitude, otherVisit.centerLongitude
-                    )
+                    val distance =
+                        calculateDistance(
+                            visit.centerLatitude,
+                            visit.centerLongitude,
+                            otherVisit.centerLatitude,
+                            otherVisit.centerLongitude
+                        )
 
                     if (distance <= clusterRadiusMeters) {
                         cluster.add(otherVisit)
@@ -146,11 +149,12 @@ class PlaceClusterer(
         val (category, confidence) = determineCategoryForCluster(cluster)
 
         // Determine significance
-        val significance = categorizer.determineSignificance(
-            visitCount = visitCount,
-            totalDuration = totalDuration,
-            lastVisitTime = lastVisit.endTime
-        )
+        val significance =
+            categorizer.determineSignificance(
+                visitCount = visitCount,
+                totalDuration = totalDuration,
+                lastVisitTime = lastVisit.endTime
+            )
 
         // Use name/address from most recent visit with that information
         val recentWithInfo = cluster.reversed().firstOrNull { it.poiName != null || it.approximateAddress != null }
@@ -190,14 +194,16 @@ class PlaceClusterer(
     private fun determineCategoryForCluster(
         cluster: List<PlaceVisit>
     ): Pair<PlaceCategory, com.po4yka.trailglass.domain.model.CategoryConfidence> {
-        val categorizations = cluster.map { visit ->
-            categorizer.categorize(visit, cluster.filter { it != visit })
-        }
+        val categorizations =
+            cluster.map { visit ->
+                categorizer.categorize(visit, cluster.filter { it != visit })
+            }
 
         // Count votes for each category
-        val categoryVotes = categorizations
-            .groupBy { it.first }
-            .mapValues { (_, pairs) -> pairs.size }
+        val categoryVotes =
+            categorizations
+                .groupBy { it.first }
+                .mapValues { (_, pairs) -> pairs.size }
 
         // Get the category with most votes
         val winningCategory = categoryVotes.maxByOrNull { it.value }?.key ?: PlaceCategory.OTHER
@@ -207,11 +213,12 @@ class PlaceClusterer(
         val winningVotes = categoryVotes[winningCategory] ?: 0
         val consensus = winningVotes.toDouble() / totalVotes
 
-        val confidence = when {
-            consensus >= 0.8 -> com.po4yka.trailglass.domain.model.CategoryConfidence.HIGH
-            consensus >= 0.5 -> com.po4yka.trailglass.domain.model.CategoryConfidence.MEDIUM
-            else -> com.po4yka.trailglass.domain.model.CategoryConfidence.LOW
-        }
+        val confidence =
+            when {
+                consensus >= 0.8 -> com.po4yka.trailglass.domain.model.CategoryConfidence.HIGH
+                consensus >= 0.5 -> com.po4yka.trailglass.domain.model.CategoryConfidence.MEDIUM
+                else -> com.po4yka.trailglass.domain.model.CategoryConfidence.LOW
+            }
 
         return winningCategory to confidence
     }
@@ -222,19 +229,20 @@ class PlaceClusterer(
     private fun findNearestPlace(
         visit: PlaceVisit,
         places: List<FrequentPlace>
-    ): FrequentPlace? {
-        return places
+    ): FrequentPlace? =
+        places
             .map { place ->
-                val distance = calculateDistance(
-                    visit.centerLatitude, visit.centerLongitude,
-                    place.centerLatitude, place.centerLongitude
-                )
+                val distance =
+                    calculateDistance(
+                        visit.centerLatitude,
+                        visit.centerLongitude,
+                        place.centerLatitude,
+                        place.centerLongitude
+                    )
                 place to distance
-            }
-            .filter { (_, distance) -> distance <= clusterRadiusMeters }
+            }.filter { (_, distance) -> distance <= clusterRadiusMeters }
             .minByOrNull { (_, distance) -> distance }
             ?.first
-    }
 
     /**
      * Update a frequent place with a new visit.
@@ -249,11 +257,12 @@ class PlaceClusterer(
         val newFirstVisitTime = minOf(place.firstVisitTime ?: visit.startTime, visit.startTime)
 
         // Recalculate significance
-        val newSignificance = categorizer.determineSignificance(
-            visitCount = newVisitCount,
-            totalDuration = newTotalDuration,
-            lastVisitTime = newLastVisitTime
-        )
+        val newSignificance =
+            categorizer.determineSignificance(
+                visitCount = newVisitCount,
+                totalDuration = newTotalDuration,
+                lastVisitTime = newLastVisitTime
+            )
 
         return place.copy(
             visitCount = newVisitCount,
@@ -271,15 +280,18 @@ class PlaceClusterer(
      * @return Distance in meters
      */
     private fun calculateDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 

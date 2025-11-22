@@ -4,7 +4,6 @@ import XCTest
  * UI tests for Map screen in TrailGlass iOS app.
  */
 final class MapScreenUITests: XCTestCase {
-
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -32,7 +31,7 @@ final class MapScreenUITests: XCTestCase {
 
         // Then - Map screen should be displayed
         let mapTitle = app.navigationBars["Map"]
-        XCTAssertTrue(mapTitle.exists || app.maps.count > 0,
+        XCTAssertTrue(mapTitle.exists || !app.maps.isEmpty,
                      "Map navigation bar or map view should exist")
     }
 
@@ -131,7 +130,7 @@ final class MapScreenUITests: XCTestCase {
             XCTAssertTrue(app.buttons["Photos"].exists)
 
             // And close button
-            XCTAssertTrue(app.buttons["Close"].exists || app.buttons.matching(NSPredicate(format: "label CONTAINS 'close'")).count > 0)
+            XCTAssertTrue(app.buttons["Close"].exists || !app.buttons.matching(NSPredicate(format: "label CONTAINS 'close'")).isEmpty)
         }
     }
 
@@ -176,7 +175,7 @@ final class MapScreenUITests: XCTestCase {
         // Then - map controls should be accessible
         let mapView = app.maps.firstMatch
         XCTAssertTrue(mapView.isAccessibilityElement ||
-                     mapView.descendants(matching: .any).count > 0,
+                     !mapView.descendants(matching: .any).isEmpty,
                      "Map or its controls should be accessible")
     }
 

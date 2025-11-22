@@ -1,6 +1,5 @@
 package com.po4yka.trailglass.feature.route.export
 
-import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.domain.model.TripRoute
 
 /**
@@ -8,7 +7,6 @@ import com.po4yka.trailglass.domain.model.TripRoute
  * Exports route data to KML format for Google Earth and other mapping applications.
  */
 class KmlExporter {
-
     /**
      * Export trip route to KML format.
      *
@@ -16,8 +14,11 @@ class KmlExporter {
      * @param tripName Optional trip name for metadata
      * @return KML XML string
      */
-    fun export(tripRoute: TripRoute, tripName: String? = null): String {
-        return buildString {
+    fun export(
+        tripRoute: TripRoute,
+        tripName: String? = null
+    ): String =
+        buildString {
             // XML header
             appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
             appendLine("<kml xmlns=\"http://www.opengis.net/kml/2.2\">")
@@ -39,7 +40,9 @@ class KmlExporter {
                         appendLine("        <description>${escapeXml(visit.approximateAddress)}</description>")
                     }
                     appendLine("        <Point>")
-                    appendLine("          <coordinates>${visit.centerLongitude},${visit.centerLatitude},0</coordinates>")
+                    appendLine(
+                        "          <coordinates>${visit.centerLongitude},${visit.centerLatitude},0</coordinates>"
+                    )
                     appendLine("        </Point>")
                     appendLine("      </Placemark>")
                 }
@@ -75,8 +78,20 @@ class KmlExporter {
                 segments.forEach { segment ->
                     if (segment.simplifiedPath.isNotEmpty()) {
                         appendLine("      <Placemark>")
-                        appendLine("        <name>${transportType.name.lowercase().replaceFirstChar { it.uppercase() }} - ${formatDistance(segment.distanceMeters)}</name>")
-                        appendLine("        <description>Distance: ${formatDistance(segment.distanceMeters)}, Duration: ${formatDuration(segment.endTime.toEpochMilliseconds() - segment.startTime.toEpochMilliseconds())}</description>")
+                        appendLine(
+                            "        <name>${transportType.name.lowercase().replaceFirstChar {
+                                it.uppercase()
+                            }} - ${formatDistance(
+                                segment.distanceMeters
+                            )}</name>"
+                        )
+                        appendLine(
+                            "        <description>Distance: ${formatDistance(
+                                segment.distanceMeters
+                            )}, Duration: ${formatDuration(
+                                segment.endTime.toEpochMilliseconds() - segment.startTime.toEpochMilliseconds()
+                            )}</description>"
+                        )
                         appendLine("        <styleUrl>#${transportType.name.lowercase()}</styleUrl>")
                         appendLine("        <LineString>")
                         appendLine("          <tessellate>1</tessellate>")
@@ -95,21 +110,21 @@ class KmlExporter {
             appendLine("  </Document>")
             appendLine("</kml>")
         }
-    }
 
     /**
      * Append KML styles for different transport types.
      */
     private fun StringBuilder.appendTransportStyles() {
-        val styles = mapOf(
-            "walk" to "ff00ff00",      // Green
-            "bike" to "ffff0000",      // Blue
-            "car" to "ff0099ff",       // Orange
-            "train" to "ffff00ff",     // Purple
-            "plane" to "ff0000ff",     // Red
-            "boat" to "ffffff00",      // Cyan
-            "unknown" to "ff999999"    // Gray
-        )
+        val styles =
+            mapOf(
+                "walk" to "ff00ff00", // Green
+                "bike" to "ffff0000", // Blue
+                "car" to "ff0099ff", // Orange
+                "train" to "ffff00ff", // Purple
+                "plane" to "ff0000ff", // Red
+                "boat" to "ffffff00", // Cyan
+                "unknown" to "ff999999" // Gray
+            )
 
         styles.forEach { (type, color) ->
             appendLine("    <Style id=\"$type\">")
@@ -124,8 +139,8 @@ class KmlExporter {
     /**
      * Format distance for display.
      */
-    private fun formatDistance(meters: Double): String {
-        return when {
+    private fun formatDistance(meters: Double): String =
+        when {
             meters < 1000 -> "${meters.toInt()} m"
             else -> {
                 val km = meters / 1000
@@ -133,7 +148,6 @@ class KmlExporter {
                 "$rounded km"
             }
         }
-    }
 
     /**
      * Format duration for display.
@@ -153,12 +167,11 @@ class KmlExporter {
     /**
      * Escape XML special characters.
      */
-    private fun escapeXml(text: String): String {
-        return text
+    private fun escapeXml(text: String): String =
+        text
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
             .replace("\"", "&quot;")
             .replace("'", "&apos;")
-    }
 }

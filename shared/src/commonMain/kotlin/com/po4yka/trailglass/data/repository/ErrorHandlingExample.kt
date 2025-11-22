@@ -34,8 +34,11 @@ class PlaceVisitRepositoryWithErrorHandling(
      * - Analytics logging
      * - User-friendly error messages
      */
-    suspend fun getPlaceVisitById(id: String, userId: String): Result<PlaceVisit?> {
-        return ErrorMapper.mapToResultSuspend {
+    suspend fun getPlaceVisitById(
+        id: String,
+        userId: String
+    ): Result<PlaceVisit?> =
+        ErrorMapper.mapToResultSuspend {
             try {
                 // Simulate database query
                 // val visit = database.placeVisitsQueries.getById(id, userId).executeAsOneOrNull()
@@ -45,16 +48,16 @@ class PlaceVisitRepositoryWithErrorHandling(
                 val error = ErrorMapper.mapDatabaseException(e, DatabaseOperation.QUERY)
                 error.logToAnalytics(
                     errorAnalytics,
-                    context = mapOf(
-                        "operation" to "getPlaceVisitById",
-                        "visitId" to id,
-                        "userId" to userId
-                    )
+                    context =
+                        mapOf(
+                            "operation" to "getPlaceVisitById",
+                            "visitId" to id,
+                            "userId" to userId
+                        )
                 )
                 throw e
             }
         }
-    }
 
     /**
      * Get place visits for time range with retry logic.
@@ -68,42 +71,43 @@ class PlaceVisitRepositoryWithErrorHandling(
         userId: String,
         startTime: Instant,
         endTime: Instant
-    ): Flow<Result<List<PlaceVisit>>> {
-        return kotlinx.coroutines.flow.flow {
+    ): Flow<Result<List<PlaceVisit>>> =
+        kotlinx.coroutines.flow.flow {
             // Execute with retry
-            val result = retryWithPolicy(
-                policy = RetryPolicy.DEFAULT,
-                onRetry = { state ->
-                    logger.info {
-                        "Retrying getPlaceVisitsForTimeRange (attempt ${state.attempt})"
+            val result =
+                retryWithPolicy(
+                    policy = RetryPolicy.DEFAULT,
+                    onRetry = { state ->
+                        logger.info {
+                            "Retrying getPlaceVisitsForTimeRange (attempt ${state.attempt})"
+                        }
+                    }
+                ) {
+                    try {
+                        // Simulate database query
+                        // val visits = database.placeVisitsQueries
+                        //     .getForTimeRange(userId, startTime, endTime)
+                        //     .executeAsList()
+                        //     .map { it.toDomainModel() }
+                        Result.Success(emptyList<PlaceVisit>())
+                    } catch (e: Exception) {
+                        val error = ErrorMapper.mapDatabaseException(e, DatabaseOperation.QUERY)
+                        error.logToAnalytics(
+                            errorAnalytics,
+                            context =
+                                mapOf(
+                                    "operation" to "getPlaceVisitsForTimeRange",
+                                    "userId" to userId,
+                                    "startTime" to startTime.toString(),
+                                    "endTime" to endTime.toString()
+                                )
+                        )
+                        Result.Error(error)
                     }
                 }
-            ) {
-                try {
-                    // Simulate database query
-                    // val visits = database.placeVisitsQueries
-                    //     .getForTimeRange(userId, startTime, endTime)
-                    //     .executeAsList()
-                    //     .map { it.toDomainModel() }
-                    Result.Success(emptyList<PlaceVisit>())
-                } catch (e: Exception) {
-                    val error = ErrorMapper.mapDatabaseException(e, DatabaseOperation.QUERY)
-                    error.logToAnalytics(
-                        errorAnalytics,
-                        context = mapOf(
-                            "operation" to "getPlaceVisitsForTimeRange",
-                            "userId" to userId,
-                            "startTime" to startTime.toString(),
-                            "endTime" to endTime.toString()
-                        )
-                    )
-                    Result.Error(error)
-                }
-            }
 
             emit(result)
         }
-    }
 
     /**
      * Insert place visit with validation and error handling.
@@ -135,27 +139,30 @@ class PlaceVisitRepositoryWithErrorHandling(
 
             // Check if constraint violation
             if (e.message?.contains("UNIQUE constraint failed") == true) {
-                TrailGlassError.DatabaseError.ConstraintViolation(
-                    technicalMessage = "Place visit already exists",
-                    cause = e
-                ).let {
-                    it.logToAnalytics(
-                        errorAnalytics,
-                        context = mapOf(
-                            "operation" to "insertPlaceVisit",
-                            "visitId" to visit.id
-                        ),
-                        severity = ErrorSeverity.WARNING
-                    )
-                    Result.Error(it)
-                }
+                TrailGlassError.DatabaseError
+                    .ConstraintViolation(
+                        technicalMessage = "Place visit already exists",
+                        cause = e
+                    ).let {
+                        it.logToAnalytics(
+                            errorAnalytics,
+                            context =
+                                mapOf(
+                                    "operation" to "insertPlaceVisit",
+                                    "visitId" to visit.id
+                                ),
+                            severity = ErrorSeverity.WARNING
+                        )
+                        Result.Error(it)
+                    }
             } else {
                 error.logToAnalytics(
                     errorAnalytics,
-                    context = mapOf(
-                        "operation" to "insertPlaceVisit",
-                        "visitId" to visit.id
-                    )
+                    context =
+                        mapOf(
+                            "operation" to "insertPlaceVisit",
+                            "visitId" to visit.id
+                        )
                 )
                 Result.Error(error)
             }
@@ -194,10 +201,11 @@ class PlaceVisitRepositoryWithErrorHandling(
                 val error = ErrorMapper.mapDatabaseException(e, DatabaseOperation.UPDATE)
                 error.logToAnalytics(
                     errorAnalytics,
-                    context = mapOf(
-                        "operation" to "updatePlaceVisit",
-                        "visitId" to visit.id
-                    )
+                    context =
+                        mapOf(
+                            "operation" to "updatePlaceVisit",
+                            "visitId" to visit.id
+                        )
                 )
                 Result.Error(error)
             }
@@ -211,8 +219,11 @@ class PlaceVisitRepositoryWithErrorHandling(
      * - Cascade delete error handling
      * - Foreign key constraint handling
      */
-    suspend fun deletePlaceVisit(id: String, userId: String): Result<Unit> {
-        return try {
+    suspend fun deletePlaceVisit(
+        id: String,
+        userId: String
+    ): Result<Unit> =
+        try {
             // Simulate database delete
             // database.placeVisitsQueries.delete(id, userId)
             Result.Success(Unit)
@@ -220,15 +231,15 @@ class PlaceVisitRepositoryWithErrorHandling(
             val error = ErrorMapper.mapDatabaseException(e, DatabaseOperation.DELETE)
             error.logToAnalytics(
                 errorAnalytics,
-                context = mapOf(
-                    "operation" to "deletePlaceVisit",
-                    "visitId" to id,
-                    "userId" to userId
-                )
+                context =
+                    mapOf(
+                        "operation" to "deletePlaceVisit",
+                        "visitId" to id,
+                        "userId" to userId
+                    )
             )
             Result.Error(error)
         }
-    }
 
     /**
      * Validate place visit input.
@@ -267,12 +278,11 @@ class PlaceVisitRepositoryWithErrorHandling(
 /**
  * Extension function demonstrating Flow error handling.
  */
-fun <T> Flow<T>.handleErrors(errorAnalytics: ErrorAnalytics): Flow<Result<T>> {
-    return this
+fun <T> Flow<T>.handleErrors(errorAnalytics: ErrorAnalytics): Flow<Result<T>> =
+    this
         .map { Result.Success(it) as Result<T> }
         .catch { exception ->
             val error = ErrorMapper.mapException(exception)
             error.logToAnalytics(errorAnalytics)
             emit(Result.Error(error))
         }
-}

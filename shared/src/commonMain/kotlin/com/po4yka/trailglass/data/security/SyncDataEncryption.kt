@@ -32,8 +32,11 @@ class SyncDataEncryption(
      * @param serializer The serializer for the data type
      * @return Encrypted payload wrapper containing the encrypted data
      */
-    suspend fun <T> encryptSyncData(data: T, serializer: KSerializer<T>): Result<EncryptedSyncPayload> {
-        return try {
+    suspend fun <T> encryptSyncData(
+        data: T,
+        serializer: KSerializer<T>
+    ): Result<EncryptedSyncPayload> =
+        try {
             // Serialize to JSON
             val jsonString = json.encodeToString(serializer, data)
 
@@ -52,7 +55,6 @@ class SyncDataEncryption(
             logger.error(e) { "Failed to encrypt sync data" }
             Result.failure(e)
         }
-    }
 
     /**
      * Decrypt sync payload received from server.
@@ -61,8 +63,11 @@ class SyncDataEncryption(
      * @param deserializer The deserializer for the data type
      * @return Decrypted data object
      */
-    suspend fun <T> decryptSyncData(payload: EncryptedSyncPayload, deserializer: KSerializer<T>): Result<T> {
-        return try {
+    suspend fun <T> decryptSyncData(
+        payload: EncryptedSyncPayload,
+        deserializer: KSerializer<T>
+    ): Result<T> =
+        try {
             if (payload.encryptionVersion != ENCRYPTION_VERSION) {
                 throw EncryptionException(
                     "Unsupported encryption version: ${payload.encryptionVersion}"
@@ -72,8 +77,9 @@ class SyncDataEncryption(
             logger.debug { "Decrypting sync data (version ${payload.encryptionVersion})" }
 
             // Parse encrypted data
-            val encryptedData = EncryptedData.fromStorageFormat(payload.encryptedData)
-                ?: throw EncryptionException("Invalid encrypted data format")
+            val encryptedData =
+                EncryptedData.fromStorageFormat(payload.encryptedData)
+                    ?: throw EncryptionException("Invalid encrypted data format")
 
             // Decrypt
             val jsonString = encryptionService.decrypt(encryptedData).getOrThrow()
@@ -86,27 +92,23 @@ class SyncDataEncryption(
             logger.error(e) { "Failed to decrypt sync data" }
             Result.failure(e)
         }
-    }
 
     /**
      * Check if E2E encryption is available (key exists).
      */
-    suspend fun isEncryptionAvailable(): Boolean {
-        return encryptionService.hasEncryptionKey()
-    }
+    suspend fun isEncryptionAvailable(): Boolean = encryptionService.hasEncryptionKey()
 
     /**
      * Initialize E2E encryption by generating a key if needed.
      */
-    suspend fun initializeEncryption(): Result<Unit> {
-        return if (!encryptionService.hasEncryptionKey()) {
+    suspend fun initializeEncryption(): Result<Unit> =
+        if (!encryptionService.hasEncryptionKey()) {
             logger.info { "Generating new E2E encryption key" }
             encryptionService.generateKey()
         } else {
             logger.info { "E2E encryption key already exists" }
             Result.success(Unit)
         }
-    }
 
     /**
      * Export encryption key for backup (password-protected).
@@ -119,7 +121,10 @@ class SyncDataEncryption(
     /**
      * Import encryption key from backup (password-protected).
      */
-    suspend fun importEncryptionKey(encryptedBackup: String, password: String): Result<Unit> {
+    suspend fun importEncryptionKey(
+        encryptedBackup: String,
+        password: String
+    ): Result<Unit> {
         logger.info { "Importing E2E encryption key" }
         return encryptionService.importKey(encryptedBackup, password)
     }
@@ -152,7 +157,6 @@ data class EncryptedSyncPayload(
      * Encrypted data in storage format (iv:tag:ciphertext).
      */
     val encryptedData: String,
-
     /**
      * Encryption version for forward compatibility.
      */

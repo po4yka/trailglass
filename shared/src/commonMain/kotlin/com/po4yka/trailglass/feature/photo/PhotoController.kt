@@ -33,13 +33,13 @@ class PhotoController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Photo action that is pending permission grant.
@@ -79,8 +79,10 @@ class PhotoController(
                             _state.update {
                                 it.copy(
                                     pendingAction = null,
-                                    hasCameraPermission = permState.currentRequest?.permissionType == PermissionType.CAMERA,
-                                    hasPhotoLibraryPermission = permState.currentRequest?.permissionType == PermissionType.PHOTO_LIBRARY
+                                    hasCameraPermission =
+                                        permState.currentRequest?.permissionType == PermissionType.CAMERA,
+                                    hasPhotoLibraryPermission =
+                                        permState.currentRequest?.permissionType == PermissionType.PHOTO_LIBRARY
                                 )
                             }
                             // Execute the pending action
@@ -96,11 +98,12 @@ class PhotoController(
                         _state.update {
                             it.copy(
                                 pendingAction = null,
-                                error = when (permState.currentRequest?.permissionType) {
-                                    PermissionType.CAMERA -> "Camera permission is required to take photos"
-                                    PermissionType.PHOTO_LIBRARY -> "Photo library permission is required to select photos"
-                                    else -> "Permission denied"
-                                }
+                                error =
+                                    when (permState.currentRequest?.permissionType) {
+                                        PermissionType.CAMERA -> "Camera permission is required to take photos"
+                                        PermissionType.PHOTO_LIBRARY -> "Photo library permission is required to select photos"
+                                        else -> "Permission denied"
+                                    }
                             )
                         }
                     }
@@ -277,7 +280,10 @@ class PhotoController(
     /**
      * Attach a photo to the current visit.
      */
-    fun attachPhotoToVisit(photoId: String, caption: String? = null) {
+    fun attachPhotoToVisit(
+        photoId: String,
+        caption: String? = null
+    ) {
         val visit = _state.value.selectedVisit
         if (visit == null) {
             logger.warn { "No visit selected for photo attachment" }

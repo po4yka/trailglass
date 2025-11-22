@@ -60,9 +60,17 @@ interface AuthRootComponent {
      * Sealed class representing child components.
      */
     sealed class Child {
-        data class Login(val component: LoginComponent) : Child()
-        data class Register(val component: RegisterComponent) : Child()
-        data class ForgotPassword(val component: ForgotPasswordComponent) : Child()
+        data class Login(
+            val component: LoginComponent
+        ) : Child()
+
+        data class Register(
+            val component: RegisterComponent
+        ) : Child()
+
+        data class ForgotPassword(
+            val component: ForgotPasswordComponent
+        ) : Child()
     }
 }
 
@@ -73,17 +81,18 @@ class DefaultAuthRootComponent(
     componentContext: ComponentContext,
     private val authController: AuthController,
     override val onAuthenticated: () -> Unit
-) : AuthRootComponent, ComponentContext by componentContext {
-
+) : AuthRootComponent,
+    ComponentContext by componentContext {
     private val navigation = StackNavigation<AuthRootComponent.Config>()
 
-    override val childStack: Value<ChildStack<*, AuthRootComponent.Child>> = childStack(
-        source = navigation,
-        serializer = AuthRootComponent.Config.serializer(),
-        initialConfiguration = AuthRootComponent.Config.Login,
-        handleBackButton = true,
-        childFactory = ::createChild
-    )
+    override val childStack: Value<ChildStack<*, AuthRootComponent.Child>> =
+        childStack(
+            source = navigation,
+            serializer = AuthRootComponent.Config.serializer(),
+            initialConfiguration = AuthRootComponent.Config.Login,
+            handleBackButton = true,
+            childFactory = ::createChild
+        )
 
     @OptIn(DelicateDecomposeApi::class)
     override fun navigateToRegister() {
@@ -103,34 +112,41 @@ class DefaultAuthRootComponent(
     private fun createChild(
         config: AuthRootComponent.Config,
         componentContext: ComponentContext
-    ): AuthRootComponent.Child = when (config) {
-        is AuthRootComponent.Config.Login -> AuthRootComponent.Child.Login(
-            component = DefaultLoginComponent(
-                componentContext = componentContext,
-                authController = authController,
-                onNavigateToApp = onAuthenticated,
-                onNavigateToRegister = ::navigateToRegister,
-                onNavigateToForgotPassword = ::navigateToForgotPassword
-            )
-        )
+    ): AuthRootComponent.Child =
+        when (config) {
+            is AuthRootComponent.Config.Login ->
+                AuthRootComponent.Child.Login(
+                    component =
+                        DefaultLoginComponent(
+                            componentContext = componentContext,
+                            authController = authController,
+                            onNavigateToApp = onAuthenticated,
+                            onNavigateToRegister = ::navigateToRegister,
+                            onNavigateToForgotPassword = ::navigateToForgotPassword
+                        )
+                )
 
-        is AuthRootComponent.Config.Register -> AuthRootComponent.Child.Register(
-            component = DefaultRegisterComponent(
-                componentContext = componentContext,
-                authController = authController,
-                onNavigateToApp = onAuthenticated,
-                onNavigateToLogin = ::navigateBack,
-                onBack = ::navigateBack
-            )
-        )
+            is AuthRootComponent.Config.Register ->
+                AuthRootComponent.Child.Register(
+                    component =
+                        DefaultRegisterComponent(
+                            componentContext = componentContext,
+                            authController = authController,
+                            onNavigateToApp = onAuthenticated,
+                            onNavigateToLogin = ::navigateBack,
+                            onBack = ::navigateBack
+                        )
+                )
 
-        is AuthRootComponent.Config.ForgotPassword -> AuthRootComponent.Child.ForgotPassword(
-            component = DefaultForgotPasswordComponent(
-                componentContext = componentContext,
-                authController = authController,
-                onNavigateToApp = onAuthenticated,
-                onBack = ::navigateBack
-            )
-        )
-    }
+            is AuthRootComponent.Config.ForgotPassword ->
+                AuthRootComponent.Child.ForgotPassword(
+                    component =
+                        DefaultForgotPasswordComponent(
+                            componentContext = componentContext,
+                            authController = authController,
+                            onNavigateToApp = onAuthenticated,
+                            onBack = ::navigateBack
+                        )
+                )
+        }
 }

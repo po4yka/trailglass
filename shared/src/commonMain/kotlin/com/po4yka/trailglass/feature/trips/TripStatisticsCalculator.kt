@@ -11,7 +11,6 @@ import kotlin.math.*
  * Calculates statistics for trips based on location data, visits, and routes.
  */
 class TripStatisticsCalculator {
-
     /**
      * Trip statistics result.
      */
@@ -38,30 +37,34 @@ class TripStatisticsCalculator {
         locationSamples: List<LocationSample> = emptyList()
     ): TripStatistics {
         // Calculate total distance
-        val totalDistance = if (locationSamples.isNotEmpty()) {
-            calculateDistanceFromSamples(locationSamples)
-        } else {
-            routeSegments.sumOf { it.distanceMeters }
-        }
+        val totalDistance =
+            if (locationSamples.isNotEmpty()) {
+                calculateDistanceFromSamples(locationSamples)
+            } else {
+                routeSegments.sumOf { it.distanceMeters }
+            }
 
         // Extract countries and cities
-        val countries = placeVisits
-            .mapNotNull { it.countryCode }
-            .distinct()
-            .sorted()
+        val countries =
+            placeVisits
+                .mapNotNull { it.countryCode }
+                .distinct()
+                .sorted()
 
-        val cities = placeVisits
-            .mapNotNull { it.city }
-            .distinct()
-            .sorted()
+        val cities =
+            placeVisits
+                .mapNotNull { it.city }
+                .distinct()
+                .sorted()
 
         // Calculate average speed
         val totalDurationSeconds = routeSegments.sumOf { (it.endTime - it.startTime).inWholeSeconds }
-        val averageSpeed = if (totalDurationSeconds > 0) {
-            (totalDistance / 1000.0) / (totalDurationSeconds / 3600.0) // km/h
-        } else {
-            0.0
-        }
+        val averageSpeed =
+            if (totalDurationSeconds > 0) {
+                (totalDistance / 1000.0) / (totalDurationSeconds / 3600.0) // km/h
+            } else {
+                0.0
+            }
 
         return TripStatistics(
             totalDistanceMeters = totalDistance,
@@ -87,10 +90,13 @@ class TripStatisticsCalculator {
             val current = sorted[i]
             val next = sorted[i + 1]
 
-            totalDistance += calculateDistance(
-                current.latitude, current.longitude,
-                next.latitude, next.longitude
-            )
+            totalDistance +=
+                calculateDistance(
+                    current.latitude,
+                    current.longitude,
+                    next.latitude,
+                    next.longitude
+                )
         }
 
         return totalDistance
@@ -102,15 +108,18 @@ class TripStatisticsCalculator {
      * @return Distance in meters
      */
     private fun calculateDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 
@@ -125,13 +134,12 @@ class TripStatisticsCalculator {
     fun updateTripWithStatistics(
         trip: Trip,
         statistics: TripStatistics
-    ): Trip {
-        return trip.copy(
+    ): Trip =
+        trip.copy(
             totalDistanceMeters = statistics.totalDistanceMeters,
             visitedPlaceCount = statistics.visitedPlaceCount,
             countriesVisited = statistics.countriesVisited,
             citiesVisited = statistics.citiesVisited,
             updatedAt = Clock.System.now()
         )
-    }
 }

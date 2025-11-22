@@ -13,5 +13,8 @@ interface PhotoMetadataExtractor {
      * @param photoId Photo ID to associate metadata with
      * @return Extracted metadata or null if extraction fails
      */
-    suspend fun extractMetadata(photoUri: String, photoId: String): PhotoMetadata?
+    suspend fun extractMetadata(
+        photoUri: String,
+        photoId: String
+    ): PhotoMetadata?
 }

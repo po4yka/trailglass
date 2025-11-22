@@ -14,7 +14,6 @@ class HomeLocationDetector(
     private val homeRadiusMeters: Double = 500.0,
     private val minNightsForHome: Int = 3
 ) {
-
     private val logger = logger()
 
     /**
@@ -47,19 +46,21 @@ class HomeLocationDetector(
         logger.debug { "Grouped visits into ${clusters.size} location clusters" }
 
         // Score each cluster
-        val candidates = clusters.map { cluster ->
-            scoreHomeCandidate(cluster)
-        }
+        val candidates =
+            clusters.map { cluster ->
+                scoreHomeCandidate(cluster)
+            }
 
         // Find the best candidate (most nights spent)
-        val homeCandidate = candidates
-            .filter { it.nightsSpent >= minNightsForHome }
-            .maxByOrNull { it.nightsSpent }
+        val homeCandidate =
+            candidates
+                .filter { it.nightsSpent >= minNightsForHome }
+                .maxByOrNull { it.nightsSpent }
 
         if (homeCandidate != null) {
             logger.info {
                 "Detected home location at (${homeCandidate.location.latitude}, ${homeCandidate.location.longitude}), " +
-                "${homeCandidate.nightsSpent} nights spent, ${homeCandidate.totalHoursSpent.toInt()} hours total"
+                    "${homeCandidate.nightsSpent} nights spent, ${homeCandidate.totalHoursSpent.toInt()} hours total"
             }
             return homeCandidate.location
         }
@@ -87,10 +88,13 @@ class HomeLocationDetector(
             for (other in visits) {
                 if (other.id in visited) continue
 
-                val distance = haversineDistance(
-                    visit.centerLatitude, visit.centerLongitude,
-                    other.centerLatitude, other.centerLongitude
-                )
+                val distance =
+                    haversineDistance(
+                        visit.centerLatitude,
+                        visit.centerLongitude,
+                        other.centerLatitude,
+                        other.centerLongitude
+                    )
 
                 if (distance <= homeRadiusMeters) {
                     cluster.add(other)
@@ -126,8 +130,9 @@ class HomeLocationDetector(
             }
         }
 
-        val lastVisit = cluster.maxByOrNull { it.endTime }?.endTime
-            ?: cluster.first().endTime
+        val lastVisit =
+            cluster.maxByOrNull { it.endTime }?.endTime
+                ?: cluster.first().endTime
 
         return HomeCandidate(
             location = Coordinate(avgLat, avgLon),
@@ -142,15 +147,18 @@ class HomeLocationDetector(
      * Calculate Haversine distance between two coordinates.
      */
     private fun haversineDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 

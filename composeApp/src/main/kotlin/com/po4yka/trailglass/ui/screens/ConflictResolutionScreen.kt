@@ -4,13 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MergeType
+import androidx.compose.material.icons.automirrored.filled.NavigateBefore
+import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.automirrored.filled.MergeType
-import androidx.compose.material.icons.automirrored.filled.NavigateBefore
-import androidx.compose.material.icons.automirrored.filled.NavigateNext
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -46,10 +46,11 @@ fun ConflictResolutionScreen(
                         Icon(Icons.Default.Close, contentDescription = "Close")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onErrorContainer
-                )
+                colors =
+                    TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
             )
         },
         modifier = modifier
@@ -60,9 +61,10 @@ fun ConflictResolutionScreen(
                 CompletionView(
                     resolvedCount = state.resolvedCount,
                     onClose = onClose,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
 
@@ -76,9 +78,10 @@ fun ConflictResolutionScreen(
                     onSkip = { controller.skipConflict() },
                     onPrevious = { controller.previousConflict() },
                     onNext = { controller.nextConflict() },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
 
@@ -86,9 +89,10 @@ fun ConflictResolutionScreen(
                 // No conflicts
                 EmptyConflictsView(
                     onClose = onClose,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
         }
@@ -96,9 +100,10 @@ fun ConflictResolutionScreen(
         // Error snackbar
         if (state.error != null) {
             Snackbar(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .padding(paddingValues),
+                modifier =
+                    Modifier
+                        .padding(16.dp)
+                        .padding(paddingValues),
                 action = {
                     TextButton(onClick = { controller.clearError() }) {
                         Text("Dismiss")
@@ -125,10 +130,11 @@ private fun ConflictView(
     val conflict = state.currentConflict ?: return
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Progress indicator
@@ -145,12 +151,16 @@ private fun ConflictView(
 
         // Conflict info
         Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+                )
         ) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     Icon(
                         Icons.Default.Warning,
                         contentDescription = null,
@@ -200,9 +210,10 @@ private fun ConflictView(
             onClick = onKeepLocal,
             enabled = !state.isResolving,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+            colors =
+                ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
         ) {
             Icon(Icons.Default.PhoneAndroid, contentDescription = null)
             Spacer(Modifier.width(8.dp))
@@ -221,7 +232,11 @@ private fun ConflictView(
         }
 
         // Merge button (if applicable)
-        if (conflict.localVersion.size + conflict.remoteVersion.size > conflict.localVersion.keys.intersect(conflict.remoteVersion.keys).size * 2) {
+        if (conflict.localVersion.size + conflict.remoteVersion.size >
+            conflict.localVersion.keys
+                .intersect(conflict.remoteVersion.keys)
+                .size * 2
+        ) {
             FilledTonalButton(
                 onClick = onMerge,
                 enabled = !state.isResolving,
@@ -384,20 +399,18 @@ private fun EmptyConflictsView(
     }
 }
 
-private fun formatEntityType(type: EntityType): String {
-    return when (type) {
+private fun formatEntityType(type: EntityType): String =
+    when (type) {
         EntityType.LOCATION -> "Location"
         EntityType.PLACE_VISIT -> "Place Visit"
         EntityType.TRIP -> "Trip"
         EntityType.PHOTO -> "Photo"
         EntityType.SETTINGS -> "Settings"
     }
-}
 
-private fun formatConflictType(type: ConflictType): String {
-    return when (type) {
+private fun formatConflictType(type: ConflictType): String =
+    when (type) {
         ConflictType.CONCURRENT_MODIFICATION -> "Modified on both devices"
         ConflictType.DELETION_CONFLICT -> "Deleted on one device, modified on another"
         ConflictType.VERSION_MISMATCH -> "Version mismatch detected"
     }
-}

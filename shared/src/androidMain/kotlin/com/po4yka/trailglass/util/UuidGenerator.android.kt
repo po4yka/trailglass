@@ -6,7 +6,5 @@ import java.util.UUID
  * Android implementation of UUID generator.
  */
 actual object UuidGenerator {
-    actual fun randomUUID(): String {
-        return UUID.randomUUID().toString()
-    }
+    actual fun randomUUID(): String = UUID.randomUUID().toString()
 }

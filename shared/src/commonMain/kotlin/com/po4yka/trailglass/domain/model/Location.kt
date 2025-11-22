@@ -1,11 +1,7 @@
 package com.po4yka.trailglass.domain.model
 
-import kotlinx.serialization.Serializable
-
-/**
- * Represents a geographic location with optional altitude and accuracy.
- */
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 /**
  * Represents a geographic location with optional altitude and accuracy.
@@ -34,7 +30,9 @@ data class Location(
         bearing: Double? = null
     ) : this(
         coordinate = Coordinate(latitude, longitude),
-        timestamp = time?.let { Instant.fromEpochMilliseconds(it) } ?: kotlinx.datetime.Clock.System.now(),
+        timestamp =
+            time?.let { Instant.fromEpochMilliseconds(it) } ?: kotlinx.datetime.Clock.System
+                .now(),
         altitude = altitude,
         accuracy = accuracy,
         speed = speed,

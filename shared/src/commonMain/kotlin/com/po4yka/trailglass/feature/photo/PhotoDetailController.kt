@@ -29,13 +29,13 @@ class PhotoDetailController(
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
-
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
-    private val controllerScope = CoroutineScope(
-        coroutineScope.coroutineContext + SupervisorJob()
-    )
+    private val controllerScope =
+        CoroutineScope(
+            coroutineScope.coroutineContext + SupervisorJob()
+        )
 
     /**
      * Photo detail UI state.
@@ -91,19 +91,21 @@ class PhotoDetailController(
                 val attachments = photoRepository.getAttachmentsForPhoto(photoId)
 
                 // Extract metadata if not already available
-                val metadata = try {
-                    metadataExtractor.extractMetadata(photo.uri, photoId)
-                } catch (e: Exception) {
-                    logger.warn(e) { "Failed to extract metadata for photo $photoId" }
-                    null
-                }
+                val metadata =
+                    try {
+                        metadataExtractor.extractMetadata(photo.uri, photoId)
+                    } catch (e: Exception) {
+                        logger.warn(e) { "Failed to extract metadata for photo $photoId" }
+                        null
+                    }
 
-                val photoWithMetadata = PhotoWithMetadata(
-                    photo = photo,
-                    metadata = metadata,
-                    attachments = attachments,
-                    clusterId = null // Would be loaded from cluster association
-                )
+                val photoWithMetadata =
+                    PhotoWithMetadata(
+                        photo = photo,
+                        metadata = metadata,
+                        attachments = attachments,
+                        clusterId = null // Would be loaded from cluster association
+                    )
 
                 _state.update {
                     it.copy(
@@ -143,8 +145,14 @@ class PhotoDetailController(
     /**
      * Attach photo to a visit.
      */
-    fun attachToVisit(visitId: String, caption: String? = null) {
-        val photoId = _state.value.photo?.photo?.id
+    fun attachToVisit(
+        visitId: String,
+        caption: String? = null
+    ) {
+        val photoId =
+            _state.value.photo
+                ?.photo
+                ?.id
         if (photoId == null) {
             logger.warn { "Cannot attach photo: no photo loaded" }
             return
@@ -225,7 +233,10 @@ class PhotoDetailController(
      * Delete photo.
      */
     fun deletePhoto() {
-        val photoId = _state.value.photo?.photo?.id
+        val photoId =
+            _state.value.photo
+                ?.photo
+                ?.id
         if (photoId == null) {
             logger.warn { "Cannot delete photo: no photo loaded" }
             return

@@ -14,17 +14,26 @@ interface ErrorAnalytics {
     /**
      * Log an error for analytics.
      */
-    fun logError(error: TrailGlassError, context: Map<String, Any> = emptyMap())
+    fun logError(
+        error: TrailGlassError,
+        context: Map<String, Any> = emptyMap()
+    )
 
     /**
      * Log a non-fatal error.
      */
-    fun logNonFatal(error: TrailGlassError, context: Map<String, Any> = emptyMap())
+    fun logNonFatal(
+        error: TrailGlassError,
+        context: Map<String, Any> = emptyMap()
+    )
 
     /**
      * Log a fatal error (app crash).
      */
-    fun logFatal(error: TrailGlassError, context: Map<String, Any> = emptyMap())
+    fun logFatal(
+        error: TrailGlassError,
+        context: Map<String, Any> = emptyMap()
+    )
 
     /**
      * Set user identifier for error tracking.
@@ -34,7 +43,10 @@ interface ErrorAnalytics {
     /**
      * Add custom context data to all error reports.
      */
-    fun setCustomData(key: String, value: String)
+    fun setCustomData(
+        key: String,
+        value: String
+    )
 
     /**
      * Clear custom context data.
@@ -50,19 +62,28 @@ class LoggingErrorAnalytics : ErrorAnalytics {
     private val customData = mutableMapOf<String, String>()
     private var userId: String? = null
 
-    override fun logError(error: TrailGlassError, context: Map<String, Any>) {
+    override fun logError(
+        error: TrailGlassError,
+        context: Map<String, Any>
+    ) {
         logger.error {
             buildErrorMessage(error, context, "ERROR")
         }
     }
 
-    override fun logNonFatal(error: TrailGlassError, context: Map<String, Any>) {
+    override fun logNonFatal(
+        error: TrailGlassError,
+        context: Map<String, Any>
+    ) {
         logger.warn {
             buildErrorMessage(error, context, "NON_FATAL")
         }
     }
 
-    override fun logFatal(error: TrailGlassError, context: Map<String, Any>) {
+    override fun logFatal(
+        error: TrailGlassError,
+        context: Map<String, Any>
+    ) {
         logger.error {
             buildErrorMessage(error, context, "FATAL")
         }
@@ -72,7 +93,10 @@ class LoggingErrorAnalytics : ErrorAnalytics {
         this.userId = userId
     }
 
-    override fun setCustomData(key: String, value: String) {
+    override fun setCustomData(
+        key: String,
+        value: String
+    ) {
         customData[key] = value
     }
 
@@ -84,8 +108,8 @@ class LoggingErrorAnalytics : ErrorAnalytics {
         error: TrailGlassError,
         context: Map<String, Any>,
         severity: String
-    ): String {
-        return buildString {
+    ): String =
+        buildString {
             appendLine("[$severity] ${error.errorCode ?: "UNK"}")
             appendLine("User Message: ${error.userMessage}")
             appendLine("Technical: ${error.getTechnicalDetails()}")
@@ -106,7 +130,6 @@ class LoggingErrorAnalytics : ErrorAnalytics {
                 appendLine("Cause: ${cause.stackTraceToString()}")
             }
         }
-    }
 }
 
 /**

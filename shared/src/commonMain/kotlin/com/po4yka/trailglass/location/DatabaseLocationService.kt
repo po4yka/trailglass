@@ -18,7 +18,6 @@ class DatabaseLocationService(
     reverseGeocoder: ReverseGeocoder,
     private val userId: String = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
 ) : LocationRecorder {
-
     private val placeVisitProcessor = PlaceVisitProcessor(reverseGeocoder)
 
     override suspend fun recordSample(sample: LocationSample) {
@@ -44,23 +43,26 @@ class DatabaseLocationService(
     /**
      * Get location samples for a time range.
      */
-    suspend fun getSamples(startTime: Instant, endTime: Instant): List<LocationSample> {
-        return locationRepository.getSamples(userId, startTime, endTime).getOrNull() ?: emptyList()
-    }
+    suspend fun getSamples(
+        startTime: Instant,
+        endTime: Instant
+    ): List<LocationSample> = locationRepository.getSamples(userId, startTime, endTime).getOrNull() ?: emptyList()
 
     /**
      * Get place visits for a time range.
      */
-    suspend fun getPlaceVisits(startTime: Instant, endTime: Instant): List<PlaceVisit> {
-        return placeVisitRepository.getVisits(userId, startTime, endTime)
-    }
+    suspend fun getPlaceVisits(
+        startTime: Instant,
+        endTime: Instant
+    ): List<PlaceVisit> = placeVisitRepository.getVisits(userId, startTime, endTime)
 
     /**
      * Get place visits with pagination.
      */
-    suspend fun getPlaceVisits(limit: Int = 50, offset: Int = 0): List<PlaceVisit> {
-        return placeVisitRepository.getVisitsByUser(userId, limit, offset)
-    }
+    suspend fun getPlaceVisits(
+        limit: Int = 50,
+        offset: Int = 0
+    ): List<PlaceVisit> = placeVisitRepository.getVisitsByUser(userId, limit, offset)
 
     /**
      * Clear old location samples.

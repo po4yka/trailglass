@@ -3,8 +3,8 @@ package com.po4yka.trailglass.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,9 +54,10 @@ fun TripStatisticsScreen(
             state.isLoading -> {
                 // Loading state
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -75,9 +76,10 @@ fun TripStatisticsScreen(
             state.error != null -> {
                 // Error state
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -114,9 +116,10 @@ fun TripStatisticsScreen(
                         primaryCountry = primaryCountry,
                         showTransportBreakdown = state.showTransportBreakdown,
                         onToggleTransportBreakdown = { controller.toggleTransportBreakdown() },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(paddingValues)
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(paddingValues)
                     )
                 }
             }
@@ -208,14 +211,16 @@ private fun TripStatisticsHeader(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -263,9 +268,10 @@ private fun SpeedMetricsCard(statistics: com.po4yka.trailglass.domain.model.Rout
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -311,7 +317,10 @@ private fun SpeedMetricsCard(statistics: com.po4yka.trailglass.domain.model.Rout
  * Individual speed metric item.
  */
 @Composable
-private fun SpeedMetricItem(label: String, speedMps: Double) {
+private fun SpeedMetricItem(
+    label: String,
+    speedMps: Double
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = "${(speedMps * 3.6).toInt()} km/h",
@@ -339,9 +348,10 @@ private fun LocationsVisitedCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

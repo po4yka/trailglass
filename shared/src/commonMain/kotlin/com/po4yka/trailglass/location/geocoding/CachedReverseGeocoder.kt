@@ -10,8 +10,10 @@ class CachedReverseGeocoder(
     private val geocoder: ReverseGeocoder,
     private val cache: GeocodingCache = GeocodingCache()
 ) : ReverseGeocoder {
-
-    override suspend fun reverseGeocode(latitude: Double, longitude: Double): GeocodedLocation? {
+    override suspend fun reverseGeocode(
+        latitude: Double,
+        longitude: Double
+    ): GeocodedLocation? {
         // Check cache first
         cache.get(latitude, longitude)?.let { return it }
 

@@ -2,8 +2,8 @@ package com.po4yka.trailglass.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -122,9 +122,10 @@ private fun MetricCard(
         colors = CardDefaults.cardColors(containerColor = color)
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -154,10 +155,9 @@ private fun MetricCard(
 /**
  * Format distance for display.
  */
-private fun formatDistance(kilometers: Double): String {
-    return when {
+private fun formatDistance(kilometers: Double): String =
+    when {
         kilometers < 1.0 -> "${(kilometers * 1000).roundToInt()} m"
         kilometers < 10.0 -> "%.1f km".format(kilometers)
         else -> "${kilometers.roundToInt()} km"
     }
-}

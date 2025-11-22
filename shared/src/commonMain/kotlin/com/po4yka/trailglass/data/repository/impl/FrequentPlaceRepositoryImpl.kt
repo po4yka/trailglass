@@ -8,29 +8,34 @@ import me.tatarka.inject.annotations.Inject
 
 @Inject
 class FrequentPlaceRepositoryImpl : FrequentPlaceRepository {
-
     private val places = mutableMapOf<String, FrequentPlace>()
 
     override suspend fun insertPlace(place: FrequentPlace) {
         places[place.id] = place
     }
 
-    override suspend fun getPlaceById(id: String): FrequentPlace? {
-        return places[id]
-    }
+    override suspend fun getPlaceById(id: String): FrequentPlace? = places[id]
 
     override suspend fun getPlacesByUser(userId: String): List<FrequentPlace> {
         // In a real impl, we'd filter by userId. Here we assume single user or just return all for now.
         return places.values.toList()
     }
 
-    override suspend fun getPlacesByCategory(userId: String, category: PlaceCategory): List<FrequentPlace> {
-        return places.values.filter { it.category == category }
-    }
+    override suspend fun getPlacesByCategory(
+        userId: String,
+        category: PlaceCategory
+    ): List<FrequentPlace> =
+        places.values.filter {
+            it.category == category
+        }
 
-    override suspend fun getPlacesBySignificance(userId: String, significance: PlaceSignificance): List<FrequentPlace> {
-        return places.values.filter { it.significance == significance }
-    }
+    override suspend fun getPlacesBySignificance(
+        userId: String,
+        significance: PlaceSignificance
+    ): List<FrequentPlace> =
+        places.values.filter {
+            it.significance == significance
+        }
 
     override suspend fun updatePlace(place: FrequentPlace) {
         places[place.id] = place
@@ -40,7 +45,5 @@ class FrequentPlaceRepositoryImpl : FrequentPlaceRepository {
         places.remove(id)
     }
 
-    override suspend fun getFavoritePlaces(userId: String): List<FrequentPlace> {
-        return places.values.filter { it.isFavorite }
-    }
+    override suspend fun getFavoritePlaces(userId: String): List<FrequentPlace> = places.values.filter { it.isFavorite }
 }

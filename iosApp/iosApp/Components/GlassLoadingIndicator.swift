@@ -299,7 +299,7 @@ private struct LinearProgress: View {
     @State private var offset: CGFloat = -100
 
     var body: some View {
-        GeometryReader { geometry in
+        GeometryReader { _ in
             ZStack(alignment: .leading) {
                 // Track
                 RoundedRectangle(cornerRadius: 4)

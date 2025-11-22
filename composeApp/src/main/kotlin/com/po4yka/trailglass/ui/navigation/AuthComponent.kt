@@ -28,7 +28,8 @@ class DefaultLoginComponent(
     override val onNavigateToApp: () -> Unit,
     override val onNavigateToRegister: () -> Unit,
     override val onNavigateToForgotPassword: () -> Unit
-) : LoginComponent, ComponentContext by componentContext
+) : LoginComponent,
+    ComponentContext by componentContext
 
 /**
  * Component for Register screen.
@@ -47,7 +48,8 @@ class DefaultRegisterComponent(
     override val onNavigateToApp: () -> Unit,
     override val onNavigateToLogin: () -> Unit,
     override val onBack: () -> Unit
-) : RegisterComponent, ComponentContext by componentContext
+) : RegisterComponent,
+    ComponentContext by componentContext
 
 /**
  * Component for ForgotPassword screen.
@@ -64,4 +66,5 @@ class DefaultForgotPasswordComponent(
     override val authController: AuthController,
     override val onNavigateToApp: () -> Unit,
     override val onBack: () -> Unit
-) : ForgotPasswordComponent, ComponentContext by componentContext
+) : ForgotPasswordComponent,
+    ComponentContext by componentContext

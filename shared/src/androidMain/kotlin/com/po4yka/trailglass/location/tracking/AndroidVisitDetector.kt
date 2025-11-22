@@ -59,16 +59,17 @@ class AndroidVisitDetector(
 
         logger.info { "Starting Android visit detection (iOS CLVisit equivalent)" }
 
-        monitoringJob = coroutineScope.launch {
-            while (isActive) {
-                try {
-                    checkForVisits()
-                } catch (e: Exception) {
-                    logger.error(e) { "Error in visit detection" }
+        monitoringJob =
+            coroutineScope.launch {
+                while (isActive) {
+                    try {
+                        checkForVisits()
+                    } catch (e: Exception) {
+                        logger.error(e) { "Error in visit detection" }
+                    }
+                    delay(checkInterval)
                 }
-                delay(checkInterval)
             }
-        }
     }
 
     /**
@@ -94,11 +95,12 @@ class AndroidVisitDetector(
     private suspend fun checkForVisits() {
         // Get recent location samples (last 30 minutes)
         val lookbackTime = Clock.System.now() - 30.minutes
-        val recentSamplesResult = locationRepository.getSamples(
-            userId = userId,
-            startTime = lookbackTime,
-            endTime = Clock.System.now()
-        )
+        val recentSamplesResult =
+            locationRepository.getSamples(
+                userId = userId,
+                startTime = lookbackTime,
+                endTime = Clock.System.now()
+            )
 
         val recentSamples = recentSamplesResult.getOrNull() ?: emptyList()
 
@@ -147,10 +149,13 @@ class AndroidVisitDetector(
         val centerLon = samples.map { it.longitude }.average()
 
         return samples.all { sample ->
-            val distance = calculateDistance(
-                centerLat, centerLon,
-                sample.latitude, sample.longitude
-            )
+            val distance =
+                calculateDistance(
+                    centerLat,
+                    centerLon,
+                    sample.latitude,
+                    sample.longitude
+                )
             distance < maxStationaryDistance
         }
     }
@@ -159,18 +164,19 @@ class AndroidVisitDetector(
      * Start tracking a new visit.
      */
     private fun startVisit(arrivalSample: LocationSample) {
-        val visit = OngoingVisit(
-            arrivalTime = arrivalSample.timestamp,
-            latitude = arrivalSample.latitude,
-            longitude = arrivalSample.longitude,
-            tripId = arrivalSample.tripId
-        )
+        val visit =
+            OngoingVisit(
+                arrivalTime = arrivalSample.timestamp,
+                latitude = arrivalSample.latitude,
+                longitude = arrivalSample.longitude,
+                tripId = arrivalSample.tripId
+            )
 
         currentVisit = visit
 
         logger.info {
             "Visit arrival detected at (${visit.latitude}, ${visit.longitude}) " +
-            "at ${visit.arrivalTime}"
+                "at ${visit.arrivalTime}"
         }
     }
 
@@ -181,10 +187,11 @@ class AndroidVisitDetector(
         val visit = currentVisit ?: return
 
         // Update visit location to be more accurate (using latest sample)
-        currentVisit = visit.copy(
-            latitude = latestSample.latitude,
-            longitude = latestSample.longitude
-        )
+        currentVisit =
+            visit.copy(
+                latitude = latestSample.latitude,
+                longitude = latestSample.longitude
+            )
 
         logger.trace { "Visit ongoing at (${latestSample.latitude}, ${latestSample.longitude})" }
     }
@@ -193,36 +200,40 @@ class AndroidVisitDetector(
      * End a visit and create a VISIT-type location sample.
      * This creates parity with iOS CLVisit events.
      */
-    private suspend fun endVisit(visit: OngoingVisit, departureTime: Instant) {
+    private suspend fun endVisit(
+        visit: OngoingVisit,
+        departureTime: Instant
+    ) {
         val duration = departureTime - visit.arrivalTime
 
         logger.info {
             "Visit departure detected after $duration at " +
-            "(${visit.latitude}, ${visit.longitude})"
+                "(${visit.latitude}, ${visit.longitude})"
         }
 
         // Create a VISIT-type location sample (Android equivalent of iOS CLVisit)
-        val visitSample = LocationSample(
-            id = uuidGenerator.randomUUID(),
-            timestamp = visit.arrivalTime, // Use arrival time for visit timestamp
-            latitude = visit.latitude,
-            longitude = visit.longitude,
-            accuracy = maxStationaryDistance, // Use threshold as accuracy estimate
-            speed = 0.0, // Stationary
-            bearing = null,
-            source = LocationSource.VISIT, // ← Android synthetic visit, matching iOS
-            tripId = visit.tripId,
-            uploadedAt = null,
-            deviceId = deviceId,
-            userId = userId
-        )
+        val visitSample =
+            LocationSample(
+                id = uuidGenerator.randomUUID(),
+                timestamp = visit.arrivalTime, // Use arrival time for visit timestamp
+                latitude = visit.latitude,
+                longitude = visit.longitude,
+                accuracy = maxStationaryDistance, // Use threshold as accuracy estimate
+                speed = 0.0, // Stationary
+                bearing = null,
+                source = LocationSource.VISIT, // ← Android synthetic visit, matching iOS
+                tripId = visit.tripId,
+                uploadedAt = null,
+                deviceId = deviceId,
+                userId = userId
+            )
 
         // Save the VISIT sample to database
         try {
             locationRepository.insertSample(visitSample)
             logger.info {
                 "Created VISIT-type location sample (Android equivalent of iOS CLVisit) " +
-                "for visit lasting $duration"
+                    "for visit lasting $duration"
             }
         } catch (e: Exception) {
             logger.error(e) { "Failed to save VISIT location sample" }
@@ -233,15 +244,18 @@ class AndroidVisitDetector(
      * Calculate distance between two coordinates using Haversine formula.
      */
     private fun calculateDistance(
-        lat1: Double, lon1: Double,
-        lat2: Double, lon2: Double
+        lat1: Double,
+        lon1: Double,
+        lat2: Double,
+        lon2: Double
     ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = Math.toRadians(lat2 - lat1)
         val dLon = Math.toRadians(lon2 - lon1)
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(Math.toRadians(lat1)) * cos(Math.toRadians(lat2)) *
                 sin(dLon / 2).pow(2)
 

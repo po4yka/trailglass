@@ -8,11 +8,11 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Commute
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
+import androidx.compose.material.icons.filled.Commute
 import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Flight
@@ -46,9 +46,10 @@ fun TransportBreakdownSection(
         modifier = modifier.fillMaxWidth()
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             // Header with toggle
             Row(
@@ -92,9 +93,11 @@ fun TransportBreakdownSection(
                 ) {
                     // Transport mode selector if callback provided
                     if (onModeSelected != null) {
-                        val availableModes = distanceByTransport.keys.toList()
-                            .sortedByDescending { distanceByTransport[it] ?: 0.0 }
-                            .take(4)
+                        val availableModes =
+                            distanceByTransport.keys
+                                .toList()
+                                .sortedByDescending { distanceByTransport[it] ?: 0.0 }
+                                .take(4)
 
                         CompactTransportModeSelector(
                             selectedMode = selectedMode,
@@ -110,8 +113,9 @@ fun TransportBreakdownSection(
                     }
 
                     // Sort by distance (descending)
-                    val sortedTransports = distanceByTransport.entries
-                        .sortedByDescending { it.value }
+                    val sortedTransports =
+                        distanceByTransport.entries
+                            .sortedByDescending { it.value }
 
                     sortedTransports.forEach { (type, distance) ->
                         val duration = durationByTransport[type] ?: 0L
@@ -154,15 +158,17 @@ private fun TransportBreakdownItem(
     isDimmed: Boolean = false
 ) {
     val containerColor by animateColorAsState(
-        targetValue = if (isHighlighted) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surface
-        },
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
-        ),
+        targetValue =
+            if (isHighlighted) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium
+            ),
         label = "container_color"
     )
 
@@ -174,9 +180,10 @@ private fun TransportBreakdownItem(
         shape = MaterialTheme.shapes.small
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -321,8 +328,8 @@ private fun DetailStatItem(
 /**
  * Get icon for transport type.
  */
-private fun getTransportIcon(type: TransportType): ImageVector {
-    return when (type) {
+private fun getTransportIcon(type: TransportType): ImageVector =
+    when (type) {
         TransportType.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
         TransportType.BIKE -> Icons.AutoMirrored.Filled.DirectionsBike
         TransportType.CAR -> Icons.Default.DirectionsCar
@@ -331,14 +338,13 @@ private fun getTransportIcon(type: TransportType): ImageVector {
         TransportType.BOAT -> Icons.Default.DirectionsBoat
         TransportType.UNKNOWN -> Icons.Default.Commute
     }
-}
 
 /**
  * Get color for transport type.
  */
 @Composable
-private fun getTransportColor(type: TransportType): androidx.compose.ui.graphics.Color {
-    return when (type) {
+private fun getTransportColor(type: TransportType): androidx.compose.ui.graphics.Color =
+    when (type) {
         TransportType.WALK -> MaterialTheme.colorScheme.primary
         TransportType.BIKE -> MaterialTheme.colorScheme.secondary
         TransportType.CAR -> MaterialTheme.colorScheme.tertiary
@@ -347,18 +353,16 @@ private fun getTransportColor(type: TransportType): androidx.compose.ui.graphics
         TransportType.BOAT -> MaterialTheme.colorScheme.secondary
         TransportType.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-}
 
 /**
  * Format distance for display.
  */
-private fun formatDistance(kilometers: Double): String {
-    return when {
+private fun formatDistance(kilometers: Double): String =
+    when {
         kilometers < 1.0 -> "${(kilometers * 1000).roundToInt()} m"
         kilometers < 10.0 -> "%.1f km".format(kilometers)
         else -> "${kilometers.roundToInt()} km"
     }
-}
 
 /**
  * Format duration for display.

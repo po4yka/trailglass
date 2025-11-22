@@ -37,13 +37,39 @@ enum class EntityType {
  */
 interface SyncMetadataRepository {
     suspend fun upsertMetadata(metadata: SyncMetadata)
-    suspend fun getMetadata(entityId: String, entityType: EntityType): SyncMetadata?
-    suspend fun getPendingSync(entityType: EntityType, limit: Int = 100): List<SyncMetadata>
+
+    suspend fun getMetadata(
+        entityId: String,
+        entityType: EntityType
+    ): SyncMetadata?
+
+    suspend fun getPendingSync(
+        entityType: EntityType,
+        limit: Int = 100
+    ): List<SyncMetadata>
+
     suspend fun getPendingDelete(entityType: EntityType): List<SyncMetadata>
-    suspend fun markAsSynced(entityId: String, entityType: EntityType, serverVersion: Long)
-    suspend fun markSyncFailed(entityId: String, entityType: EntityType, error: String)
-    suspend fun deleteMetadata(entityId: String, entityType: EntityType)
+
+    suspend fun markAsSynced(
+        entityId: String,
+        entityType: EntityType,
+        serverVersion: Long
+    )
+
+    suspend fun markSyncFailed(
+        entityId: String,
+        entityType: EntityType,
+        error: String
+    )
+
+    suspend fun deleteMetadata(
+        entityId: String,
+        entityType: EntityType
+    )
+
     suspend fun getAllPendingSync(): List<SyncMetadata>
+
     suspend fun getPendingSyncCount(): Int
+
     suspend fun getLastSyncedMetadata(): SyncMetadata?
 }

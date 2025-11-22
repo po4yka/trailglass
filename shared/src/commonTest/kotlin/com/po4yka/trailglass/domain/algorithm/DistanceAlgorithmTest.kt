@@ -8,7 +8,6 @@ import kotlin.math.abs
 import kotlin.test.Test
 
 class DistanceAlgorithmTest {
-
     // Test coordinates
     private val newYork = Coordinate(40.7128, -74.0060)
     private val london = Coordinate(51.5074, -0.1278)
@@ -16,9 +15,9 @@ class DistanceAlgorithmTest {
     private val tokyo = Coordinate(35.6762, 139.6503)
 
     // Expected distances (in meters, approximate)
-    private val newYorkToLondon = 5570_000.0  // ~5,570 km
-    private val newYorkToSydney = 15_990_000.0  // ~15,990 km
-    private val londonToTokyo = 9590_000.0  // ~9,590 km
+    private val newYorkToLondon = 5570_000.0 // ~5,570 km
+    private val newYorkToSydney = 15_990_000.0 // ~15,990 km
+    private val londonToTokyo = 9590_000.0 // ~9,590 km
 
     @Test
     fun `haversine distance should calculate NYC to London correctly`() {
@@ -91,12 +90,12 @@ class DistanceAlgorithmTest {
 
         // Two points 1km apart (approximately)
         val point1 = Coordinate(40.0, -74.0)
-        val point2 = Coordinate(40.009, -74.0)  // ~1 km north
+        val point2 = Coordinate(40.009, -74.0) // ~1 km north
 
         val distance = algorithm.calculate(point1, point2)
 
         // Should be approximately 1000 meters
-        abs(distance - 1000.0) shouldBeLessThan 100.0  // Within 10% for short distance
+        abs(distance - 1000.0) shouldBeLessThan 100.0 // Within 10% for short distance
     }
 
     @Test
@@ -109,13 +108,13 @@ class DistanceAlgorithmTest {
 
         // Error should be significant (>5%) for very long distances
         val error = abs(simpleDist - haversineDist) / haversineDist
-        error shouldBeGreaterThan 0.05  // >5% error
+        error shouldBeGreaterThan 0.05 // >5% error
     }
 
     @Test
     fun `all algorithms should handle equator crossing`() {
-        val point1 = Coordinate(10.0, 0.0)  // Northern hemisphere
-        val point2 = Coordinate(-10.0, 0.0)  // Southern hemisphere
+        val point1 = Coordinate(10.0, 0.0) // Northern hemisphere
+        val point2 = Coordinate(-10.0, 0.0) // Southern hemisphere
 
         val haversine = HaversineDistance().calculate(point1, point2)
         val vincenty = VincentyDistance().calculate(point1, point2)
@@ -131,8 +130,8 @@ class DistanceAlgorithmTest {
 
     @Test
     fun `all algorithms should handle prime meridian crossing`() {
-        val point1 = Coordinate(51.5, -0.5)  // West of Greenwich
-        val point2 = Coordinate(51.5, 0.5)   // East of Greenwich
+        val point1 = Coordinate(51.5, -0.5) // West of Greenwich
+        val point2 = Coordinate(51.5, 0.5) // East of Greenwich
 
         val haversine = HaversineDistance().calculate(point1, point2)
         val vincenty = VincentyDistance().calculate(point1, point2)
@@ -141,7 +140,7 @@ class DistanceAlgorithmTest {
         haversine shouldBeGreaterThan 65_000.0
         haversine shouldBeLessThan 75_000.0
 
-        abs(vincenty - haversine) shouldBeLessThan 500.0  // Within 500m
+        abs(vincenty - haversine) shouldBeLessThan 500.0 // Within 500m
     }
 
     @Test

@@ -15,7 +15,6 @@ class GetMapDataUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
     private val routeSegmentRepository: RouteSegmentRepository
 ) {
-
     private val logger = logger()
 
     /**
@@ -43,35 +42,38 @@ class GetMapDataUseCase(
         logger.debug { "Found ${routes.size} routes" }
 
         // Convert to map markers
-        val markers = visits.map { visit ->
-            MapMarker(
-                id = "marker_${visit.id}",
-                coordinate = Coordinate(visit.centerLatitude, visit.centerLongitude),
-                title = visit.city ?: visit.poiName ?: "Unknown location",
-                snippet = visit.approximateAddress,
-                placeVisitId = visit.id
-            )
-        }
+        val markers =
+            visits.map { visit ->
+                MapMarker(
+                    id = "marker_${visit.id}",
+                    coordinate = Coordinate(visit.centerLatitude, visit.centerLongitude),
+                    title = visit.city ?: visit.poiName ?: "Unknown location",
+                    snippet = visit.approximateAddress,
+                    placeVisitId = visit.id
+                )
+            }
 
         // Convert to map routes
-        val mapRoutes = routes.map { route ->
-            MapRoute(
-                id = "route_${route.id}",
-                coordinates = route.simplifiedPath,
-                transportType = route.transportType,
-                color = getTransportColor(route.transportType),
-                routeSegmentId = route.id
-            )
-        }
+        val mapRoutes =
+            routes.map { route ->
+                MapRoute(
+                    id = "route_${route.id}",
+                    coordinates = route.simplifiedPath,
+                    transportType = route.transportType,
+                    color = getTransportColor(route.transportType),
+                    routeSegmentId = route.id
+                )
+            }
 
         // Calculate bounding region
         val region = calculateBoundingRegion(markers, mapRoutes)
 
-        val mapData = MapDisplayData(
-            markers = markers,
-            routes = mapRoutes,
-            region = region
-        )
+        val mapData =
+            MapDisplayData(
+                markers = markers,
+                routes = mapRoutes,
+                region = region
+            )
 
         logger.info {
             "Map data prepared: ${markers.size} markers, ${mapRoutes.size} routes"
@@ -83,17 +85,16 @@ class GetMapDataUseCase(
     /**
      * Get color for transport type (ARGB format).
      */
-    private fun getTransportColor(transportType: TransportType): Int {
-        return when (transportType) {
-            TransportType.WALK -> 0xFF4CAF50.toInt()     // Green
-            TransportType.BIKE -> 0xFF2196F3.toInt()     // Blue
-            TransportType.CAR -> 0xFFF44336.toInt()      // Red
-            TransportType.TRAIN -> 0xFF9C27B0.toInt()    // Purple
-            TransportType.PLANE -> 0xFFFF9800.toInt()    // Orange
-            TransportType.BOAT -> 0xFF00BCD4.toInt()     // Cyan
-            TransportType.UNKNOWN -> 0xFF9E9E9E.toInt()  // Gray
+    private fun getTransportColor(transportType: TransportType): Int =
+        when (transportType) {
+            TransportType.WALK -> 0xFF4CAF50.toInt() // Green
+            TransportType.BIKE -> 0xFF2196F3.toInt() // Blue
+            TransportType.CAR -> 0xFFF44336.toInt() // Red
+            TransportType.TRAIN -> 0xFF9C27B0.toInt() // Purple
+            TransportType.PLANE -> 0xFFFF9800.toInt() // Orange
+            TransportType.BOAT -> 0xFF00BCD4.toInt() // Cyan
+            TransportType.UNKNOWN -> 0xFF9E9E9E.toInt() // Gray
         }
-    }
 
     /**
      * Calculate bounding region that contains all markers and routes.

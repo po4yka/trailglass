@@ -10,7 +10,6 @@ data class TrackingConfig(
      * Tracking accuracy mode.
      */
     val accuracy: TrackingAccuracy = TrackingAccuracy.BALANCED,
-
     /**
      * Minimum time interval between location updates in milliseconds.
      */
@@ -20,22 +19,18 @@ data class TrackingConfig(
      * Minimum distance between location updates in meters.
      */
     val distanceFilterMeters: Float = 10f,
-
     /**
      * Whether to track in background.
      */
     val backgroundTracking: Boolean = true,
-
     /**
      * Whether to detect trips automatically.
      */
     val autoTripDetection: Boolean = true,
-
     /**
      * Whether to detect place visits automatically.
      */
     val autoPlaceVisitDetection: Boolean = true,
-
     /**
      * Whether to detect transport mode automatically.
      */
@@ -69,5 +64,7 @@ sealed class TrackingStatus {
      *
      * @param reason Reason for pause
      */
-    data class Paused(val reason: String) : TrackingStatus()
+    data class Paused(
+        val reason: String
+    ) : TrackingStatus()
 }

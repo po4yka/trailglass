@@ -1,17 +1,16 @@
 package com.po4yka.trailglass.data.remote.auth
 
 import kotlinx.cinterop.*
+import me.tatarka.inject.annotations.Inject
 import platform.CoreFoundation.*
 import platform.Foundation.*
 import platform.Security.*
-import me.tatarka.inject.annotations.Inject
 
 /**
  * iOS implementation using Keychain Services.
  */
 @Inject
 actual class SecureTokenStorage {
-
     actual suspend fun saveTokens(tokens: AuthTokens) {
         saveToKeychain(KEY_ACCESS_TOKEN, tokens.accessToken)
         saveToKeychain(KEY_REFRESH_TOKEN, tokens.refreshToken)
@@ -37,7 +36,10 @@ actual class SecureTokenStorage {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    private fun saveToKeychain(key: String, value: String) {
+    private fun saveToKeychain(
+        key: String,
+        value: String
+    ) {
         val query = createKeychainQuery(key)
 
         // Delete existing item
@@ -86,8 +88,8 @@ actual class SecureTokenStorage {
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    private fun createKeychainQuery(key: String): CFDictionaryRef {
-        return CFDictionaryCreateMutable(
+    private fun createKeychainQuery(key: String): CFDictionaryRef =
+        CFDictionaryCreateMutable(
             null,
             4,
             null,
@@ -98,16 +100,11 @@ actual class SecureTokenStorage {
             CFDictionarySetValue(this, kSecAttrAccount, key.toCFString())
             CFDictionarySetValue(this, kSecAttrAccessible, kSecAttrAccessibleAfterFirstUnlock)
         } as CFDictionaryRef
-    }
 
-    private fun String.toNSData(): NSData {
-        return (this as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!
-    }
+    private fun String.toNSData(): NSData = (this as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!
 
     @OptIn(ExperimentalForeignApi::class)
-    private fun String.toCFString(): CFStringRef {
-        return CFStringCreateWithCString(null, this, kCFStringEncodingUTF8)!!
-    }
+    private fun String.toCFString(): CFStringRef = CFStringCreateWithCString(null, this, kCFStringEncodingUTF8)!!
 
     companion object {
         private const val SERVICE_NAME = "com.po4yka.trailglass"

@@ -16,4 +16,5 @@ interface MapComponent {
 class DefaultMapComponent(
     componentContext: ComponentContext,
     override val mapController: MapController
-) : MapComponent, ComponentContext by componentContext
+) : MapComponent,
+    ComponentContext by componentContext

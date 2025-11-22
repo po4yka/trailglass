@@ -5,15 +5,14 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.feature.stats.models.PlaceStatistics
 import com.po4yka.trailglass.feature.stats.models.PlaceVisitCount
 import com.po4yka.trailglass.feature.stats.models.VisitRecord
-import kotlin.time.Duration
 import me.tatarka.inject.annotations.Inject
+import kotlin.time.Duration
 
 /**
  * Calculator for place visit statistics.
  */
 @Inject
 class PlaceStatisticsCalculator {
-
     /**
      * Calculate comprehensive place statistics from visits.
      */
@@ -31,57 +30,62 @@ class PlaceStatisticsCalculator {
         }
 
         // Group visits by place identifier (using coordinates as fallback)
-        val placeGroups = visits.groupBy { visit ->
-            visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-            ?: "${visit.centerLatitude},${visit.centerLongitude}"
-        }
+        val placeGroups =
+            visits.groupBy { visit ->
+                visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
+                    ?: "${visit.centerLatitude},${visit.centerLongitude}"
+            }
 
         val totalPlaces = placeGroups.size
 
         // Calculate most visited places
-        val mostVisitedPlaces = placeGroups
-            .map { (placeId, placeVisits) ->
-                val representative = placeVisits.first()
-                PlaceVisitCount(
-                    placeId = representative.frequentPlaceId,
-                    placeName = representative.displayName,
-                    visitCount = placeVisits.size,
-                    totalDuration = placeVisits.fold(Duration.ZERO) { acc, visit ->
-                        acc + visit.duration
-                    },
-                    category = representative.category,
-                    city = representative.city,
-                    country = representative.countryCode
-                )
-            }
-            .sortedByDescending { it.visitCount }
-            .take(10)
+        val mostVisitedPlaces =
+            placeGroups
+                .map { (placeId, placeVisits) ->
+                    val representative = placeVisits.first()
+                    PlaceVisitCount(
+                        placeId = representative.frequentPlaceId,
+                        placeName = representative.displayName,
+                        visitCount = placeVisits.size,
+                        totalDuration =
+                            placeVisits.fold(Duration.ZERO) { acc, visit ->
+                                acc + visit.duration
+                            },
+                        category = representative.category,
+                        city = representative.city,
+                        country = representative.countryCode
+                    )
+                }.sortedByDescending { it.visitCount }
+                .take(10)
 
         // Count visits by category
-        val visitsByCategory = visits
-            .groupBy { it.category }
-            .mapValues { (_, visits) -> visits.size }
+        val visitsByCategory =
+            visits
+                .groupBy { it.category }
+                .mapValues { (_, visits) -> visits.size }
 
         // Calculate average visit duration
         val totalDuration = visits.fold(Duration.ZERO) { acc, visit -> acc + visit.duration }
         val averageVisitDuration = totalDuration / visits.size
 
         // Find longest and shortest visits
-        val longestVisit = visits.maxByOrNull { it.duration }?.let {
-            VisitRecord(
-                placeName = it.displayName,
-                duration = it.duration,
-                category = it.category
-            )
-        }
+        val longestVisit =
+            visits.maxByOrNull { it.duration }?.let {
+                VisitRecord(
+                    placeName = it.displayName,
+                    duration = it.duration,
+                    category = it.category
+                )
+            }
 
-        val shortestVisit = visits.minByOrNull { it.duration }?.let {
-            VisitRecord(
-                placeName = it.displayName,
-                duration = it.duration,
-                category = it.category
-            )
-        }
+        val shortestVisit =
+            visits.minByOrNull { it.duration }?.let {
+                VisitRecord(
+                    placeName = it.displayName,
+                    duration = it.duration,
+                    category = it.category
+                )
+            }
 
         return PlaceStatistics(
             totalPlaces = totalPlaces,
@@ -111,22 +115,25 @@ class PlaceStatisticsCalculator {
     /**
      * Calculate time spent by category.
      */
-    fun getTimeByCategory(visits: List<PlaceVisit>): Map<PlaceCategory, Duration> {
-        return visits
+    fun getTimeByCategory(visits: List<PlaceVisit>): Map<PlaceCategory, Duration> =
+        visits
             .groupBy { it.category }
             .mapValues { (_, categoryVisits) ->
                 categoryVisits.fold(Duration.ZERO) { acc, visit -> acc + visit.duration }
             }
-    }
 
     /**
      * Get top places by total time spent.
      */
-    fun getTopPlacesByDuration(visits: List<PlaceVisit>, limit: Int = 5): List<PlaceVisitCount> {
-        val placeGroups = visits.groupBy { visit ->
-            visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-            ?: "${visit.centerLatitude},${visit.centerLongitude}"
-        }
+    fun getTopPlacesByDuration(
+        visits: List<PlaceVisit>,
+        limit: Int = 5
+    ): List<PlaceVisitCount> {
+        val placeGroups =
+            visits.groupBy { visit ->
+                visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
+                    ?: "${visit.centerLatitude},${visit.centerLongitude}"
+            }
 
         return placeGroups
             .map { (placeId, placeVisits) ->
@@ -135,15 +142,15 @@ class PlaceStatisticsCalculator {
                     placeId = representative.frequentPlaceId,
                     placeName = representative.displayName,
                     visitCount = placeVisits.size,
-                    totalDuration = placeVisits.fold(Duration.ZERO) { acc, visit ->
-                        acc + visit.duration
-                    },
+                    totalDuration =
+                        placeVisits.fold(Duration.ZERO) { acc, visit ->
+                            acc + visit.duration
+                        },
                     category = representative.category,
                     city = representative.city,
                     country = representative.countryCode
                 )
-            }
-            .sortedByDescending { it.totalDuration }
+            }.sortedByDescending { it.totalDuration }
             .take(limit)
     }
 }

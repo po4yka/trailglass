@@ -9,7 +9,6 @@ import kotlin.time.measureTime
  * This provides a simple way to run performance benchmarks and see results.
  */
 object BenchmarkRunner {
-
     private const val ITERATIONS = 1000
     private const val WARMUP_ITERATIONS = 100
 
@@ -27,15 +26,16 @@ object BenchmarkRunner {
         val to: Coordinate
     )
 
-    private val scenarios = listOf(
-        Scenario("100m", Coordinate(40.7128, -74.0060), Coordinate(40.7138, -74.0060)),
-        Scenario("500m", Coordinate(40.7128, -74.0060), Coordinate(40.7173, -74.0060)),
-        Scenario("10km", Coordinate(40.7128, -74.0060), Coordinate(40.6782, -73.9442)),
-        Scenario("50km", Coordinate(40.7128, -74.0060), Coordinate(40.7357, -74.1724)),
-        Scenario("1000km", Coordinate(40.7128, -74.0060), Coordinate(41.8781, -87.6298)),
-        Scenario("5000km", Coordinate(40.7128, -74.0060), Coordinate(51.5074, -0.1278)),
-        Scenario("15000km", Coordinate(40.7128, -74.0060), Coordinate(-33.8688, 151.2093))
-    )
+    private val scenarios =
+        listOf(
+            Scenario("100m", Coordinate(40.7128, -74.0060), Coordinate(40.7138, -74.0060)),
+            Scenario("500m", Coordinate(40.7128, -74.0060), Coordinate(40.7173, -74.0060)),
+            Scenario("10km", Coordinate(40.7128, -74.0060), Coordinate(40.6782, -73.9442)),
+            Scenario("50km", Coordinate(40.7128, -74.0060), Coordinate(40.7357, -74.1724)),
+            Scenario("1000km", Coordinate(40.7128, -74.0060), Coordinate(41.8781, -87.6298)),
+            Scenario("5000km", Coordinate(40.7128, -74.0060), Coordinate(51.5074, -0.1278)),
+            Scenario("15000km", Coordinate(40.7128, -74.0060), Coordinate(-33.8688, 151.2093))
+        )
 
     fun runDistanceBenchmarks(): List<BenchmarkResult> {
         val results = mutableListOf<BenchmarkResult>()
@@ -46,11 +46,12 @@ object BenchmarkRunner {
         println("Iterations: $ITERATIONS, Warmup: $WARMUP_ITERATIONS")
         println()
 
-        val algorithms = listOf(
-            "Simple" to SimpleDistance(),
-            "Haversine" to HaversineDistance(),
-            "Vincenty" to VincentyDistance()
-        )
+        val algorithms =
+            listOf(
+                "Simple" to SimpleDistance(),
+                "Haversine" to HaversineDistance(),
+                "Vincenty" to VincentyDistance()
+            )
 
         for (scenario in scenarios) {
             println("${"-".repeat(80)}")
@@ -67,9 +68,10 @@ object BenchmarkRunner {
 
                 val times = mutableListOf<Duration>()
                 repeat(ITERATIONS) {
-                    val time = measureTime {
-                        algorithm.calculate(scenario.from, scenario.to)
-                    }
+                    val time =
+                        measureTime {
+                            algorithm.calculate(scenario.from, scenario.to)
+                        }
                     times.add(time)
                 }
 
@@ -93,7 +95,12 @@ object BenchmarkRunner {
             val baseline = scenarioResults[0]
             for (i in 1 until scenarioResults.size) {
                 val ratio = scenarioResults[i].averageTimeMicros / baseline.averageTimeMicros
-                println("    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${String.format("%.2f", ratio)}x")
+                println(
+                    "    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${String.format(
+                        "%.2f",
+                        ratio
+                    )}x"
+                )
             }
             println()
         }
@@ -109,11 +116,12 @@ object BenchmarkRunner {
         println("${"=".repeat(80)}")
         println()
 
-        val algorithms = listOf(
-            "Initial" to InitialBearing(),
-            "Final" to FinalBearing(),
-            "Rhumb" to RhumbLineBearing()
-        )
+        val algorithms =
+            listOf(
+                "Initial" to InitialBearing(),
+                "Final" to FinalBearing(),
+                "Rhumb" to RhumbLineBearing()
+            )
 
         val testScenarios = listOf(scenarios[2], scenarios[4], scenarios[6])
 
@@ -131,9 +139,10 @@ object BenchmarkRunner {
 
                 val times = mutableListOf<Duration>()
                 repeat(ITERATIONS) {
-                    val time = measureTime {
-                        algorithm.calculate(scenario.from, scenario.to)
-                    }
+                    val time =
+                        measureTime {
+                            algorithm.calculate(scenario.from, scenario.to)
+                        }
                     times.add(time)
                 }
 
@@ -161,11 +170,12 @@ object BenchmarkRunner {
         println("${"=".repeat(80)}")
         println()
 
-        val algorithms = listOf(
-            "Linear" to LinearInterpolation(),
-            "SLERP" to SphericalInterpolation(),
-            "Cubic" to CubicInterpolation()
-        )
+        val algorithms =
+            listOf(
+                "Linear" to LinearInterpolation(),
+                "SLERP" to SphericalInterpolation(),
+                "Cubic" to CubicInterpolation()
+            )
 
         val testScenarios = listOf(scenarios[2], scenarios[4])
         val stepCounts = listOf(10, 50, 100)
@@ -185,9 +195,10 @@ object BenchmarkRunner {
 
                     val times = mutableListOf<Duration>()
                     repeat(ITERATIONS) {
-                        val time = measureTime {
-                            algorithm.generatePath(scenario.from, scenario.to, steps)
-                        }
+                        val time =
+                            measureTime {
+                                algorithm.generatePath(scenario.from, scenario.to, steps)
+                            }
                         times.add(time)
                     }
 

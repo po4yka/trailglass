@@ -122,7 +122,9 @@ sealed class PermissionResult {
     /**
      * An error occurred during permission request.
      */
-    data class Error(val message: String) : PermissionResult()
+    data class Error(
+        val message: String
+    ) : PermissionResult()
 }
 
 /**

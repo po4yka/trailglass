@@ -7,8 +7,12 @@ import kotlinx.coroutines.flow.StateFlow
  */
 sealed class NetworkState {
     data object Connected : NetworkState()
+
     data object Disconnected : NetworkState()
-    data class Limited(val reason: String) : NetworkState() // e.g., metered connection
+
+    data class Limited(
+        val reason: String
+    ) : NetworkState() // e.g., metered connection
 }
 
 /**
@@ -63,8 +67,9 @@ interface NetworkConnectivityMonitor {
 /**
  * Extension to check if network state allows sync.
  */
-fun NetworkState.allowsSync(): Boolean = when (this) {
-    is NetworkState.Connected -> true
-    is NetworkState.Disconnected -> false
-    is NetworkState.Limited -> false // Can be changed to allow limited sync
-}
+fun NetworkState.allowsSync(): Boolean =
+    when (this) {
+        is NetworkState.Connected -> true
+        is NetworkState.Disconnected -> false
+        is NetworkState.Limited -> false // Can be changed to allow limited sync
+    }

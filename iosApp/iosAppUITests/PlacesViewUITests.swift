@@ -2,7 +2,6 @@ import XCTest
 
 /// UI tests for PlacesView screen
 final class PlacesViewUITests: XCTestCase {
-
     var app: XCUIApplication!
 
     override func setUpWithError() throws {
@@ -153,7 +152,7 @@ final class PlacesViewUITests: XCTestCase {
             // - Place name
             // - Visit count
             // Note: Specific checks depend on data availability
-            XCTAssertTrue(firstRow.images.count > 0, "Row should have category icon")
+            XCTAssertTrue(!firstRow.images.isEmpty, "Row should have category icon")
         }
     }
 

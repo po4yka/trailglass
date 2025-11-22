@@ -7,14 +7,14 @@ import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.auth.TokenStorageProvider
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
+import com.po4yka.trailglass.data.security.EncryptionService
+import com.po4yka.trailglass.data.security.SyncDataEncryption
 import com.po4yka.trailglass.data.sync.ConflictResolver
 import com.po4yka.trailglass.data.sync.DefaultConflictResolver
 import com.po4yka.trailglass.data.sync.SyncCoordinator
 import com.po4yka.trailglass.data.sync.SyncStateRepository
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.data.sync.SyncableEntity
-import com.po4yka.trailglass.data.security.EncryptionService
-import com.po4yka.trailglass.data.security.SyncDataEncryption
 import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Provides
 
@@ -30,19 +30,17 @@ import me.tatarka.inject.annotations.Provides
  * - Syncable repositories
  */
 interface SyncModule {
-
     /**
      * Provides API configuration.
      * Can be overridden for different environments (dev, staging, prod).
      */
     @Provides
-    fun provideApiConfig(): ApiConfig {
-        return ApiConfig(
+    fun provideApiConfig(): ApiConfig =
+        ApiConfig(
             baseUrl = "https://trailglass.po4yka.com/api/v1",
             timeout = 30000,
             enableLogging = true // Should be false in production
         )
-    }
 
     /**
      * Provides secure token storage.
@@ -57,9 +55,7 @@ interface SyncModule {
      */
     @AppScope
     @Provides
-    fun provideTokenProvider(secureStorage: SecureTokenStorage): TokenProvider {
-        return TokenStorageProvider(secureStorage)
-    }
+    fun provideTokenProvider(secureStorage: SecureTokenStorage): TokenProvider = TokenStorageProvider(secureStorage)
 
     /**
      * Provides platform device information provider.
@@ -77,9 +73,7 @@ interface SyncModule {
         config: ApiConfig,
         tokenProvider: TokenProvider,
         deviceInfoProvider: DeviceInfoProvider
-    ): TrailGlassApiClient {
-        return TrailGlassApiClient(config, tokenProvider, deviceInfoProvider)
-    }
+    ): TrailGlassApiClient = TrailGlassApiClient(config, tokenProvider, deviceInfoProvider)
 
     /**
      * Provides sync state repository.
@@ -97,18 +91,14 @@ interface SyncModule {
     fun provideSyncCoordinator(
         apiClient: TrailGlassApiClient,
         syncStateRepository: SyncStateRepository
-    ): SyncCoordinator {
-        return SyncCoordinator(apiClient, syncStateRepository)
-    }
+    ): SyncCoordinator = SyncCoordinator(apiClient, syncStateRepository)
 
     /**
      * Provides default conflict resolver.
      */
     @AppScope
     @Provides
-    fun provideConflictResolver(): ConflictResolver<SyncableEntity> {
-        return DefaultConflictResolver()
-    }
+    fun provideConflictResolver(): ConflictResolver<SyncableEntity> = DefaultConflictResolver()
 
     /**
      * Provides sync metadata repository.
@@ -146,8 +136,8 @@ interface SyncModule {
         apiClient: TrailGlassApiClient,
         deviceId: String,
         userId: String
-    ): com.po4yka.trailglass.data.sync.SyncManager {
-        return com.po4yka.trailglass.data.sync.SyncManager(
+    ): com.po4yka.trailglass.data.sync.SyncManager =
+        com.po4yka.trailglass.data.sync.SyncManager(
             syncCoordinator = syncCoordinator,
             syncMetadataRepository = syncMetadataRepository,
             conflictRepository = conflictRepository,
@@ -161,22 +151,18 @@ interface SyncModule {
             deviceId = deviceId,
             userId = userId
         )
-    }
-
-
 
     /**
      * Provides JSON serializer for encryption.
      */
     @AppScope
     @Provides
-    fun provideJson(): Json {
-        return Json {
+    fun provideJson(): Json =
+        Json {
             ignoreUnknownKeys = true
             isLenient = true
             encodeDefaults = true
         }
-    }
 
     /**
      * Provides sync data encryption for E2E encryption.
@@ -186,7 +172,5 @@ interface SyncModule {
     fun provideSyncDataEncryption(
         encryptionService: EncryptionService,
         json: Json
-    ): SyncDataEncryption {
-        return SyncDataEncryption(encryptionService, json)
-    }
+    ): SyncDataEncryption = SyncDataEncryption(encryptionService, json)
 }

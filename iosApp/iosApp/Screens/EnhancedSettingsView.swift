@@ -72,7 +72,12 @@ struct EnhancedSettingsView: View {
                     showClearDataAlert = false
                 }
             } message: {
-                Text("This will permanently delete all your data including trips, locations, photos, and settings. This action cannot be undone.\n\nAre you sure you want to continue?")
+                Text("""
+                This will permanently delete all your data including trips, locations, photos, and \
+                settings. This action cannot be undone.
+
+                Are you sure you want to continue?
+                """)
             }
         }
         .navigationBarHidden(true)

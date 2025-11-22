@@ -35,9 +35,10 @@ fun PieChart(
     ) {
         // Pie chart
         Canvas(
-            modifier = Modifier
-                .size(200.dp)
-                .align(Alignment.CenterHorizontally)
+            modifier =
+                Modifier
+                    .size(200.dp)
+                    .align(Alignment.CenterHorizontally)
         ) {
             val canvasSize = min(size.width, size.height)
             val radius = canvasSize / 2f
@@ -56,14 +57,16 @@ fun PieChart(
                     startAngle = startAngle,
                     sweepAngle = sweepAngle,
                     useCenter = false,
-                    topLeft = Offset(
-                        centerX - radius + strokeWidth / 2,
-                        centerY - radius + strokeWidth / 2
-                    ),
-                    size = Size(
-                        (radius - strokeWidth / 2) * 2,
-                        (radius - strokeWidth / 2) * 2
-                    ),
+                    topLeft =
+                        Offset(
+                            centerX - radius + strokeWidth / 2,
+                            centerY - radius + strokeWidth / 2
+                        ),
+                    size =
+                        Size(
+                            (radius - strokeWidth / 2) * 2,
+                            (radius - strokeWidth / 2) * 2
+                        ),
                     style = Stroke(width = strokeWidth)
                 )
 

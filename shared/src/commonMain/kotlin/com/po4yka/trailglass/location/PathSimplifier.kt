@@ -12,7 +12,6 @@ import kotlin.math.*
 class PathSimplifier(
     private val epsilonMeters: Double = 50.0
 ) {
-
     private val logger = logger()
 
     /**
@@ -31,7 +30,7 @@ class PathSimplifier(
         val simplified = douglasPeucker(points, epsilonMeters)
 
         val reduction = ((1.0 - simplified.size.toDouble() / points.size) * 100).toInt()
-        logger.debug { "Simplified path from ${points.size} to ${simplified.size} points (${reduction}% reduction)" }
+        logger.debug { "Simplified path from ${points.size} to ${simplified.size} points ($reduction% reduction)" }
 
         return simplified
     }
@@ -41,7 +40,10 @@ class PathSimplifier(
      * Recursively simplifies a polyline by removing points that deviate
      * less than epsilon from the line between endpoints.
      */
-    private fun douglasPeucker(points: List<Coordinate>, epsilon: Double): List<Coordinate> {
+    private fun douglasPeucker(
+        points: List<Coordinate>,
+        epsilon: Double
+    ): List<Coordinate> {
         if (points.size < 3) return points
 
         // Find the point with the maximum distance from the line segment
@@ -108,16 +110,18 @@ class PathSimplifier(
         val dist13 = haversineDistance(lineStart, point) / R
 
         // Bearing from start to end
-        val bearing12 = atan2(
-            sin(lon2 - lon1) * cos(lat2),
-            cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)
-        )
+        val bearing12 =
+            atan2(
+                sin(lon2 - lon1) * cos(lat2),
+                cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon2 - lon1)
+            )
 
         // Bearing from start to point
-        val bearing13 = atan2(
-            sin(lon3 - lon1) * cos(lat3),
-            cos(lat1) * sin(lat3) - sin(lat1) * cos(lat3) * cos(lon3 - lon1)
-        )
+        val bearing13 =
+            atan2(
+                sin(lon3 - lon1) * cos(lat3),
+                cos(lat1) * sin(lat3) - sin(lat1) * cos(lat3) * cos(lon3 - lon1)
+            )
 
         // Cross-track distance (perpendicular distance to great circle)
         val crossTrackDistance = abs(asin(sin(dist13) * sin(bearing13 - bearing12))) * R
@@ -130,13 +134,17 @@ class PathSimplifier(
      *
      * @return Distance in meters
      */
-    private fun haversineDistance(c1: Coordinate, c2: Coordinate): Double {
+    private fun haversineDistance(
+        c1: Coordinate,
+        c2: Coordinate
+    ): Double {
         val earthRadiusMeters = 6371000.0
 
         val dLat = (c2.latitude - c1.latitude * PI / 180.0)
         val dLon = (c2.longitude - c1.longitude * PI / 180.0)
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos((c1.latitude * PI / 180.0)) * cos((c2.latitude * PI / 180.0)) *
                 sin(dLon / 2).pow(2)
 

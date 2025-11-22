@@ -24,14 +24,13 @@ class GetPlaceVisitsUseCase(
         userId: String,
         startTime: Instant,
         endTime: Instant
-    ): Result<List<PlaceVisit>> {
-        return try {
+    ): Result<List<PlaceVisit>> =
+        try {
             val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
             Result.success(visits)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 
     /**
      * Get place visits for a user with pagination.
@@ -45,12 +44,11 @@ class GetPlaceVisitsUseCase(
         userId: String,
         limit: Int = 50,
         offset: Int = 0
-    ): Result<List<PlaceVisit>> {
-        return try {
+    ): Result<List<PlaceVisit>> =
+        try {
             val visits = placeVisitRepository.getVisitsByUser(userId, limit, offset)
             Result.success(visits)
         } catch (e: Exception) {
             Result.failure(e)
         }
-    }
 }

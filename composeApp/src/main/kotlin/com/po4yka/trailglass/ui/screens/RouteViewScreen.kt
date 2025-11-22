@@ -2,7 +2,6 @@ package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BarChart
@@ -24,11 +23,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.feature.route.MapStyle
@@ -76,23 +72,24 @@ fun RouteViewScreen(
     fun shareExport(exportResult: com.po4yka.trailglass.feature.route.export.ExportResult) {
         scope.launch {
             val shareHandler = AndroidRouteShareHandler(context)
-            shareHandler.shareRouteFile(
-                fileName = exportResult.fileName,
-                content = exportResult.content,
-                mimeType = exportResult.mimeType
-            ).onSuccess {
-                controller.clearExportResult()
-                snackbarHostState.showSnackbar(
-                    message = "Export ready to share",
-                    duration = SnackbarDuration.Short
-                )
-            }.onFailure { error ->
-                controller.clearExportResult()
-                snackbarHostState.showSnackbar(
-                    message = "Failed to share: ${error.message}",
-                    duration = SnackbarDuration.Short
-                )
-            }
+            shareHandler
+                .shareRouteFile(
+                    fileName = exportResult.fileName,
+                    content = exportResult.content,
+                    mimeType = exportResult.mimeType
+                ).onSuccess {
+                    controller.clearExportResult()
+                    snackbarHostState.showSnackbar(
+                        message = "Export ready to share",
+                        duration = SnackbarDuration.Short
+                    )
+                }.onFailure { error ->
+                    controller.clearExportResult()
+                    snackbarHostState.showSnackbar(
+                        message = "Failed to share: ${error.message}",
+                        duration = SnackbarDuration.Short
+                    )
+                }
         }
     }
 
@@ -184,9 +181,10 @@ fun RouteViewScreen(
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
         ) {
             when {
                 state.isLoading -> {
@@ -288,9 +286,10 @@ fun RouteViewScreen(
             // Loading indicator for export
             if (state.isExporting) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(
@@ -339,10 +338,11 @@ private fun RouteViewContent(
         RouteSummaryCard(
             tripRoute = tripRoute,
             onPlayClick = onPlayClick,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth()
+                    .padding(16.dp)
         )
     }
 }
@@ -359,9 +359,10 @@ private fun MapStyleSelectorSheet(
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
         ) {
             Text(
                 text = "Choose Map Style",
@@ -393,20 +394,23 @@ private fun MapStyleOption(
 ) {
     Surface(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
         shape = MaterialTheme.shapes.medium,
-        color = if (isSelected) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.surface
-        }
+        color =
+            if (isSelected) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            }
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -415,27 +419,30 @@ private fun MapStyleOption(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = when (style) {
-                        MapStyle.STANDARD -> Icons.Default.Map
-                        MapStyle.SATELLITE -> Icons.Default.Satellite
-                        MapStyle.TERRAIN -> Icons.Default.Terrain
-                        MapStyle.DARK -> Icons.Default.DarkMode
-                    },
+                    imageVector =
+                        when (style) {
+                            MapStyle.STANDARD -> Icons.Default.Map
+                            MapStyle.SATELLITE -> Icons.Default.Satellite
+                            MapStyle.TERRAIN -> Icons.Default.Terrain
+                            MapStyle.DARK -> Icons.Default.DarkMode
+                        },
                     contentDescription = null,
-                    tint = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    }
+                    tint =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        }
                 )
                 Text(
                     text = style.name.lowercase().replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (isSelected) {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    }
+                    color =
+                        if (isSelected) {
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        }
                 )
             }
 
@@ -513,9 +520,10 @@ private fun PrivacyWarningDialog(
         confirmButton = {
             Button(
                 onClick = onConfirm,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error
+                    )
             ) {
                 Icon(Icons.Default.Share, contentDescription = null)
                 Spacer(Modifier.width(8.dp))

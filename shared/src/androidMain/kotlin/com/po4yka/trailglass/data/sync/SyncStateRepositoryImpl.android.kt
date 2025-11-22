@@ -22,8 +22,9 @@ private val Context.syncStateDataStore: DataStore<Preferences> by preferencesDat
  * Android implementation using DataStore.
  */
 @Inject
-actual class SyncStateRepositoryImpl(private val context: Context) : SyncStateRepository {
-
+actual class SyncStateRepositoryImpl(
+    private val context: Context
+) : SyncStateRepository {
     private object Keys {
         val LAST_SYNC_TIMESTAMP = stringPreferencesKey("last_sync_timestamp")
         val LAST_SYNC_VERSION = longPreferencesKey("last_sync_version")
@@ -32,23 +33,24 @@ actual class SyncStateRepositoryImpl(private val context: Context) : SyncStateRe
         val ERROR = stringPreferencesKey("error")
     }
 
-    actual override suspend fun getSyncState(): SyncState {
-        return context.syncStateDataStore.data.map { preferences ->
-            SyncState(
-                lastSyncTimestamp = preferences[Keys.LAST_SYNC_TIMESTAMP]?.let {
-                    try {
-                        Instant.parse(it)
-                    } catch (e: Exception) {
-                        null
-                    }
-                },
-                lastSyncVersion = preferences[Keys.LAST_SYNC_VERSION] ?: 0,
-                isSyncing = preferences[Keys.IS_SYNCING] ?: false,
-                pendingChanges = preferences[Keys.PENDING_CHANGES] ?: 0,
-                error = preferences[Keys.ERROR]
-            )
-        }.first()
-    }
+    actual override suspend fun getSyncState(): SyncState =
+        context.syncStateDataStore.data
+            .map { preferences ->
+                SyncState(
+                    lastSyncTimestamp =
+                        preferences[Keys.LAST_SYNC_TIMESTAMP]?.let {
+                            try {
+                                Instant.parse(it)
+                            } catch (e: Exception) {
+                                null
+                            }
+                        },
+                    lastSyncVersion = preferences[Keys.LAST_SYNC_VERSION] ?: 0,
+                    isSyncing = preferences[Keys.IS_SYNCING] ?: false,
+                    pendingChanges = preferences[Keys.PENDING_CHANGES] ?: 0,
+                    error = preferences[Keys.ERROR]
+                )
+            }.first()
 
     actual override suspend fun updateSyncState(state: SyncState) {
         context.syncStateDataStore.edit { preferences ->

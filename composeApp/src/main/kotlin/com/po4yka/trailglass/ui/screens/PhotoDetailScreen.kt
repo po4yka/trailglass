@@ -3,8 +3,6 @@ package com.po4yka.trailglass.ui.screens
 import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
@@ -63,9 +61,10 @@ fun PhotoDetailScreen(
         when {
             state.isLoading -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -75,9 +74,10 @@ fun PhotoDetailScreen(
                 ErrorView(
                     error = state.error!!,
                     onRetry = { controller.loadPhoto(photoId) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
             state.photo != null -> {
@@ -85,9 +85,10 @@ fun PhotoDetailScreen(
                     photoWithMetadata = state.photo!!,
                     onAttachToVisit = { controller.showAttachmentDialog() },
                     onViewOnRoute = onViewOnRoute,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
         }
@@ -109,9 +110,10 @@ private fun PhotoDetailContent(
         // Photo image
         item {
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(4f / 3f)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(4f / 3f)
             ) {
                 SubcomposeAsyncImage(
                     model = Uri.parse(photoWithMetadata.photo.uri),
@@ -237,7 +239,7 @@ private fun ExifSection(metadata: com.po4yka.trailglass.domain.model.PhotoMetada
                     SettingChip("${it.toInt()}mm")
                 }
                 metadata.aperture?.let {
-                    SettingChip("f/${it}")
+                    SettingChip("f/$it")
                 }
                 metadata.iso?.let {
                     SettingChip("ISO $it")
@@ -280,9 +282,10 @@ private fun AttachmentsSection(attachments: List<com.po4yka.trailglass.domain.mo
                     leadingContent = {
                         Icon(Icons.Default.Place, contentDescription = null)
                     },
-                    colors = ListItemDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
+                    colors =
+                        ListItemDefaults.colors(
+                            containerColor = Color.Transparent
+                        )
                 )
             }
         }
@@ -298,7 +301,10 @@ private fun SettingChip(text: String) {
 }
 
 @Composable
-private fun InfoRow(label: String, value: String) {
+private fun InfoRow(
+    label: String,
+    value: String
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -321,9 +327,13 @@ private fun InfoRow(label: String, value: String) {
  */
 interface PhotoDetailController {
     val state: kotlinx.coroutines.flow.StateFlow<PhotoDetailState>
+
     fun loadPhoto(photoId: String)
+
     fun sharePhoto()
+
     fun deletePhoto()
+
     fun showAttachmentDialog()
 }
 

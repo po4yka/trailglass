@@ -44,9 +44,10 @@ fun ConflictListScreen(
     ) { padding ->
         if (conflicts.isEmpty()) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -72,9 +73,10 @@ fun ConflictListScreen(
             }
         } else {
             LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                modifier =
+                    modifier
+                        .fillMaxSize()
+                        .padding(padding),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -101,9 +103,10 @@ fun ConflictCard(
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.extended.warning
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.extended.warning
+            )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
@@ -153,7 +156,9 @@ fun ConflictCard(
                     Text(
                         text = formatDateTime(conflict.localModified),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.extended.onWarning.copy(alpha = 0.7f)
+                        color =
+                            MaterialTheme.colorScheme.extended.onWarning
+                                .copy(alpha = 0.7f)
                     )
                 }
 
@@ -166,7 +171,9 @@ fun ConflictCard(
                     Text(
                         text = formatDateTime(conflict.remoteModified),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.extended.onWarning.copy(alpha = 0.7f)
+                        color =
+                            MaterialTheme.colorScheme.extended.onWarning
+                                .copy(alpha = 0.7f)
                     )
                 }
             }
@@ -174,9 +181,10 @@ fun ConflictCard(
             Button(
                 onClick = onClick,
                 modifier = Modifier.align(Alignment.End),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.extended.warningEmphasis
-                )
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.extended.warningEmphasis
+                    )
             ) {
                 Text("Resolve")
             }
@@ -220,9 +228,10 @@ fun ConflictResolutionDialog(
 
                 // Local version
                 Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
-                    )
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                        )
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -247,9 +256,10 @@ fun ConflictResolutionDialog(
 
                 // Remote version
                 Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer
-                    )
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
+                        )
                 ) {
                     Column(
                         modifier = Modifier.padding(12.dp),
@@ -309,7 +319,10 @@ fun ConflictResolutionDialog(
 }
 
 @Composable
-private fun Chip(text: String, modifier: Modifier = Modifier) {
+private fun Chip(
+    text: String,
+    modifier: Modifier = Modifier
+) {
     Surface(
         modifier = modifier,
         shape = MaterialTheme.shapes.small,

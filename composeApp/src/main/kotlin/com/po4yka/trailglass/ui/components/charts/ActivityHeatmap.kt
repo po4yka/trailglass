@@ -83,9 +83,10 @@ fun ActivityHeatmap(
                         val intensity = if (maxActivity > 0) activity.toFloat() / maxActivity else 0f
 
                         Canvas(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(20.dp)
+                            modifier =
+                                Modifier
+                                    .weight(1f)
+                                    .height(20.dp)
                         ) {
                             val color = blendColors(lowColor, highColor, intensity)
                             drawRoundRect(
@@ -102,9 +103,10 @@ fun ActivityHeatmap(
 
         // Legend
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -144,7 +146,11 @@ fun ActivityHeatmap(
 /**
  * Blend two colors based on intensity.
  */
-private fun blendColors(low: Color, high: Color, intensity: Float): Color {
+private fun blendColors(
+    low: Color,
+    high: Color,
+    intensity: Float
+): Color {
     val clampedIntensity = intensity.coerceIn(0f, 1f)
     return Color(
         red = low.red + (high.red - low.red) * clampedIntensity,

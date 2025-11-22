@@ -6,8 +6,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -48,17 +48,19 @@ fun RegisterScreen(
 
     // Password validation
     val passwordMatch = password == confirmPassword
-    val passwordError = when {
-        password.isNotBlank() && password.length < 8 -> "Password must be at least 8 characters"
-        confirmPassword.isNotBlank() && !passwordMatch -> "Passwords do not match"
-        else -> null
-    }
+    val passwordError =
+        when {
+            password.isNotBlank() && password.length < 8 -> "Password must be at least 8 characters"
+            confirmPassword.isNotBlank() && !passwordMatch -> "Passwords do not match"
+            else -> null
+        }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
-            .padding(24.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(32.dp))
@@ -92,9 +94,10 @@ fun RegisterScreen(
         if (errorMessage != null) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -125,13 +128,15 @@ fun RegisterScreen(
             leadingIcon = {
                 Icon(Icons.Default.Person, contentDescription = "Name")
             },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
             singleLine = true,
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()
@@ -148,13 +153,15 @@ fun RegisterScreen(
             leadingIcon = {
                 Icon(Icons.Default.Email, contentDescription = "Email")
             },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Email,
+                    imeAction = ImeAction.Next
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
             singleLine = true,
             enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()
@@ -174,28 +181,45 @@ fun RegisterScreen(
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
-                        imageVector = if (passwordVisible) Icons.Default.Visibility
-                        else Icons.Default.VisibilityOff,
-                        contentDescription = if (passwordVisible) "Hide password"
-                        else "Show password"
+                        imageVector =
+                            if (passwordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                        contentDescription =
+                            if (passwordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
+                            }
                     )
                 }
             },
-            visualTransformation = if (passwordVisible) VisualTransformation.None
-            else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
+            visualTransformation =
+                if (passwordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                ),
             singleLine = true,
             enabled = !isLoading,
             isError = passwordError != null && password.isNotBlank(),
-            supportingText = if (passwordError != null && password.isNotBlank()) {
-                { Text(passwordError) }
-            } else null,
+            supportingText =
+                if (passwordError != null && password.isNotBlank()) {
+                    { Text(passwordError) }
+                } else {
+                    null
+                },
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -213,28 +237,46 @@ fun RegisterScreen(
             trailingIcon = {
                 IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                     Icon(
-                        imageVector = if (confirmPasswordVisible) Icons.Default.Visibility
-                        else Icons.Default.VisibilityOff,
-                        contentDescription = if (confirmPasswordVisible) "Hide password"
-                        else "Show password"
+                        imageVector =
+                            if (confirmPasswordVisible) {
+                                Icons.Default.Visibility
+                            } else {
+                                Icons.Default.VisibilityOff
+                            },
+                        contentDescription =
+                            if (confirmPasswordVisible) {
+                                "Hide password"
+                            } else {
+                                "Show password"
+                            }
                     )
                 }
             },
-            visualTransformation = if (confirmPasswordVisible) VisualTransformation.None
-            else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                    if (displayName.isNotBlank() && email.isNotBlank() &&
-                        password.isNotBlank() && passwordMatch && passwordError == null) {
-                        authController.register(email, password, displayName)
+            visualTransformation =
+                if (confirmPasswordVisible) {
+                    VisualTransformation.None
+                } else {
+                    PasswordVisualTransformation()
+                },
+            keyboardOptions =
+                KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done
+                ),
+            keyboardActions =
+                KeyboardActions(
+                    onDone = {
+                        focusManager.clearFocus()
+                        if (displayName.isNotBlank() &&
+                            email.isNotBlank() &&
+                            password.isNotBlank() &&
+                            passwordMatch &&
+                            passwordError == null
+                        ) {
+                            authController.register(email, password, displayName)
+                        }
                     }
-                }
-            ),
+                ),
             singleLine = true,
             enabled = !isLoading,
             isError = confirmPassword.isNotBlank() && !passwordMatch,
@@ -249,7 +291,8 @@ fun RegisterScreen(
                 focusManager.clearFocus()
                 authController.register(email, password, displayName)
             },
-            enabled = !isLoading &&
+            enabled =
+                !isLoading &&
                     displayName.isNotBlank() &&
                     email.isNotBlank() &&
                     password.isNotBlank() &&

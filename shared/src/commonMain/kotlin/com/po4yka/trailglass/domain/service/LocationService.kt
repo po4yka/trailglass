@@ -33,7 +33,10 @@ interface LocationService {
      * @param intervalMs Update interval in milliseconds (default: 5000ms)
      * @param fastestIntervalMs Fastest update interval in milliseconds (default: 2000ms)
      */
-    suspend fun startTracking(intervalMs: Long = 5000, fastestIntervalMs: Long = 2000)
+    suspend fun startTracking(
+        intervalMs: Long = 5000,
+        fastestIntervalMs: Long = 2000
+    )
 
     /**
      * Stop tracking location updates.

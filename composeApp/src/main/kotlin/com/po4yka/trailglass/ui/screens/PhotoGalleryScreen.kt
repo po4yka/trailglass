@@ -10,13 +10,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.automirrored.filled.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -61,9 +60,10 @@ fun PhotoGalleryScreen(
         when {
             state.isLoading -> {
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -73,26 +73,29 @@ fun PhotoGalleryScreen(
                 ErrorView(
                     error = state.error!!,
                     onRetry = { controller.refresh() },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
             state.photoGroups.isNotEmpty() -> {
                 PhotoGalleryContent(
                     photoGroups = state.photoGroups,
                     onPhotoClick = onPhotoClick,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
             else -> {
                 EmptyGalleryView(
                     onImportClick = { controller.importPhotos() },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                 )
             }
         }
@@ -189,9 +192,10 @@ private fun PhotoGridItem(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .aspectRatio(1f)
-            .clickable(onClick = onClick),
+        modifier =
+            modifier
+                .aspectRatio(1f)
+                .clickable(onClick = onClick),
         shape = RoundedCornerShape(8.dp)
     ) {
         Box {
@@ -225,18 +229,20 @@ private fun PhotoGridItem(
             // Attachment indicator
             if (photo.attachments.isNotEmpty()) {
                 Surface(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(4.dp),
+                    modifier =
+                        Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp),
                     shape = RoundedCornerShape(4.dp),
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
                 ) {
                     Icon(
                         Icons.Default.Place,
                         contentDescription = "Attached to visit",
-                        modifier = Modifier
-                            .size(16.dp)
-                            .padding(2.dp),
+                        modifier =
+                            Modifier
+                                .size(16.dp)
+                                .padding(2.dp),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
@@ -291,8 +297,11 @@ private fun EmptyGalleryView(
  */
 interface PhotoGalleryController {
     val state: kotlinx.coroutines.flow.StateFlow<PhotoGalleryState>
+
     fun loadGallery()
+
     fun importPhotos()
+
     fun refresh()
 }
 

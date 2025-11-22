@@ -16,7 +16,6 @@ class SuggestPhotosForVisitUseCase(
     private val photoRepository: PhotoRepository,
     private val suggestionRadiusMeters: Double = 500.0 // 500m radius
 ) {
-
     private val logger = logger()
 
     /**
@@ -26,32 +25,38 @@ class SuggestPhotosForVisitUseCase(
      * @param userId User ID
      * @return List of suggested photos, sorted by relevance (best match first)
      */
-    suspend fun execute(visit: PlaceVisit, userId: String): List<Photo> {
+    suspend fun execute(
+        visit: PlaceVisit,
+        userId: String
+    ): List<Photo> {
         logger.debug { "Suggesting photos for visit ${visit.id}" }
 
         // Get photos within the visit time range
-        val photos = photoRepository.getPhotosInTimeRange(
-            userId = userId,
-            startTime = visit.startTime,
-            endTime = visit.endTime
-        )
+        val photos =
+            photoRepository.getPhotosInTimeRange(
+                userId = userId,
+                startTime = visit.startTime,
+                endTime = visit.endTime
+            )
 
         logger.debug { "Found ${photos.size} photos in time range" }
 
         // Filter and score photos
-        val scoredPhotos = photos.mapNotNull { photo ->
-            val score = calculateRelevanceScore(photo, visit)
-            if (score > 0.0) {
-                photo to score
-            } else {
-                null
+        val scoredPhotos =
+            photos.mapNotNull { photo ->
+                val score = calculateRelevanceScore(photo, visit)
+                if (score > 0.0) {
+                    photo to score
+                } else {
+                    null
+                }
             }
-        }
 
         // Sort by score (descending)
-        val suggestedPhotos = scoredPhotos
-            .sortedByDescending { it.second }
-            .map { it.first }
+        val suggestedPhotos =
+            scoredPhotos
+                .sortedByDescending { it.second }
+                .map { it.first }
 
         logger.info { "Suggesting ${suggestedPhotos.size} photos for visit ${visit.id}" }
         return suggestedPhotos
@@ -65,7 +70,10 @@ class SuggestPhotosForVisitUseCase(
      * - Time overlap (1.0 if exact overlap)
      * - Location proximity (1.0 if within suggestionRadiusMeters)
      */
-    private fun calculateRelevanceScore(photo: Photo, visit: PlaceVisit): Double {
+    private fun calculateRelevanceScore(
+        photo: Photo,
+        visit: PlaceVisit
+    ): Double {
         var score = 0.0
 
         // Time score (1.0 if photo is within visit time)
@@ -74,10 +82,11 @@ class SuggestPhotosForVisitUseCase(
             score += 1.0
         } else {
             // Reduce score for photos taken close to visit time
-            val timeDiff = minOf(
-                abs((photoTime - visit.startTime).inWholeMinutes),
-                abs((photoTime - visit.endTime).inWholeMinutes)
-            )
+            val timeDiff =
+                minOf(
+                    abs((photoTime - visit.startTime).inWholeMinutes),
+                    abs((photoTime - visit.endTime).inWholeMinutes)
+                )
 
             // Decay score based on time difference (30 minutes = 0.5 score)
             score += maxOf(0.0, 1.0 - (timeDiff / 30.0))
@@ -85,12 +94,13 @@ class SuggestPhotosForVisitUseCase(
 
         // Location score (if photo has location data)
         if (photo.latitude != null && photo.longitude != null) {
-            val distance = haversineDistance(
-                photo.latitude,
-                photo.longitude,
-                visit.centerLatitude,
-                visit.centerLongitude
-            )
+            val distance =
+                haversineDistance(
+                    photo.latitude,
+                    photo.longitude,
+                    visit.centerLatitude,
+                    visit.centerLongitude
+                )
 
             if (distance <= suggestionRadiusMeters) {
                 // Within radius - add full location score
@@ -118,7 +128,8 @@ class SuggestPhotosForVisitUseCase(
         val dLat = (lat2 - lat1) * PI / 180.0
         val dLon = (lon2 - lon1) * PI / 180.0
 
-        val a = sin(dLat / 2).pow(2) +
+        val a =
+            sin(dLat / 2).pow(2) +
                 cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
                 sin(dLon / 2).pow(2)
 

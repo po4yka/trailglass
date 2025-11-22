@@ -20,4 +20,5 @@ class DefaultTripStatisticsComponent(
     override val tripId: String,
     override val tripStatisticsController: TripStatisticsController,
     override val onBack: () -> Unit
-) : TripStatisticsComponent, ComponentContext by componentContext
+) : TripStatisticsComponent,
+    ComponentContext by componentContext

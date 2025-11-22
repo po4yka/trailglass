@@ -31,17 +31,19 @@ class UpdatePlaceVisitUseCase(
     ): Result<PlaceVisit> {
         return try {
             // Get existing visit
-            val existing = placeVisitRepository.getVisitById(visitId)
-                ?: return Result.failure(IllegalArgumentException("Visit not found: $visitId"))
+            val existing =
+                placeVisitRepository.getVisitById(visitId)
+                    ?: return Result.failure(IllegalArgumentException("Visit not found: $visitId"))
 
             // Update with new values
-            val updated = existing.copy(
-                userLabel = userLabel ?: existing.userLabel,
-                userNotes = userNotes ?: existing.userNotes,
-                category = category ?: existing.category,
-                isFavorite = isFavorite ?: existing.isFavorite,
-                updatedAt = Clock.System.now()
-            )
+            val updated =
+                existing.copy(
+                    userLabel = userLabel ?: existing.userLabel,
+                    userNotes = userNotes ?: existing.userNotes,
+                    category = category ?: existing.category,
+                    isFavorite = isFavorite ?: existing.isFavorite,
+                    updatedAt = Clock.System.now()
+                )
 
             // Save updated visit
             placeVisitRepository.updateVisit(updated)
@@ -65,15 +67,17 @@ class UpdatePlaceVisitUseCase(
         category: PlaceCategory? = null
     ): Result<List<PlaceVisit>> {
         return try {
-            val updated = visitIds.mapNotNull { visitId ->
-                val existing = placeVisitRepository.getVisitById(visitId) ?: return@mapNotNull null
+            val updated =
+                visitIds.mapNotNull { visitId ->
+                    val existing = placeVisitRepository.getVisitById(visitId) ?: return@mapNotNull null
 
-                existing.copy(
-                    userLabel = userLabel ?: existing.userLabel,
-                    category = category ?: existing.category,
-                    updatedAt = Clock.System.now()
-                ).also { placeVisitRepository.updateVisit(it) }
-            }
+                    existing
+                        .copy(
+                            userLabel = userLabel ?: existing.userLabel,
+                            category = category ?: existing.category,
+                            updatedAt = Clock.System.now()
+                        ).also { placeVisitRepository.updateVisit(it) }
+                }
 
             Result.success(updated)
         } catch (e: Exception) {

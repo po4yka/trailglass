@@ -12,7 +12,9 @@ sealed class CameraMove {
      *
      * @param position The target camera position
      */
-    data class Instant(val position: CameraPosition) : CameraMove()
+    data class Instant(
+        val position: CameraPosition
+    ) : CameraMove()
 
     /**
      * Smooth easing animation to a new position.

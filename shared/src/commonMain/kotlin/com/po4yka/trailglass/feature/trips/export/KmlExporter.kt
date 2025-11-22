@@ -9,7 +9,6 @@ import com.po4yka.trailglass.domain.model.Trip
  * KML is used by Google Earth and other mapping applications.
  */
 class KmlExporter {
-
     /**
      * Export a trip to KML format.
      *
@@ -22,8 +21,8 @@ class KmlExporter {
         trip: Trip,
         locationSamples: List<LocationSample>,
         placeVisits: List<PlaceVisit> = emptyList()
-    ): String {
-        return buildString {
+    ): String =
+        buildString {
             // XML declaration
             appendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
 
@@ -95,17 +94,15 @@ class KmlExporter {
             appendLine("  </Document>")
             appendLine("</kml>")
         }
-    }
 
     /**
      * Escape special XML characters.
      */
-    private fun escapeXml(text: String): String {
-        return text
+    private fun escapeXml(text: String): String =
+        text
             .replace("&", "&amp;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
             .replace("\"", "&quot;")
             .replace("'", "&apos;")
-    }
 }

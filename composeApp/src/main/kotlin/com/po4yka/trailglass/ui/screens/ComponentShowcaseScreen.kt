@@ -48,9 +48,10 @@ fun ComponentShowcaseScreen(
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
+            modifier =
+                Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -325,12 +326,13 @@ fun ComponentShowcaseScreen(
                         SplitButtonWithMenu(
                             primaryText = "View Details",
                             onPrimaryClick = { /* Open trip detail */ },
-                            menuItems = listOf(
-                                SplitButtonMenuItem("Edit") { /* Edit trip */ },
-                                SplitButtonMenuItem("Delete") { /* Delete trip */ },
-                                SplitButtonMenuItem("Duplicate") { /* Duplicate trip */ },
-                                SplitButtonMenuItem("Export") { /* Export trip */ }
-                            )
+                            menuItems =
+                                listOf(
+                                    SplitButtonMenuItem("Edit") { /* Edit trip */ },
+                                    SplitButtonMenuItem("Delete") { /* Delete trip */ },
+                                    SplitButtonMenuItem("Duplicate") { /* Duplicate trip */ },
+                                    SplitButtonMenuItem("Export") { /* Export trip */ }
+                                )
                         )
 
                         HorizontalDivider()
@@ -344,12 +346,13 @@ fun ComponentShowcaseScreen(
                         SplitButtonWithMenu(
                             primaryText = "Export All Data",
                             onPrimaryClick = { /* Export with defaults */ },
-                            menuItems = listOf(
-                                SplitButtonMenuItem("Export GPX only") { /* GPX */ },
-                                SplitButtonMenuItem("Export JSON") { /* JSON */ },
-                                SplitButtonMenuItem("Export Photos") { /* Photos */ },
-                                SplitButtonMenuItem("Custom...") { /* Custom */ }
-                            ),
+                            menuItems =
+                                listOf(
+                                    SplitButtonMenuItem("Export GPX only") { /* GPX */ },
+                                    SplitButtonMenuItem("Export JSON") { /* JSON */ },
+                                    SplitButtonMenuItem("Export Photos") { /* Photos */ },
+                                    SplitButtonMenuItem("Custom...") { /* Custom */ }
+                                ),
                             variant = SplitButtonVariant.Outlined
                         )
 
@@ -364,11 +367,12 @@ fun ComponentShowcaseScreen(
                         SplitButtonWithMenu(
                             primaryText = "Share Photo",
                             onPrimaryClick = { /* Share immediately */ },
-                            menuItems = listOf(
-                                SplitButtonMenuItem("Share as...") { /* Share options */ },
-                                SplitButtonMenuItem("Copy") { /* Copy to clipboard */ },
-                                SplitButtonMenuItem("Save to Device") { /* Save */ }
-                            )
+                            menuItems =
+                                listOf(
+                                    SplitButtonMenuItem("Share as...") { /* Share options */ },
+                                    SplitButtonMenuItem("Copy") { /* Copy to clipboard */ },
+                                    SplitButtonMenuItem("Save to Device") { /* Save */ }
+                                )
                         )
                     }
                 }
@@ -385,9 +389,10 @@ private fun ComponentSection(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
     ) {
         Column(
             modifier = Modifier.padding(16.dp),

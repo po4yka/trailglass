@@ -356,7 +356,7 @@ class PhotoGalleryViewModel: ObservableObject {
 
     @Published var photoGroups: [PhotoGroup] = []
     @Published var isLoading: Bool = false
-    @Published var error: String? = nil
+    @Published var error: String?
 
     init(controller: PhotoGalleryController) {
         self.controller = controller

@@ -23,11 +23,11 @@ enum class TransportType {
             if (speedMps == null || speedMps < 0) return UNKNOWN
 
             return when {
-                speedMps < 2.0 -> WALK          // < 7.2 km/h
-                speedMps < 7.0 -> BIKE          // 7.2 - 25 km/h
-                speedMps < 50.0 -> CAR          // 25 - 180 km/h
-                speedMps < 100.0 -> TRAIN       // 180 - 360 km/h
-                else -> PLANE                    // > 360 km/h
+                speedMps < 2.0 -> WALK // < 7.2 km/h
+                speedMps < 7.0 -> BIKE // 7.2 - 25 km/h
+                speedMps < 50.0 -> CAR // 25 - 180 km/h
+                speedMps < 100.0 -> TRAIN // 180 - 360 km/h
+                else -> PLANE // > 360 km/h
             }
         }
     }

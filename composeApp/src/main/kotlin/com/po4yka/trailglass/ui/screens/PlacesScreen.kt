@@ -63,9 +63,10 @@ fun PlacesScreen(
                     showSearch = false
                     onClearSearch()
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
 
@@ -117,10 +118,11 @@ private fun SearchBar(
             }
         },
         singleLine = true,
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
+        colors =
+            TextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
         shape = MaterialTheme.shapes.large
     )
 }
@@ -271,13 +273,15 @@ private fun FrequentPlaceCard(
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = when (place.significance) {
-                PlaceSignificance.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
-                PlaceSignificance.FREQUENT -> MaterialTheme.colorScheme.secondaryContainer
-                else -> MaterialTheme.colorScheme.surfaceVariant
-            }
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    when (place.significance) {
+                        PlaceSignificance.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
+                        PlaceSignificance.FREQUENT -> MaterialTheme.colorScheme.secondaryContainer
+                        else -> MaterialTheme.colorScheme.surfaceVariant
+                    }
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header row with icon and name
@@ -315,9 +319,10 @@ private fun FrequentPlaceCard(
 
             // Statistics row
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 // Visit count
@@ -340,7 +345,9 @@ private fun FrequentPlaceCard(
                         onClick = { },
                         label = {
                             Text(
-                                place.category.name.lowercase().replaceFirstChar { it.uppercase() },
+                                place.category.name
+                                    .lowercase()
+                                    .replaceFirstChar { it.uppercase() },
                                 style = MaterialTheme.typography.labelSmall
                             )
                         }
@@ -381,8 +388,8 @@ private fun StatChip(
 }
 
 @Composable
-private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector {
-    return when (category) {
+private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphics.vector.ImageVector =
+    when (category) {
         PlaceCategory.HOME -> Icons.Default.Home
         PlaceCategory.WORK -> Icons.Default.Work
         PlaceCategory.FOOD -> Icons.Default.Restaurant
@@ -398,7 +405,6 @@ private fun getCategoryIcon(category: PlaceCategory): androidx.compose.ui.graphi
         PlaceCategory.SERVICE -> Icons.Default.Build
         PlaceCategory.OTHER -> Icons.Default.Place
     }
-}
 
 private fun formatDuration(duration: Duration): String {
     val hours = duration.inWholeHours

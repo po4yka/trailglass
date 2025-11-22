@@ -14,7 +14,6 @@ import me.tatarka.inject.annotations.Inject
 class AttachPhotoToVisitUseCase(
     private val photoRepository: PhotoRepository
 ) {
-
     private val logger = logger()
 
     /**
@@ -40,13 +39,14 @@ class AttachPhotoToVisitUseCase(
         }
 
         return try {
-            val attachment = PhotoAttachment(
-                id = "attachment_${UuidGenerator.randomUUID()}",
-                photoId = photoId,
-                placeVisitId = visitId,
-                attachedAt = Clock.System.now(),
-                caption = caption
-            )
+            val attachment =
+                PhotoAttachment(
+                    id = "attachment_${UuidGenerator.randomUUID()}",
+                    photoId = photoId,
+                    placeVisitId = visitId,
+                    attachedAt = Clock.System.now(),
+                    caption = caption
+                )
 
             photoRepository.attachPhotoToVisit(attachment)
             logger.info { "Successfully attached photo $photoId to visit $visitId" }
@@ -59,7 +59,11 @@ class AttachPhotoToVisitUseCase(
 
     sealed class Result {
         object Success : Result()
+
         object AlreadyAttached : Result()
-        data class Error(val message: String) : Result()
+
+        data class Error(
+            val message: String
+        ) : Result()
     }
 }

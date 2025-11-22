@@ -10,46 +10,38 @@ data class Photo(
      * Unique identifier for the photo.
      */
     val id: String,
-
     /**
      * Platform-specific URI/path to the photo.
      * Android: content:// URI
      * iOS: PHAsset localIdentifier
      */
     val uri: String,
-
     /**
      * When the photo was taken.
      */
     val timestamp: Instant,
-
     /**
      * Location where photo was taken (if available).
      */
     val latitude: Double? = null,
     val longitude: Double? = null,
-
     /**
      * Photo dimensions.
      */
     val width: Int? = null,
     val height: Int? = null,
-
     /**
      * File size in bytes.
      */
     val sizeBytes: Long? = null,
-
     /**
      * MIME type (e.g., "image/jpeg").
      */
     val mimeType: String? = null,
-
     /**
      * User ID who owns this photo.
      */
     val userId: String,
-
     /**
      * When this photo was added to TrailGlass.
      */
@@ -64,22 +56,18 @@ data class PhotoAttachment(
      * Unique identifier for the attachment.
      */
     val id: String,
-
     /**
      * Photo ID.
      */
     val photoId: String,
-
     /**
      * Place visit ID this photo is attached to.
      */
     val placeVisitId: String,
-
     /**
      * When the attachment was created.
      */
     val attachedAt: Instant,
-
     /**
      * Optional caption/note for this attachment.
      */

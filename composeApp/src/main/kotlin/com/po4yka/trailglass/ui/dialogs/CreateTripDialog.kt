@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Trip
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import java.util.UUID
 
 /**
@@ -41,10 +40,11 @@ fun CreateTripDialog(
             tonalElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
-                    .verticalScroll(rememberScrollState()),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Title
@@ -150,10 +150,11 @@ fun CreateTripDialog(
                                             modifier = Modifier.size(16.dp)
                                         )
                                     },
-                                    modifier = Modifier
-                                        .clickable {
-                                            tags = tags.filter { it != tag }
-                                        }
+                                    modifier =
+                                        Modifier
+                                            .clickable {
+                                                tags = tags.filter { it != tag }
+                                            }
                                 )
                             }
                         }
@@ -177,19 +178,20 @@ fun CreateTripDialog(
                     Button(
                         onClick = {
                             val now = Clock.System.now()
-                            val trip = Trip(
-                                id = UUID.randomUUID().toString(),
-                                name = tripName.trim(),
-                                startTime = now,
-                                endTime = if (isOngoing) null else now, // For past trips, use now as placeholder
-                                isOngoing = isOngoing,
-                                userId = userId,
-                                description = description.trim().ifBlank { null },
-                                tags = tags,
-                                isAutoDetected = false,
-                                detectionConfidence = 1.0f, // Manual creation
-                                createdAt = now
-                            )
+                            val trip =
+                                Trip(
+                                    id = UUID.randomUUID().toString(),
+                                    name = tripName.trim(),
+                                    startTime = now,
+                                    endTime = if (isOngoing) null else now, // For past trips, use now as placeholder
+                                    isOngoing = isOngoing,
+                                    userId = userId,
+                                    description = description.trim().ifBlank { null },
+                                    tags = tags,
+                                    isAutoDetected = false,
+                                    detectionConfidence = 1.0f, // Manual creation
+                                    createdAt = now
+                                )
                             onConfirm(trip)
                         },
                         enabled = tripName.isNotBlank(),

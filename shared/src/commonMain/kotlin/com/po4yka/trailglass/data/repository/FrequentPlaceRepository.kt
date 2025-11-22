@@ -8,7 +8,6 @@ import com.po4yka.trailglass.domain.model.PlaceSignificance
  * Repository for managing frequently visited places.
  */
 interface FrequentPlaceRepository {
-
     /**
      * Insert a new frequent place.
      */

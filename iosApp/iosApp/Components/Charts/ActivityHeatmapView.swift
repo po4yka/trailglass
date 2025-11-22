@@ -8,7 +8,7 @@ struct ActivityHeatmapView: View {
     let data: [String: [Int: Int]] // day -> hour -> activity count
     let lowColor: Color
     let highColor: Color
-    @State private var selectedCell: CellPosition? = nil
+    @State private var selectedCell: CellPosition?
     @State private var animatedIntensities: [String: [Int: Float]] = [:]
 
     init(data: [String: [Int: Int]], lowColor: Color = Color.lightCyan, highColor: Color = Color.blueSlate) {
@@ -52,7 +52,7 @@ struct ActivityHeatmapView: View {
 
                 // Glass heatmap grid
                 VStack(spacing: 3) {
-                    ForEach(Array(days.enumerated()), id: \.offset) { dayIndex, day in
+                    ForEach(Array(days.enumerated()), id: \.offset) { _, day in
                         HStack(spacing: 3) {
                             // Glass day label
                             Text(day)
