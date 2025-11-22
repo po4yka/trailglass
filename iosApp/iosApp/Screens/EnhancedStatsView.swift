@@ -6,33 +6,46 @@ import SwiftUI
  */
 struct EnhancedStatsView: View {
     @StateObject private var viewModel: EnhancedStatsViewModel
+    @State private var scrollOffset: CGFloat = 0
 
     init(controller: EnhancedStatsController) {
         _viewModel = StateObject(wrappedValue: EnhancedStatsViewModel(controller: controller))
     }
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                if viewModel.isLoading {
-                    ProgressView()
-                } else if let error = viewModel.error {
-                    ErrorView(error: error) {
+        VStack(spacing: 0) {
+            // Large flexible navigation bar with chart preview background
+            LargeFlexibleNavigationBar(
+                title: "Statistics",
+                scrollOffset: scrollOffset,
+                actions: [
+                    NavigationAction(icon: "arrow.clockwise") {
                         viewModel.refresh()
                     }
-                } else if let stats = viewModel.stats {
-                    StatsContent(stats: stats, viewModel: viewModel)
-                } else {
-                    EmptyStatsView()
+                ],
+                subtitle: {
+                    Text(viewModel.selectedPeriod == .year ? "Year Overview" : "Month Overview")
+                },
+                backgroundContent: {
+                    HeroGradientBackground(
+                        startColor: Color.lightCyan,
+                        endColor: Color.coolSteel
+                    )
                 }
-            }
-            .navigationTitle("Statistics & Analytics")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.refresh() }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
+            )
+
+            if viewModel.isLoading {
+                Spacer()
+                GlassLoadingIndicator(variant: .morphing, size: 72, color: .coolSteel)
+                Spacer()
+            } else if let error = viewModel.error {
+                ErrorView(error: error) {
+                    viewModel.refresh()
                 }
+            } else if let stats = viewModel.stats {
+                StatsContent(stats: stats, viewModel: viewModel, scrollOffset: $scrollOffset)
+            } else {
+                EmptyStatsView()
             }
         }
         .onAppear {
@@ -47,9 +60,18 @@ struct EnhancedStatsView: View {
 private struct StatsContent: View {
     let stats: ComprehensiveStatistics
     let viewModel: EnhancedStatsViewModel
+    @Binding var scrollOffset: CGFloat
 
     var body: some View {
         ScrollView {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named("scroll")).minY
+                )
+            }
+            .frame(height: 0)
+
             VStack(spacing: 0) {
                 // Period selector
                 PeriodSelector(
@@ -107,7 +129,12 @@ private struct StatsContent: View {
                     }
                 }
                 .padding(16)
+                .padding(.bottom, 80) // Add padding for floating tab bar
             }
+        }
+        .coordinateSpace(name: "scroll")
+        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+            scrollOffset = value
         }
     }
 }
@@ -121,37 +148,29 @@ private struct PeriodSelector: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Button(action: { onPeriodChange(.year) }) {
-                HStack {
-                    if selectedPeriod == .year {
-                        Image(systemName: "checkmark")
-                    }
-                    Text("Year")
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(selectedPeriod == .year ? Color.adaptivePrimary : Color(.systemGray5))
-                .foregroundColor(selectedPeriod == .year ? .white : .primary)
-                .cornerRadius(8)
+            GlassButton(
+                title: "Year",
+                icon: selectedPeriod == .year ? "checkmark" : nil,
+                variant: .filled,
+                isSelected: selectedPeriod == .year,
+                tint: .coolSteel
+            ) {
+                onPeriodChange(.year)
             }
 
-            Button(action: { onPeriodChange(.month) }) {
-                HStack {
-                    if selectedPeriod == .month {
-                        Image(systemName: "checkmark")
-                    }
-                    Text("Month")
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(selectedPeriod == .month ? Color.adaptivePrimary : Color(.systemGray5))
-                .foregroundColor(selectedPeriod == .month ? .white : .primary)
-                .cornerRadius(8)
+            GlassButton(
+                title: "Month",
+                icon: selectedPeriod == .month ? "checkmark" : nil,
+                variant: .filled,
+                isSelected: selectedPeriod == .month,
+                tint: .coolSteel
+            ) {
+                onPeriodChange(.month)
             }
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.systemGray6))
+        .glassBackground(material: .ultraThin, tint: .lightCyan, cornerRadius: 8)
     }
 }
 
@@ -179,28 +198,32 @@ private struct OverviewCards: View {
     var body: some View {
         VStack(spacing: 8) {
             HStack(spacing: 8) {
-                StatCard(
+                StatGlassCard(
                     title: "Distance",
                     value: "\(Int(stats.distanceStats.totalDistanceKm)) km",
-                    icon: "ruler"
+                    icon: "ruler",
+                    tint: .coastalPath
                 )
-                StatCard(
+                StatGlassCard(
                     title: "Countries",
                     value: "\(stats.geographicStats.countries.count)",
-                    icon: "globe"
+                    icon: "globe",
+                    tint: .seaGlass
                 )
             }
 
             HStack(spacing: 8) {
-                StatCard(
+                StatGlassCard(
                     title: "Places",
                     value: "\(stats.placeStats.totalPlaces)",
-                    icon: "mappin.and.ellipse"
+                    icon: "mappin.and.ellipse",
+                    tint: .blueSlate
                 )
-                StatCard(
+                StatGlassCard(
                     title: "Active Days",
                     value: "\(stats.activeDays)",
-                    icon: "calendar"
+                    icon: "calendar",
+                    tint: .coolSteel
                 )
             }
         }

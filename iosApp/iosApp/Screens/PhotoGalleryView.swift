@@ -2,12 +2,14 @@ import SwiftUI
 import shared
 
 /**
- * SwiftUI photo gallery screen showing photos grouped by date.
- * Matches Android PhotoGalleryScreen functionality with navigation to detail view.
+ * SwiftUI photo gallery screen with Liquid Glass components.
+ * Shows photos grouped by date with glass styling and animations.
  */
 struct PhotoGalleryView: View {
     let appComponent: AppComponent
     @StateObject private var viewModel: PhotoGalleryViewModel
+    @State private var scrollOffset: CGFloat = 0
+    @State private var showGridView = false
 
     init(appComponent: AppComponent) {
         self.appComponent = appComponent
@@ -15,69 +17,106 @@ struct PhotoGalleryView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
+        ZStack {
+            Color.backgroundLight.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Medium flexible navigation bar
+                MediumFlexibleNavigationBar(
+                    title: "Photos",
+                    scrollOffset: scrollOffset,
+                    actions: [
+                        NavigationAction(icon: showGridView ? "list.bullet" : "square.grid.2x2") {
+                            withAnimation(MotionConfig.smooth) {
+                                showGridView.toggle()
+                            }
+                        },
+                        NavigationAction(icon: "plus") {
+                            viewModel.importPhotos()
+                        },
+                        NavigationAction(icon: "arrow.clockwise") {
+                            viewModel.refresh()
+                        }
+                    ],
+                    subtitle: {
+                        Text(photoSubtitle)
+                    }
+                )
+
                 if viewModel.isLoading {
-                    ProgressView()
+                    GlassLoadingIndicator(variant: .pulsing, color: .lightBlue)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = viewModel.error {
-                    ErrorView(error: error, onRetry: viewModel.refresh)
+                    PhotoErrorView(error: error, onRetry: viewModel.refresh)
                 } else if !viewModel.photoGroups.isEmpty {
                     PhotoGalleryContent(
                         photoGroups: viewModel.photoGroups,
-                        appComponent: appComponent
+                        appComponent: appComponent,
+                        scrollOffset: $scrollOffset,
+                        showGridView: showGridView
                     )
                 } else {
                     EmptyGalleryView(onImportClick: viewModel.importPhotos)
                 }
             }
-            .navigationTitle("Photos")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: viewModel.importPhotos) {
-                        Image(systemName: "plus")
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: viewModel.refresh) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                }
-            }
-            .onAppear {
-                viewModel.loadGallery()
-            }
         }
+        .navigationBarHidden(true)
+        .onAppear {
+            viewModel.loadGallery()
+        }
+    }
+
+    private var photoSubtitle: String {
+        let count = viewModel.photoGroups.reduce(0) { $0 + $1.photoCount }
+        return "\(count) photos"
     }
 }
 
 /**
- * Gallery content showing photo groups with navigation.
+ * Gallery content with glass styling and scroll tracking.
  */
 private struct PhotoGalleryContent: View {
     let photoGroups: [PhotoGroup]
     let appComponent: AppComponent
+    @Binding var scrollOffset: CGFloat
+    let showGridView: Bool
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 24) {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named("scroll")).minY
+                )
+            }
+            .frame(height: 0)
+
+            LazyVStack(spacing: 20) {
                 ForEach(photoGroups, id: \.date) { group in
                     PhotoGroupSection(
                         group: group,
-                        appComponent: appComponent
+                        appComponent: appComponent,
+                        showGridView: showGridView
                     )
                 }
             }
             .padding(16)
+            .padding(.bottom, 96) // Extra padding for tab bar
+        }
+        .coordinateSpace(name: "scroll")
+        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+            scrollOffset = value
         }
     }
 }
 
 /**
- * Section showing photos for a specific date.
+ * Photo group section with glass styling.
  */
 private struct PhotoGroupSection: View {
     let group: PhotoGroup
     let appComponent: AppComponent
+    let showGridView: Bool
 
     private let columns = [
         GridItem(.flexible()),
@@ -86,35 +125,55 @@ private struct PhotoGroupSection: View {
     ]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Date header
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(formatDate(group.date))
-                        .font(.title2)
-                        .fontWeight(.bold)
+        GlassEffectGroup(spacing: 12, padding: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Date header with glass styling
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(formatDate(group.date))
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
 
-                    if let location = group.location {
-                        Text(location)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        if let location = group.location {
+                            HStack(spacing: 4) {
+                                Image(systemName: "location.fill")
+                                    .font(.caption2)
+                                Text(location)
+                                    .font(.caption)
+                            }
+                            .foregroundColor(.blueSlate)
+                        }
                     }
+
+                    Spacer()
+
+                    // Photo count badge
+                    HStack(spacing: 4) {
+                        Image(systemName: "photo.fill")
+                            .font(.caption)
+                        Text("\(group.photoCount)")
+                            .font(.caption)
+                            .fontWeight(.medium)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .glassBackground(
+                        material: .ultraThin,
+                        tint: .lightBlue,
+                        cornerRadius: 8
+                    )
+                    .foregroundColor(.coolSteel)
                 }
 
-                Spacer()
-
-                Text("\(group.photoCount) photos")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-
-            // Photo grid
-            LazyVGrid(columns: columns, spacing: 4) {
-                ForEach(group.photos, id: \.photo.id) { photoWithMeta in
-                    NavigationLink(destination: PhotoDetailView(photoId: photoWithMeta.photo.id, appComponent: appComponent)) {
-                        PhotoGridItem(photo: photoWithMeta)
+                // Photo grid
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(group.photos, id: \.photo.id) { photoWithMeta in
+                        NavigationLink(destination: PhotoDetailView(photoId: photoWithMeta.photo.id, appComponent: appComponent)) {
+                            PhotoGlassGridItem(photo: photoWithMeta)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
             }
         }
@@ -141,9 +200,9 @@ private struct PhotoGroupSection: View {
 }
 
 /**
- * Individual photo grid item.
+ * Photo grid item with glass overlay.
  */
-private struct PhotoGridItem: View {
+private struct PhotoGlassGridItem: View {
     let photo: PhotoWithMetadata
 
     var body: some View {
@@ -153,18 +212,20 @@ private struct PhotoGridItem: View {
                 switch phase {
                 case .empty:
                     Rectangle()
-                        .fill(Color(.systemGray5))
-                        .overlay(ProgressView())
+                        .fill(Color.lightCyan.opacity(0.3))
+                        .overlay(
+                            GlassLoadingIndicator(variant: .pulsing, size: 24, color: .lightBlue)
+                        )
                 case .success(let image):
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 case .failure:
                     Rectangle()
-                        .fill(Color(.systemGray5))
+                        .fill(Color.lightCyan.opacity(0.3))
                         .overlay(
-                            Image(systemName: "photo")
-                                .foregroundColor(.red)
+                            Image(systemName: "photo.fill")
+                                .foregroundColor(.driftwood)
                         )
                 @unknown default:
                     EmptyView()
@@ -172,81 +233,117 @@ private struct PhotoGridItem: View {
             }
             .frame(height: 120)
             .clipped()
-            .cornerRadius(8)
+            .cornerRadius(12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .strokeBorder(Color.white.opacity(0.2), lineWidth: 1)
+            )
 
-            // Attachment indicator
+            // Attachment indicator with glass background
             if !photo.attachments.isEmpty {
-                HStack(spacing: 2) {
+                HStack(spacing: 3) {
                     Image(systemName: "mappin.circle.fill")
                         .font(.caption2)
                     Text("\(photo.attachments.count)")
                         .font(.caption2)
                         .fontWeight(.bold)
                 }
-                .padding(.horizontal, 6)
-                .padding(.vertical, 3)
-                .background(Color.blue.opacity(0.9))
                 .foregroundColor(.white)
-                .cornerRadius(6)
-                .padding(4)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .glassBackground(
+                    material: .thick,
+                    tint: .coastalPath,
+                    cornerRadius: 8
+                )
+                .padding(6)
             }
         }
     }
 }
 
 /**
- * Empty gallery state.
+ * Empty gallery with glass styling.
  */
 private struct EmptyGalleryView: View {
     let onImportClick: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "photo.on.rectangle")
+        VStack(spacing: 24) {
+            Image(systemName: "photo.on.rectangle.angled")
                 .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .foregroundColor(.lightBlue)
 
-            Text("No photos yet")
-                .font(.title)
+            VStack(spacing: 8) {
+                Text("No photos yet")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
 
-            Text("Import photos to see your memories")
-                .font(.body)
-                .foregroundColor(.secondary)
-
-            Button(action: onImportClick) {
-                Label("Import Photos", systemImage: "plus")
+                Text("Import photos to see your memories")
+                    .font(.body)
+                    .foregroundColor(.secondary)
             }
-            .buttonStyle(.borderedProminent)
-            .padding(.top, 8)
+
+            GlassButton(
+                title: "Import Photos",
+                icon: "plus",
+                variant: .filled,
+                tint: .lightBlue,
+                action: onImportClick
+            )
         }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 /**
- * Error view with retry option.
+ * Error view with glass styling.
  */
-private struct ErrorView: View {
+private struct PhotoErrorView: View {
     let error: String
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 64))
-                .foregroundColor(.red)
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(.driftwood)
 
-            Text("Something went wrong")
-                .font(.title)
+            VStack(spacing: 8) {
+                Text("Something went wrong")
+                    .font(.headline)
+                    .foregroundColor(.primary)
 
-            Text(error)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
+                Text(error)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
 
-            Button("Retry", action: onRetry)
-                .buttonStyle(.borderedProminent)
+            GlassButton(
+                title: "Retry",
+                icon: "arrow.clockwise",
+                variant: .filled,
+                tint: .lightBlue,
+                action: onRetry
+            )
         }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/**
+ * Scroll offset preference key.
+ */
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 

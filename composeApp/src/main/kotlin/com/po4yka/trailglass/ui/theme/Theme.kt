@@ -65,6 +65,19 @@ private val DarkColorScheme = darkColorScheme(
     surfaceTint = SurfaceTintDark
 )
 
+/**
+ * TrailGlass theme using Material 3 with support for Material 3 Expressive features.
+ *
+ * Material 3 Expressive (M3E) is an expansion of Material Design 3 that includes:
+ * - Enhanced motion schemes with spring animations
+ * - New expressive components (FloatingActionButtonMenu, SplitButton, LoadingIndicator, etc.)
+ * - Advanced theming capabilities
+ *
+ * Note: Material3 Expressive APIs are experimental and marked with @ExperimentalMaterial3ExpressiveApi.
+ * To use expressive components in your composables, add @OptIn(ExperimentalMaterial3ExpressiveApi::class).
+ *
+ * Current Material3 version: 1.5.0-alpha08
+ */
 @Composable
 fun TrailGlassTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

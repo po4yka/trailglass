@@ -19,6 +19,16 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
+import com.po4yka.trailglass.ui.theme.MorphableShapes
+import com.po4yka.trailglass.ui.theme.CategoryShapes
+import com.po4yka.trailglass.ui.theme.animateShapeMorph
+import com.po4yka.trailglass.ui.theme.shapeMorphSpring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 
 /**
  * Screen showing all trips with filtering and sorting options.
@@ -145,6 +155,24 @@ private fun TripCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Track press state for shape morphing
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    // Animate card shape: slight morph when pressed for tactile feedback
+    // Ongoing trips get a more dynamic shape
+    val cardShape by animateShapeMorph(
+        targetShape = when {
+            isPressed -> MorphableShapes.RoundedSquare
+            trip.isOngoing -> MorphableShapes.Wave
+            else -> MorphableShapes.Circle
+        },
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        )
+    )
+
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
@@ -153,7 +181,9 @@ private fun TripCard(
                 MaterialTheme.colorScheme.primaryContainer
             else
                 MaterialTheme.colorScheme.surfaceVariant
-        )
+        ),
+        shape = cardShape,
+        interactionSource = interactionSource
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Header row

@@ -2,8 +2,8 @@ import SwiftUI
 import shared
 
 /**
- * SwiftUI settings screen matching Android EnhancedSettingsScreen.
- * Comprehensive settings with all preference categories.
+ * SwiftUI settings screen with Liquid Glass components.
+ * Comprehensive settings with all preference categories and glass styling.
  */
 struct EnhancedSettingsView: View {
     let appComponent: AppComponent
@@ -16,10 +16,33 @@ struct EnhancedSettingsView: View {
     }
 
     var body: some View {
-        NavigationView {
-            Group {
+        ZStack {
+            Color.backgroundLight.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Standard navigation bar for modal-style settings
+                HStack {
+                    Text("Settings")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.primary)
+
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 16)
+                .background(
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .overlay(
+                            Rectangle()
+                                .fill(Color.lightCyan.opacity(0.2))
+                        )
+                )
+
                 if viewModel.isLoading {
-                    ProgressView()
+                    GlassLoadingIndicator(variant: .pulsing, color: .coolSteel)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let settings = viewModel.settings {
                     SettingsContent(
                         settings: settings,
@@ -31,7 +54,6 @@ struct EnhancedSettingsView: View {
                     EmptySettingsView()
                 }
             }
-            .navigationTitle("Settings")
             .alert("Error", isPresented: $viewModel.showError) {
                 Button("OK") {
                     viewModel.clearError()
@@ -53,11 +75,12 @@ struct EnhancedSettingsView: View {
                 Text("This will permanently delete all your data including trips, locations, photos, and settings. This action cannot be undone.\n\nAre you sure you want to continue?")
             }
         }
+        .navigationBarHidden(true)
     }
 }
 
 /**
- * Main settings content.
+ * Main settings content with glass cards.
  */
 private struct SettingsContent: View {
     let settings: AppSettings
@@ -66,70 +89,105 @@ private struct SettingsContent: View {
     let onClearData: () -> Void
 
     var body: some View {
-        Form {
-            // Tracking Section
-            Section("Location Tracking") {
-                TrackingPreferencesSection(
-                    preferences: settings.trackingPreferences,
-                    onUpdate: { viewModel.updateTrackingPreferences($0) }
-                )
-            }
-
-            // Privacy Section
-            Section("Privacy") {
-                PrivacySettingsSection(
-                    privacy: settings.privacySettings,
-                    onUpdate: { viewModel.updatePrivacySettings($0) }
-                )
-            }
-
-            // Units Section
-            Section("Units & Format") {
-                UnitPreferencesSection(
-                    units: settings.unitPreferences,
-                    onUpdate: { viewModel.updateUnitPreferences($0) }
-                )
-            }
-
-            // Appearance Section
-            Section("Appearance") {
-                AppearanceSettingsSection(
-                    appearance: settings.appearanceSettings,
-                    onUpdate: { viewModel.updateAppearanceSettings($0) }
-                )
-            }
-
-            // Account Section
-            Section("Account & Sync") {
-                AccountSettingsSection(
-                    account: settings.accountSettings,
-                    appComponent: appComponent
-                )
-            }
-
-            // Data Management Section
-            Section("Data Management") {
-                DataManagementSection(
-                    data: settings.dataManagement,
-                    onClearData: onClearData
-                )
-            }
-
-            // About Section
-            Section("About") {
-                AboutSection()
-            }
-
-            // Reset Section
-            Section {
-                Button(role: .destructive, action: { viewModel.resetToDefaults() }) {
-                    HStack {
-                        Image(systemName: "arrow.clockwise")
-                        Text("Reset All Settings")
-                    }
+        ScrollView {
+            VStack(spacing: 16) {
+                // Tracking Section
+                SettingsSectionCard(title: "Location Tracking", icon: "location.fill", tint: .coastalPath) {
+                    TrackingPreferencesSection(
+                        preferences: settings.trackingPreferences,
+                        onUpdate: { viewModel.updateTrackingPreferences($0) }
+                    )
                 }
+
+                // Privacy Section
+                SettingsSectionCard(title: "Privacy", icon: "lock.fill", tint: .blueSlate) {
+                    PrivacySettingsSection(
+                        privacy: settings.privacySettings,
+                        onUpdate: { viewModel.updatePrivacySettings($0) }
+                    )
+                }
+
+                // Units Section
+                SettingsSectionCard(title: "Units & Format", icon: "ruler.fill", tint: .coolSteel) {
+                    UnitPreferencesSection(
+                        units: settings.unitPreferences,
+                        onUpdate: { viewModel.updateUnitPreferences($0) }
+                    )
+                }
+
+                // Appearance Section
+                SettingsSectionCard(title: "Appearance", icon: "paintbrush.fill", tint: .lightBlue) {
+                    AppearanceSettingsSection(
+                        appearance: settings.appearanceSettings,
+                        onUpdate: { viewModel.updateAppearanceSettings($0) }
+                    )
+                }
+
+                // Account Section
+                SettingsSectionCard(title: "Account & Sync", icon: "person.fill", tint: .seaGlass) {
+                    AccountSettingsSection(
+                        account: settings.accountSettings,
+                        appComponent: appComponent
+                    )
+                }
+
+                // Data Management Section
+                SettingsSectionCard(title: "Data Management", icon: "externaldrive.fill", tint: .neutralCategory) {
+                    DataManagementSection(
+                        data: settings.dataManagement,
+                        onClearData: onClearData
+                    )
+                }
+
+                // About Section
+                SettingsSectionCard(title: "About", icon: "info.circle.fill", tint: .blueSlate) {
+                    AboutSection()
+                }
+
+                // Reset Button
+                GlassButton(
+                    title: "Reset All Settings",
+                    icon: "arrow.clockwise",
+                    variant: .outlined,
+                    tint: .driftwood
+                ) {
+                    viewModel.resetToDefaults()
+                }
+                .padding(.horizontal, 16)
+            }
+            .padding(.vertical, 16)
+            .padding(.bottom, 96) // Extra padding for tab bar
+        }
+    }
+}
+
+/**
+ * Settings section card with glass styling.
+ */
+private struct SettingsSectionCard<Content: View>: View {
+    let title: String
+    let icon: String
+    let tint: Color
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        GlassEffectGroup(spacing: 12, padding: 16) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Section header
+                HStack(spacing: 8) {
+                    Image(systemName: icon)
+                        .foregroundColor(tint)
+                        .font(.headline)
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                }
+                .padding(.bottom, 4)
+
+                content()
             }
         }
+        .padding(.horizontal, 16)
     }
 }
 
@@ -413,50 +471,95 @@ private struct AccountSettingsSection: View {
 }
 
 /**
- * Data management section.
+ * Data management section with glass buttons.
  */
 private struct DataManagementSection: View {
     let data: DataManagement
     let onClearData: () -> Void
 
     var body: some View {
-        HStack {
-            Text("Storage Used")
-            Spacer()
-            Text(String(format: "%.2f MB", data.storageUsedMb))
-                .foregroundColor(.secondary)
-        }
-
-        if let lastExport = data.lastExportTime {
+        VStack(spacing: 12) {
+            // Storage info
             HStack {
-                Text("Last Export")
+                HStack(spacing: 6) {
+                    Image(systemName: "internaldrive")
+                        .foregroundColor(.coolSteel)
+                        .font(.subheadline)
+                    Text("Storage Used")
+                        .font(.subheadline)
+                }
                 Spacer()
-                Text(formatTimestamp(lastExport))
-                    .foregroundColor(.secondary)
+                Text(String(format: "%.2f MB", data.storageUsedMb))
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(.blueSlate)
             }
-        }
+            .padding(.vertical, 4)
 
-        if let lastBackup = data.lastBackupTime {
-            HStack {
-                Text("Last Backup")
-                Spacer()
-                Text(formatTimestamp(lastBackup))
-                    .foregroundColor(.secondary)
+            if let lastExport = data.lastExportTime {
+                HStack {
+                    HStack(spacing: 6) {
+                        Image(systemName: "arrow.up.doc")
+                            .foregroundColor(.coolSteel)
+                            .font(.subheadline)
+                        Text("Last Export")
+                            .font(.subheadline)
+                    }
+                    Spacer()
+                    Text(formatTimestamp(lastExport))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
             }
-        }
 
-        NavigationLink("Export Data") {
-            Text("Export options")
-        }
+            if let lastBackup = data.lastBackupTime {
+                HStack {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock.arrow.circlepath")
+                            .foregroundColor(.coolSteel)
+                            .font(.subheadline)
+                        Text("Last Backup")
+                            .font(.subheadline)
+                    }
+                    Spacer()
+                    Text(formatTimestamp(lastBackup))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
+            }
 
-        NavigationLink("Import Data") {
-            Text("Import options")
-        }
+            Divider()
+                .padding(.vertical, 4)
 
-        Button(role: .destructive, action: onClearData) {
-            HStack {
-                Image(systemName: "trash")
-                Text("Clear All Data")
+            // Action buttons
+            VStack(spacing: 10) {
+                GlassButton(
+                    title: "Export Data",
+                    icon: "square.and.arrow.up",
+                    variant: .outlined,
+                    tint: .coolSteel
+                ) {
+                    // TODO: Export data
+                }
+
+                GlassButton(
+                    title: "Import Data",
+                    icon: "square.and.arrow.down",
+                    variant: .outlined,
+                    tint: .coolSteel
+                ) {
+                    // TODO: Import data
+                }
+
+                GlassButton(
+                    title: "Clear All Data",
+                    icon: "trash.fill",
+                    variant: .outlined,
+                    tint: .driftwood,
+                    action: onClearData
+                )
             }
         }
     }
@@ -485,19 +588,26 @@ private struct AboutSection: View {
 }
 
 /**
- * Empty settings view.
+ * Empty settings view with glass styling.
  */
 private struct EmptySettingsView: View {
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "gearshape")
+        VStack(spacing: 20) {
+            Image(systemName: "gearshape.fill")
                 .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .foregroundColor(.coolSteel)
 
             Text("Settings Unavailable")
                 .font(.title2)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
+
+            Text("Unable to load settings at this time")
+                .font(.body)
                 .foregroundColor(.secondary)
         }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

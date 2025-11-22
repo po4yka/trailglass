@@ -21,8 +21,39 @@ struct TripDetailView: View {
     }
 
     var body: some View {
-        NavigationView {
+        VStack(spacing: 0) {
+            // Large flexible navigation bar with trip metadata
+            if let stats = viewModel.tripStats {
+                LargeFlexibleNavigationBar(
+                    title: stats.tripName,
+                    scrollOffset: viewModel.scrollOffset,
+                    actions: [
+                        NavigationAction(icon: "ellipsis.circle") {
+                            viewModel.showMenu = true
+                        }
+                    ],
+                    subtitle: {
+                        Text(formatTripMetadata(stats))
+                    },
+                    backgroundContent: {
+                        HeroGradientBackground(
+                            startColor: Color.lightCyan,
+                            endColor: Color.coastalPath
+                        )
+                    }
+                )
+            }
+
+            // Content
             ScrollView {
+                GeometryReader { geometry in
+                    Color.clear.preference(
+                        key: ScrollOffsetPreferenceKey.self,
+                        value: geometry.frame(in: .named("scroll")).minY
+                    )
+                }
+                .frame(height: 0)
+
                 if viewModel.isLoading {
                     ProgressView()
                         .frame(maxWidth: .infinity, minHeight: 200)
@@ -47,61 +78,43 @@ struct TripDetailView: View {
                     )
                 }
             }
-            .navigationTitle(viewModel.tripStats?.tripName ?? "Trip Details")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
-                    }
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button(action: { viewModel.showRouteReplay = true }) {
-                            Label("Route Replay", systemImage: "play.circle.fill")
-                        }
-
-                        Divider()
-
-                        Button(action: { viewModel.shareTrip() }) {
-                            Label("Share", systemImage: "square.and.arrow.up")
-                        }
-
-                        Menu("Export") {
-                            Button(action: { viewModel.exportTrip(format: "gpx") }) {
-                                Label("Export as GPX", systemImage: "map")
-                            }
-                            Button(action: { viewModel.exportTrip(format: "kml") }) {
-                                Label("Export as KML", systemImage: "globe")
-                            }
-                        }
-
-                        Divider()
-
-                        Button(role: .destructive, action: { viewModel.showDeleteAlert = true }) {
-                            Label("Delete Trip", systemImage: "trash")
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
+            .coordinateSpace(name: "scroll")
+            .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                viewModel.scrollOffset = value
             }
-            .alert("Delete Trip?", isPresented: $viewModel.showDeleteAlert) {
-                Button("Cancel", role: .cancel) { }
-                Button("Delete", role: .destructive, action: { viewModel.deleteTrip() })
-            } message: {
-                Text("This action cannot be undone. All trip data will be permanently deleted.")
+        }
+        .alert("Delete Trip?", isPresented: $viewModel.showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive, action: { viewModel.deleteTrip() })
+        } message: {
+            Text("This action cannot be undone. All trip data will be permanently deleted.")
+        }
+        .confirmationDialog("Trip Actions", isPresented: $viewModel.showMenu) {
+            Button("Route Replay") {
+                viewModel.showRouteReplay = true
             }
-            .sheet(item: $viewModel.exportedFile) { exportedFile in
-                ShareSheet(activityItems: [createExportFile(from: exportedFile)])
+            Button("Share") {
+                viewModel.shareTrip()
             }
-            .fullScreenCover(isPresented: $viewModel.showRouteReplay) {
-                RouteReplayView(
-                    tripId: tripId,
-                    controller: appComponent.routeReplayController
-                )
+            Button("Export as GPX") {
+                viewModel.exportTrip(format: "gpx")
             }
+            Button("Export as KML") {
+                viewModel.exportTrip(format: "kml")
+            }
+            Button("Delete Trip", role: .destructive) {
+                viewModel.showDeleteAlert = true
+            }
+            Button("Cancel", role: .cancel) { }
+        }
+        .sheet(item: $viewModel.exportedFile) { exportedFile in
+            ShareSheet(activityItems: [createExportFile(from: exportedFile)])
+        }
+        .fullScreenCover(isPresented: $viewModel.showRouteReplay) {
+            RouteReplayView(
+                tripId: tripId,
+                controller: appComponent.routeReplayController
+            )
         }
         .onAppear {
             viewModel.loadTrip()
@@ -110,6 +123,35 @@ struct TripDetailView: View {
             if deleted {
                 dismiss()
             }
+        }
+    }
+
+    private func formatTripMetadata(_ stats: TripStatistics) -> String {
+        let distance = formatDistance(stats.totalDistance)
+        let duration = stats.duration.map { formatDuration($0) } ?? ""
+        return "\(distance) • \(duration)"
+    }
+
+    private func formatDistance(_ meters: Double) -> String {
+        if meters < 1000 {
+            return String(format: "%.0f m", meters)
+        } else {
+            return String(format: "%.1f km", meters / 1000)
+        }
+    }
+
+    private func formatDuration(_ duration: KotlinDuration) -> String {
+        let hours = duration.inWholeHours
+        let minutes = duration.inWholeMinutes % 60
+
+        if hours > 24 {
+            let days = hours / 24
+            let remainingHours = hours % 24
+            return "\(days)d \(remainingHours)h"
+        } else if hours > 0 {
+            return "\(hours)h \(minutes)m"
+        } else {
+            return "\(minutes)m"
         }
     }
 
@@ -159,6 +201,7 @@ private struct TripDetailContent: View {
             }
         }
         .padding()
+        .padding(.bottom, 80) // Add padding for floating tab bar
     }
 }
 
@@ -462,6 +505,8 @@ class TripDetailViewModel: ObservableObject {
     @Published var exportedFile: ExportedFile?
     @Published var isExporting = false
     @Published var tripDeleted = false
+    @Published var scrollOffset: CGFloat = 0
+    @Published var showMenu = false
 
     init(tripId: String, statsController: TripStatisticsController, routeController: RouteViewController, tripsController: TripsController) {
         self.tripId = tripId

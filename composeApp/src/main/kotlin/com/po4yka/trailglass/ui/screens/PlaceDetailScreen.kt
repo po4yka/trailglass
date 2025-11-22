@@ -1,8 +1,7 @@
 package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Build
@@ -34,11 +33,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceSignificance
+import com.po4yka.trailglass.ui.components.MediumFlexibleTopAppBar
+import com.po4yka.trailglass.ui.components.FlexibleTopAppBarDefaults
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -55,18 +57,54 @@ fun PlaceDetailScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Create scroll behavior for collapsing app bar
+    val scrollBehavior = FlexibleTopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    // Format place metadata for subtitle
+    val metadataText = if (place != null) {
+        buildString {
+            append("${place.visitCount} visits")
+
+            if (place.totalDuration > Duration.ZERO) {
+                append(" • ${formatDuration(place.totalDuration)} total")
+            }
+
+            place.lastVisitTime?.let { lastVisit ->
+                val now = kotlinx.datetime.Clock.System.now()
+                val daysSince = (now - lastVisit).inWholeDays
+                when {
+                    daysSince == 0L -> append(" • Last visit today")
+                    daysSince == 1L -> append(" • Last visit yesterday")
+                    daysSince < 7 -> append(" • Last visit $daysSince days ago")
+                    else -> append(" • Last visit ${formatDate(lastVisit)}")
+                }
+            }
+        }
+    } else {
+        ""
+    }
+
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = { Text("Place Details") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    if (place != null) {
+            if (place != null) {
+                MediumFlexibleTopAppBar(
+                    title = { Text(place.displayName) },
+                    subtitle = { Text(metadataText) },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    },
+                    leadingIcon = {
+                        Icon(
+                            getCategoryIcon(place.category),
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    actions = {
                         IconButton(onClick = onToggleFavorite) {
                             Icon(
                                 if (place.isFavorite) Icons.Default.Star else Icons.Default.StarBorder,
@@ -74,15 +112,33 @@ fun PlaceDetailScreen(
                                 tint = if (place.isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                             )
                         }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = when (place.significance) {
+                        PlaceSignificance.PRIMARY -> FlexibleTopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            scrolledContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                        PlaceSignificance.FREQUENT -> FlexibleTopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            scrolledContainerColor = MaterialTheme.colorScheme.surface
+                        )
+                        else -> FlexibleTopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            scrolledContainerColor = MaterialTheme.colorScheme.surface
+                        )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            )
+            } else {
+                TopAppBar(
+                    title = { Text("Place Details") },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+            }
         }
     ) { paddingValues ->
         if (place == null) {
@@ -110,90 +166,14 @@ private fun PlaceDetailContent(
     place: FrequentPlace,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Header Card with place name and category
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = when (place.significance) {
-                    PlaceSignificance.PRIMARY -> MaterialTheme.colorScheme.primaryContainer
-                    PlaceSignificance.FREQUENT -> MaterialTheme.colorScheme.secondaryContainer
-                    else -> MaterialTheme.colorScheme.surfaceVariant
-                }
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(
-                        getCategoryIcon(place.category),
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp)
-                    )
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = place.displayName,
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        place.city?.let { city ->
-                            Text(
-                                text = city,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
-
-                // Significance badge
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    AssistChip(
-                        onClick = { },
-                        label = {
-                            Text(
-                                place.significance.name.lowercase()
-                                    .replaceFirstChar { it.uppercase() }
-                            )
-                        },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Star,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp)
-                            )
-                        }
-                    )
-
-                    if (place.category != PlaceCategory.OTHER) {
-                        AssistChip(
-                            onClick = { },
-                            label = {
-                                Text(
-                                    place.category.name.lowercase()
-                                        .replaceFirstChar { it.uppercase() }
-                                )
-                            }
-                        )
-                    }
-                }
-            }
-        }
-
         // Statistics Section
-        Card(modifier = Modifier.fillMaxWidth()) {
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -243,9 +223,11 @@ private fun PlaceDetailContent(
                 }
             }
         }
+        }
 
         // Location Section
-        Card(modifier = Modifier.fillMaxWidth()) {
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -277,10 +259,12 @@ private fun PlaceDetailContent(
                 )
             }
         }
+        }
 
         // Notes Section (if available)
         if (place.userNotes != null || place.userLabel != null) {
-            Card(modifier = Modifier.fillMaxWidth()) {
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -326,6 +310,7 @@ private fun PlaceDetailContent(
                     }
                 }
             }
+        }
         }
     }
 }

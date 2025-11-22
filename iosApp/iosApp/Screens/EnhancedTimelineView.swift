@@ -8,111 +8,135 @@ struct EnhancedTimelineView: View {
     @StateObject private var viewModel: EnhancedTimelineViewModel
     @State private var showFilterSheet = false
     @State private var showSearchBar = false
+    @State private var scrollOffset: CGFloat = 0
 
     init(controller: EnhancedTimelineController) {
         _viewModel = StateObject(wrappedValue: EnhancedTimelineViewModel(controller: controller))
     }
 
     var body: some View {
-        NavigationView {
-            ZStack {
-                VStack(spacing: 0) {
-                    // Zoom level selector
-                    ZoomLevelSelector(
-                        currentZoom: viewModel.zoomLevel,
-                        onZoomChanged: { viewModel.setZoomLevel($0) }
-                    )
-
-                    // Date navigation
-                    DateNavigationBar(
-                        selectedDate: viewModel.selectedDate,
-                        zoomLevel: viewModel.zoomLevel,
-                        onPrevious: { viewModel.navigatePrevious() },
-                        onNext: { viewModel.navigateNext() },
-                        onToday: { viewModel.jumpToToday() }
-                    )
-
-                    // Active filters indicator
-                    if viewModel.filter.isActive {
-                        ActiveFiltersChips(
-                            filter: viewModel.filter,
-                            onClearAll: { viewModel.clearFilters() }
-                        )
+        VStack(spacing: 0) {
+            // Large flexible navigation bar with hero background
+            LargeFlexibleNavigationBar(
+                title: "Timeline",
+                scrollOffset: scrollOffset,
+                actions: [
+                    NavigationAction(icon: "magnifyingglass") {
+                        showSearchBar.toggle()
+                    },
+                    NavigationAction(icon: "line.3.horizontal.decrease.circle") {
+                        showFilterSheet = true
+                    },
+                    NavigationAction(icon: "arrow.clockwise") {
+                        viewModel.refresh()
                     }
+                ],
+                subtitle: {
+                    Text(formatDateForZoom(viewModel.selectedDate, viewModel.zoomLevel))
+                },
+                backgroundContent: {
+                    HeroGradientBackground(
+                        startColor: Color.lightCyan,
+                        endColor: Color.coolSteel
+                    )
+                }
+            )
 
-                    // Content
-                    if viewModel.isLoading {
+            // Zoom level selector
+            ZoomLevelSelector(
+                currentZoom: viewModel.zoomLevel,
+                onZoomChanged: { viewModel.setZoomLevel($0) }
+            )
+
+            // Date navigation
+            DateNavigationBar(
+                selectedDate: viewModel.selectedDate,
+                zoomLevel: viewModel.zoomLevel,
+                onPrevious: { viewModel.navigatePrevious() },
+                onNext: { viewModel.navigateNext() },
+                onToday: { viewModel.jumpToToday() }
+            )
+
+            // Active filters indicator
+            if viewModel.filter.isActive {
+                ActiveFiltersChips(
+                    filter: viewModel.filter,
+                    onClearAll: { viewModel.clearFilters() }
+                )
+            }
+
+            // Content
+            ZStack {
+                if viewModel.isLoading {
+                    VStack {
                         Spacer()
-                        ProgressView()
+                        GlassLoadingIndicator(variant: .pulsing, size: 72, color: .coastalPath)
                         Spacer()
-                    } else if let error = viewModel.error {
+                    }
+                } else if let error = viewModel.error {
+                    VStack {
                         Spacer()
                         ErrorView(error: error) {
                             viewModel.refresh()
                         }
                         Spacer()
-                    } else if !viewModel.items.isEmpty {
-                        TimelineContent(
-                            items: viewModel.items,
-                            zoomLevel: viewModel.zoomLevel
-                        )
-                    } else {
+                    }
+                } else if !viewModel.items.isEmpty {
+                    TimelineContent(
+                        items: viewModel.items,
+                        zoomLevel: viewModel.zoomLevel,
+                        scrollOffset: $scrollOffset
+                    )
+                } else {
+                    VStack {
                         Spacer()
                         EmptyTimelineView()
                         Spacer()
                     }
                 }
-            }
-            .navigationTitle(showSearchBar ? "" : "Timeline")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    if showSearchBar {
-                        Button("Done") {
-                            showSearchBar = false
-                            viewModel.clearSearch()
-                        }
-                    } else {
-                        HStack(spacing: 4) {
-                            Button(action: { showSearchBar = true }) {
-                                Image(systemName: "magnifyingglass")
-                            }
 
-                            Button(action: { showFilterSheet = true }) {
-                                ZStack(alignment: .topTrailing) {
-                                    Image(systemName: "line.3.horizontal.decrease.circle")
-                                    if viewModel.filter.activeFilterCount > 0 {
-                                        Circle()
-                                            .fill(Color.adaptivePrimary)
-                                            .frame(width: 16, height: 16)
-                                            .overlay(
-                                                Text("\(viewModel.filter.activeFilterCount)")
-                                                    .font(.caption2)
-                                                    .foregroundColor(.white)
-                                            )
-                                            .offset(x: 8, y: -8)
-                                    }
-                                }
-                            }
-
-                            Button(action: { viewModel.refresh() }) {
-                                Image(systemName: "arrow.clockwise")
-                            }
-                        }
+                // Tracking FAB overlay
+                VStack {
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        TrackingFAB(
+                            isTracking: $viewModel.isTracking,
+                            onToggleTracking: { viewModel.toggleTracking() },
+                            onAddPhoto: { viewModel.addPhoto() },
+                            onAddNote: { viewModel.addNote() },
+                            onCheckIn: { viewModel.checkIn() }
+                        )
                     }
                 }
             }
-            .searchable(text: $viewModel.searchQuery, isPresented: $showSearchBar, prompt: "Search timeline...")
-            .sheet(isPresented: $showFilterSheet) {
-                TimelineFilterSheet(
-                    currentFilter: viewModel.filter,
-                    onFilterChanged: { viewModel.updateFilter($0) },
-                    onDismiss: { showFilterSheet = false }
-                )
-            }
+        }
+        .searchable(text: $viewModel.searchQuery, isPresented: $showSearchBar, prompt: "Search timeline...")
+        .sheet(isPresented: $showFilterSheet) {
+            TimelineFilterSheet(
+                currentFilter: viewModel.filter,
+                onFilterChanged: { viewModel.updateFilter($0) },
+                onDismiss: { showFilterSheet = false }
+            )
         }
         .onAppear {
             viewModel.loadTimeline()
+        }
+    }
+
+    private func formatDateForZoom(_ date: LocalDate, _ zoom: TimelineZoomLevel) -> String {
+        switch zoom {
+        case .day:
+            return "Day View • \(date.year)-\(String(format: "%02d", date.monthNumber))-\(String(format: "%02d", date.dayOfMonth))"
+        case .week:
+            return "Week View"
+        case .month:
+            let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+            return "Month View • \(monthNames[Int(date.monthNumber) - 1]) \(date.year)"
+        case .year:
+            return "Year View • \(date.year)"
+        @unknown default:
+            return "Timeline"
         }
     }
 }
@@ -127,25 +151,19 @@ private struct ZoomLevelSelector: View {
     var body: some View {
         HStack(spacing: 8) {
             ForEach([TimelineZoomLevel.day, .week, .month, .year], id: \.self) { zoom in
-                Button(action: { onZoomChanged(zoom) }) {
-                    HStack {
-                        if currentZoom == zoom {
-                            Image(systemName: "checkmark")
-                                .font(.caption)
-                        }
-                        Text(zoom.displayName)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(currentZoom == zoom ? Color.adaptivePrimary : Color(.systemGray5))
-                    .foregroundColor(currentZoom == zoom ? .white : .primary)
-                    .cornerRadius(8)
+                GlassButton(
+                    title: zoom.displayName,
+                    icon: currentZoom == zoom ? "checkmark" : nil,
+                    variant: .filled,
+                    isSelected: currentZoom == zoom,
+                    tint: .coastalPath
+                ) {
+                    onZoomChanged(zoom)
                 }
             }
         }
         .padding(8)
-        .frame(maxWidth: .infinity)
-        .background(Color(.systemGray6))
+        .glassBackground(material: .ultraThin, tint: .lightCyan, cornerRadius: 8)
     }
 }
 
@@ -244,15 +262,29 @@ private struct ActiveFiltersChips: View {
 private struct TimelineContent: View {
     let items: [GetTimelineUseCaseTimelineItemUI]
     let zoomLevel: TimelineZoomLevel
+    @Binding var scrollOffset: CGFloat
 
     var body: some View {
         ScrollView {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named("scroll")).minY
+                )
+            }
+            .frame(height: 0)
+
             LazyVStack(spacing: 12) {
                 ForEach(Array(items.enumerated()), id: \.offset) { _, item in
                     TimelineItemView(item: item)
                 }
             }
             .padding(16)
+            .padding(.bottom, 80) // Add padding for floating tab bar
+        }
+        .coordinateSpace(name: "scroll")
+        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+            scrollOffset = value
         }
     }
 }
@@ -270,9 +302,9 @@ private struct TimelineItemView: View {
             } else if let dayEnd = item as? GetTimelineUseCaseTimelineItemUIDayEndUI {
                 DayMarkerCard(text: "Day End", icon: "moon.stars")
             } else if let visit = item as? GetTimelineUseCaseTimelineItemUIVisitUI {
-                EnhancedVisitCard(visit: visit.placeVisit)
+                VisitGlassCard(visit: visit.placeVisit)
             } else if let route = item as? GetTimelineUseCaseTimelineItemUIRouteUI {
-                EnhancedRouteCard(route: route.routeSegment)
+                RouteGlassCard(route: route.routeSegment)
             } else if let daySummary = item as? GetTimelineUseCaseTimelineItemUIDaySummaryUI {
                 DaySummaryCard(summary: daySummary)
             } else if let weekSummary = item as? GetTimelineUseCaseTimelineItemUIWeekSummaryUI {
@@ -443,36 +475,16 @@ private struct DaySummaryCard: View {
     let summary: GetTimelineUseCaseTimelineItemUIDaySummaryUI
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "calendar")
-                    .foregroundColor(.purple)
-                Text(formatDate(summary.date))
-                    .font(.headline)
-            }
-
-            HStack(spacing: 16) {
-                SummaryStatItem(
-                    icon: "mappin.and.ellipse",
-                    label: "Places",
-                    value: "\(summary.totalVisits)"
-                )
-                SummaryStatItem(
-                    icon: "ruler",
-                    label: "Distance",
-                    value: "\(Int(summary.totalDistanceMeters / 1000)) km"
-                )
-                SummaryStatItem(
-                    icon: "figure.walk",
-                    label: "Routes",
-                    value: "\(summary.totalRoutes)"
-                )
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .padding(16)
-        .background(Color.purple.opacity(0.1))
-        .cornerRadius(12)
+        SummaryGlassCard(
+            title: formatDate(summary.date),
+            subtitle: nil,
+            icon: "calendar",
+            stats: [
+                (icon: "mappin.and.ellipse", label: "Places", value: "\(summary.totalVisits)"),
+                (icon: "ruler", label: "Distance", value: "\(Int(summary.totalDistanceMeters / 1000)) km"),
+                (icon: "figure.walk", label: "Routes", value: "\(summary.totalRoutes)")
+            ]
+        )
     }
 }
 
@@ -483,41 +495,16 @@ private struct WeekSummaryCard: View {
     let summary: GetTimelineUseCaseTimelineItemUIWeekSummaryUI
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 8) {
-                    Image(systemName: "calendar.badge.clock")
-                        .foregroundColor(.purple)
-                    Text("Week Summary")
-                        .font(.headline)
-                }
-                Text("\(formatDate(summary.weekStart)) - \(formatDate(summary.weekEnd))")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            HStack(spacing: 16) {
-                SummaryStatItem(
-                    icon: "mappin.and.ellipse",
-                    label: "Places",
-                    value: "\(summary.totalVisits)"
-                )
-                SummaryStatItem(
-                    icon: "ruler",
-                    label: "Distance",
-                    value: "\(Int(summary.totalDistanceMeters / 1000)) km"
-                )
-                SummaryStatItem(
-                    icon: "calendar",
-                    label: "Days Active",
-                    value: "\(summary.activeDays)"
-                )
-            }
-            .frame(maxWidth: .infinity)
-        }
-        .padding(16)
-        .background(Color.purple.opacity(0.1))
-        .cornerRadius(12)
+        SummaryGlassCard(
+            title: "Week Summary",
+            subtitle: "\(formatDate(summary.weekStart)) - \(formatDate(summary.weekEnd))",
+            icon: "calendar.badge.clock",
+            stats: [
+                (icon: "mappin.and.ellipse", label: "Places", value: "\(summary.totalVisits)"),
+                (icon: "ruler", label: "Distance", value: "\(Int(summary.totalDistanceMeters / 1000)) km"),
+                (icon: "calendar", label: "Days Active", value: "\(summary.activeDays)")
+            ]
+        )
     }
 }
 
@@ -528,59 +515,31 @@ private struct MonthSummaryCard: View {
     let summary: GetTimelineUseCaseTimelineItemUIMonthSummaryUI
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 8) {
-                Image(systemName: "calendar.circle")
-                    .foregroundColor(.purple)
-                Text("\(summary.month.name) \(summary.year)")
-                    .font(.headline)
-            }
-
-            HStack(spacing: 16) {
-                SummaryStatItem(
-                    icon: "mappin.and.ellipse",
-                    label: "Places",
-                    value: "\(summary.totalVisits)"
-                )
-                SummaryStatItem(
-                    icon: "ruler",
-                    label: "Distance",
-                    value: "\(Int(summary.totalDistanceMeters / 1000)) km"
-                )
-                SummaryStatItem(
-                    icon: "calendar.badge.clock",
-                    label: "Weeks",
-                    value: "\(summary.activeWeeks)"
-                )
-            }
-            .frame(maxWidth: .infinity)
+        VStack(spacing: 12) {
+            SummaryGlassCard(
+                title: "\(summary.month.name) \(summary.year)",
+                subtitle: nil,
+                icon: "calendar.circle",
+                stats: [
+                    (icon: "mappin.and.ellipse", label: "Places", value: "\(summary.totalVisits)"),
+                    (icon: "ruler", label: "Distance", value: "\(Int(summary.totalDistanceMeters / 1000)) km"),
+                    (icon: "calendar.badge.clock", label: "Weeks", value: "\(summary.activeWeeks)")
+                ]
+            )
 
             if !summary.topCategories.isEmpty {
-                Divider()
-
-                Text("Top Categories")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-
                 HStack(spacing: 8) {
                     ForEach(Array(summary.topCategories.prefix(3)), id: \.name) { category in
-                        HStack(spacing: 4) {
-                            Image(systemName: categoryIcon(category))
-                                .font(.caption2)
-                            Text(categoryName(category))
-                                .font(.caption2)
-                        }
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color(.systemGray5))
-                        .cornerRadius(4)
+                        GlassFilterChip(
+                            label: categoryName(category),
+                            icon: categoryIcon(category),
+                            isSelected: false,
+                            tint: .blueSlate
+                        ) {}
                     }
                 }
             }
         }
-        .padding(16)
-        .background(Color.purple.opacity(0.1))
-        .cornerRadius(12)
     }
 }
 
@@ -763,10 +722,29 @@ class EnhancedTimelineViewModel: ObservableObject {
     @Published var searchQuery: String = ""
     @Published var isLoading: Bool = false
     @Published var error: String?
+    @Published var isTracking: Bool = false
 
     init(controller: EnhancedTimelineController) {
         self.controller = controller
         observeState()
+    }
+
+    // FAB actions
+    func toggleTracking() {
+        // TODO: Implement tracking toggle via controller
+        isTracking.toggle()
+    }
+
+    func addPhoto() {
+        // TODO: Implement add photo action
+    }
+
+    func addNote() {
+        // TODO: Implement add note action
+    }
+
+    func checkIn() {
+        // TODO: Implement check-in action
     }
 
     func loadTimeline() {

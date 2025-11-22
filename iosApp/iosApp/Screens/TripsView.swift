@@ -4,10 +4,12 @@ import shared
 /**
  * SwiftUI trips screen with TripsController integration.
  * Shows all trips with filtering, sorting, and navigation to trip details.
+ * Updated with Liquid Glass components.
  */
 struct TripsView: View {
     let appComponent: AppComponent
     @StateObject private var viewModel: TripsViewModel
+    @State private var scrollOffset: CGFloat = 0
 
     init(appComponent: AppComponent) {
         self.appComponent = appComponent
@@ -15,10 +17,36 @@ struct TripsView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
+        ZStack {
+            Color.backgroundLight.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Large flexible navigation bar with hero background
+                LargeFlexibleNavigationBar(
+                    title: "Trips",
+                    scrollOffset: scrollOffset,
+                    actions: [
+                        NavigationAction(icon: "line.3.horizontal.decrease.circle") {
+                            // Filter action
+                        },
+                        NavigationAction(icon: "arrow.up.arrow.down.circle") {
+                            // Sort action
+                        }
+                    ],
+                    subtitle: {
+                        Text(tripSubtitle)
+                    },
+                    backgroundContent: {
+                        HeroGradientBackground(
+                            startColor: .lightCyan,
+                            endColor: .coastalPath
+                        )
+                    }
+                )
+
                 if viewModel.isLoading && viewModel.trips.isEmpty {
-                    ProgressView()
+                    GlassLoadingIndicator(variant: .pulsing, color: .coastalPath)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = viewModel.error {
                     ErrorView(error: error, onRetry: { viewModel.loadTrips() })
                 } else if viewModel.filteredTrips.isEmpty {
@@ -32,258 +60,235 @@ struct TripsView: View {
                         trips: viewModel.filteredTrips,
                         ongoingTrips: viewModel.ongoingTrips,
                         appComponent: appComponent,
-                        onRefresh: { viewModel.refresh() }
+                        onRefresh: { viewModel.refresh() },
+                        scrollOffset: $scrollOffset
                     )
                 }
+            }
 
-                // Floating action button
-                VStack {
+            // Glass FAB
+            VStack {
+                Spacer()
+                HStack {
                     Spacer()
-                    HStack {
-                        Spacer()
-                        Button(action: { viewModel.showCreateDialog() }) {
-                            Image(systemName: "plus")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                                .frame(width: 56, height: 56)
-                                .background(Color.blue)
-                                .clipShape(Circle())
-                                .shadow(radius: 4)
-                        }
-                        .padding(.trailing, 16)
-                        .padding(.bottom, 16)
+                    GlassButton(
+                        icon: "plus",
+                        variant: .filled,
+                        tint: .coastalPath
+                    ) {
+                        viewModel.showCreateDialog()
                     }
+                    .frame(width: 56, height: 56)
+                    .padding(.trailing, 16)
+                    .padding(.bottom, 96) // Extra padding for tab bar
                 }
             }
-            .navigationTitle("Trips")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        // Sort options
-                        Menu("Sort By") {
-                            Button(action: { viewModel.setSortOption(.dateDesc) }) {
-                                Label("Newest First", systemImage: viewModel.sortOption == .dateDesc ? "checkmark" : "")
-                            }
-                            Button(action: { viewModel.setSortOption(.dateAsc) }) {
-                                Label("Oldest First", systemImage: viewModel.sortOption == .dateAsc ? "checkmark" : "")
-                            }
-                            Button(action: { viewModel.setSortOption(.nameAsc) }) {
-                                Label("Name A-Z", systemImage: viewModel.sortOption == .nameAsc ? "checkmark" : "")
-                            }
-                            Button(action: { viewModel.setSortOption(.durationDesc) }) {
-                                Label("Longest Duration", systemImage: viewModel.sortOption == .durationDesc ? "checkmark" : "")
-                            }
-                            Button(action: { viewModel.setSortOption(.distanceDesc) }) {
-                                Label("Farthest Distance", systemImage: viewModel.sortOption == .distanceDesc ? "checkmark" : "")
-                            }
-                        }
-
-                        // Filter options
-                        Menu("Filter") {
-                            Button(action: { viewModel.toggleOngoingFilter() }) {
-                                Label("Ongoing Trips", systemImage: viewModel.filterShowOngoing ? "checkmark" : "")
-                            }
-                            Button(action: { viewModel.toggleCompletedFilter() }) {
-                                Label("Completed Trips", systemImage: viewModel.filterShowCompleted ? "checkmark" : "")
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "ellipsis.circle")
-                    }
-                }
-
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.refresh() }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                }
-            }
-            .searchable(text: $viewModel.searchQuery, prompt: "Search trips...")
         }
+        .navigationBarHidden(true)
         .onAppear {
             viewModel.loadTrips()
         }
     }
+
+    private var tripSubtitle: String {
+        let totalCount = viewModel.trips.count
+        let ongoingCount = viewModel.ongoingTrips.count
+        if ongoingCount > 0 {
+            return "\(totalCount) trips • \(ongoingCount) ongoing"
+        }
+        return "\(totalCount) trips"
+    }
 }
 
 /**
- * Trips content with list.
+ * Trips content with glass cards.
  */
 private struct TripsContent: View {
     let trips: [Trip]
     let ongoingTrips: [Trip]
     let appComponent: AppComponent
     let onRefresh: () -> Void
+    @Binding var scrollOffset: CGFloat
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 12) {
-                // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Trips")
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named("scroll")).minY
+                )
+            }
+            .frame(height: 0)
 
-                        Text("\(trips.count) total")
-                            .font(.body)
+            GlassEffectGroup(spacing: 12, padding: 16) {
+                VStack(spacing: 12) {
+                    // Group trips: ongoing first, then completed
+                    let ongoing = trips.filter { $0.isOngoing }
+                    let completed = trips.filter { !$0.isOngoing }
+
+                    // Ongoing trips section
+                    if !ongoing.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Ongoing")
+                                .font(.headline)
+                                .foregroundColor(.coastalPath)
+                                .padding(.horizontal, 4)
+
+                            ForEach(ongoing, id: \.id) { trip in
+                                NavigationLink(destination: TripDetailView(tripId: trip.id, appComponent: appComponent)) {
+                                    TripGlassCard(trip: trip)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+
+                    // Completed trips section
+                    if !completed.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text(ongoing.isEmpty ? "All Trips" : "Past Trips")
+                                .font(.headline)
+                                .foregroundColor(.blueSlate)
+                                .padding(.horizontal, 4)
+                                .padding(.top, ongoing.isEmpty ? 0 : 12)
+
+                            ForEach(completed, id: \.id) { trip in
+                                NavigationLink(destination: TripDetailView(tripId: trip.id, appComponent: appComponent)) {
+                                    TripGlassCard(trip: trip)
+                                }
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 96) // Extra padding for FAB and tab bar
+        }
+        .coordinateSpace(name: "scroll")
+        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+            scrollOffset = value
+        }
+    }
+}
+
+/**
+ * Trip glass card with Liquid Glass styling.
+ */
+private struct TripGlassCard: View {
+    let trip: Trip
+
+    var body: some View {
+        GlassCard(variant: trip.isOngoing ? .route : .visit) {
+            VStack(alignment: .leading, spacing: 12) {
+                // Header row
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Text(trip.displayName)
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.primary)
+
+                            if trip.isOngoing {
+                                HStack(spacing: 4) {
+                                    Circle()
+                                        .fill(Color.coastalPath)
+                                        .frame(width: 6, height: 6)
+                                    Text("Ongoing")
+                                        .font(.caption2)
+                                        .fontWeight(.medium)
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical: 4)
+                                .glassBackground(
+                                    material: .ultraThin,
+                                    tint: .coastalPath,
+                                    cornerRadius: 8
+                                )
+                            }
+                        }
+
+                        // Date range
+                        Text(formatDateRange(trip))
+                            .font(.subheadline)
                             .foregroundColor(.secondary)
                     }
 
                     Spacer()
 
-                    Button(action: onRefresh) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 16)
-
-                // Group trips: ongoing first, then completed
-                let ongoing = trips.filter { $0.isOngoing }
-                let completed = trips.filter { !$0.isOngoing }
-
-                // Ongoing trips section
-                if !ongoing.isEmpty {
-                    SectionHeader(text: "Ongoing")
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-
-                    ForEach(ongoing, id: \.id) { trip in
-                        NavigationLink(destination: TripDetailView(tripId: trip.id, appComponent: appComponent)) {
-                            TripCard(trip: trip)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.horizontal, 16)
-                    }
-                }
-
-                // Completed trips section
-                if !completed.isEmpty {
-                    SectionHeader(text: ongoing.isEmpty ? "All Trips" : "Past Trips")
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-
-                    ForEach(completed, id: \.id) { trip in
-                        NavigationLink(destination: TripDetailView(tripId: trip.id, appComponent: appComponent)) {
-                            TripCard(trip: trip)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.horizontal, 16)
-                    }
-                }
-            }
-            .padding(.bottom, 80) // Extra padding for FAB
-        }
-    }
-}
-
-/**
- * Section header.
- */
-private struct SectionHeader: View {
-    let text: String
-
-    var body: some View {
-        Text(text)
-            .font(.title3)
-            .fontWeight(.semibold)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 8)
-    }
-}
-
-/**
- * Trip card.
- */
-private struct TripCard: View {
-    let trip: Trip
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header row
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack(spacing: 8) {
-                        Text(trip.displayName)
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .foregroundColor(.primary)
-
-                        if trip.isOngoing {
-                            Text("Ongoing")
-                                .font(.caption)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.blue)
-                                .foregroundColor(.white)
-                                .cornerRadius(4)
-                        }
-                    }
-
-                    // Date range
-                    Text(formatDateRange(trip))
-                        .font(.body)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
-
-                // Auto-detected badge
-                if trip.isAutoDetected {
-                    Text("Auto")
-                        .font(.caption)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Color.purple.opacity(0.2))
-                        .foregroundColor(.purple)
-                        .cornerRadius(4)
-                }
-            }
-
-            // Description
-            if let description = trip.description {
-                Text(description)
-                    .font(.body)
-                    .lineLimit(2)
-                    .foregroundColor(.primary)
-            }
-
-            // Statistics
-            if !trip.summary.isEmpty {
-                Text(trip.summary)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-
-            // Tags
-            if !trip.tags.isEmpty {
-                HStack(spacing: 8) {
-                    ForEach(Array(trip.tags.prefix(3)), id: \.self) { tag in
+                    // Auto-detected badge
+                    if trip.isAutoDetected {
                         HStack(spacing: 4) {
-                            Image(systemName: "tag")
+                            Image(systemName: "sparkles")
                                 .font(.caption2)
-                            Text(tag)
-                                .font(.caption)
+                            Text("Auto")
+                                .font(.caption2)
+                                .fontWeight(.medium)
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color(.systemGray5))
-                        .cornerRadius(4)
+                        .glassBackground(
+                            material: .ultraThin,
+                            tint: .duskPurple,
+                            cornerRadius: 8
+                        )
+                        .foregroundColor(.duskPurple)
                     }
+                }
 
-                    if trip.tags.count > 3 {
-                        Text("+\(trip.tags.count - 3)")
+                // Description
+                if let description = trip.description {
+                    Text(description)
+                        .font(.body)
+                        .lineLimit(2)
+                        .foregroundColor(.primary)
+                }
+
+                // Statistics
+                if !trip.summary.isEmpty {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chart.bar.fill")
+                            .font(.caption)
+                            .foregroundColor(.blueSlate)
+                        Text(trip.summary)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                 }
+
+                // Tags
+                if !trip.tags.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(Array(trip.tags.prefix(4)), id: \.self) { tag in
+                                HStack(spacing: 4) {
+                                    Image(systemName: "tag.fill")
+                                        .font(.caption2)
+                                    Text(tag)
+                                        .font(.caption)
+                                }
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .glassBackground(
+                                    material: .ultraThin,
+                                    tint: .coolSteel,
+                                    cornerRadius: 6
+                                )
+                                .foregroundColor(.primary)
+                            }
+
+                            if trip.tags.count > 4 {
+                                Text("+\(trip.tags.count - 4)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 8)
+                            }
+                        }
+                    }
+                }
             }
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(trip.isOngoing ? Color.blue.opacity(0.1) : Color(.systemGray6))
-        .cornerRadius(12)
     }
 
     private func formatDateRange(_ trip: Trip) -> String {
@@ -305,86 +310,115 @@ private struct TripCard: View {
 }
 
 /**
- * Empty trips view.
+ * Scroll offset preference key.
+ */
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
+    }
+}
+
+/**
+ * Empty trips view with glass styling.
  */
 private struct EmptyTripsView: View {
     let onCreateTrip: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 24) {
             Image(systemName: "suitcase")
                 .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .foregroundColor(.coolSteel)
 
-            Text("No Trips Yet")
-                .font(.title2)
-                .foregroundColor(.secondary)
+            VStack(spacing: 8) {
+                Text("No Trips Yet")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
 
-            Text("Start tracking your adventures")
-                .font(.body)
-                .foregroundColor(.secondary)
-
-            Button(action: onCreateTrip) {
-                HStack {
-                    Image(systemName: "plus")
-                    Text("Create Trip")
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                Text("Start tracking your adventures")
+                    .font(.body)
+                    .foregroundColor(.secondary)
             }
-            .buttonStyle(.borderedProminent)
+
+            GlassButton(
+                title: "Create Trip",
+                icon: "plus",
+                variant: .filled,
+                tint: .coastalPath,
+                action: onCreateTrip
+            )
         }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 /**
- * No results view (when filters yield no results).
+ * No results view with glass styling.
  */
 private struct NoResultsView: View {
     let message: String
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Image(systemName: "magnifyingglass")
                 .font(.system(size: 48))
-                .foregroundColor(.secondary)
+                .foregroundColor(.blueSlate)
 
-            Text(message)
-                .font(.body)
-                .foregroundColor(.secondary)
+            VStack(spacing: 8) {
+                Text(message)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .foregroundColor(.primary)
 
-            Text("Try adjusting your filters or search query")
-                .font(.caption)
-                .foregroundColor(.secondary)
+                Text("Try adjusting your filters or search query")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
         }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
 /**
- * Error view.
+ * Error view with glass styling.
  */
 private struct ErrorView: View {
     let error: String
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle.fill")
                 .font(.system(size: 48))
-                .foregroundColor(.red)
+                .foregroundColor(.driftwood)
 
-            Text("Error Loading Trips")
-                .font(.headline)
+            VStack(spacing: 8) {
+                Text("Error Loading Trips")
+                    .font(.headline)
+                    .foregroundColor(.primary)
 
-            Text(error)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                Text(error)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
 
-            Button("Retry", action: onRetry)
-                .buttonStyle(.borderedProminent)
+            GlassButton(
+                title: "Retry",
+                icon: "arrow.clockwise",
+                variant: .filled,
+                tint: .coastalPath,
+                action: onRetry
+            )
         }
-        .padding()
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 

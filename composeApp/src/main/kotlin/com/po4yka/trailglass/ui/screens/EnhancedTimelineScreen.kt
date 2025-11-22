@@ -66,11 +66,19 @@ import kotlinx.datetime.LocalDate
 @Composable
 fun EnhancedTimelineScreen(
     controller: EnhancedTimelineController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    trackingController: com.po4yka.trailglass.feature.tracking.LocationTrackingController? = null,
+    onAddPhoto: () -> Unit = {},
+    onAddNote: () -> Unit = {},
+    onCheckIn: () -> Unit = {}
 ) {
     val state by controller.state.collectAsState()
     var showFilterSheet by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
+
+    // Tracking state
+    val trackingState by (trackingController?.uiState?.collectAsState() ?: remember { mutableStateOf(null) })
+    val isTracking = trackingState?.trackingState?.isTracking ?: false
 
     Scaffold(
         topBar = {
@@ -113,6 +121,23 @@ fun EnhancedTimelineScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            if (trackingController != null) {
+                com.po4yka.trailglass.ui.components.TrackingFABMenu(
+                    isTracking = isTracking,
+                    onToggleTracking = {
+                        if (isTracking) {
+                            trackingController.stopTracking()
+                        } else {
+                            trackingController.startTracking(com.po4yka.trailglass.location.tracking.TrackingMode.ACTIVE)
+                        }
+                    },
+                    onAddPhoto = onAddPhoto,
+                    onAddNote = onAddNote,
+                    onCheckIn = onCheckIn
+                )
+            }
         },
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->

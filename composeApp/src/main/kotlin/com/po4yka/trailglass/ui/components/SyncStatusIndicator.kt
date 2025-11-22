@@ -54,26 +54,21 @@ fun SyncStatusIndicator(
             .clickable(onClick = onClick)
             .padding(8.dp)
     ) {
-        // Rotating animation for in-progress state
-        val infiniteTransition = rememberInfiniteTransition(label = "sync rotation")
-        val rotation by infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = if (syncStatus.isActive) 360f else 0f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(2000, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "rotation"
-        )
-
-        Icon(
-            imageVector = icon,
-            contentDescription = "Sync status",
-            tint = tint,
-            modifier = Modifier
-                .size(24.dp)
-                .then(if (syncStatus.isActive) Modifier.rotate(rotation) else Modifier)
-        )
+        // Use wavy loading indicator for active sync
+        if (syncStatus.isActive) {
+            WavyLoadingIndicator(
+                size = 24.dp,
+                color = tint,
+                strokeWidth = 2.dp
+            )
+        } else {
+            Icon(
+                imageVector = icon,
+                contentDescription = "Sync status",
+                tint = tint,
+                modifier = Modifier.size(24.dp)
+            )
+        }
 
         // Badge for pending count
         if (syncStatus.pendingCount > 0 && !syncStatus.isActive) {
@@ -167,8 +162,8 @@ fun SyncStatusCard(
                 }
                 is SyncProgress.InProgress -> {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        LinearProgressIndicator(
-                            progress = { progress.percentage / 100f },
+                        WavyLinearProgressIndicator(
+                            progress = progress.percentage / 100f,
                             modifier = Modifier.fillMaxWidth()
                         )
                         Text(

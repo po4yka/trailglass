@@ -144,6 +144,16 @@ fun MainScaffold(
                     is RootComponent.Child.Timeline -> {
                         EnhancedTimelineScreen(
                             controller = instance.component.enhancedTimelineController,
+                            trackingController = instance.component.locationTrackingController,
+                            onAddPhoto = {
+                                // TODO: Navigate to add photo screen
+                            },
+                            onAddNote = {
+                                // TODO: Navigate to add note screen
+                            },
+                            onCheckIn = {
+                                // TODO: Navigate to manual check-in screen
+                            },
                             modifier = Modifier
                         )
                     }

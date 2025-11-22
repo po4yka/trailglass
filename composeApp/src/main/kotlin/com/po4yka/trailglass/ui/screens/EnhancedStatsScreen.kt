@@ -23,6 +23,7 @@ import com.po4yka.trailglass.feature.stats.EnhancedStatsController
 import com.po4yka.trailglass.feature.stats.GetStatsUseCase
 import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
 import com.po4yka.trailglass.ui.components.ErrorView
+import com.po4yka.trailglass.ui.components.TransportModeSelector
 import com.po4yka.trailglass.ui.components.charts.*
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.Clock
@@ -40,6 +41,7 @@ fun EnhancedStatsScreen(
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
+    var selectedTransportMode by remember { mutableStateOf<TransportType?>(null) }
 
     // Load current year on first composition
     LaunchedEffect(Unit) {
@@ -89,6 +91,10 @@ fun EnhancedStatsScreen(
                 state.stats != null -> {
                     EnhancedStatsContent(
                         stats = state.stats!!,
+                        selectedTransportMode = selectedTransportMode,
+                        onTransportModeSelected = { mode ->
+                            selectedTransportMode = if (selectedTransportMode == mode) null else mode
+                        },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -154,20 +160,69 @@ private fun PeriodSelector(
 @Composable
 private fun EnhancedStatsContent(
     stats: ComprehensiveStatistics,
+    selectedTransportMode: TransportType?,
+    onTransportModeSelected: (TransportType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Filter stats by selected transport mode
+    val filteredStats = if (selectedTransportMode != null) {
+        filterStatsByTransportMode(stats, selectedTransportMode)
+    } else {
+        stats
+    }
+
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // Transport Mode Selector
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        "Filter by Transport Mode",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
+                    TransportModeSelector(
+                        selectedMode = selectedTransportMode,
+                        onModeSelected = onTransportModeSelected,
+                        showLabels = true
+                    )
+
+                    if (selectedTransportMode != null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                "Showing: ${selectedTransportMode.name.lowercase().replaceFirstChar { it.uppercase() }}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Medium
+                            )
+                            TextButton(onClick = { onTransportModeSelected(selectedTransportMode) }) {
+                                Text("Clear Filter")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Overview section
         item {
             SectionHeader("Overview")
         }
 
         item {
-            OverviewCards(stats)
+            OverviewCards(filteredStats)
         }
 
         // Distance statistics
@@ -176,13 +231,13 @@ private fun EnhancedStatsContent(
         }
 
         item {
-            DistanceStatsCard(stats)
+            DistanceStatsCard(filteredStats)
         }
 
         // Transport type distribution
         if (stats.distanceStats.byTransportType.isNotEmpty()) {
             item {
-                TransportDistributionCard(stats)
+                TransportDistributionCard(stats, selectedTransportMode)
             }
         }
 
@@ -192,23 +247,23 @@ private fun EnhancedStatsContent(
         }
 
         item {
-            PlaceStatsCard(stats)
+            PlaceStatsCard(filteredStats)
         }
 
         // Category distribution
-        if (stats.placeStats.visitsByCategory.isNotEmpty()) {
+        if (filteredStats.placeStats.visitsByCategory.isNotEmpty()) {
             item {
-                CategoryDistributionCard(stats)
+                CategoryDistributionCard(filteredStats)
             }
         }
 
         // Most visited places
-        if (stats.placeStats.mostVisitedPlaces.isNotEmpty()) {
+        if (filteredStats.placeStats.mostVisitedPlaces.isNotEmpty()) {
             item {
                 SectionHeader("Most Visited Places")
             }
 
-            stats.placeStats.mostVisitedPlaces.take(5).forEach { place ->
+            filteredStats.placeStats.mostVisitedPlaces.take(5).forEach { place ->
                 item {
                     MostVisitedPlaceCard(place)
                 }
@@ -221,13 +276,13 @@ private fun EnhancedStatsContent(
         }
 
         item {
-            TravelPatternsCard(stats)
+            TravelPatternsCard(filteredStats)
         }
 
         // Activity heatmap
-        if (stats.travelPatterns.weekdayActivity.isNotEmpty()) {
+        if (filteredStats.travelPatterns.weekdayActivity.isNotEmpty()) {
             item {
-                ActivityHeatmapCard(stats)
+                ActivityHeatmapCard(filteredStats)
             }
         }
 
@@ -237,13 +292,13 @@ private fun EnhancedStatsContent(
         }
 
         item {
-            GeographicStatsCard(stats)
+            GeographicStatsCard(filteredStats)
         }
 
         // Top countries
-        if (stats.geographicStats.topCountries.isNotEmpty()) {
+        if (filteredStats.geographicStats.topCountries.isNotEmpty()) {
             item {
-                TopCountriesCard(stats)
+                TopCountriesCard(filteredStats)
             }
         }
     }
@@ -355,7 +410,7 @@ private fun DistanceStatsCard(stats: ComprehensiveStatistics) {
 }
 
 @Composable
-private fun TransportDistributionCard(stats: ComprehensiveStatistics) {
+private fun TransportDistributionCard(stats: ComprehensiveStatistics, selectedMode: TransportType?) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
@@ -372,11 +427,16 @@ private fun TransportDistributionCard(stats: ComprehensiveStatistics) {
             }
 
             val barData = stats.distanceStats.byTransportType.map { (type, meters) ->
+                val isSelected = selectedMode == type
                 BarData(
                     label = type.name.take(4),
                     value = (meters / 1000).toFloat(),
                     formattedValue = "${(meters / 1000).toInt()}km",
-                    color = transportColors[type]
+                    color = if (selectedMode != null && !isSelected) {
+                        transportColors[type]?.copy(alpha = 0.3f)
+                    } else {
+                        transportColors[type]
+                    }
                 )
             }.sortedByDescending { it.value }
 
@@ -632,4 +692,29 @@ private fun EmptyStatsView(modifier: Modifier = Modifier) {
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
+}
+
+/**
+ * Filter comprehensive statistics by transport mode.
+ * Returns a new ComprehensiveStatistics instance with only data from the selected transport mode.
+ */
+private fun filterStatsByTransportMode(
+    stats: ComprehensiveStatistics,
+    transportMode: TransportType
+): ComprehensiveStatistics {
+    // Filter distance stats
+    val filteredByTransportType = stats.distanceStats.byTransportType
+        .filterKeys { it == transportMode }
+
+    val filteredTotalDistanceMeters = filteredByTransportType.values.sum()
+
+    // For now, return stats with filtered transport data
+    // This is a simplified filter - a full implementation would require
+    // filtering routes, visits connected to those routes, etc.
+    return stats.copy(
+        distanceStats = stats.distanceStats.copy(
+            totalDistanceMeters = filteredTotalDistanceMeters,
+            byTransportType = filteredByTransportType
+        )
+    )
 }

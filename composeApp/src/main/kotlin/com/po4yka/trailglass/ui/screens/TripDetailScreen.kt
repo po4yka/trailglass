@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,9 +22,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Trip
+import com.po4yka.trailglass.ui.components.LargeFlexibleTopAppBar
+import com.po4yka.trailglass.ui.components.FlexibleTopAppBarDefaults
+import com.po4yka.trailglass.ui.theme.CoastalPath
+import com.po4yka.trailglass.ui.theme.BlueSlate
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -48,10 +55,42 @@ fun TripDetailScreen(
     var showExportMenu by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
+    // Create scroll behavior for collapsing app bar
+    val scrollBehavior = FlexibleTopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    // Format trip metadata for subtitle
+    val startDate = trip.startTime.toLocalDateTime(TimeZone.currentSystemDefault())
+    val metadataText = buildString {
+        // Date range
+        trip.endTime?.let { endTime ->
+            val endDate = endTime.toLocalDateTime(TimeZone.currentSystemDefault())
+            append("${startDate.date} to ${endDate.date}")
+        } ?: append("Started ${startDate.date}")
+
+        // Duration
+        if (trip.duration != null) {
+            append(" • ${formatDuration(trip.duration!!)}")
+        }
+
+        // Distance
+        if (trip.totalDistanceMeters > 0) {
+            append(" • ${(trip.totalDistanceMeters / 1000).toInt()} km")
+        }
+
+        // Places
+        if (trip.visitedPlaceCount > 0) {
+            append(" • ${trip.visitedPlaceCount} places")
+        }
+    }
+
     Scaffold(
+        modifier = modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
+            LargeFlexibleTopAppBar(
                 title = { Text(trip.displayName) },
+                subtitle = { Text(metadataText) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -64,14 +103,6 @@ fun TripDetailScreen(
                     IconButton(onClick = { showExportMenu = true }) {
                         Icon(Icons.Default.Download, contentDescription = "Export")
                     }
-                    IconButton(onClick = onEdit) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
-                    }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Delete")
-                    }
-
-                    // Export menu
                     DropdownMenu(
                         expanded = showExportMenu,
                         onDismissRequest = { showExportMenu = false }
@@ -97,21 +128,42 @@ fun TripDetailScreen(
                             }
                         )
                     }
+                    IconButton(onClick = onEdit) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                    }
+                    IconButton(onClick = { showDeleteDialog = true }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = FlexibleTopAppBarDefaults.silentWatersColors(),
+                backgroundContent = {
+                    // Hero gradient background using trip route color or default
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = if (trip.isOngoing) {
+                                        listOf(CoastalPath, BlueSlate)
+                                    } else {
+                                        listOf(
+                                            MaterialTheme.colorScheme.primaryContainer,
+                                            MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                    }
+                                )
+                            )
+                    )
                 }
             )
-        },
-        modifier = modifier.fillMaxSize()
+        }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.padding(paddingValues),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Trip header card
-            item {
-                TripHeaderCard(trip)
-            }
-
             // View Route button
             item {
                 Button(

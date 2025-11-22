@@ -198,7 +198,8 @@ class DefaultRootComponent(
         is RootComponent.Config.Timeline -> RootComponent.Child.Timeline(
             component = DefaultTimelineComponent(
                 componentContext = componentContext,
-                enhancedTimelineController = appComponent.enhancedTimelineController
+                enhancedTimelineController = appComponent.enhancedTimelineController,
+                locationTrackingController = appComponent.locationTrackingController
             )
         )
 

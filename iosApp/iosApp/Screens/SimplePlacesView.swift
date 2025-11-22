@@ -2,22 +2,49 @@ import SwiftUI
 import shared
 import Combine
 
-/// Simplified Places screen that works with the PlacesController
+/// Simplified Places screen with Liquid Glass components
 struct SimplePlacesView: View {
     @StateObject private var viewModel: SimplePlacesViewModel
+    @State private var scrollOffset: CGFloat = 0
+    @State private var selectedCategories: Set<String> = []
 
     init(placesController: PlacesController) {
         _viewModel = StateObject(wrappedValue: SimplePlacesViewModel(controller: placesController))
     }
 
     var body: some View {
-        NavigationView {
-            ZStack {
+        ZStack {
+            Color.backgroundLight.ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Large flexible navigation bar with gradient
+                LargeFlexibleNavigationBar(
+                    title: "Places",
+                    scrollOffset: scrollOffset,
+                    actions: [
+                        NavigationAction(icon: "magnifyingglass") {
+                            // Search action
+                        },
+                        NavigationAction(icon: "arrow.clockwise") {
+                            viewModel.refresh()
+                        }
+                    ],
+                    subtitle: {
+                        Text(placesSubtitle)
+                    },
+                    backgroundContent: {
+                        HeroGradientBackground(
+                            startColor: .lightCyan,
+                            endColor: .seaGlass
+                        )
+                    }
+                )
+
                 if viewModel.isLoading {
-                    ProgressView()
+                    GlassLoadingIndicator(variant: .pulsing, color: .seaGlass)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let error = viewModel.error {
-                    ErrorView(error: error) {
+                    PlacesErrorView(error: error) {
                         viewModel.refresh()
                     }
                 } else if viewModel.places.isEmpty && viewModel.searchQuery.isEmpty {
@@ -29,26 +56,13 @@ struct SimplePlacesView: View {
                         places: viewModel.places,
                         onPlaceTap: { place in
                             viewModel.selectedPlace = place
-                        }
+                        },
+                        scrollOffset: $scrollOffset,
+                        selectedCategories: $selectedCategories
                     )
                 }
             }
-            .navigationTitle("Places")
-            .navigationBarTitleDisplayMode(.large)
-            .searchable(
-                text: $viewModel.searchQuery,
-                prompt: "Search places..."
-            )
-            .onChange(of: viewModel.searchQuery) { newValue in
-                viewModel.onSearchQueryChanged(newValue)
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { viewModel.refresh() }) {
-                        Image(systemName: "arrow.clockwise")
-                    }
-                }
-            }
+
             .sheet(item: $viewModel.selectedPlace) { selectedPlace in
                 if let frequentPlace = viewModel.getFrequentPlace(for: selectedPlace) {
                     NavigationView {
@@ -65,52 +79,126 @@ struct SimplePlacesView: View {
                 }
             }
         }
+        .navigationBarHidden(true)
+    }
+
+    private var placesSubtitle: String {
+        let count = viewModel.places.count
+        return "\(count) places visited"
     }
 }
 
-/// List of frequent places
+/// List of frequent places with glass styling
 struct PlacesList: View {
     let places: [FrequentPlaceItem]
     let onPlaceTap: (FrequentPlaceItem) -> Void
+    @Binding var scrollOffset: CGFloat
+    @Binding var selectedCategories: Set<String>
+
+    // Common categories for filtering
+    private let categories: [(id: String, label: String, icon: String, color: Color)] = [
+        ("HOME", "Home", "house.fill", .coolSteel),
+        ("WORK", "Work", "briefcase.fill", .blueSlate),
+        ("FOOD", "Food", "fork.knife", .morningCategory),
+        ("SHOPPING", "Shopping", "cart.fill", .seaGlass),
+        ("FITNESS", "Fitness", "figure.run", .coastalPath),
+        ("ENTERTAINMENT", "Entertainment", "theatermasks.fill", .duskPurple)
+    ]
+
+    var filteredPlaces: [FrequentPlaceItem] {
+        if selectedCategories.isEmpty {
+            return places
+        }
+        return places.filter { selectedCategories.contains($0.category) }
+    }
 
     var body: some View {
-        List(places) { place in
-            PlaceRow(place: place)
-                .onTapGesture {
-                    onPlaceTap(place)
+        ScrollView {
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: ScrollOffsetPreferenceKey.self,
+                    value: geometry.frame(in: .named("scroll")).minY
+                )
+            }
+            .frame(height: 0)
+
+            VStack(spacing: 16) {
+                // Category filter chips
+                ScrollableGlassGroup {
+                    ForEach(categories, id: \.id) { category in
+                        GlassFilterChip(
+                            label: category.label,
+                            icon: category.icon,
+                            isSelected: selectedCategories.contains(category.id),
+                            tint: category.color
+                        ) {
+                            if selectedCategories.contains(category.id) {
+                                selectedCategories.remove(category.id)
+                            } else {
+                                selectedCategories.insert(category.id)
+                            }
+                        }
+                    }
                 }
+
+                // Places list
+                GlassEffectGroup(spacing: 12, padding: 16) {
+                    VStack(spacing: 12) {
+                        ForEach(filteredPlaces) { place in
+                            Button {
+                                onPlaceTap(place)
+                            } label: {
+                                PlaceGlassCard(place: place)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+            .padding(.bottom, 96) // Extra padding for tab bar
         }
-        .listStyle(.plain)
+        .coordinateSpace(name: "scroll")
+        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+            scrollOffset = value
+        }
     }
 }
 
-/// Individual place row
-struct PlaceRow: View {
+/// Place glass card with Liquid Glass styling
+struct PlaceGlassCard: View {
     let place: FrequentPlaceItem
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                // Category icon
+        GlassCard(variant: .visit) {
+            HStack(spacing: 12) {
+                // Category icon with glass background
                 Image(systemName: place.categoryIcon)
                     .foregroundColor(place.categoryColor)
                     .font(.title2)
                     .frame(width: 44, height: 44)
-                    .background(place.categoryColor.opacity(0.15))
-                    .cornerRadius(8)
+                    .glassBackground(
+                        material: .ultraThin,
+                        tint: place.categoryColor,
+                        cornerRadius: 10
+                    )
 
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack {
+                VStack(alignment: .leading, spacing: 6) {
+                    // Name and favorite
+                    HStack(spacing: 6) {
                         Text(place.displayName)
                             .font(.headline)
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
 
                         if place.isFavorite {
                             Image(systemName: "star.fill")
-                                .foregroundColor(.yellow)
+                                .foregroundColor(.warning)
                                 .font(.caption)
                         }
                     }
 
+                    // City/location
                     if let city = place.city {
                         Text(city)
                             .font(.subheadline)
@@ -118,15 +206,24 @@ struct PlaceRow: View {
                             .lineLimit(1)
                     }
 
+                    // Visit count and duration
                     HStack(spacing: 12) {
-                        Label("\(place.visitCount) visits", systemImage: "mappin.circle")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        HStack(spacing: 4) {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.caption)
+                            Text("\(place.visitCount)")
+                                .font(.caption)
+                        }
+                        .foregroundColor(.blueSlate)
 
                         if place.averageDurationMinutes > 0 {
-                            Label(formatDuration(minutes: place.averageDurationMinutes), systemImage: "clock")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                            HStack(spacing: 4) {
+                                Image(systemName: "clock.fill")
+                                    .font(.caption)
+                                Text(formatDuration(minutes: place.averageDurationMinutes))
+                                    .font(.caption)
+                            }
+                            .foregroundColor(.coolSteel)
                         }
                     }
                 }
@@ -134,16 +231,21 @@ struct PlaceRow: View {
                 Spacer()
 
                 // Significance badge
-                Text(place.significanceLabel)
-                    .font(.caption2)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(place.significanceColor.opacity(0.2))
-                    .foregroundColor(place.significanceColor)
-                    .cornerRadius(8)
+                VStack(spacing: 4) {
+                    Text(place.significanceLabel)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .glassBackground(
+                    material: .ultraThin,
+                    tint: place.significanceColor,
+                    cornerRadius: 8
+                )
+                .foregroundColor(place.significanceColor)
             }
         }
-        .padding(.vertical, 4)
     }
 
     private func formatDuration(minutes: Int) -> String {
@@ -158,80 +260,101 @@ struct PlaceRow: View {
     }
 }
 
-/// Empty state view
+/// Empty state view with glass styling
 struct EmptyPlacesView: View {
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 24) {
             Image(systemName: "mappin.slash")
                 .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .foregroundColor(.seaGlass)
 
-            Text("No Places Yet")
-                .font(.title2)
-                .fontWeight(.semibold)
+            VStack(spacing: 8) {
+                Text("No Places Yet")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
 
-            Text("As you travel, TrailGlass will automatically detect and record your frequent places.")
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                Text("As you travel, TrailGlass will automatically detect and record your frequent places.")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
         }
+        .padding(32)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
-/// No search results view
+/// No search results view with glass styling
 struct NoSearchResultsView: View {
     let query: String
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .font(.system(size: 48))
+                .foregroundColor(.blueSlate)
 
-            Text("No Results")
-                .font(.title2)
-                .fontWeight(.semibold)
+            VStack(spacing: 8) {
+                Text("No Results")
+                    .font(.headline)
+                    .foregroundColor(.primary)
 
-            Text("No places found matching \"\(query)\"")
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                Text("No places found matching \"\(query)\"")
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+            }
         }
+        .padding(32)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
 
-/// Error view
-struct ErrorView: View {
+/// Error view with glass styling
+struct PlacesErrorView: View {
     let error: String
     let onRetry: () -> Void
 
     var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 64))
-                .foregroundColor(.red)
+        VStack(spacing: 20) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 48))
+                .foregroundColor(.driftwood)
 
-            Text("Error")
-                .font(.title2)
-                .fontWeight(.semibold)
+            VStack(spacing: 8) {
+                Text("Error Loading Places")
+                    .font(.headline)
+                    .foregroundColor(.primary)
 
-            Text(error)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-
-            Button(action: onRetry) {
-                Text("Retry")
-                    .fontWeight(.semibold)
+                Text(error)
+                    .font(.body)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
             }
-            .buttonStyle(.borderedProminent)
+
+            GlassButton(
+                title: "Retry",
+                icon: "arrow.clockwise",
+                variant: .filled,
+                tint: .seaGlass,
+                action: onRetry
+            )
         }
+        .padding(32)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// Scroll offset preference key
+private struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
