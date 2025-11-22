@@ -44,7 +44,7 @@ compass = "2.4.1"
 moko-resources = "0.25.1"
 moko-resources-generator = "0.25.2"
 gradle-versions = "0.53.0"
-ktlint-gradle = "12.1.2"
+ktlint-gradle = "14.0.1"
 detekt = "1.23.7"
 
 [libraries]
