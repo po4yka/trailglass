@@ -237,7 +237,7 @@ private fun AnimatedActionButton(
                 contentColor = MaterialTheme.colorScheme.extended.activeRoute
             ),
         border =
-            ButtonDefaults.outlinedButtonBorder.copy(
+            ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
                 brush =
                     androidx.compose.ui.graphics.SolidColor(
                         MaterialTheme.colorScheme.extended.activeRoute

@@ -4,7 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Flight
@@ -164,7 +164,7 @@ private fun getCategoryIcon(category: String): ImageVector? =
         "water", "swimming", "beach", "ocean" -> Icons.Default.WaterDrop
         "transport", "car", "bus", "train" -> Icons.Default.DirectionsCar
         "flight", "plane", "airport" -> Icons.Default.Flight
-        "bike", "cycling", "bicycle" -> Icons.Default.DirectionsBike
+        "bike", "cycling", "bicycle" -> Icons.AutoMirrored.Filled.DirectionsBike
         "food", "restaurant", "dining" -> Icons.Default.Restaurant
         "cafe", "coffee" -> Icons.Default.LocalCafe
         "work", "office", "meeting" -> Icons.Default.Work
