@@ -9,15 +9,11 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Luggage
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tag
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -45,7 +41,7 @@ import kotlinx.datetime.toLocalDateTime
  * This screen uses Paging 3 to load trips incrementally, providing better
  * performance for users with large trip histories.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripsScreenPaging(
     database: Database,
@@ -75,14 +71,6 @@ fun TripsScreenPaging(
 
     val lazyPagingItems = pager.flow.collectAsLazyPagingItems()
 
-    // Pull-to-refresh state
-    val isRefreshing = lazyPagingItems.loadState.refresh is LoadState.Loading
-    val pullRefreshState =
-        rememberPullRefreshState(
-            refreshing = isRefreshing,
-            onRefresh = { lazyPagingItems.refresh() }
-        )
-
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButton = {
@@ -94,25 +82,13 @@ fun TripsScreenPaging(
             }
         }
     ) { paddingValues ->
-        Box(
-            modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .pullRefresh(pullRefreshState)
-        ) {
-            TripsPagingContent(
-                lazyPagingItems = lazyPagingItems,
-                onTripClick = onTripClick,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            PullRefreshIndicator(
-                refreshing = isRefreshing,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
+        TripsPagingContent(
+            lazyPagingItems = lazyPagingItems,
+            onTripClick = onTripClick,
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        )
     }
 }
 

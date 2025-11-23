@@ -5,14 +5,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.EventNote
 import androidx.compose.material.icons.automirrored.filled.StickyNote2
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -39,7 +35,7 @@ import kotlin.time.Duration
  * This screen uses Paging 3 to load place visits incrementally, providing better
  * performance for users with large location histories.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedTimelineScreenPaging(
     database: Database,
@@ -75,14 +71,6 @@ fun EnhancedTimelineScreenPaging(
     val trackingState by (trackingController?.uiState?.collectAsState() ?: remember { mutableStateOf(null) })
     val isTracking = trackingState?.trackingState?.isTracking ?: false
 
-    // Pull-to-refresh state
-    val isRefreshing = lazyPagingItems.loadState.refresh is LoadState.Loading
-    val pullRefreshState =
-        rememberPullRefreshState(
-            refreshing = isRefreshing,
-            onRefresh = { lazyPagingItems.refresh() }
-        )
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -115,24 +103,12 @@ fun EnhancedTimelineScreenPaging(
         },
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
-        Box(
-            modifier =
-                Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .pullRefresh(pullRefreshState)
-        ) {
-            TimelinePagingContent(
-                lazyPagingItems = lazyPagingItems,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            PullRefreshIndicator(
-                refreshing = isRefreshing,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-        }
+        TimelinePagingContent(
+            lazyPagingItems = lazyPagingItems,
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
+        )
     }
 }
 

@@ -3,11 +3,13 @@ package com.po4yka.trailglass.ui.screens
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.Trip
 import com.po4yka.trailglass.feature.export.ExportController
 import com.po4yka.trailglass.ui.components.ExportDialog
@@ -94,7 +96,7 @@ fun TripsScreenWrapper(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Icon(
-                        androidx.compose.material.icons.Icons.Default.Add,
+                        Icons.Default.Add,
                         contentDescription = "Create Trip"
                     )
                 }

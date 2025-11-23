@@ -27,6 +27,7 @@ import com.po4yka.trailglass.feature.photo.ImportPhotoUseCase
 import com.po4yka.trailglass.feature.photo.PhotoGalleryController
 import com.po4yka.trailglass.photo.rememberMultiplePhotoImportHandler
 import com.po4yka.trailglass.ui.components.ErrorView
+import kotlinx.coroutines.launch
 
 /**
  * Enhanced photo gallery screen with integrated photo import functionality.
@@ -42,6 +43,7 @@ fun EnhancedPhotoGalleryScreen(
 ) {
     val state by controller.state.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val (photoPicker, handler) =
         rememberMultiplePhotoImportHandler(
@@ -49,13 +51,13 @@ fun EnhancedPhotoGalleryScreen(
             userId = userId,
             maxPhotos = 20,
             onImportSuccess = { message ->
-                kotlinx.coroutines.GlobalScope.launch {
+                scope.launch {
                     snackbarHostState.showSnackbar(message)
                     controller.refresh()
                 }
             },
             onImportError = { error ->
-                kotlinx.coroutines.GlobalScope.launch {
+                scope.launch {
                     snackbarHostState.showSnackbar(
                         message = "Error: $error",
                         duration = SnackbarDuration.Long

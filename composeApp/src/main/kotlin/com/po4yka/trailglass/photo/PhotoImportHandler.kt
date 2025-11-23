@@ -11,12 +11,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.po4yka.trailglass.feature.photo.ImportPhotoUseCase
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.util.Log
 
-private val logger = KotlinLogging.logger {}
+private const val TAG = "PhotoImportHandler"
 
 /**
  * Handler for photo import operations on Android.
@@ -35,12 +35,12 @@ class PhotoImportHandler(
      * @param uri Content URI from photo picker
      */
     suspend fun importPhotoFromUri(uri: Uri) {
-        logger.info { "Importing photo from URI: $uri" }
+        Log.i(TAG, "Importing photo from URI: $uri")
 
         try {
             val photoData = readPhotoBytes(uri)
             if (photoData == null) {
-                logger.error { "Failed to read photo data from URI: $uri" }
+                Log.e(TAG, "Failed to read photo data from URI: $uri")
                 onImportError("Failed to read photo data")
                 return
             }
@@ -54,16 +54,16 @@ class PhotoImportHandler(
 
             when (result) {
                 is ImportPhotoUseCase.ImportResult.Success -> {
-                    logger.info { "Successfully imported photo ${result.photo.id}" }
+                    Log.i(TAG, "Successfully imported photo ${result.photo.id}")
                     onImportSuccess(result.photo.id)
                 }
                 is ImportPhotoUseCase.ImportResult.Error -> {
-                    logger.error { "Failed to import photo: ${result.message}" }
+                    Log.e(TAG, "Failed to import photo: ${result.message}")
                     onImportError(result.message)
                 }
             }
         } catch (e: Exception) {
-            logger.error(e) { "Exception importing photo from $uri" }
+            Log.e(TAG, "Exception importing photo from $uri", e)
             onImportError(e.message ?: "Unknown error")
         }
     }
@@ -74,7 +74,7 @@ class PhotoImportHandler(
      * @param uris List of content URIs from photo picker
      */
     suspend fun importPhotosFromUris(uris: List<Uri>) {
-        logger.info { "Importing ${uris.size} photos" }
+        Log.i(TAG, "Importing ${uris.size} photos")
 
         var successCount = 0
         var errorCount = 0
@@ -83,7 +83,7 @@ class PhotoImportHandler(
             try {
                 val photoData = readPhotoBytes(uri)
                 if (photoData == null) {
-                    logger.error { "Failed to read photo data from URI: $uri" }
+                    Log.e(TAG, "Failed to read photo data from URI: $uri")
                     errorCount++
                     continue
                 }
@@ -97,21 +97,21 @@ class PhotoImportHandler(
 
                 when (result) {
                     is ImportPhotoUseCase.ImportResult.Success -> {
-                        logger.info { "Successfully imported photo ${result.photo.id}" }
+                        Log.i(TAG, "Successfully imported photo ${result.photo.id}")
                         successCount++
                     }
                     is ImportPhotoUseCase.ImportResult.Error -> {
-                        logger.error { "Failed to import photo: ${result.message}" }
+                        Log.e(TAG, "Failed to import photo: ${result.message}")
                         errorCount++
                     }
                 }
             } catch (e: Exception) {
-                logger.error(e) { "Exception importing photo from $uri" }
+                Log.e(TAG, "Exception importing photo from $uri", e)
                 errorCount++
             }
         }
 
-        logger.info { "Import complete: $successCount succeeded, $errorCount failed" }
+        Log.i(TAG, "Import complete: $successCount succeeded, $errorCount failed")
 
         if (successCount > 0) {
             onImportSuccess("Imported $successCount photo(s)")
@@ -134,7 +134,7 @@ class PhotoImportHandler(
                     inputStream.readBytes()
                 }
             } catch (e: Exception) {
-                logger.error(e) { "Failed to read bytes from URI: $uri" }
+                Log.e(TAG, "Failed to read bytes from URI: $uri", e)
                 null
             }
         }
