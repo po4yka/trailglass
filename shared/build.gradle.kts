@@ -152,8 +152,9 @@ dependencies {
     add("kspIosArm64", libs.kotlin.inject.compiler)
     add("kspIosSimulatorArm64", libs.kotlin.inject.compiler)
 
-    // Detekt formatting plugin
+    // Detekt plugins
     detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.compose.rules.detekt)
 }
 
 // Code coverage configuration

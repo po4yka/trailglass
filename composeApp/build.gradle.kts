@@ -130,8 +130,12 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Detekt formatting plugin
+    // Detekt plugins
     detektPlugins(libs.detekt.formatting)
+    detektPlugins(libs.compose.rules.detekt)
+
+    // Compose Lint checks
+    lintChecks(libs.slack.compose.lints)
 }
 
 // Secrets plugin configuration

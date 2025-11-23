@@ -1,10 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
-    <!-- Compose-specific checks -->
-    <issue id="UnusedMaterial3ScaffoldPaddingParameter" severity="error" />
+    <!-- Compose State Management -->
     <issue id="UnrememberedMutableState" severity="error" />
+    <issue id="RememberReturnType" severity="error" />
+    <issue id="MutableCollectionMutableState" severity="warning" />
+    <issue id="StateFlowValueCalledInComposition" severity="warning" />
+    <issue id="FlowOperatorInvokedInComposition" severity="warning" />
+    <issue id="CoroutineCreationDuringComposition" severity="error" />
+
+    <!-- Compose Naming Conventions -->
     <issue id="ComposableNaming" severity="warning" />
     <issue id="ComposableLambdaParameterNaming" severity="warning" />
+    <issue id="ComposableLambdaParameterPosition" severity="warning" />
+
+    <!-- Compose Modifiers -->
+    <issue id="ModifierParameter" severity="warning" />
+    <issue id="ModifierFactoryExtensionFunction" severity="warning" />
+    <issue id="ModifierFactoryReturnType" severity="warning" />
+    <issue id="ModifierFactoryUnreferencedReceiver" severity="warning" />
+    <issue id="ModifierNodeInspectableProperties" severity="warning" />
+
+    <!-- Compose Material 3 -->
+    <issue id="UnusedMaterial3ScaffoldPaddingParameter" severity="error" />
+    <issue id="UnnecessaryComposedModifier" severity="warning" />
+
+    <!-- Compose Performance -->
+    <issue id="AutoboxingStateCreation" severity="warning" />
+    <issue id="FrequentlyChangedStateReadInComposition" severity="warning" />
+    <issue id="InvalidColorHexValue" severity="error" />
+
+    <!-- Compose Previews -->
+    <issue id="PreviewMustBeTopLevelFunction" severity="error" />
+    <issue id="PreviewNaming" severity="warning" />
+    <issue id="PreviewAnnotationInFunctionWithParameters" severity="warning" />
+    <issue id="PreviewPublic" severity="warning" />
+
+    <!-- Compose ViewModels & Dependencies -->
+    <issue id="ComposableDestinationInComposeScope" severity="warning" />
+    <issue id="InvalidFragmentVersionForActivityResult" severity="error" />
 
     <!-- Performance -->
     <issue id="UnusedResources" severity="warning" />

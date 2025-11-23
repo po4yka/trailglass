@@ -19,8 +19,9 @@ complexity:
     threshold: 60
   LongParameterList:
     active: true
-    functionThreshold: 6
-    constructorThreshold: 7
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreAnnotated: ['Composable']
   CyclomaticComplexMethod:
     active: true
     threshold: 15
@@ -68,6 +69,7 @@ naming:
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**']
     functionPattern: '[a-z][a-zA-Z0-9]*'
     excludeClassPattern: '$^'
+    ignoreAnnotated: ['Composable']
   ClassNaming:
     active: true
     classPattern: '[A-Z][a-zA-Z0-9]*'
@@ -164,6 +166,49 @@ style:
   UseIfInsteadOfWhen:
     active: false
   UnusedImports:
+    active: true
+
+Compose:
+  active: true
+  ComposableAnnotationNaming:
+    active: true
+  ComposableNaming:
+    active: true
+  ComposableParamOrder:
+    active: true
+  CompositionLocalAllowlist:
+    active: true
+  CompositionLocalNaming:
+    active: true
+  ContentEmitterReturningValues:
+    active: true
+  ContentTrailingLambda:
+    active: true
+  ContentSlotReused:
+    active: true
+  DefaultsVisibility:
+    active: true
+  LambdaParameterEventTrailing:
+    active: true
+  ModifierClickableOrder:
+    active: true
+  ModifierComposed:
+    active: true
+  ModifierMissing:
+    active: true
+  ModifierNaming:
+    active: true
+  ModifierNotUsedAtRoot:
+    active: true
+  ModifierReused:
+    active: true
+  PreviewPublic:
+    active: true
+  RememberMissing:
+    active: true
+  ViewModelForwarding:
+    active: true
+  ViewModelInjection:
     active: true
 
 formatting:

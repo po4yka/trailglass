@@ -46,6 +46,8 @@ moko-resources-generator = "0.25.2"
 gradle-versions = "0.53.0"
 ktlint-gradle = "12.1.2"
 detekt = "1.23.7"
+compose-rules-detekt = "0.4.27"
+slack-compose-lints = "1.4.4"
 androidx-paging = "3.3.5"
 kotlinx-io = "0.7.3"
 
@@ -122,6 +124,8 @@ androidx-paging-common = { module = "androidx.paging:paging-common", version.ref
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
 kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", version.ref = "detekt" }
+compose-rules-detekt = { module = "io.nlopez.compose.rules:detekt", version.ref = "compose-rules-detekt" }
+slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
