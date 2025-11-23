@@ -47,12 +47,8 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -97,7 +93,10 @@ interface DeviceInfoProvider {
     fun getAppVersion(): String
 }
 
-/** Main API client for TrailGlass backend. */
+/**
+ * Main API client for TrailGlass backend.
+ * Coordinates all API operations by delegating to specialized API clients.
+ */
 @Inject
 class TrailGlassApiClient(
     private val config: ApiConfig,
@@ -154,6 +153,12 @@ class TrailGlassApiClient(
             }
         }
 
+    // Specialized API clients
+    private val locationSyncApi = LocationSyncApi(config.baseUrl)
+    private val photoSyncApi = PhotoSyncApi(config.baseUrl)
+    private val tripSyncApi = TripSyncApi(config.baseUrl)
+    private val userDeviceApi = UserDeviceApi(config.baseUrl)
+
     /** Execute an authenticated request with automatic token refresh. */
     private suspend inline fun <reified T> authenticatedRequest(
         crossinline block: suspend (HttpClient, String) -> T
@@ -194,7 +199,7 @@ class TrailGlassApiClient(
 
             val response =
                 client
-                    .post("${config.baseUrl}/auth/refresh") {
+                    .post("${config.baseUrl}${ApiEndpoints.AUTH_REFRESH}") {
                         contentType(ContentType.Application.Json)
                         setBody(RefreshTokenRequest(refreshToken))
                     }.body<RefreshTokenResponse>()
@@ -221,7 +226,7 @@ class TrailGlassApiClient(
         try {
             val response =
                 client
-                    .post("${config.baseUrl}/auth/register") {
+                    .post("${config.baseUrl}${ApiEndpoints.AUTH_REGISTER}") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             RegisterRequest(
@@ -253,7 +258,7 @@ class TrailGlassApiClient(
         try {
             val response =
                 client
-                    .post("${config.baseUrl}/auth/login") {
+                    .post("${config.baseUrl}${ApiEndpoints.AUTH_LOGIN}") {
                         contentType(ContentType.Application.Json)
                         setBody(
                             LoginRequest(
@@ -279,7 +284,7 @@ class TrailGlassApiClient(
 
     suspend fun logout(): Result<Unit> =
         authenticatedRequest { httpClient, token ->
-            httpClient.post("${config.baseUrl}/auth/logout") {
+            httpClient.post("${config.baseUrl}${ApiEndpoints.AUTH_LOGOUT}") {
                 bearerAuth(token)
                 contentType(ContentType.Application.Json)
                 setBody(LogoutRequest(deviceId = deviceInfoProvider.getDeviceId()))
@@ -291,42 +296,24 @@ class TrailGlassApiClient(
 
     suspend fun getSyncStatus(): Result<SyncStatusResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/sync/status") {
-                    bearerAuth(token)
-                }.body<SyncStatusResponse>()
+            userDeviceApi.getSyncStatus(httpClient, token)
         }
 
     suspend fun performDeltaSync(request: DeltaSyncRequest): Result<DeltaSyncResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .post("${config.baseUrl}/sync/delta") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<DeltaSyncResponse>()
+            userDeviceApi.performDeltaSync(httpClient, token, request)
         }
 
     suspend fun resolveConflict(request: ResolveConflictRequest): Result<ResolveConflictResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .post("${config.baseUrl}/sync/resolve-conflict") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<ResolveConflictResponse>()
+            userDeviceApi.resolveConflict(httpClient, token, request)
         }
 
     // ========== Locations ==========
 
     suspend fun uploadLocationBatch(request: BatchLocationRequest): Result<BatchLocationResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .post("${config.baseUrl}/locations/batch") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<BatchLocationResponse>()
+            locationSyncApi.uploadLocationBatch(httpClient, token, request)
         }
 
     suspend fun getLocations(
@@ -337,22 +324,12 @@ class TrailGlassApiClient(
         offset: Int = 0
     ): Result<LocationsResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/locations") {
-                    bearerAuth(token)
-                    parameter("startTime", startTime)
-                    parameter("endTime", endTime)
-                    parameter("minAccuracy", minAccuracy)
-                    parameter("limit", limit)
-                    parameter("offset", offset)
-                }.body<LocationsResponse>()
+            locationSyncApi.getLocations(httpClient, token, startTime, endTime, minAccuracy, limit, offset)
         }
 
     suspend fun deleteLocation(id: String): Result<Unit> =
         authenticatedRequest { httpClient, token ->
-            httpClient.delete("${config.baseUrl}/locations/$id") {
-                bearerAuth(token)
-            }
+            locationSyncApi.deleteLocation(httpClient, token, id)
         }
 
     // ========== Place Visits ==========
@@ -366,34 +343,17 @@ class TrailGlassApiClient(
         offset: Int = 0
     ): Result<PlaceVisitsResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/place-visits") {
-                    bearerAuth(token)
-                    parameter("startTime", startTime)
-                    parameter("endTime", endTime)
-                    parameter("category", category)
-                    parameter("isFavorite", isFavorite)
-                    parameter("limit", limit)
-                    parameter("offset", offset)
-                }.body<PlaceVisitsResponse>()
+            locationSyncApi.getPlaceVisits(httpClient, token, startTime, endTime, category, isFavorite, limit, offset)
         }
 
     suspend fun getPlaceVisit(id: String): Result<PlaceVisitDto> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/place-visits/$id") {
-                    bearerAuth(token)
-                }.body<PlaceVisitDto>()
+            locationSyncApi.getPlaceVisit(httpClient, token, id)
         }
 
     suspend fun createPlaceVisit(request: CreatePlaceVisitRequest): Result<PlaceVisitResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .post("${config.baseUrl}/place-visits") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<PlaceVisitResponse>()
+            locationSyncApi.createPlaceVisit(httpClient, token, request)
         }
 
     suspend fun updatePlaceVisit(
@@ -401,19 +361,12 @@ class TrailGlassApiClient(
         request: UpdatePlaceVisitRequest
     ): Result<PlaceVisitResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .put("${config.baseUrl}/place-visits/$id") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<PlaceVisitResponse>()
+            locationSyncApi.updatePlaceVisit(httpClient, token, id, request)
         }
 
     suspend fun deletePlaceVisit(id: String): Result<Unit> =
         authenticatedRequest { httpClient, token ->
-            httpClient.delete("${config.baseUrl}/place-visits/$id") {
-                bearerAuth(token)
-            }
+            locationSyncApi.deletePlaceVisit(httpClient, token, id)
         }
 
     // ========== Trips ==========
@@ -425,24 +378,12 @@ class TrailGlassApiClient(
         offset: Int = 0
     ): Result<TripsResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/trips") {
-                    bearerAuth(token)
-                    parameter("startDate", startDate)
-                    parameter("endDate", endDate)
-                    parameter("limit", limit)
-                    parameter("offset", offset)
-                }.body<TripsResponse>()
+            tripSyncApi.getTrips(httpClient, token, startDate, endDate, limit, offset)
         }
 
     suspend fun createTrip(request: CreateTripRequest): Result<TripResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .post("${config.baseUrl}/trips") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<TripResponse>()
+            tripSyncApi.createTrip(httpClient, token, request)
         }
 
     suspend fun updateTrip(
@@ -450,94 +391,58 @@ class TrailGlassApiClient(
         request: UpdateTripRequest
     ): Result<TripResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .put("${config.baseUrl}/trips/$id") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<TripResponse>()
+            tripSyncApi.updateTrip(httpClient, token, id, request)
         }
 
     suspend fun deleteTrip(id: String): Result<Unit> =
         authenticatedRequest { httpClient, token ->
-            httpClient.delete("${config.baseUrl}/trips/$id") {
-                bearerAuth(token)
-            }
+            tripSyncApi.deleteTrip(httpClient, token, id)
         }
 
     // ========== Settings ==========
 
     suspend fun getSettings(): Result<SettingsDto> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/settings") {
-                    bearerAuth(token)
-                }.body<SettingsDto>()
+            userDeviceApi.getSettings(httpClient, token)
         }
 
     suspend fun updateSettings(request: UpdateSettingsRequest): Result<SettingsResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .put("${config.baseUrl}/settings") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<SettingsResponse>()
+            userDeviceApi.updateSettings(httpClient, token, request)
         }
 
     // ========== User Profile ==========
 
     suspend fun getUserProfile(): Result<UserProfileDto> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/user/profile") {
-                    bearerAuth(token)
-                }.body<UserProfileDto>()
+            userDeviceApi.getUserProfile(httpClient, token)
         }
 
     suspend fun updateUserProfile(request: UpdateUserProfileRequest): Result<UpdateUserProfileResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .put("${config.baseUrl}/user/profile") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<UpdateUserProfileResponse>()
+            userDeviceApi.updateUserProfile(httpClient, token, request)
         }
 
     suspend fun getUserDevices(): Result<UserDevicesResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/user/devices") {
-                    bearerAuth(token)
-                }.body<UserDevicesResponse>()
+            userDeviceApi.getUserDevices(httpClient, token)
         }
 
     suspend fun deleteUserDevice(deviceId: String): Result<Unit> =
         authenticatedRequest { httpClient, token ->
-            httpClient.delete("${config.baseUrl}/user/devices/$deviceId") {
-                bearerAuth(token)
-            }
+            userDeviceApi.deleteUserDevice(httpClient, token, deviceId)
         }
 
     // ========== Data Export ==========
 
     suspend fun requestExport(request: DataExportRequest): Result<DataExportResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .post("${config.baseUrl}/export/request") {
-                    bearerAuth(token)
-                    contentType(ContentType.Application.Json)
-                    setBody(request)
-                }.body<DataExportResponse>()
+            userDeviceApi.requestExport(httpClient, token, request)
         }
 
     suspend fun getExportStatus(exportId: String): Result<ExportStatusResponse> =
         authenticatedRequest { httpClient, token ->
-            httpClient
-                .get("${config.baseUrl}/export/$exportId/status") {
-                    bearerAuth(token)
-                }.body<ExportStatusResponse>()
+            userDeviceApi.getExportStatus(httpClient, token, exportId)
         }
 
     // ========== Helper Methods ==========

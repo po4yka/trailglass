@@ -71,9 +71,7 @@ class PerformanceTracer(
     inline fun <T> trackScreenLoad(
         screenName: String,
         block: () -> T
-    ): T {
-        return trackPerformanceTraceUseCase.trace(screenName, block)
-    }
+    ): T = trackPerformanceTraceUseCase.trace(screenName, block)
 
     /**
      * Track screen load performance (suspending version).
@@ -85,9 +83,7 @@ class PerformanceTracer(
     suspend inline fun <T> trackScreenLoadSuspend(
         screenName: String,
         crossinline block: suspend () -> T
-    ): T {
-        return trackPerformanceTraceUseCase.traceSuspend(screenName, block)
-    }
+    ): T = trackPerformanceTraceUseCase.traceSuspend(screenName, block)
 
     /**
      * Track database query performance.
@@ -205,7 +201,8 @@ class PerformanceTracer(
      * Platform-agnostic implementation.
      */
     @PublishedApi
-    internal fun currentTimeMillis(): Long {
-        return kotlinx.datetime.Clock.System.now().toEpochMilliseconds()
-    }
+    internal fun currentTimeMillis(): Long =
+        kotlinx.datetime.Clock.System
+            .now()
+            .toEpochMilliseconds()
 }

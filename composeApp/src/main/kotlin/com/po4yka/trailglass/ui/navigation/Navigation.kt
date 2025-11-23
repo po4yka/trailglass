@@ -32,7 +32,7 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
 import com.po4yka.trailglass.ui.dialogs.CreateTripDialog
-import com.po4yka.trailglass.ui.screens.AlgorithmSettingsScreen
+import com.po4yka.trailglass.ui.screens.algorithmsettings.AlgorithmSettingsScreen
 import com.po4yka.trailglass.ui.screens.DeviceManagementScreen
 import com.po4yka.trailglass.ui.screens.EnhancedStatsScreen
 import com.po4yka.trailglass.ui.screens.EnhancedTimelineScreen

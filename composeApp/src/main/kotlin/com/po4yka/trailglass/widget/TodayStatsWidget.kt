@@ -25,7 +25,6 @@ private val logger = KotlinLogging.logger {}
  * - Current tracking status
  */
 class TodayStatsWidget : AppWidgetProvider() {
-
     private val widgetScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onUpdate(
@@ -77,24 +76,27 @@ class TodayStatsWidget : AppWidgetProvider() {
                 )
 
                 // Update status
-                val statusText = if (widgetData.isTracking) {
-                    context.getString(R.string.widget_tracking_active)
-                } else {
-                    context.getString(R.string.widget_tracking_inactive)
-                }
+                val statusText =
+                    if (widgetData.isTracking) {
+                        context.getString(R.string.widget_tracking_active)
+                    } else {
+                        context.getString(R.string.widget_tracking_inactive)
+                    }
                 views.setTextViewText(R.id.widget_status, statusText)
 
                 // Set up click intent to open app
-                val intent = Intent(context, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    data = android.net.Uri.parse("trailglass://app/stats/today")
-                }
-                val pendingIntent = PendingIntent.getActivity(
-                    context,
-                    0,
-                    intent,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
+                val intent =
+                    Intent(context, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        data = android.net.Uri.parse("trailglass://app/stats/today")
+                    }
+                val pendingIntent =
+                    PendingIntent.getActivity(
+                        context,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                    )
                 views.setOnClickPendingIntent(R.id.widget_title, pendingIntent)
 
                 // Update the widget
@@ -129,12 +131,14 @@ class TodayStatsWidget : AppWidgetProvider() {
          * Call this when location data changes to refresh the widget.
          */
         fun requestUpdate(context: Context) {
-            val intent = Intent(context, TodayStatsWidget::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            }
-            val ids = AppWidgetManager.getInstance(context).getAppWidgetIds(
-                android.content.ComponentName(context, TodayStatsWidget::class.java)
-            )
+            val intent =
+                Intent(context, TodayStatsWidget::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                }
+            val ids =
+                AppWidgetManager.getInstance(context).getAppWidgetIds(
+                    android.content.ComponentName(context, TodayStatsWidget::class.java)
+                )
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
             context.sendBroadcast(intent)
         }

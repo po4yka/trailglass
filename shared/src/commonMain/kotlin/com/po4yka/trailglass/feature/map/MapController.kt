@@ -3,11 +3,9 @@ package com.po4yka.trailglass.feature.map
 import com.po4yka.trailglass.domain.model.CameraMove
 import com.po4yka.trailglass.domain.model.CameraPosition
 import com.po4yka.trailglass.domain.model.Coordinate
-import com.po4yka.trailglass.domain.model.MapDisplayData
 import com.po4yka.trailglass.domain.model.MapEvent
 import com.po4yka.trailglass.domain.model.MapEventSink
 import com.po4yka.trailglass.domain.model.MapMarker
-import com.po4yka.trailglass.domain.model.MapRegion
 import com.po4yka.trailglass.domain.model.MapRoute
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
@@ -55,25 +53,6 @@ class MapController(
 
     private var locationTrackingJob: Job? = null
     private var pendingFollowModeParams: FollowModeParams? = null
-
-    /** Follow mode parameters. */
-    private data class FollowModeParams(
-        val zoom: Float,
-        val tilt: Float,
-        val bearing: Float
-    )
-
-    /** Map UI state. */
-    data class MapState(
-        val mapData: MapDisplayData = MapDisplayData(),
-        val cameraMove: CameraMove? = null,
-        val selectedMarker: MapMarker? = null,
-        val selectedRoute: MapRoute? = null,
-        val isFollowModeEnabled: Boolean = false,
-        val isLoading: Boolean = false,
-        val error: String? = null,
-        val hasLocationPermission: Boolean = false
-    )
 
     private val _state = MutableStateFlow(MapState())
     val state: StateFlow<MapState> = _state.asStateFlow()
@@ -150,7 +129,7 @@ class MapController(
                             position =
                                 CameraPosition(
                                     target = region.center,
-                                    zoom = calculateZoomLevel(region)
+                                    zoom = MapOperations.calculateZoomLevel(region)
                                 ),
                             durationMs = 1500
                         )
@@ -245,7 +224,7 @@ class MapController(
             val position =
                 CameraPosition(
                     target = region.center,
-                    zoom = calculateZoomLevel(region)
+                    zoom = MapOperations.calculateZoomLevel(region)
                 )
             val cameraMove =
                 if (animated) {
@@ -420,22 +399,6 @@ class MapController(
                 logger.info { "Map is ready for interaction" }
                 // Could trigger initial data load or other setup here
             }
-        }
-    }
-
-    /** Calculate appropriate zoom level for a region. Higher latitudeDelta = lower zoom. */
-    private fun calculateZoomLevel(region: MapRegion): Float {
-        // Rough approximation: zoom levels from 1 (world) to 20 (building)
-        val delta = maxOf(region.latitudeDelta, region.longitudeDelta)
-
-        return when {
-            delta > 10.0 -> 5f // Country level
-            delta > 5.0 -> 7f // Large region
-            delta > 1.0 -> 9f // City level
-            delta > 0.5 -> 11f // District
-            delta > 0.1 -> 13f // Neighborhood
-            delta > 0.05 -> 15f // Street level
-            else -> 17f // Building level
         }
     }
 

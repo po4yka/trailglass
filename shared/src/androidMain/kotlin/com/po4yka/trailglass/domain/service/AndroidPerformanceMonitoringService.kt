@@ -150,12 +150,11 @@ class AndroidPerformanceMonitoringService : PerformanceMonitoringService {
         }
     }
 
-    override fun isPerformanceCollectionEnabled(): Boolean {
-        return try {
+    override fun isPerformanceCollectionEnabled(): Boolean =
+        try {
             performance.isPerformanceCollectionEnabled
         } catch (e: Exception) {
             logger.error(e) { "Failed to check if performance collection is enabled: ${e.message}" }
             false
         }
-    }
 }

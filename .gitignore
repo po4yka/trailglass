@@ -166,3 +166,10 @@ composeApp/build/
 
 # virtual machine crash logs
 hs_err_pid*
+
+# Design prompts - generated mockups
+docs/design-prompts/generated/*.png
+docs/design-prompts/generated/*.jpg
+docs/design-prompts/generated/*.jpeg
+docs/design-prompts/generated/*.webp
+!docs/design-prompts/generated/README.md
