@@ -82,7 +82,8 @@ class AndroidReverseGeocoder(
                     val result = addresses.firstOrNull()?.toGeocodedLocation(latitude, longitude)
                     continuation.resume(result)
                 }
-            } catch (e: Exception) {
+            } catch (e: IllegalArgumentException) {
+                logger.warn(e) { "Invalid coordinates for geocoding: ($latitude, $longitude)" }
                 continuation.resume(null)
             }
         }

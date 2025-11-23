@@ -67,8 +67,10 @@ class AndroidVisitDetector(
                 while (isActive) {
                     try {
                         checkForVisits()
-                    } catch (e: Exception) {
-                        logger.error(e) { "Error in visit detection" }
+                    } catch (e: kotlinx.coroutines.CancellationException) {
+                        throw e // Re-throw cancellation
+                    } catch (e: IllegalStateException) {
+                        logger.error(e) { "Invalid state in visit detection" }
                     }
                     delay(checkInterval)
                 }
@@ -221,15 +223,16 @@ class AndroidVisitDetector(
             )
 
         // Save the VISIT sample to database
-        try {
-            locationRepository.insertSample(visitSample)
-            logger.info {
-                "Created VISIT-type location sample (Android equivalent of iOS CLVisit) " +
-                    "for visit lasting $duration"
+        locationRepository
+            .insertSample(visitSample)
+            .onSuccess {
+                logger.info {
+                    "Created VISIT-type location sample (Android equivalent of iOS CLVisit) " +
+                        "for visit lasting $duration"
+                }
+            }.onError { error ->
+                logger.error { "Failed to save VISIT location sample: ${error.userMessage}" }
             }
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to save VISIT location sample" }
-        }
     }
 
     /** Calculate distance between two coordinates using Haversine formula. */

@@ -162,8 +162,11 @@ fun PhotoAttachmentHandler(
                                         isAttaching = false
                                     }
                                 }
-                            } catch (e: Exception) {
-                                error = e.message ?: "Unknown error"
+                            } catch (e: java.io.IOException) {
+                                error = "Failed to read photo: ${e.message}"
+                                isAttaching = false
+                            } catch (e: SecurityException) {
+                                error = "Permission denied to read photo"
                                 isAttaching = false
                             }
                         }

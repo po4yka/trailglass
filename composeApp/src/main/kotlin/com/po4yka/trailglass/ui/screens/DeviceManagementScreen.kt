@@ -380,6 +380,7 @@ private fun formatTimestamp(timestamp: String): String =
         val instant = Instant.parse(timestamp)
         val localDateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
         "${localDateTime.date} ${localDateTime.time.hour}:${localDateTime.time.minute.toString().padStart(2, '0')}"
-    } catch (e: Exception) {
+    } catch (e: IllegalArgumentException) {
+        // Invalid timestamp format
         timestamp
     }

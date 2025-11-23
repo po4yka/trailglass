@@ -39,7 +39,8 @@ actual class SyncStateRepositoryImpl(
                         preferences[Keys.LAST_SYNC_TIMESTAMP]?.let {
                             try {
                                 Instant.parse(it)
-                            } catch (e: Exception) {
+                            } catch (e: IllegalArgumentException) {
+                                // Invalid timestamp format, return null
                                 null
                             }
                         },

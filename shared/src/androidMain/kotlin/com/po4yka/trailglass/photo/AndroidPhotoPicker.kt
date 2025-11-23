@@ -84,8 +84,11 @@ class AndroidPhotoPicker(
                     userId = userId,
                     addedAt = Clock.System.now()
                 )
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to extract photo from URI: $uri" }
+            } catch (e: SecurityException) {
+                logger.error(e) { "Permission denied to access photo: $uri" }
+                null
+            } catch (e: IllegalArgumentException) {
+                logger.error(e) { "Invalid URI or photo data: $uri" }
                 null
             }
         }

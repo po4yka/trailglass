@@ -98,8 +98,8 @@ class AndroidNetworkConnectivityMonitor(
             connectivityManager.unregisterNetworkCallback(networkCallback)
             isMonitoring = false
             logger.info { "Network monitoring stopped" }
-        } catch (e: Exception) {
-            logger.error(e) { "Error stopping network monitoring" }
+        } catch (e: IllegalArgumentException) {
+            logger.error(e) { "Network callback was not registered" }
         }
     }
 

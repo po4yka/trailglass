@@ -34,8 +34,11 @@ class AndroidPhotoMetadataExtractor(
                 val exif = ExifInterface(stream)
                 extractFromExif(exif, photoId)
             }
-        } catch (e: Exception) {
-            logger.error(e) { "Failed to extract EXIF metadata from $photoUri" }
+        } catch (e: java.io.IOException) {
+            logger.error(e) { "Failed to read EXIF metadata from $photoUri" }
+            null
+        } catch (e: SecurityException) {
+            logger.error(e) { "Permission denied to read photo at $photoUri" }
             null
         }
     }
@@ -134,7 +137,7 @@ class AndroidPhotoMetadataExtractor(
             format.timeZone = TimeZone.getDefault()
             val date = format.parse(dateTimeStr)
             date?.let { Instant.fromEpochMilliseconds(it.time) }
-        } catch (e: Exception) {
+        } catch (e: java.text.ParseException) {
             logger.warn(e) { "Failed to parse EXIF datetime: $dateTimeStr" }
             null
         }
@@ -147,7 +150,7 @@ class AndroidPhotoMetadataExtractor(
                 value >= 1 -> "${value.toInt()}s"
                 else -> "1/${(1 / value).toInt()}"
             }
-        } catch (e: Exception) {
+        } catch (e: NumberFormatException) {
             exposureTime
         }
 }
