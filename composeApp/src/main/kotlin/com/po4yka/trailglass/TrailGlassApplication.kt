@@ -4,10 +4,13 @@ import android.app.Application
 import com.po4yka.trailglass.di.AppComponent
 import com.po4yka.trailglass.di.createAndroidAppComponent
 import com.po4yka.trailglass.sync.SyncScheduler
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * TrailGlass Application class.
@@ -49,10 +52,9 @@ class TrailGlassApplication : Application() {
                 // Access syncCoordinator to ensure it's initialized
                 // The actual initialization happens in the DI component
                 appComponent.syncCoordinator
-                println("SyncCoordinator initialized successfully")
+                logger.info { "SyncCoordinator initialized successfully" }
             } catch (e: Exception) {
-                println("Failed to initialize SyncCoordinator: ${e.message}")
-                e.printStackTrace()
+                logger.error(e) { "Failed to initialize SyncCoordinator: ${e.message}" }
             }
         }
     }
@@ -64,10 +66,9 @@ class TrailGlassApplication : Application() {
                 context = applicationContext,
                 intervalMinutes = 60
             )
-            println("Background sync scheduled successfully")
+            logger.info { "Background sync scheduled successfully" }
         } catch (e: Exception) {
-            println("Failed to schedule background sync: ${e.message}")
-            e.printStackTrace()
+            logger.error(e) { "Failed to schedule background sync: ${e.message}" }
         }
     }
 
@@ -75,10 +76,9 @@ class TrailGlassApplication : Application() {
     private fun startNetworkMonitoring() {
         try {
             appComponent.networkConnectivityMonitor.startMonitoring()
-            println("Network connectivity monitoring started successfully")
+            logger.info { "Network connectivity monitoring started successfully" }
         } catch (e: Exception) {
-            println("Failed to start network monitoring: ${e.message}")
-            e.printStackTrace()
+            logger.error(e) { "Failed to start network monitoring: ${e.message}" }
         }
     }
 
@@ -86,10 +86,9 @@ class TrailGlassApplication : Application() {
     private fun stopNetworkMonitoring() {
         try {
             appComponent.networkConnectivityMonitor.stopMonitoring()
-            println("Network connectivity monitoring stopped")
+            logger.info { "Network connectivity monitoring stopped" }
         } catch (e: Exception) {
-            println("Failed to stop network monitoring: ${e.message}")
-            e.printStackTrace()
+            logger.error(e) { "Failed to stop network monitoring: ${e.message}" }
         }
     }
 

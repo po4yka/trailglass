@@ -1,10 +1,13 @@
 package com.po4yka.trailglass.domain.algorithm
 
 import com.po4yka.trailglass.domain.model.Coordinate
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.time.Duration
 import kotlin.time.measureTime
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Performance benchmark tests for geographic algorithms.
@@ -237,12 +240,12 @@ class AlgorithmPerformanceBenchmark {
 
     @Test
     fun `benchmark distance algorithms`() {
-        println("\n" + "=".repeat(80))
-        println("DISTANCE ALGORITHM PERFORMANCE BENCHMARK")
-        println("=".repeat(80))
-        println("Iterations per test: $ITERATIONS")
-        println("Warmup iterations: $WARMUP_ITERATIONS")
-        println()
+        logger.info { "\n" + "=".repeat(80) }
+        logger.info { "DISTANCE ALGORITHM PERFORMANCE BENCHMARK" }
+        logger.info { "=".repeat(80) }
+        logger.info { "Iterations per test: $ITERATIONS" }
+        logger.info { "Warmup iterations: $WARMUP_ITERATIONS" }
+        logger.info { "" }
 
         val algorithms =
             listOf(
@@ -252,20 +255,20 @@ class AlgorithmPerformanceBenchmark {
             )
 
         for (scenario in scenarios) {
-            println("-".repeat(80))
-            println("Scenario: ${scenario.name}")
-            println("Expected distance: ${scenario.expectedDistance.toLong()}m")
-            println()
+            logger.info { "-".repeat(80) }
+            logger.info { "Scenario: ${scenario.name}" }
+            logger.info { "Expected distance: ${scenario.expectedDistance.toLong()}m" }
+            logger.info { "" }
 
             val results =
                 algorithms.map { (algorithm, name) ->
                     benchmarkDistance(algorithm, name, scenario)
                 }
 
-            results.forEach { println(it.format()) }
+            results.forEach { logger.info { it.format() } }
 
             // Performance comparison
-            println("  Performance comparison:")
+            logger.info { "  Performance comparison:" }
             val baseline = results.first()
             results.drop(1).forEach { result ->
                 val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
@@ -275,22 +278,22 @@ class AlgorithmPerformanceBenchmark {
                     } else {
                         "${String.format("%.2f", 1 / ratio)}x faster"
                     }
-                println("    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison")
+                logger.info { "    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison" }
             }
-            println()
+            logger.info { "" }
         }
 
-        println("=".repeat(80))
+        logger.info { "=".repeat(80) }
     }
 
     @Test
     fun `benchmark bearing algorithms`() {
-        println("\n" + "=".repeat(80))
-        println("BEARING ALGORITHM PERFORMANCE BENCHMARK")
-        println("=".repeat(80))
-        println("Iterations per test: $ITERATIONS")
-        println("Warmup iterations: $WARMUP_ITERATIONS")
-        println()
+        logger.info { "\n" + "=".repeat(80) }
+        logger.info { "BEARING ALGORITHM PERFORMANCE BENCHMARK" }
+        logger.info { "=".repeat(80) }
+        logger.info { "Iterations per test: $ITERATIONS" }
+        logger.info { "Warmup iterations: $WARMUP_ITERATIONS" }
+        logger.info { "" }
 
         val algorithms =
             listOf(
@@ -308,19 +311,19 @@ class AlgorithmPerformanceBenchmark {
             )
 
         for (scenario in bearingScenarios) {
-            println("-".repeat(80))
-            println("Scenario: ${scenario.name}")
-            println()
+            logger.info { "-".repeat(80) }
+            logger.info { "Scenario: ${scenario.name}" }
+            logger.info { "" }
 
             val results =
                 algorithms.map { (algorithm, name) ->
                     benchmarkBearing(algorithm, name, scenario)
                 }
 
-            results.forEach { println(it.format()) }
+            results.forEach { logger.info { it.format() } }
 
             // Performance comparison
-            println("  Performance comparison:")
+            logger.info { "  Performance comparison:" }
             val baseline = results.first()
             results.drop(1).forEach { result ->
                 val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
@@ -330,22 +333,22 @@ class AlgorithmPerformanceBenchmark {
                     } else {
                         "${String.format("%.2f", 1 / ratio)}x faster"
                     }
-                println("    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison")
+                logger.info { "    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison" }
             }
-            println()
+            logger.info { "" }
         }
 
-        println("=".repeat(80))
+        logger.info { "=".repeat(80) }
     }
 
     @Test
     fun `benchmark interpolation algorithms with different step counts`() {
-        println("\n" + "=".repeat(80))
-        println("INTERPOLATION ALGORITHM PERFORMANCE BENCHMARK")
-        println("=".repeat(80))
-        println("Iterations per test: $ITERATIONS")
-        println("Warmup iterations: $WARMUP_ITERATIONS")
-        println()
+        logger.info { "\n" + "=".repeat(80) }
+        logger.info { "INTERPOLATION ALGORITHM PERFORMANCE BENCHMARK" }
+        logger.info { "=".repeat(80) }
+        logger.info { "Iterations per test: $ITERATIONS" }
+        logger.info { "Warmup iterations: $WARMUP_ITERATIONS" }
+        logger.info { "" }
 
         val algorithms =
             listOf(
@@ -364,13 +367,13 @@ class AlgorithmPerformanceBenchmark {
             )
 
         for (scenario in interpolationScenarios) {
-            println("-".repeat(80))
-            println("Scenario: ${scenario.name}")
-            println()
+            logger.info { "-".repeat(80) }
+            logger.info { "Scenario: ${scenario.name}" }
+            logger.info { "" }
 
             for (steps in stepCounts) {
-                println("  Step count: $steps")
-                println()
+                logger.info { "  Step count: $steps" }
+                logger.info { "" }
 
                 val results =
                     algorithms.map { (algorithm, name) ->
@@ -378,13 +381,13 @@ class AlgorithmPerformanceBenchmark {
                     }
 
                 results.forEach { result ->
-                    println("    ${result.algorithmName}:")
-                    println("      Average: ${result.averageTimeMicros.toLong()}us")
-                    println("      Total: ${result.totalTime.inWholeMilliseconds}ms")
+                    logger.info { "    ${result.algorithmName}:" }
+                    logger.info { "      Average: ${result.averageTimeMicros.toLong()}us" }
+                    logger.info { "      Total: ${result.totalTime.inWholeMilliseconds}ms" }
                 }
 
                 // Performance comparison
-                println("    Performance comparison:")
+                logger.info { "    Performance comparison:" }
                 val baseline = results.first()
                 results.drop(1).forEach { result ->
                     val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
@@ -396,13 +399,13 @@ class AlgorithmPerformanceBenchmark {
                         }
                     val algoName = result.algorithmName.substringBefore(" (")
                     val baselineName = baseline.algorithmName.substringBefore(" (")
-                    println("      $algoName vs $baselineName: $comparison")
+                    logger.info { "      $algoName vs $baselineName: $comparison" }
                 }
-                println()
+                logger.info { "" }
             }
         }
 
-        println("=".repeat(80))
+        logger.info { "=".repeat(80) }
     }
 
     @Test
@@ -415,14 +418,14 @@ class AlgorithmPerformanceBenchmark {
 
     @Test
     fun `benchmark comprehensive comparison summary`() {
-        println("\n" + "=".repeat(80))
-        println("COMPREHENSIVE ALGORITHM PERFORMANCE SUMMARY")
-        println("=".repeat(80))
-        println()
+        logger.info { "\n" + "=".repeat(80) }
+        logger.info { "COMPREHENSIVE ALGORITHM PERFORMANCE SUMMARY" }
+        logger.info { "=".repeat(80) }
+        logger.info { "" }
 
         // Distance algorithms across all scenarios
-        println("DISTANCE ALGORITHMS - AVERAGE PERFORMANCE ACROSS ALL SCENARIOS")
-        println("-".repeat(80))
+        logger.info { "DISTANCE ALGORITHMS - AVERAGE PERFORMANCE ACROSS ALL SCENARIOS" }
+        logger.info { "-".repeat(80) }
 
         val distanceAlgorithms =
             listOf(
@@ -444,70 +447,70 @@ class AlgorithmPerformanceBenchmark {
         // Calculate average across all scenarios
         distanceResults.forEach { (name, times) ->
             val avgTime = times.reduce { acc, duration -> acc + duration } / times.size
-            println("$name: ${avgTime.inWholeMicroseconds}us average")
+            logger.info { "$name: ${avgTime.inWholeMicroseconds}us average" }
         }
 
-        println()
+        logger.info { "" }
 
         // Performance ratios
         val simpleAvg = distanceResults["Simple"]!!.reduce { acc, d -> acc + d } / scenarios.size
         val haversineAvg = distanceResults["Haversine"]!!.reduce { acc, d -> acc + d } / scenarios.size
         val vincentyAvg = distanceResults["Vincenty"]!!.reduce { acc, d -> acc + d } / scenarios.size
 
-        println("Performance ratios (across all distances):")
-        println(
+        logger.info { "Performance ratios (across all distances):" }
+        logger.info {
             "  Haversine vs Simple: ${
                 String.format(
                     "%.2f",
                     haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
                 )
             }x"
-        )
-        println(
+        }
+        logger.info {
             "  Vincenty vs Simple: ${
                 String.format(
                     "%.2f",
                     vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
                 )
             }x"
-        )
-        println(
+        }
+        logger.info {
             "  Vincenty vs Haversine: ${
                 String.format(
                     "%.2f",
                     vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds
                 )
             }x"
-        )
+        }
 
-        println()
-        println("=".repeat(80))
-        println()
+        logger.info { "" }
+        logger.info { "=".repeat(80) }
+        logger.info { "" }
 
         // Recommendations
-        println("RECOMMENDATIONS")
-        println("-".repeat(80))
-        println("Short distances (<1km):")
-        println("  - Use Simple for best performance (fastest)")
-        println("  - Accuracy trade-off: ~1-5% error acceptable")
-        println()
-        println("Medium distances (1-100km):")
-        println("  - Use Haversine for balance of speed and accuracy")
-        println("  - Accuracy: <0.5% error")
-        println()
-        println("Long distances (>100km):")
-        println("  - Use Haversine for most applications (good speed, good accuracy)")
-        println("  - Use Vincenty for scientific/surveying applications (best accuracy)")
-        println()
-        println("Bearing calculations:")
-        println("  - All algorithms have similar performance")
-        println("  - Use Initial for most navigation use cases")
-        println()
-        println("Interpolation:")
-        println("  - Use Linear for simple animations (fastest)")
-        println("  - Use SLERP for geographic accuracy (great circle path)")
-        println("  - Use Cubic for smooth visual animations")
-        println()
-        println("=".repeat(80))
+        logger.info { "RECOMMENDATIONS" }
+        logger.info { "-".repeat(80) }
+        logger.info { "Short distances (<1km):" }
+        logger.info { "  - Use Simple for best performance (fastest)" }
+        logger.info { "  - Accuracy trade-off: ~1-5% error acceptable" }
+        logger.info { "" }
+        logger.info { "Medium distances (1-100km):" }
+        logger.info { "  - Use Haversine for balance of speed and accuracy" }
+        logger.info { "  - Accuracy: <0.5% error" }
+        logger.info { "" }
+        logger.info { "Long distances (>100km):" }
+        logger.info { "  - Use Haversine for most applications (good speed, good accuracy)" }
+        logger.info { "  - Use Vincenty for scientific/surveying applications (best accuracy)" }
+        logger.info { "" }
+        logger.info { "Bearing calculations:" }
+        logger.info { "  - All algorithms have similar performance" }
+        logger.info { "  - Use Initial for most navigation use cases" }
+        logger.info { "" }
+        logger.info { "Interpolation:" }
+        logger.info { "  - Use Linear for simple animations (fastest)" }
+        logger.info { "  - Use SLERP for geographic accuracy (great circle path)" }
+        logger.info { "  - Use Cubic for smooth visual animations" }
+        logger.info { "" }
+        logger.info { "=".repeat(80) }
     }
 }

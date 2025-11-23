@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.remote.auth
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
@@ -35,6 +36,8 @@ import platform.Security.kSecMatchLimit
 import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
+
+private val logger = KotlinLogging.logger {}
 
 /** iOS implementation using Keychain Services. */
 @Inject
@@ -84,7 +87,7 @@ actual class SecureTokenStorage {
 
         val status = SecItemAdd(addQuery as CFDictionaryRef, null)
         if (status != errSecSuccess) {
-            println("Keychain save failed for key: $key, status: $status")
+            logger.error { "Keychain save failed for key: $key, status: $status" }
         }
     }
 

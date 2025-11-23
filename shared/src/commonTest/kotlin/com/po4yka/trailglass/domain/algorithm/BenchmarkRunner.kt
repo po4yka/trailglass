@@ -1,8 +1,11 @@
 package com.po4yka.trailglass.domain.algorithm
 
 import com.po4yka.trailglass.domain.model.Coordinate
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.time.Duration
 import kotlin.time.measureTime
+
+private val logger = KotlinLogging.logger {}
 
 /**
  * Standalone benchmark runner that can be executed to generate performance reports. This provides a simple way to run
@@ -40,11 +43,11 @@ object BenchmarkRunner {
     fun runDistanceBenchmarks(): List<BenchmarkResult> {
         val results = mutableListOf<BenchmarkResult>()
 
-        println("\n${"=".repeat(80)}")
-        println("DISTANCE ALGORITHM PERFORMANCE BENCHMARK")
-        println("${"=".repeat(80)}")
-        println("Iterations: $ITERATIONS, Warmup: $WARMUP_ITERATIONS")
-        println()
+        logger.info { "\n${"=".repeat(80)}" }
+        logger.info { "DISTANCE ALGORITHM PERFORMANCE BENCHMARK" }
+        logger.info { "=".repeat(80) }
+        logger.info { "Iterations: $ITERATIONS, Warmup: $WARMUP_ITERATIONS" }
+        logger.info { "" }
 
         val algorithms =
             listOf(
@@ -54,9 +57,9 @@ object BenchmarkRunner {
             )
 
         for (scenario in scenarios) {
-            println("${"-".repeat(80)}")
-            println("Scenario: ${scenario.name}")
-            println()
+            logger.info { "-".repeat(80) }
+            logger.info { "Scenario: ${scenario.name}" }
+            logger.info { "" }
 
             val scenarioResults = mutableListOf<BenchmarkResult>()
 
@@ -83,28 +86,28 @@ object BenchmarkRunner {
                 scenarioResults.add(result)
                 results.add(result)
 
-                println("  $name:")
-                println("    Average: ${String.format("%.2f", avgTime)}us")
-                println("    Min: ${String.format("%.2f", minTime)}us")
-                println("    Max: ${String.format("%.2f", maxTime)}us")
+                logger.info { "  $name:" }
+                logger.info { "    Average: ${String.format("%.2f", avgTime)}us" }
+                logger.info { "    Min: ${String.format("%.2f", minTime)}us" }
+                logger.info { "    Max: ${String.format("%.2f", maxTime)}us" }
             }
 
             // Show comparisons
-            println()
-            println("  Performance comparison:")
+            logger.info { "" }
+            logger.info { "  Performance comparison:" }
             val baseline = scenarioResults[0]
             for (i in 1 until scenarioResults.size) {
                 val ratio = scenarioResults[i].averageTimeMicros / baseline.averageTimeMicros
-                println(
+                logger.info {
                     "    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${
                         String.format(
                             "%.2f",
                             ratio
                         )
                     }x"
-                )
+                }
             }
-            println()
+            logger.info { "" }
         }
 
         return results
@@ -113,10 +116,10 @@ object BenchmarkRunner {
     fun runBearingBenchmarks(): List<BenchmarkResult> {
         val results = mutableListOf<BenchmarkResult>()
 
-        println("\n${"=".repeat(80)}")
-        println("BEARING ALGORITHM PERFORMANCE BENCHMARK")
-        println("${"=".repeat(80)}")
-        println()
+        logger.info { "\n${"=".repeat(80)}" }
+        logger.info { "BEARING ALGORITHM PERFORMANCE BENCHMARK" }
+        logger.info { "=".repeat(80) }
+        logger.info { "" }
 
         val algorithms =
             listOf(
@@ -128,9 +131,9 @@ object BenchmarkRunner {
         val testScenarios = listOf(scenarios[2], scenarios[4], scenarios[6])
 
         for (scenario in testScenarios) {
-            println("${"-".repeat(80)}")
-            println("Scenario: ${scenario.name}")
-            println()
+            logger.info { "-".repeat(80) }
+            logger.info { "Scenario: ${scenario.name}" }
+            logger.info { "" }
 
             val scenarioResults = mutableListOf<BenchmarkResult>()
 
@@ -156,9 +159,9 @@ object BenchmarkRunner {
                 scenarioResults.add(result)
                 results.add(result)
 
-                println("  $name: ${String.format("%.2f", avgTime)}us avg")
+                logger.info { "  $name: ${String.format("%.2f", avgTime)}us avg" }
             }
-            println()
+            logger.info { "" }
         }
 
         return results
@@ -167,10 +170,10 @@ object BenchmarkRunner {
     fun runInterpolationBenchmarks(): List<BenchmarkResult> {
         val results = mutableListOf<BenchmarkResult>()
 
-        println("\n${"=".repeat(80)}")
-        println("INTERPOLATION ALGORITHM PERFORMANCE BENCHMARK")
-        println("${"=".repeat(80)}")
-        println()
+        logger.info { "\n${"=".repeat(80)}" }
+        logger.info { "INTERPOLATION ALGORITHM PERFORMANCE BENCHMARK" }
+        logger.info { "=".repeat(80) }
+        logger.info { "" }
 
         val algorithms =
             listOf(
@@ -183,12 +186,12 @@ object BenchmarkRunner {
         val stepCounts = listOf(10, 50, 100)
 
         for (scenario in testScenarios) {
-            println("${"-".repeat(80)}")
-            println("Scenario: ${scenario.name}")
-            println()
+            logger.info { "-".repeat(80) }
+            logger.info { "Scenario: ${scenario.name}" }
+            logger.info { "" }
 
             for (steps in stepCounts) {
-                println("  Steps: $steps")
+                logger.info { "  Steps: $steps" }
 
                 for ((name, algorithm) in algorithms) {
                     repeat(WARMUP_ITERATIONS) {
@@ -208,9 +211,9 @@ object BenchmarkRunner {
                     val result = BenchmarkResult("$name-$steps", scenario.name, avgTime, 0.0, 0.0)
                     results.add(result)
 
-                    println("    $name: ${String.format("%.2f", avgTime)}us")
+                    logger.info { "    $name: ${String.format("%.2f", avgTime)}us" }
                 }
-                println()
+                logger.info { "" }
             }
         }
 
@@ -218,26 +221,26 @@ object BenchmarkRunner {
     }
 
     fun printSummary(distanceResults: List<BenchmarkResult>) {
-        println("\n${"=".repeat(80)}")
-        println("PERFORMANCE SUMMARY")
-        println("${"=".repeat(80)}")
-        println()
+        logger.info { "\n${"=".repeat(80)}" }
+        logger.info { "PERFORMANCE SUMMARY" }
+        logger.info { "=".repeat(80) }
+        logger.info { "" }
 
         // Group by algorithm and calculate averages
         val byAlgorithm = distanceResults.groupBy { it.algorithmName }
 
-        println("Average performance across all distances:")
+        logger.info { "Average performance across all distances:" }
         byAlgorithm.forEach { (algo, results) ->
             val avg = results.map { it.averageTimeMicros }.average()
-            println("  $algo: ${String.format("%.2f", avg)}us")
+            logger.info { "  $algo: ${String.format("%.2f", avg)}us" }
         }
 
-        println()
-        println("Recommendations:")
-        println("  - Simple: Best for <1km (fastest, 1-5% error)")
-        println("  - Haversine: Best for 1km-10000km (balanced speed/accuracy)")
-        println("  - Vincenty: Best for >10000km or scientific use (most accurate)")
-        println()
-        println("${"=".repeat(80)}")
+        logger.info { "" }
+        logger.info { "Recommendations:" }
+        logger.info { "  - Simple: Best for <1km (fastest, 1-5% error)" }
+        logger.info { "  - Haversine: Best for 1km-10000km (balanced speed/accuracy)" }
+        logger.info { "  - Vincenty: Best for >10000km or scientific use (most accurate)" }
+        logger.info { "" }
+        logger.info { "=".repeat(80) }
     }
 }

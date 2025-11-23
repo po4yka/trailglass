@@ -1,5 +1,11 @@
 #!/usr/bin/env kotlin
 
+@file:DependsOn("io.github.oshai:kotlin-logging-jvm:7.0.0")
+
+import io.github.oshai.kotlinlogging.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
+
 /**
  * Simple script to demonstrate benchmark usage.
  *
@@ -10,7 +16,7 @@
  * or temporarily remove the @Ignore annotation from the test class.
  */
 
-println("""
+logger.info { """
 Performance Benchmark Guide
 ===========================
 
@@ -75,4 +81,4 @@ RECOMMENDATIONS:
     - Use Linear for simple UI animations (fastest)
     - Use SLERP for geographic accuracy (great circles)
     - Use Cubic for smooth visual transitions
-""")
+""" }
