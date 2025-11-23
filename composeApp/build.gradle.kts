@@ -65,7 +65,7 @@ android {
         )
 
         // Ignore the config directory (false positive)
-        ignore += setOf("config")
+        disable += setOf("config")
     }
 }
 
@@ -82,7 +82,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation("androidx.compose.material:material-icons-extended")
+    implementation(libs.androidx.compose.material.icons.extended)
 
     // Image loading
     implementation(libs.coil.compose)

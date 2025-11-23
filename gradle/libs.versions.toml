@@ -47,12 +47,13 @@ gradle-versions = "0.53.0"
 ktlint-gradle = "12.1.2"
 detekt = "1.23.7"
 compose-rules-detekt = "0.4.27"
-slack-compose-lints = "1.4.4"
+slack-compose-lints = "1.4.2"
 androidx-paging = "3.3.5"
 kotlinx-io = "0.7.3"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
