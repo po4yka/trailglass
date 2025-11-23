@@ -87,6 +87,9 @@ abstract class AppComponent(
     // Crash reporting service (from PlatformModule)
     abstract val crashReportingService: com.po4yka.trailglass.domain.service.CrashReportingService
 
+    // Performance monitoring service (from PlatformModule)
+    abstract val performanceMonitoringService: com.po4yka.trailglass.domain.service.PerformanceMonitoringService
+
     // Network connectivity monitor (from PlatformModule)
     abstract val networkConnectivityMonitor: com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 

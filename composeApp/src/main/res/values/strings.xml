@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">Trailglass</string>
+
+    <!-- Shortcuts -->
+    <string name="shortcut_start_tracking_short">Start Tracking</string>
+    <string name="shortcut_start_tracking_long">Start location tracking</string>
+    <string name="shortcut_today_stats_short">Today Stats</string>
+    <string name="shortcut_today_stats_long">View today\'s travel stats</string>
+    <string name="shortcut_export_short">Export Trip</string>
+    <string name="shortcut_export_long">Export recent trip</string>
+    <string name="shortcut_timeline_short">Timeline</string>
+    <string name="shortcut_timeline_long">View travel timeline</string>
+    <string name="shortcut_disabled_message">This shortcut is currently unavailable</string>
+
+    <!-- Widget -->
+    <string name="widget_title">Trailglass Today</string>
+    <string name="widget_description">Your daily travel stats at a glance</string>
+    <string name="widget_distance_km">%1$.1f km</string>
+    <string name="widget_places">%1$d places</string>
+    <string name="widget_tracking_active">Tracking active</string>
+    <string name="widget_tracking_inactive">Not tracking</string>
+    <string name="widget_no_data">No data yet</string>
 </resources>

@@ -2,6 +2,7 @@ package com.po4yka.trailglass
 
 import android.app.Application
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.perf.FirebasePerformance
 import com.po4yka.trailglass.crash.CrashHandler
 import com.po4yka.trailglass.di.AppComponent
 import com.po4yka.trailglass.di.createAndroidAppComponent
@@ -32,6 +33,9 @@ class TrailGlassApplication : Application() {
 
         // Initialize Firebase Crashlytics
         initializeCrashlytics()
+
+        // Initialize Firebase Performance Monitoring
+        initializePerformanceMonitoring()
 
         // Install custom crash handler
         installCrashHandler()
@@ -115,6 +119,20 @@ class TrailGlassApplication : Application() {
             logger.info { "Firebase Crashlytics initialized successfully" }
         } catch (e: Exception) {
             logger.error(e) { "Failed to initialize Firebase Crashlytics: ${e.message}" }
+        }
+    }
+
+    /** Initialize Firebase Performance Monitoring. */
+    private fun initializePerformanceMonitoring() {
+        try {
+            // Enable Performance Monitoring collection
+            // For now, enable by default. Later, tie this to user settings.
+            val performance = FirebasePerformance.getInstance()
+            performance.isPerformanceCollectionEnabled = true
+
+            logger.info { "Firebase Performance Monitoring initialized successfully" }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to initialize Firebase Performance Monitoring: ${e.message}" }
         }
     }
 

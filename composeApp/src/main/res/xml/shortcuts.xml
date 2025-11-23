@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Start Tracking Shortcut -->
+    <shortcut
+        android:shortcutId="start_tracking"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_start_tracking_short"
+        android:shortcutLongLabel="@string/shortcut_start_tracking_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.po4yka.trailglass"
+            android:targetClass="com.po4yka.trailglass.MainActivity"
+            android:data="trailglass://app/tracking/start" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <!-- View Today's Stats Shortcut -->
+    <shortcut
+        android:shortcutId="view_today_stats"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_today_stats_short"
+        android:shortcutLongLabel="@string/shortcut_today_stats_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.po4yka.trailglass"
+            android:targetClass="com.po4yka.trailglass.MainActivity"
+            android:data="trailglass://app/stats/today" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <!-- Export Recent Trip Shortcut -->
+    <shortcut
+        android:shortcutId="export_trip"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_export_short"
+        android:shortcutLongLabel="@string/shortcut_export_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.po4yka.trailglass"
+            android:targetClass="com.po4yka.trailglass.MainActivity"
+            android:data="trailglass://app/export/recent" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <!-- View Timeline Shortcut -->
+    <shortcut
+        android:shortcutId="view_timeline"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/shortcut_timeline_short"
+        android:shortcutLongLabel="@string/shortcut_timeline_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.po4yka.trailglass"
+            android:targetClass="com.po4yka.trailglass.MainActivity"
+            android:data="trailglass://app/timeline" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>

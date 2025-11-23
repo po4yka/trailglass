@@ -15,9 +15,11 @@ import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.AndroidCrashReportingService
 import com.po4yka.trailglass.domain.service.AndroidLocationService
+import com.po4yka.trailglass.domain.service.AndroidPerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.AndroidPushNotificationService
 import com.po4yka.trailglass.domain.service.CrashReportingService
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.PushNotificationService
 import com.po4yka.trailglass.photo.AndroidPhotoMetadataExtractor
 import com.po4yka.trailglass.photo.PhotoMetadataExtractor
@@ -107,4 +109,8 @@ class AndroidPlatformModule(
     /** Provides Android-specific crash reporting service. */
     @Provides
     override fun crashReportingService(): CrashReportingService = AndroidCrashReportingService()
+
+    /** Provides Android-specific performance monitoring service. */
+    @Provides
+    override fun performanceMonitoringService(): PerformanceMonitoringService = AndroidPerformanceMonitoringService()
 }

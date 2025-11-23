@@ -11,6 +11,9 @@ import com.arkivanov.decompose.defaultComponentContext
 import com.po4yka.trailglass.di.AppComponent
 import com.po4yka.trailglass.ui.navigation.AppRootComponent
 import com.po4yka.trailglass.ui.navigation.DefaultAppRootComponent
+import io.github.oshai.kotlinlogging.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 class MainActivity : ComponentActivity() {
     /** Access to the application-level DI component. Use this to get dependencies like controllers and repositories. */
@@ -52,13 +55,52 @@ class MainActivity : ComponentActivity() {
     private fun handleIntent(intent: Intent) {
         val data = intent.data ?: return
 
-        // Extract path from the URI
-        // For trailglass://app/stats -> path = "stats"
-        // For https://trailglass.app/timeline -> path = "timeline"
-        data.path?.removePrefix("/") ?: data.host ?: return
+        logger.info { "Handling deep link: $data" }
 
-        // Deep links only work when user is authenticated and in main app
-        // TODO: Handle deep linking to main screens once authenticated
+        // Extract path from the URI
+        // For trailglass://app/tracking/start -> host = "app", path = "/tracking/start"
+        // For https://trailglass.app/timeline -> host = "trailglass.app", path = "/timeline"
+        val path = data.path?.removePrefix("/") ?: return
+
+        logger.debug { "Deep link path: $path" }
+
+        // Route to appropriate screen based on path
+        when {
+            // Tracking shortcuts
+            path.startsWith("tracking/start") -> {
+                logger.info { "Starting tracking from shortcut" }
+                // TODO: Navigate to tracking screen and start tracking
+                // appRootComponent.navigateToTracking()
+            }
+
+            // Stats shortcuts
+            path.startsWith("stats/today") -> {
+                logger.info { "Opening today's stats from shortcut/widget" }
+                // TODO: Navigate to stats screen
+                // appRootComponent.navigateToStats()
+            }
+
+            // Export shortcuts
+            path.startsWith("export/recent") -> {
+                logger.info { "Opening export from shortcut" }
+                // TODO: Navigate to export screen
+                // appRootComponent.navigateToExport()
+            }
+
+            // Timeline shortcut
+            path == "timeline" -> {
+                logger.info { "Opening timeline from shortcut" }
+                // TODO: Navigate to timeline
+                // appRootComponent.navigateToTimeline()
+            }
+
+            else -> {
+                logger.warn { "Unknown deep link path: $path" }
+            }
+        }
+
+        // Note: Deep links only work properly when user is authenticated and in main app
+        // You may need to queue the navigation if user is not yet authenticated
     }
 }
 

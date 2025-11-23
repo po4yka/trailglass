@@ -51,8 +51,12 @@ slack-compose-lints = "1.4.2"
 androidx-paging = "3.3.5"
 kotlinx-io = "0.7.3"
 firebase-bom = "33.9.0"
+firebase-crashlytics-ktx = "19.2.1"
+firebase-messaging-ktx = "24.1.0"
+firebase-perf-ktx = "21.0.2"
 google-services = "4.4.2"
 firebase-crashlytics-gradle = "3.0.2"
+firebase-perf-gradle = "1.4.2"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
@@ -131,10 +135,11 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 compose-rules-detekt = { module = "io.nlopez.compose.rules:detekt", version.ref = "compose-rules-detekt" }
 slack-compose-lints = { module = "com.slack.lint.compose:compose-lint-checks", version.ref = "slack-compose-lints" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
-firebase-messaging = { module = "com.google.firebase:firebase-messaging-ktx" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebase-messaging-ktx" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx" }
-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx", version.ref = "firebase-crashlytics-ktx" }
 firebase-crashlytics-ndk = { module = "com.google.firebase:firebase-crashlytics-ndk" }
+firebase-perf = { module = "com.google.firebase:firebase-perf-ktx", version.ref = "firebase-perf-ktx" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -153,3 +158,4 @@ ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-gradle" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-gradle" }
+firebase-perf = { id = "com.google.firebase.firebase-perf", version.ref = "firebase-perf-gradle" }

@@ -57,4 +57,7 @@ interface PlatformModule {
 
     /** Platform-specific crash reporting service. */
     fun crashReportingService(): com.po4yka.trailglass.domain.service.CrashReportingService
+
+    /** Platform-specific performance monitoring service. */
+    fun performanceMonitoringService(): com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 }

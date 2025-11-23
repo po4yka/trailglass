@@ -14,8 +14,10 @@ import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.CrashReportingService
 import com.po4yka.trailglass.domain.service.IosCrashReportingService
 import com.po4yka.trailglass.domain.service.IosLocationService
+import com.po4yka.trailglass.domain.service.IosPerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.IosPushNotificationService
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.PushNotificationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -98,4 +100,8 @@ class IOSPlatformModule : PlatformModule {
     /** Provides iOS-specific crash reporting service. */
     @Provides
     override fun crashReportingService(): CrashReportingService = IosCrashReportingService()
+
+    /** Provides iOS-specific performance monitoring service. */
+    @Provides
+    override fun performanceMonitoringService(): PerformanceMonitoringService = IosPerformanceMonitoringService()
 }
