@@ -4,9 +4,7 @@ import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.TransportType
 import kotlinx.datetime.Instant
 
-/**
- * Filter criteria for timeline items.
- */
+/** Filter criteria for timeline items. */
 data class TimelineFilter(
     val transportTypes: Set<TransportType> = emptySet(),
     val placeCategories: Set<PlaceCategory> = emptySet(),
@@ -18,9 +16,7 @@ data class TimelineFilter(
     val maxDuration: kotlin.time.Duration? = null,
     val showOnlyFavorites: Boolean = false
 ) {
-    /**
-     * Check if any filters are active.
-     */
+    /** Check if any filters are active. */
     val isActive: Boolean
         get() =
             transportTypes.isNotEmpty() ||
@@ -33,9 +29,7 @@ data class TimelineFilter(
                 maxDuration != null ||
                 showOnlyFavorites
 
-    /**
-     * Get count of active filters.
-     */
+    /** Get count of active filters. */
     val activeFilterCount: Int
         get() =
             listOf(
@@ -51,9 +45,7 @@ data class TimelineFilter(
             ).count { it }
 }
 
-/**
- * Date range for filtering.
- */
+/** Date range for filtering. */
 data class DateRange(
     val startTime: Instant,
     val endTime: Instant

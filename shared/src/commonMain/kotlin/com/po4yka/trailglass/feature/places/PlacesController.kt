@@ -16,9 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Sort options for places list.
- */
+/** Sort options for places list. */
 enum class PlaceSortOption {
     MOST_VISITED,
     RECENTLY_VISITED,
@@ -27,8 +25,7 @@ enum class PlaceSortOption {
 }
 
 /**
- * Controller for places feature.
- * Manages frequent places state and user actions.
+ * Controller for places feature. Manages frequent places state and user actions.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -47,9 +44,7 @@ class PlacesController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Places UI state.
-     */
+    /** Places UI state. */
     data class PlacesState(
         val allPlaces: List<FrequentPlace> = emptyList(),
         val places: List<FrequentPlace> = emptyList(),
@@ -69,9 +64,7 @@ class PlacesController(
         loadPlaces()
     }
 
-    /**
-     * Filter and sort places based on current state.
-     */
+    /** Filter and sort places based on current state. */
     private fun filterAndSortPlaces(
         allPlaces: List<FrequentPlace>,
         query: String,
@@ -111,9 +104,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Load frequent places for the user.
-     */
+    /** Load frequent places for the user. */
     fun loadPlaces() {
         logger.debug { "Loading frequent places for user $userId" }
 
@@ -151,9 +142,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Refresh the frequent places list.
-     */
+    /** Refresh the frequent places list. */
     fun refresh() {
         logger.info { "Refreshing frequent places" }
 
@@ -191,9 +180,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Toggle favorite status for a place.
-     */
+    /** Toggle favorite status for a place. */
     fun toggleFavorite(placeId: String) {
         controllerScope.launch {
             try {
@@ -228,9 +215,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Get a specific place by ID.
-     */
+    /** Get a specific place by ID. */
     suspend fun getPlaceById(placeId: String): FrequentPlace? =
         try {
             frequentPlaceRepository.getPlaceById(placeId)
@@ -239,18 +224,13 @@ class PlacesController(
             null
         }
 
-    /**
-     * Filter places by minimum significance.
-     */
+    /** Filter places by minimum significance. */
     fun setMinSignificance(significance: PlaceSignificance) {
         _state.update { it.copy(minSignificance = significance) }
         loadPlaces()
     }
 
-    /**
-     * Search places by query.
-     * Filters places by name, address, city, or user label.
-     */
+    /** Search places by query. Filters places by name, address, city, or user label. */
     fun search(query: String) {
         logger.debug { "Searching places with query: $query" }
 
@@ -269,9 +249,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Clear search query and show all places.
-     */
+    /** Clear search query and show all places. */
     fun clearSearch() {
         logger.debug { "Clearing search" }
 
@@ -290,9 +268,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Toggle category filter.
-     */
+    /** Toggle category filter. */
     fun toggleCategoryFilter(category: PlaceCategory) {
         logger.debug { "Toggling category filter: $category" }
 
@@ -319,9 +295,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Clear all category filters.
-     */
+    /** Clear all category filters. */
     fun clearCategoryFilters() {
         logger.debug { "Clearing category filters" }
 
@@ -341,9 +315,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Set sort option.
-     */
+    /** Set sort option. */
     fun setSortOption(option: PlaceSortOption) {
         logger.debug { "Setting sort option: $option" }
 
@@ -363,9 +335,7 @@ class PlacesController(
         }
     }
 
-    /**
-     * Update place category manually.
-     */
+    /** Update place category manually. */
     fun updatePlaceCategory(
         placeId: String,
         newCategory: PlaceCategory
@@ -406,16 +376,14 @@ class PlacesController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

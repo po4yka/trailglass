@@ -6,7 +6,12 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
@@ -17,7 +22,14 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Train
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -29,8 +41,8 @@ import com.po4yka.trailglass.domain.model.TransportType
 import kotlin.math.roundToInt
 
 /**
- * Expandable transport breakdown section showing distance and duration by transport type.
- * Now includes interactive mode selector for detailed stats and highlighting.
+ * Expandable transport breakdown section showing distance and duration by transport type. Now includes interactive mode
+ * selector for detailed stats and highlighting.
  */
 @Composable
 fun TransportBreakdownSection(
@@ -146,9 +158,7 @@ fun TransportBreakdownSection(
     }
 }
 
-/**
- * Individual transport breakdown item with animated highlighting.
- */
+/** Individual transport breakdown item with animated highlighting. */
 @Composable
 private fun TransportBreakdownItem(
     transportType: TransportType,
@@ -227,9 +237,7 @@ private fun TransportBreakdownItem(
     }
 }
 
-/**
- * Detailed stats card for selected transport mode.
- */
+/** Detailed stats card for selected transport mode. */
 @Composable
 private fun SelectedModeDetails(
     transportType: TransportType,
@@ -299,9 +307,7 @@ private fun SelectedModeDetails(
     }
 }
 
-/**
- * Individual stat item for detailed view.
- */
+/** Individual stat item for detailed view. */
 @Composable
 private fun DetailStatItem(
     label: String,
@@ -325,9 +331,7 @@ private fun DetailStatItem(
     }
 }
 
-/**
- * Get icon for transport type.
- */
+/** Get icon for transport type. */
 private fun getTransportIcon(type: TransportType): ImageVector =
     when (type) {
         TransportType.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
@@ -339,9 +343,7 @@ private fun getTransportIcon(type: TransportType): ImageVector =
         TransportType.UNKNOWN -> Icons.Default.Commute
     }
 
-/**
- * Get color for transport type.
- */
+/** Get color for transport type. */
 @Composable
 private fun getTransportColor(type: TransportType): androidx.compose.ui.graphics.Color =
     when (type) {
@@ -354,9 +356,7 @@ private fun getTransportColor(type: TransportType): androidx.compose.ui.graphics
         TransportType.UNKNOWN -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-/**
- * Format distance for display.
- */
+/** Format distance for display. */
 private fun formatDistance(kilometers: Double): String =
     when {
         kilometers < 1.0 -> "${(kilometers * 1000).roundToInt()} m"
@@ -364,9 +364,7 @@ private fun formatDistance(kilometers: Double): String =
         else -> "${kilometers.roundToInt()} km"
     }
 
-/**
- * Format duration for display.
- */
+/** Format duration for display. */
 private fun formatDuration(seconds: Long): String {
     val hours = seconds / 3600
     val minutes = (seconds % 3600) / 60

@@ -2,10 +2,7 @@ package com.po4yka.trailglass.domain.model
 
 import kotlinx.datetime.Instant
 
-/**
- * Raw GPS/network location point recorded by the app.
- * All higher-level timelines are derived from this data.
- */
+/** Raw GPS/network location point recorded by the app. All higher-level timelines are derived from this data. */
 data class LocationSample(
     val id: String,
     val timestamp: Instant,
@@ -37,24 +34,21 @@ data class LocationSample(
  */
 enum class LocationSource {
     /**
-     * GPS satellite positioning - available on both platforms.
-     * Provides high accuracy but higher battery consumption.
+     * GPS satellite positioning - available on both platforms. Provides high accuracy but higher battery consumption.
      */
     GPS,
 
     /**
-     * Network-based positioning (cell towers, WiFi) - primarily Android.
-     * Android's FusedLocationProviderClient distinguishes between GPS and network.
-     * iOS CoreLocation doesn't provide this distinction.
+     * Network-based positioning (cell towers, WiFi) - primarily Android. Android's FusedLocationProviderClient
+     * distinguishes between GPS and network. iOS CoreLocation doesn't provide this distinction.
      */
     NETWORK,
 
     /**
      * Visit detection - significant location stays.
      *
-     * Detects when a user arrives at and departs from significant locations
-     * with low battery impact. Both platforms now support this feature with
-     * different underlying implementations.
+     * Detects when a user arrives at and departs from significant locations with low battery impact. Both platforms now
+     * support this feature with different underlying implementations.
      *
      * **Platform Implementations:**
      *
@@ -86,8 +80,8 @@ enum class LocationSource {
      * Significant location change monitoring.
      *
      * Platform Implementation:
-     * - iOS: `startMonitoringSignificantLocationChanges()` - updates only when
-     *   device moves a significant distance (typically 500+ meters)
+     * - iOS: `startMonitoringSignificantLocationChanges()` - updates only when device moves a significant distance
+     *   (typically 500+ meters)
      * - Android: Can be simulated with low-frequency location updates
      *
      * Used for passive tracking with minimal battery impact.

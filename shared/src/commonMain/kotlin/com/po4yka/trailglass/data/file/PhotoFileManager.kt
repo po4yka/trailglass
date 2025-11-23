@@ -7,8 +7,8 @@ import kotlinx.io.files.SystemFileSystem
 private val logger = KotlinLogging.logger {}
 
 /**
- * Manages photo file operations using Kotlinx IO.
- * Handles storing, retrieving, and managing photo files across platforms.
+ * Manages photo file operations using Kotlinx IO. Handles storing, retrieving, and managing photo files across
+ * platforms.
  */
 class PhotoFileManager(
     private val fileOperations: FileOperations

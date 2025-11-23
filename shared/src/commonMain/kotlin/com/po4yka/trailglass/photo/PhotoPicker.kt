@@ -2,9 +2,7 @@ package com.po4yka.trailglass.photo
 
 import com.po4yka.trailglass.domain.model.Photo
 
-/**
- * Platform-agnostic interface for picking photos from the device.
- */
+/** Platform-agnostic interface for picking photos from the device. */
 interface PhotoPicker {
     /**
      * Pick a single photo from the device.
@@ -21,9 +19,7 @@ interface PhotoPicker {
      */
     suspend fun pickPhotos(maxPhotos: Int = 10): List<Photo>
 
-    /**
-     * Check if photo picking is available (permissions granted).
-     */
+    /** Check if photo picking is available (permissions granted). */
     suspend fun hasPermissions(): Boolean
 
     /**
@@ -34,9 +30,7 @@ interface PhotoPicker {
     suspend fun requestPermissions(): Boolean
 }
 
-/**
- * Photo metadata extracted from the device.
- */
+/** Photo metadata extracted from the device. */
 data class PhotoMetadata(
     val uri: String,
     val timestamp: kotlinx.datetime.Instant,

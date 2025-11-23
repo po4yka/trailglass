@@ -1,8 +1,6 @@
 package com.po4yka.trailglass.domain.model
 
-/**
- * Enhanced map marker with custom icon support.
- */
+/** Enhanced map marker with custom icon support. */
 data class EnhancedMapMarker(
     val id: String,
     val coordinate: Coordinate,
@@ -14,9 +12,7 @@ data class EnhancedMapMarker(
     val visitCount: Int = 1
 )
 
-/**
- * Marker cluster representing multiple markers in close proximity.
- */
+/** Marker cluster representing multiple markers in close proximity. */
 data class MarkerCluster(
     val id: String,
     val coordinate: Coordinate, // Center of cluster
@@ -24,17 +20,13 @@ data class MarkerCluster(
     val count: Int = markers.size
 )
 
-/**
- * Heatmap point with intensity value.
- */
+/** Heatmap point with intensity value. */
 data class HeatmapPoint(
     val coordinate: Coordinate,
     val intensity: Float // 0.0 to 1.0
 )
 
-/**
- * Heatmap data for visualization.
- */
+/** Heatmap data for visualization. */
 data class HeatmapData(
     val points: List<HeatmapPoint>,
     val radius: Int = 20, // Radius in pixels
@@ -42,9 +34,7 @@ data class HeatmapData(
     val gradient: HeatmapGradient = HeatmapGradient.DEFAULT
 )
 
-/**
- * Heatmap color gradient configuration.
- */
+/** Heatmap color gradient configuration. */
 data class HeatmapGradient(
     val colors: List<Int>,
     val startPoints: List<Float>
@@ -91,9 +81,7 @@ data class HeatmapGradient(
     }
 }
 
-/**
- * Enhanced map display data with clustering and heatmap support.
- */
+/** Enhanced map display data with clustering and heatmap support. */
 data class EnhancedMapDisplayData(
     val markers: List<EnhancedMapMarker> = emptyList(),
     val clusters: List<MarkerCluster> = emptyList(),
@@ -104,9 +92,7 @@ data class EnhancedMapDisplayData(
     val heatmapEnabled: Boolean = false
 )
 
-/**
- * Map visualization mode.
- */
+/** Map visualization mode. */
 enum class MapVisualizationMode {
     MARKERS, // Show individual markers
     CLUSTERS, // Show clustered markers

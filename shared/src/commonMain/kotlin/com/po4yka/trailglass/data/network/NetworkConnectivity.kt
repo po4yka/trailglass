@@ -8,28 +8,25 @@ import kotlinx.coroutines.flow.Flow
  * Provides real-time network status and connectivity checks.
  */
 interface NetworkConnectivity {
-    /**
-     * Flow of network connection status.
-     * Emits true when connected, false when disconnected.
-     */
+    /** Flow of network connection status. Emits true when connected, false when disconnected. */
     val isConnected: Flow<Boolean>
 
     /**
      * Check current network connection status.
+     *
      * @return true if network is available, false otherwise
      */
     suspend fun isNetworkAvailable(): Boolean
 
     /**
      * Get network type (WiFi, Cellular, etc.).
+     *
      * @return NetworkType enum indicating connection type
      */
     suspend fun getNetworkType(): NetworkType
 }
 
-/**
- * Network connection types.
- */
+/** Network connection types. */
 enum class NetworkType {
     /** No network connection */
     NONE,
@@ -47,9 +44,7 @@ enum class NetworkType {
     OTHER
 }
 
-/**
- * Factory for creating platform-specific NetworkConnectivity instances.
- */
+/** Factory for creating platform-specific NetworkConnectivity instances. */
 expect object NetworkConnectivityFactory {
     fun create(): NetworkConnectivity
 }

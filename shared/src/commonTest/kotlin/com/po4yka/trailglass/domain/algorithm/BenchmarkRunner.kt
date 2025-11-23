@@ -5,8 +5,8 @@ import kotlin.time.Duration
 import kotlin.time.measureTime
 
 /**
- * Standalone benchmark runner that can be executed to generate performance reports.
- * This provides a simple way to run performance benchmarks and see results.
+ * Standalone benchmark runner that can be executed to generate performance reports. This provides a simple way to run
+ * performance benchmarks and see results.
  */
 object BenchmarkRunner {
     private const val ITERATIONS = 1000
@@ -96,10 +96,12 @@ object BenchmarkRunner {
             for (i in 1 until scenarioResults.size) {
                 val ratio = scenarioResults[i].averageTimeMicros / baseline.averageTimeMicros
                 println(
-                    "    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${String.format(
-                        "%.2f",
-                        ratio
-                    )}x"
+                    "    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${
+                        String.format(
+                            "%.2f",
+                            ratio
+                        )
+                    }x"
                 )
             }
             println()

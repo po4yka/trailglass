@@ -1,6 +1,13 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.ExpandLess
@@ -9,8 +16,24 @@ import androidx.compose.material.icons.filled.GroupWork
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Whatshot
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,15 +43,26 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.TileOverlay
 import com.google.android.gms.maps.model.TileOverlayOptions
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapEffect
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.MapsComposeExperimentalApi
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.heatmaps.HeatmapTileProvider
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.EnhancedMapDisplayData
+import com.po4yka.trailglass.domain.model.EnhancedMapMarker
+import com.po4yka.trailglass.domain.model.HeatmapData
+import com.po4yka.trailglass.domain.model.MapRoute
+import com.po4yka.trailglass.domain.model.MapVisualizationMode
+import com.po4yka.trailglass.domain.model.MarkerCluster
+import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.map.EnhancedMapController
 import com.po4yka.trailglass.feature.map.MarkerIconProvider
 
-/**
- * Enhanced Google Maps view with clustering, heatmap, and custom markers.
- */
+/** Enhanced Google Maps view with clustering, heatmap, and custom markers. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedMapView(
@@ -39,7 +73,7 @@ fun EnhancedMapView(
     onRouteClick: (MapRoute) -> Unit = {}
 ) {
     val state by controller.state.collectAsState()
-    val scope = rememberCoroutineScope()
+    rememberCoroutineScope()
 
     Box(modifier = modifier.fillMaxSize()) {
         if (state.isLoading) {
@@ -499,9 +533,7 @@ private fun getClusterBitmapDescriptor(
         isSelected = isSelected
     )
 
-/**
- * Get route width based on transport type.
- */
+/** Get route width based on transport type. */
 private fun getRouteWidth(transportType: TransportType): Float =
     when (transportType) {
         TransportType.WALK -> 8f
@@ -513,9 +545,7 @@ private fun getRouteWidth(transportType: TransportType): Float =
         TransportType.UNKNOWN -> 8f
     }
 
-/**
- * Get icon for visualization mode.
- */
+/** Get icon for visualization mode. */
 private fun getModeIcon(mode: MapVisualizationMode) =
     when (mode) {
         MapVisualizationMode.MARKERS -> Icons.Default.Place
@@ -524,9 +554,7 @@ private fun getModeIcon(mode: MapVisualizationMode) =
         MapVisualizationMode.HYBRID -> Icons.Default.Layers
     }
 
-/**
- * Get label for visualization mode.
- */
+/** Get label for visualization mode. */
 private fun getModeLabel(mode: MapVisualizationMode) =
     when (mode) {
         MapVisualizationMode.MARKERS -> "Markers"
@@ -536,8 +564,8 @@ private fun getModeLabel(mode: MapVisualizationMode) =
     }
 
 /**
- * Calculate appropriate zoom level based on region deltas.
- * Uses the larger delta (latitude or longitude) to determine zoom.
+ * Calculate appropriate zoom level based on region deltas. Uses the larger delta (latitude or longitude) to determine
+ * zoom.
  */
 private fun calculateZoomLevel(
     latitudeDelta: Double,

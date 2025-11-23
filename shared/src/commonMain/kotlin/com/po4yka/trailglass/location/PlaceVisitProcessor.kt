@@ -5,13 +5,18 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.location.geocoding.ReverseGeocoder
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 /**
- * Processes location samples to detect and create PlaceVisits with geocoded information.
- * Uses DBSCAN-like clustering to group nearby points in time and space.
+ * Processes location samples to detect and create PlaceVisits with geocoded information. Uses DBSCAN-like clustering to
+ * group nearby points in time and space.
  */
 class PlaceVisitProcessor(
     private val reverseGeocoder: ReverseGeocoder,
@@ -53,9 +58,7 @@ class PlaceVisitProcessor(
         return visits
     }
 
-    /**
-     * Cluster samples using spatial and temporal proximity.
-     */
+    /** Cluster samples using spatial and temporal proximity. */
     private fun clusterSamples(samples: List<LocationSample>): List<List<LocationSample>> {
         val clusters = mutableListOf<MutableList<LocationSample>>()
         var currentCluster = mutableListOf<LocationSample>()
@@ -97,9 +100,7 @@ class PlaceVisitProcessor(
         return clusters
     }
 
-    /**
-     * Create a PlaceVisit from a cluster of samples, with reverse geocoding.
-     */
+    /** Create a PlaceVisit from a cluster of samples, with reverse geocoding. */
     private suspend fun createPlaceVisit(samples: List<LocationSample>): PlaceVisit? {
         if (samples.isEmpty()) return null
 
@@ -146,9 +147,7 @@ class PlaceVisitProcessor(
         )
     }
 
-    /**
-     * Generate a deterministic ID for a PlaceVisit.
-     */
+    /** Generate a deterministic ID for a PlaceVisit. */
     private fun generatePlaceVisitId(
         time: Instant,
         lat: Double,

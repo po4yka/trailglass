@@ -17,9 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Map style options for route visualization.
- */
+/** Map style options for route visualization. */
 enum class MapStyle {
     STANDARD,
     SATELLITE,
@@ -28,8 +26,7 @@ enum class MapStyle {
 }
 
 /**
- * Controller for the Route View screen.
- * Manages route data loading, map state, and replay controls.
+ * Controller for the Route View screen. Manages route data loading, map state, and replay controls.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -47,9 +44,7 @@ class RouteViewController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * State for Route View screen.
-     */
+    /** State for Route View screen. */
     data class RouteViewState(
         val tripRoute: TripRoute? = null,
         val isLoading: Boolean = false,
@@ -69,9 +64,7 @@ class RouteViewController(
     private val _state = MutableStateFlow(RouteViewState())
     val state: StateFlow<RouteViewState> = _state.asStateFlow()
 
-    /**
-     * Load route data for a trip.
-     */
+    /** Load route data for a trip. */
     fun loadRoute(tripId: String) {
         controllerScope.launch {
             logger.info { "Loading route for trip $tripId" }
@@ -98,17 +91,13 @@ class RouteViewController(
         }
     }
 
-    /**
-     * Change map style.
-     */
+    /** Change map style. */
     fun setMapStyle(style: MapStyle) {
         logger.debug { "Changing map style to $style" }
         _state.value = _state.value.copy(mapStyle = style)
     }
 
-    /**
-     * Show/hide map style selector.
-     */
+    /** Show/hide map style selector. */
     fun toggleMapStyleSelector() {
         _state.value =
             _state.value.copy(
@@ -116,9 +105,7 @@ class RouteViewController(
             )
     }
 
-    /**
-     * Show/hide statistics screen.
-     */
+    /** Show/hide statistics screen. */
     fun toggleStatistics() {
         _state.value =
             _state.value.copy(
@@ -126,39 +113,29 @@ class RouteViewController(
             )
     }
 
-    /**
-     * Recenter camera to fit entire route.
-     */
+    /** Recenter camera to fit entire route. */
     fun recenterCamera() {
         logger.debug { "Recenter camera requested" }
         _state.value = _state.value.copy(shouldRecenterCamera = true)
     }
 
-    /**
-     * Acknowledge camera recentering (called after UI applies camera move).
-     */
+    /** Acknowledge camera recentering (called after UI applies camera move). */
     fun acknowledgeRecenter() {
         _state.value = _state.value.copy(shouldRecenterCamera = false)
     }
 
-    /**
-     * Select a photo marker on the map.
-     */
+    /** Select a photo marker on the map. */
     fun selectPhotoMarker(marker: PhotoMarker?) {
         logger.debug { "Photo marker selected: ${marker?.photoId}" }
         _state.value = _state.value.copy(selectedPhotoMarker = marker)
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.value = _state.value.copy(error = null)
     }
 
-    /**
-     * Get route bounds for camera positioning.
-     */
+    /** Get route bounds for camera positioning. */
     fun getRouteBounds(): Pair<Coordinate, Coordinate>? {
         val bounds = _state.value.tripRoute?.bounds ?: return null
         return Pair(
@@ -167,9 +144,7 @@ class RouteViewController(
         )
     }
 
-    /**
-     * Export route to specified format.
-     */
+    /** Export route to specified format. */
     fun exportRoute(
         tripName: String,
         format: ExportFormat
@@ -200,16 +175,14 @@ class RouteViewController(
         }
     }
 
-    /**
-     * Clear export result after handling.
-     */
+    /** Clear export result after handling. */
     fun clearExportResult() {
         _state.value = _state.value.copy(exportResult = null)
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

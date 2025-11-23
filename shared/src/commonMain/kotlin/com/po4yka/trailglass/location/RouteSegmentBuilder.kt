@@ -6,12 +6,14 @@ import com.po4yka.trailglass.domain.model.RouteSegment
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Builds route segments from location samples.
- * Identifies movement between places and infers transport type.
- */
+/** Builds route segments from location samples. Identifies movement between places and infers transport type. */
 class RouteSegmentBuilder(
     private val pathSimplifier: PathSimplifier = PathSimplifier()
 ) {
@@ -58,9 +60,7 @@ class RouteSegmentBuilder(
         return segments
     }
 
-    /**
-     * Group samples that represent movement (between visits).
-     */
+    /** Group samples that represent movement (between visits). */
     private fun groupMovementSamples(
         samples: List<LocationSample>,
         visitSampleIds: Set<String>,
@@ -96,17 +96,13 @@ class RouteSegmentBuilder(
         return groups
     }
 
-    /**
-     * Find which visit contains a given sample ID.
-     */
+    /** Find which visit contains a given sample ID. */
     private fun findVisitContainingSample(
         sampleId: String,
         visits: List<PlaceVisit>
     ): PlaceVisit? = visits.find { it.locationSampleIds.contains(sampleId) }
 
-    /**
-     * Create a route segment from movement samples.
-     */
+    /** Create a route segment from movement samples. */
     private fun createRouteSegment(
         samples: List<LocationSample>,
         fromVisit: PlaceVisit?,
@@ -147,9 +143,7 @@ class RouteSegmentBuilder(
         )
     }
 
-    /**
-     * Calculate total distance traveled along a path.
-     */
+    /** Calculate total distance traveled along a path. */
     private fun calculateTotalDistance(samples: List<LocationSample>): Double {
         var totalDistance = 0.0
         for (i in 0 until samples.lastIndex) {
@@ -165,9 +159,7 @@ class RouteSegmentBuilder(
         return totalDistance
     }
 
-    /**
-     * Calculate Haversine distance between two coordinates.
-     */
+    /** Calculate Haversine distance between two coordinates. */
     private fun haversineDistance(
         lat1: Double,
         lon1: Double,
@@ -189,9 +181,7 @@ class RouteSegmentBuilder(
         return earthRadiusMeters * c
     }
 
-    /**
-     * Generate a deterministic ID for a route segment.
-     */
+    /** Generate a deterministic ID for a route segment. */
     private fun generateSegmentId(
         time: Instant,
         fromId: String?,

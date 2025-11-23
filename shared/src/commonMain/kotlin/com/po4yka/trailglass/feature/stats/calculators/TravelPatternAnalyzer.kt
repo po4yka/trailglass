@@ -10,16 +10,12 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Analyzer for travel patterns and temporal statistics.
- */
+/** Analyzer for travel patterns and temporal statistics. */
 @Inject
 class TravelPatternAnalyzer(
     private val timeZone: TimeZone = TimeZone.currentSystemDefault()
 ) {
-    /**
-     * Analyze travel patterns from visits and routes.
-     */
+    /** Analyze travel patterns from visits and routes. */
     fun analyze(
         visits: List<PlaceVisit>,
         routes: List<RouteSegment>
@@ -46,9 +42,7 @@ class TravelPatternAnalyzer(
         )
     }
 
-    /**
-     * Analyze activity by hour of day (0-23).
-     */
+    /** Analyze activity by hour of day (0-23). */
     private fun analyzeHourlyActivity(
         visits: List<PlaceVisit>,
         routes: List<RouteSegment>
@@ -86,9 +80,7 @@ class TravelPatternAnalyzer(
         }
     }
 
-    /**
-     * Analyze activity by day of week.
-     */
+    /** Analyze activity by day of week. */
     private fun analyzeWeekdayActivity(
         visits: List<PlaceVisit>,
         routes: List<RouteSegment>
@@ -126,9 +118,7 @@ class TravelPatternAnalyzer(
         }
     }
 
-    /**
-     * Analyze weekday vs weekend split.
-     */
+    /** Analyze weekday vs weekend split. */
     private fun analyzeWeekdaySplit(
         visits: List<PlaceVisit>,
         routes: List<RouteSegment>
@@ -176,9 +166,7 @@ class TravelPatternAnalyzer(
         )
     }
 
-    /**
-     * Get most active time range.
-     */
+    /** Get most active time range. */
     fun getMostActiveTimeRange(
         visits: List<PlaceVisit>,
         routes: List<RouteSegment>
@@ -194,9 +182,7 @@ class TravelPatternAnalyzer(
         }
     }
 
-    /**
-     * Helper class for tracking activity events.
-     */
+    /** Helper class for tracking activity events. */
     private sealed class ActivityEvent {
         object Visit : ActivityEvent()
 

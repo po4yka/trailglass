@@ -1,6 +1,14 @@
 package com.po4yka.trailglass.ui.permission
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -13,7 +21,14 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +40,8 @@ import com.po4yka.trailglass.domain.permission.PermissionType
 import com.po4yka.trailglass.domain.permission.SettingsInstructions
 
 /**
- * Dialog showing permission rationale before requesting.
- * Explains why the permission is needed and what features it enables.
+ * Dialog showing permission rationale before requesting. Explains why the permission is needed and what features it
+ * enables.
  */
 @Composable
 fun PermissionRationaleDialog(
@@ -133,10 +148,7 @@ fun PermissionRationaleDialog(
     )
 }
 
-/**
- * Dialog shown when permission is denied (but not permanently).
- * Encourages user to reconsider.
- */
+/** Dialog shown when permission is denied (but not permanently). Encourages user to reconsider. */
 @Composable
 fun PermissionDeniedDialog(
     requestState: PermissionRequestState,
@@ -209,10 +221,7 @@ fun PermissionDeniedDialog(
     )
 }
 
-/**
- * Dialog shown when permission is permanently denied.
- * Provides instructions to enable in settings.
- */
+/** Dialog shown when permission is permanently denied. Provides instructions to enable in settings. */
 @Composable
 fun PermissionPermanentlyDeniedDialog(
     requestState: PermissionRequestState,
@@ -312,10 +321,7 @@ fun PermissionPermanentlyDeniedDialog(
     )
 }
 
-/**
- * Compact permission request banner (alternative to full dialog).
- * Shows at top of screen with brief explanation.
- */
+/** Compact permission request banner (alternative to full dialog). Shows at top of screen with brief explanation. */
 @Composable
 fun PermissionRequestBanner(
     requestState: PermissionRequestState,
@@ -370,9 +376,7 @@ fun PermissionRequestBanner(
     }
 }
 
-/**
- * Get icon for permission type.
- */
+/** Get icon for permission type. */
 private fun getPermissionIcon(permissionType: PermissionType): ImageVector =
     when (permissionType) {
         PermissionType.LOCATION_FINE,

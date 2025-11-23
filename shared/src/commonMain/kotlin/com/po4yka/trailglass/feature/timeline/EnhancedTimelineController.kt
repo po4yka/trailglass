@@ -35,9 +35,7 @@ class EnhancedTimelineController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Enhanced timeline UI state.
-     */
+    /** Enhanced timeline UI state. */
     data class EnhancedTimelineState(
         val selectedDate: LocalDate =
             Clock.System
@@ -60,9 +58,7 @@ class EnhancedTimelineController(
         loadTimeline()
     }
 
-    /**
-     * Load timeline for the current state.
-     */
+    /** Load timeline for the current state. */
     fun loadTimeline() {
         val currentState = _state.value
 
@@ -89,18 +85,14 @@ class EnhancedTimelineController(
         }
     }
 
-    /**
-     * Change the selected date.
-     */
+    /** Change the selected date. */
     fun selectDate(date: LocalDate) {
         logger.debug { "Selecting date: $date" }
         _state.update { it.copy(selectedDate = date) }
         loadTimeline()
     }
 
-    /**
-     * Navigate to next period (day/week/month/year depending on zoom level).
-     */
+    /** Navigate to next period (day/week/month/year depending on zoom level). */
     fun navigateNext() {
         val currentState = _state.value
         val nextDate =
@@ -109,10 +101,12 @@ class EnhancedTimelineController(
                     kotlinx.datetime.LocalDate.Companion.fromEpochDays(
                         currentState.selectedDate.toEpochDays() + 1
                     )
+
                 TimelineZoomLevel.WEEK ->
                     kotlinx.datetime.LocalDate.Companion.fromEpochDays(
                         currentState.selectedDate.toEpochDays() + 7
                     )
+
                 TimelineZoomLevel.MONTH -> {
                     val year =
                         if (currentState.selectedDate.monthNumber ==
@@ -132,6 +126,7 @@ class EnhancedTimelineController(
                         }
                     kotlinx.datetime.LocalDate(year, month, 1)
                 }
+
                 TimelineZoomLevel.YEAR ->
                     kotlinx.datetime.LocalDate(
                         currentState.selectedDate.year + 1,
@@ -142,9 +137,7 @@ class EnhancedTimelineController(
         selectDate(nextDate)
     }
 
-    /**
-     * Navigate to previous period (day/week/month/year depending on zoom level).
-     */
+    /** Navigate to previous period (day/week/month/year depending on zoom level). */
     fun navigatePrevious() {
         val currentState = _state.value
         val previousDate =
@@ -153,10 +146,12 @@ class EnhancedTimelineController(
                     kotlinx.datetime.LocalDate.Companion.fromEpochDays(
                         currentState.selectedDate.toEpochDays() - 1
                     )
+
                 TimelineZoomLevel.WEEK ->
                     kotlinx.datetime.LocalDate.Companion.fromEpochDays(
                         currentState.selectedDate.toEpochDays() - 7
                     )
+
                 TimelineZoomLevel.MONTH -> {
                     val year =
                         if (currentState.selectedDate.monthNumber ==
@@ -176,6 +171,7 @@ class EnhancedTimelineController(
                         }
                     kotlinx.datetime.LocalDate(year, month, 1)
                 }
+
                 TimelineZoomLevel.YEAR ->
                     kotlinx.datetime.LocalDate(
                         currentState.selectedDate.year - 1,
@@ -186,9 +182,7 @@ class EnhancedTimelineController(
         selectDate(previousDate)
     }
 
-    /**
-     * Jump to today.
-     */
+    /** Jump to today. */
     fun jumpToToday() {
         val today =
             Clock.System
@@ -198,36 +192,28 @@ class EnhancedTimelineController(
         selectDate(today)
     }
 
-    /**
-     * Change zoom level.
-     */
+    /** Change zoom level. */
     fun setZoomLevel(zoomLevel: TimelineZoomLevel) {
         logger.debug { "Changing zoom level to: $zoomLevel" }
         _state.update { it.copy(zoomLevel = zoomLevel) }
         loadTimeline()
     }
 
-    /**
-     * Update filter.
-     */
+    /** Update filter. */
     fun updateFilter(filter: TimelineFilter) {
         logger.debug { "Updating filter: ${filter.activeFilterCount} active filters" }
         _state.update { it.copy(filter = filter) }
         loadTimeline()
     }
 
-    /**
-     * Clear all filters.
-     */
+    /** Clear all filters. */
     fun clearFilters() {
         logger.debug { "Clearing all filters" }
         _state.update { it.copy(filter = TimelineFilter()) }
         loadTimeline()
     }
 
-    /**
-     * Search timeline.
-     */
+    /** Search timeline. */
     fun search(query: String?) {
         logger.debug { "Searching timeline: query=$query" }
         val currentFilter = _state.value.filter
@@ -236,31 +222,25 @@ class EnhancedTimelineController(
         loadTimeline()
     }
 
-    /**
-     * Clear search.
-     */
+    /** Clear search. */
     fun clearSearch() {
         search(null)
     }
 
-    /**
-     * Refresh the timeline.
-     */
+    /** Refresh the timeline. */
     fun refresh() {
         logger.debug { "Refreshing timeline" }
         loadTimeline()
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

@@ -5,12 +5,16 @@ import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.domain.model.PhotoGroup
 import com.po4yka.trailglass.domain.model.PhotoWithMetadata
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.*
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.atTime
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for getting photos grouped by date for gallery display.
- */
+/** Use case for getting photos grouped by date for gallery display. */
 @Inject
 class GetPhotoGalleryUseCase(
     private val photoRepository: PhotoRepository,
@@ -95,9 +99,7 @@ class GetPhotoGalleryUseCase(
         return photoGroups
     }
 
-    /**
-     * Get all photos for a user, grouped by month.
-     */
+    /** Get all photos for a user, grouped by month. */
     suspend fun getAllPhotosGroupedByMonth(userId: String): Map<YearMonth, List<PhotoWithMetadata>> {
         logger.info { "Getting all photos grouped by month for user $userId" }
 

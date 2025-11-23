@@ -4,11 +4,17 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.EnhancedMapMarker
 import com.po4yka.trailglass.domain.model.MarkerCluster
 import com.po4yka.trailglass.util.UuidGenerator
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.floor
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
- * Clusters markers using grid-based clustering algorithm.
- * More efficient than distance-based clustering for large datasets.
+ * Clusters markers using grid-based clustering algorithm. More efficient than distance-based clustering for large
+ * datasets.
  */
 class MarkerClusterer(
     private val gridSize: Int = 60, // Grid size in pixels at zoom level 20
@@ -69,10 +75,7 @@ class MarkerClusterer(
         return Pair(clusters, singleMarkers)
     }
 
-    /**
-     * Calculate grid cell size based on zoom level.
-     * Higher zoom = smaller cells = less clustering.
-     */
+    /** Calculate grid cell size based on zoom level. Higher zoom = smaller cells = less clustering. */
     private fun calculateCellSize(zoomLevel: Float): Double {
         // At zoom 20, use gridSize directly
         // At lower zooms, increase cell size exponentially
@@ -80,9 +83,7 @@ class MarkerClusterer(
         return gridSize * scale / 256.0 // Convert to lat/lng degrees
     }
 
-    /**
-     * Get grid cell key for a coordinate.
-     */
+    /** Get grid cell key for a coordinate. */
     private fun getCellKey(
         coordinate: Coordinate,
         cellSize: Double
@@ -92,9 +93,7 @@ class MarkerClusterer(
         return "$cellX,$cellY"
     }
 
-    /**
-     * Calculate geometric center of coordinates.
-     */
+    /** Calculate geometric center of coordinates. */
     private fun calculateCenter(coordinates: List<Coordinate>): Coordinate {
         if (coordinates.isEmpty()) {
             return Coordinate(0.0, 0.0)
@@ -107,17 +106,12 @@ class MarkerClusterer(
     }
 }
 
-/**
- * Distance-based marker clusterer using DBSCAN-like algorithm.
- * More accurate but slower for large datasets.
- */
+/** Distance-based marker clusterer using DBSCAN-like algorithm. More accurate but slower for large datasets. */
 class DistanceBasedClusterer(
     private val maxDistance: Double = 0.001, // ~100 meters
     private val minClusterSize: Int = 2
 ) {
-    /**
-     * Cluster markers based on distance.
-     */
+    /** Cluster markers based on distance. */
     fun cluster(markers: List<EnhancedMapMarker>): Pair<List<MarkerCluster>, List<EnhancedMapMarker>> {
         if (markers.isEmpty()) {
             return Pair(emptyList(), emptyList())
@@ -155,9 +149,7 @@ class DistanceBasedClusterer(
         return Pair(clusters, singleMarkers)
     }
 
-    /**
-     * Find all markers within maxDistance of the given marker.
-     */
+    /** Find all markers within maxDistance of the given marker. */
     private fun findNeighbors(
         marker: EnhancedMapMarker,
         allMarkers: List<EnhancedMapMarker>,
@@ -172,9 +164,7 @@ class DistanceBasedClusterer(
             }
         }
 
-    /**
-     * Calculate haversine distance between two coordinates in degrees.
-     */
+    /** Calculate haversine distance between two coordinates in degrees. */
     private fun haversineDistance(
         c1: Coordinate,
         c2: Coordinate

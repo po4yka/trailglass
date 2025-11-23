@@ -1,6 +1,14 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
 import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
@@ -14,7 +22,14 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Straighten
 import androidx.compose.material.icons.filled.Train
-import androidx.compose.material3.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,10 +38,7 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.TripRoute
 import kotlin.math.roundToInt
 
-/**
- * Summary card displayed at the bottom of the Route View.
- * Shows trip statistics and a play button for route replay.
- */
+/** Summary card displayed at the bottom of the Route View. Shows trip statistics and a play button for route replay. */
 @Composable
 fun RouteSummaryCard(
     tripRoute: TripRoute,
@@ -164,9 +176,7 @@ fun RouteSummaryCard(
     }
 }
 
-/**
- * Individual statistic item.
- */
+/** Individual statistic item. */
 @Composable
 private fun StatisticItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -198,9 +208,7 @@ private fun StatisticItem(
     }
 }
 
-/**
- * Transport type chip with distance.
- */
+/** Transport type chip with distance. */
 @Composable
 private fun TransportChip(
     transportType: String,
@@ -233,9 +241,7 @@ private fun TransportChip(
     )
 }
 
-/**
- * Format duration for display.
- */
+/** Format duration for display. */
 private fun formatDuration(
     days: Int,
     hours: Int,
@@ -247,9 +253,7 @@ private fun formatDuration(
         append("$minutes min${if (minutes > 1) "s" else ""}")
     }
 
-/**
- * Format distance for display.
- */
+/** Format distance for display. */
 private fun formatDistance(kilometers: Double): String =
     when {
         kilometers < 1.0 -> "${(kilometers * 1000).roundToInt()} m"

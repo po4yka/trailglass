@@ -7,10 +7,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlin.time.Duration.Companion.hours
 
-/**
- * Detects trips from place visit data.
- * Coordinates home location detection and trip boundary detection.
- */
+/** Detects trips from place visit data. Coordinates home location detection and trip boundary detection. */
 class TripDetector(
     private val homeLocationDetector: HomeLocationDetector = HomeLocationDetector(),
     private val tripBoundaryDetector: TripBoundaryDetector = TripBoundaryDetector()
@@ -74,18 +71,14 @@ class TripDetector(
         return trips
     }
 
-    /**
-     * Generate a deterministic trip ID.
-     */
+    /** Generate a deterministic trip ID. */
     private fun generateTripId(
         userId: String,
         startTime: Instant,
         index: Int
     ): String = "trip_${userId.hashCode()}_${startTime.toEpochMilliseconds()}_$index"
 
-    /**
-     * Check if a trip is recent (within last 24 hours).
-     */
+    /** Check if a trip is recent (within last 24 hours). */
     private fun isRecentTrip(endTime: Instant): Boolean {
         // Simple heuristic: if the trip ended within the last 24 hours, consider it ongoing
         val now = Clock.System.now()

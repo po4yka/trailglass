@@ -10,9 +10,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import java.io.IOException
 import kotlin.coroutines.resume
 
-/**
- * Android implementation of ReverseGeocoder using Android's Geocoder API.
- */
+/** Android implementation of ReverseGeocoder using Android's Geocoder API. */
 class AndroidReverseGeocoder(
     private val context: Context
 ) : ReverseGeocoder {
@@ -109,17 +107,12 @@ class AndroidReverseGeocoder(
         )
 }
 
-/**
- * Factory function to create AndroidReverseGeocoder.
- * Requires Android Context.
- */
+/** Factory function to create AndroidReverseGeocoder. Requires Android Context. */
 actual fun createReverseGeocoder(): ReverseGeocoder =
     throw IllegalStateException(
         "createReverseGeocoder() requires Android Context. " +
             "Use createAndroidReverseGeocoder(context) instead."
     )
 
-/**
- * Android-specific factory function that accepts Context.
- */
+/** Android-specific factory function that accepts Context. */
 fun createAndroidReverseGeocoder(context: Context): ReverseGeocoder = AndroidReverseGeocoder(context)

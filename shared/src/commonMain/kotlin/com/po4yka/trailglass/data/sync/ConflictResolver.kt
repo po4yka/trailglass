@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.sync
 
 import com.po4yka.trailglass.logging.logger
 
-/**
- * Interface for resolving sync conflicts.
- */
+/** Interface for resolving sync conflicts. */
 interface ConflictResolver<T : SyncableEntity> {
     /**
      * Resolve a conflict between local and remote entities.
@@ -19,9 +17,7 @@ interface ConflictResolver<T : SyncableEntity> {
     ): T
 }
 
-/**
- * Default conflict resolver implementation.
- */
+/** Default conflict resolver implementation. */
 class DefaultConflictResolver<T : SyncableEntity> : ConflictResolver<T> {
     private val logger = logger()
 
@@ -57,8 +53,8 @@ class DefaultConflictResolver<T : SyncableEntity> : ConflictResolver<T> {
     }
 
     /**
-     * Attempt to automatically merge conflicting entities.
-     * Default implementation uses last-write-wins based on lastModified timestamp.
+     * Attempt to automatically merge conflicting entities. Default implementation uses last-write-wins based on
+     * lastModified timestamp.
      */
     private fun attemptMerge(conflict: SyncConflict<T>): T {
         val local = conflict.localEntity
@@ -79,20 +75,14 @@ class DefaultConflictResolver<T : SyncableEntity> : ConflictResolver<T> {
     }
 }
 
-/**
- * Exception thrown when a conflict requires manual resolution.
- */
+/** Exception thrown when a conflict requires manual resolution. */
 class ConflictRequiresManualResolutionException(
     val conflict: SyncConflict<*>
 ) : Exception("Conflict for ${conflict.entityType}:${conflict.entityId} requires manual resolution")
 
-/**
- * Conflict detection helper.
- */
+/** Conflict detection helper. */
 object ConflictDetector {
-    /**
-     * Detect if there's a conflict between local and remote entities.
-     */
+    /** Detect if there's a conflict between local and remote entities. */
     fun <T : SyncableEntity> detectConflict(
         local: T,
         remote: T,
@@ -136,9 +126,7 @@ object ConflictDetector {
         return null
     }
 
-    /**
-     * Suggest a resolution strategy based on conflict type.
-     */
+    /** Suggest a resolution strategy based on conflict type. */
     fun suggestResolutionStrategy(conflictType: ConflictType): ResolutionStrategy =
         when (conflictType) {
             ConflictType.CONCURRENT_MODIFICATION -> ResolutionStrategy.MERGE

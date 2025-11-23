@@ -6,43 +6,25 @@ package com.po4yka.trailglass.domain.model
  * Defines how frequently and accurately location should be tracked.
  */
 data class TrackingConfig(
-    /**
-     * Tracking accuracy mode.
-     */
+    /** Tracking accuracy mode. */
     val accuracy: TrackingAccuracy = TrackingAccuracy.BALANCED,
-    /**
-     * Minimum time interval between location updates in milliseconds.
-     */
+    /** Minimum time interval between location updates in milliseconds. */
     val updateIntervalMs: Long = 30000, // 30 seconds default
-    /**
-     * Minimum distance between location updates in meters.
-     */
+    /** Minimum distance between location updates in meters. */
     val distanceFilterMeters: Float = 10f,
-    /**
-     * Whether to track in background.
-     */
+    /** Whether to track in background. */
     val backgroundTracking: Boolean = true,
-    /**
-     * Whether to detect trips automatically.
-     */
+    /** Whether to detect trips automatically. */
     val autoTripDetection: Boolean = true,
-    /**
-     * Whether to detect place visits automatically.
-     */
+    /** Whether to detect place visits automatically. */
     val autoPlaceVisitDetection: Boolean = true,
-    /**
-     * Whether to detect transport mode automatically.
-     */
+    /** Whether to detect transport mode automatically. */
     val autoTransportDetection: Boolean = true
 )
 
-/**
- * Current tracking status.
- */
+/** Current tracking status. */
 sealed class TrackingStatus {
-    /**
-     * Tracking is stopped.
-     */
+    /** Tracking is stopped. */
     data object Stopped : TrackingStatus()
 
     /**

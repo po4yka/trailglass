@@ -15,8 +15,7 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for Device Management screen.
- * Manages list of user's devices and allows device removal.
+ * Controller for Device Management screen. Manages list of user's devices and allows device removal.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -33,9 +32,7 @@ class DeviceManagementController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Device Management UI state.
-     */
+    /** Device Management UI state. */
     data class DeviceManagementState(
         val devices: List<DeviceDto> = emptyList(),
         val isLoading: Boolean = false,
@@ -46,9 +43,7 @@ class DeviceManagementController(
     private val _state = MutableStateFlow(DeviceManagementState())
     val state: StateFlow<DeviceManagementState> = _state.asStateFlow()
 
-    /**
-     * Load all devices for the current user.
-     */
+    /** Load all devices for the current user. */
     fun loadDevices() {
         logger.debug { "Loading user devices" }
 
@@ -79,17 +74,13 @@ class DeviceManagementController(
         }
     }
 
-    /**
-     * Refresh devices list.
-     */
+    /** Refresh devices list. */
     fun refresh() {
         logger.debug { "Refreshing devices" }
         loadDevices()
     }
 
-    /**
-     * Delete a device.
-     */
+    /** Delete a device. */
     fun deleteDevice(
         deviceId: String,
         onSuccess: () -> Unit = {}
@@ -127,16 +118,14 @@ class DeviceManagementController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

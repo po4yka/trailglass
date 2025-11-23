@@ -5,8 +5,8 @@ import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.db.TrailGlassDatabase
 
 /**
- * Android unit test implementation to create test database.
- * Uses JDBC SQLite driver since Android unit tests run on JVM.
+ * Android unit test implementation to create test database. Uses JDBC SQLite driver since Android unit tests run on
+ * JVM.
  */
 actual fun createTestDatabaseImpl(): Database {
     val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)

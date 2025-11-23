@@ -4,9 +4,7 @@ import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.repository.LocationRepository
 import platform.UIKit.UIDevice
 
-/**
- * iOS implementation of LocationTrackerFactory.
- */
+/** iOS implementation of LocationTrackerFactory. */
 actual class LocationTrackerFactory {
     actual fun create(
         repository: LocationRepository,

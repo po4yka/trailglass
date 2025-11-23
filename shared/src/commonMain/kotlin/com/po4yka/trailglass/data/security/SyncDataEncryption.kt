@@ -3,15 +3,14 @@ package com.po4yka.trailglass.data.security
 import com.po4yka.trailglass.logging.logger
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Inject
 
 /**
  * Service for encrypting and decrypting sync data payloads.
  *
- * This service integrates with the sync system to provide end-to-end encryption
- * for user data. When E2E encryption is enabled:
+ * This service integrates with the sync system to provide end-to-end encryption for user data. When E2E encryption is
+ * enabled:
  * - All sync data is encrypted on the client before sending to the server
  * - All received data is decrypted on the client after receiving from the server
  * - The server only stores encrypted blobs - cannot read the actual data
@@ -93,14 +92,10 @@ class SyncDataEncryption(
             Result.failure(e)
         }
 
-    /**
-     * Check if E2E encryption is available (key exists).
-     */
+    /** Check if E2E encryption is available (key exists). */
     suspend fun isEncryptionAvailable(): Boolean = encryptionService.hasEncryptionKey()
 
-    /**
-     * Initialize E2E encryption by generating a key if needed.
-     */
+    /** Initialize E2E encryption by generating a key if needed. */
     suspend fun initializeEncryption(): Result<Unit> =
         if (!encryptionService.hasEncryptionKey()) {
             logger.info { "Generating new E2E encryption key" }
@@ -110,17 +105,13 @@ class SyncDataEncryption(
             Result.success(Unit)
         }
 
-    /**
-     * Export encryption key for backup (password-protected).
-     */
+    /** Export encryption key for backup (password-protected). */
     suspend fun exportEncryptionKey(password: String): Result<String> {
         logger.info { "Exporting E2E encryption key" }
         return encryptionService.exportKey(password)
     }
 
-    /**
-     * Import encryption key from backup (password-protected).
-     */
+    /** Import encryption key from backup (password-protected). */
     suspend fun importEncryptionKey(
         encryptedBackup: String,
         password: String
@@ -129,36 +120,26 @@ class SyncDataEncryption(
         return encryptionService.importKey(encryptedBackup, password)
     }
 
-    /**
-     * Delete encryption key.
-     * WARNING: This will make all encrypted data permanently unrecoverable!
-     */
+    /** Delete encryption key. WARNING: This will make all encrypted data permanently unrecoverable! */
     suspend fun deleteEncryptionKey(): Result<Unit> {
         logger.warn { "Deleting E2E encryption key - encrypted data will be unrecoverable!" }
         return encryptionService.deleteKey()
     }
 
     companion object {
-        /**
-         * Current encryption version.
-         * Increment this if the encryption format changes.
-         */
+        /** Current encryption version. Increment this if the encryption format changes. */
         private const val ENCRYPTION_VERSION = 1
     }
 }
 
 /**
- * Encrypted sync payload sent to/from server.
- * The server stores this as an opaque blob without access to the actual data.
+ * Encrypted sync payload sent to/from server. The server stores this as an opaque blob without access to the actual
+ * data.
  */
 @Serializable
 data class EncryptedSyncPayload(
-    /**
-     * Encrypted data in storage format (iv:tag:ciphertext).
-     */
+    /** Encrypted data in storage format (iv:tag:ciphertext). */
     val encryptedData: String,
-    /**
-     * Encryption version for forward compatibility.
-     */
+    /** Encryption version for forward compatibility. */
     val encryptionVersion: Int
 )

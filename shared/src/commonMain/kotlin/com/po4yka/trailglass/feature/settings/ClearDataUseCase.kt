@@ -8,9 +8,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for clearing all app data including settings, database, and caches.
- */
+/** Use case for clearing all app data including settings, database, and caches. */
 @Inject
 class ClearDataUseCase(
     private val database: Database,

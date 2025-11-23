@@ -5,8 +5,8 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.Trip
 
 /**
- * Exports trip data to KML (Keyhole Markup Language) format.
- * KML is used by Google Earth and other mapping applications.
+ * Exports trip data to KML (Keyhole Markup Language) format. KML is used by Google Earth and other mapping
+ * applications.
  */
 class KmlExporter {
     /**
@@ -95,9 +95,7 @@ class KmlExporter {
             appendLine("</kml>")
         }
 
-    /**
-     * Escape special XML characters.
-     */
+    /** Escape special XML characters. */
     private fun escapeXml(text: String): String =
         text
             .replace("&", "&amp;")

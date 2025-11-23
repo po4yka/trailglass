@@ -2,9 +2,7 @@ package com.po4yka.trailglass.domain.model
 
 import kotlinx.datetime.Instant
 
-/**
- * EXIF and extended metadata for a photo.
- */
+/** EXIF and extended metadata for a photo. */
 data class PhotoMetadata(
     val photoId: String,
     // EXIF Location data
@@ -39,9 +37,7 @@ data class PhotoMetadata(
     }
 }
 
-/**
- * Photo cluster grouping photos by location and time.
- */
+/** Photo cluster grouping photos by location and time. */
 data class PhotoCluster(
     val id: String,
     val centerLatitude: Double,

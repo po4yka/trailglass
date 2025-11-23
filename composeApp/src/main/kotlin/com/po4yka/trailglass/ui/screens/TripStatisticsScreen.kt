@@ -1,12 +1,41 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,9 +46,7 @@ import com.po4yka.trailglass.ui.components.StatisticsMetricCards
 import com.po4yka.trailglass.ui.components.SummaryTimerDisplay
 import com.po4yka.trailglass.ui.components.TransportBreakdownSection
 
-/**
- * Trip Statistics screen - shows detailed statistics for a trip.
- */
+/** Trip Statistics screen - shows detailed statistics for a trip. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripStatisticsScreen(
@@ -127,9 +154,7 @@ fun TripStatisticsScreen(
     }
 }
 
-/**
- * Main statistics content.
- */
+/** Main statistics content. */
 @Composable
 private fun TripStatisticsContent(
     tripRoute: TripRoute,
@@ -201,9 +226,7 @@ private fun TripStatisticsContent(
     }
 }
 
-/**
- * Header with country flag and trip name.
- */
+/** Header with country flag and trip name. */
 @Composable
 private fun TripStatisticsHeader(
     tripName: String?,
@@ -259,9 +282,7 @@ private fun TripStatisticsHeader(
     }
 }
 
-/**
- * Speed metrics card.
- */
+/** Speed metrics card. */
 @Composable
 private fun SpeedMetricsCard(statistics: com.po4yka.trailglass.domain.model.RouteStatistics) {
     Card(
@@ -313,9 +334,7 @@ private fun SpeedMetricsCard(statistics: com.po4yka.trailglass.domain.model.Rout
     }
 }
 
-/**
- * Individual speed metric item.
- */
+/** Individual speed metric item. */
 @Composable
 private fun SpeedMetricItem(
     label: String,
@@ -336,9 +355,7 @@ private fun SpeedMetricItem(
     }
 }
 
-/**
- * Locations visited card.
- */
+/** Locations visited card. */
 @Composable
 private fun LocationsVisitedCard(
     countries: List<String>,
@@ -401,10 +418,7 @@ private fun LocationsVisitedCard(
     }
 }
 
-/**
- * Get country flag emoji from country code.
- * Simple implementation - can be enhanced with a proper mapping.
- */
+/** Get country flag emoji from country code. Simple implementation - can be enhanced with a proper mapping. */
 private fun getCountryFlag(countryCode: String): String {
     // Convert country code to flag emoji
     // This is a simple implementation - you might want to use a library for proper mapping

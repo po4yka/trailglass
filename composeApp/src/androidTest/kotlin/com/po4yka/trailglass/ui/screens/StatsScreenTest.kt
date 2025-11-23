@@ -1,12 +1,10 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.waitForIdle
 import com.po4yka.trailglass.feature.stats.GetStatsUseCase
 import com.po4yka.trailglass.feature.stats.StatsController
 import com.po4yka.trailglass.feature.stats.StatsPeriod
@@ -17,9 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-/**
- * UI tests for StatsScreen.
- */
+/** UI tests for StatsScreen. */
 class StatsScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()

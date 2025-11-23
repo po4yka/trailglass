@@ -9,8 +9,8 @@ import com.po4yka.trailglass.location.geocoding.ReverseGeocoder
 import kotlinx.datetime.Instant
 
 /**
- * Database-backed location service that persists location data.
- * This service integrates reverse geocoding and database storage.
+ * Database-backed location service that persists location data. This service integrates reverse geocoding and database
+ * storage.
  */
 class DatabaseLocationService(
     private val locationRepository: LocationRepository,
@@ -40,33 +40,25 @@ class DatabaseLocationService(
         }
     }
 
-    /**
-     * Get location samples for a time range.
-     */
+    /** Get location samples for a time range. */
     suspend fun getSamples(
         startTime: Instant,
         endTime: Instant
     ): List<LocationSample> = locationRepository.getSamples(userId, startTime, endTime).getOrNull() ?: emptyList()
 
-    /**
-     * Get place visits for a time range.
-     */
+    /** Get place visits for a time range. */
     suspend fun getPlaceVisits(
         startTime: Instant,
         endTime: Instant
     ): List<PlaceVisit> = placeVisitRepository.getVisits(userId, startTime, endTime)
 
-    /**
-     * Get place visits with pagination.
-     */
+    /** Get place visits with pagination. */
     suspend fun getPlaceVisits(
         limit: Int = 50,
         offset: Int = 0
     ): List<PlaceVisit> = placeVisitRepository.getVisitsByUser(userId, limit, offset)
 
-    /**
-     * Clear old location samples.
-     */
+    /** Clear old location samples. */
     suspend fun clearOldSamples(beforeTime: Instant) {
         locationRepository.deleteOldSamples(userId, beforeTime)
     }

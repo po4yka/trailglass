@@ -1,7 +1,14 @@
 package com.po4yka.trailglass.feature.places
 
-import com.po4yka.trailglass.domain.model.*
-import kotlinx.datetime.*
+import com.po4yka.trailglass.domain.model.CategoryConfidence
+import com.po4yka.trailglass.domain.model.PlaceCategory
+import com.po4yka.trailglass.domain.model.PlaceSignificance
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DayOfWeek
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -45,9 +52,7 @@ class PlaceCategorizer {
         return PlaceCategory.OTHER to CategoryConfidence.LOW
     }
 
-    /**
-     * Categorize based on POI name keywords.
-     */
+    /** Categorize based on POI name keywords. */
     private fun categorizeBPOI(poiName: String): PlaceCategory? {
         val normalized = poiName.lowercase()
 
@@ -145,9 +150,7 @@ class PlaceCategorizer {
         }
     }
 
-    /**
-     * Categorize based on visit patterns and temporal data.
-     */
+    /** Categorize based on visit patterns and temporal data. */
     private fun categorizeByPattern(
         visit: PlaceVisit,
         visitHistory: List<PlaceVisit>
@@ -181,9 +184,7 @@ class PlaceCategorizer {
         return null
     }
 
-    /**
-     * Analyze temporal patterns in visit history.
-     */
+    /** Analyze temporal patterns in visit history. */
     private fun analyzeTimeOfDayPattern(visits: List<PlaceVisit>): TimeOfDayPattern {
         var weekdayDaytimeCount = 0
         var eveningCount = 0
@@ -210,9 +211,7 @@ class PlaceCategorizer {
         )
     }
 
-    /**
-     * Determine place significance based on visit frequency and recency.
-     */
+    /** Determine place significance based on visit frequency and recency. */
     fun determineSignificance(
         visitCount: Int,
         totalDuration: Duration,

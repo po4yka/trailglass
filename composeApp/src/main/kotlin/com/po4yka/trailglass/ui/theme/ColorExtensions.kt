@@ -6,8 +6,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
 /**
- * Extended color palette for TrailGlass beyond Material 3 ColorScheme.
- * Provides semantic access to success, warning, route, category, and visualization colors.
+ * Extended color palette for TrailGlass beyond Material 3 ColorScheme. Provides semantic access to success, warning,
+ * route, category, and visualization colors.
  */
 data class ExtendedColors(
     // Success states
@@ -88,10 +88,7 @@ val DarkExtendedColors =
             )
     )
 
-/**
- * Extension property to access extended colors from Material Theme.
- * Usage: MaterialTheme.extendedColors.success
- */
+/** Extension property to access extended colors from Material Theme. Usage: MaterialTheme.extendedColors.success */
 val ColorScheme.extended: ExtendedColors
     @Composable
     @ReadOnlyComposable

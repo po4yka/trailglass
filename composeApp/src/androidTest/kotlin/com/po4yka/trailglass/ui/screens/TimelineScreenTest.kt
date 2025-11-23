@@ -1,13 +1,11 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
-import androidx.compose.ui.test.waitForIdle
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.RouteSegment
@@ -23,9 +21,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-/**
- * UI tests for TimelineScreen.
- */
+/** UI tests for TimelineScreen. */
 class TimelineScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()

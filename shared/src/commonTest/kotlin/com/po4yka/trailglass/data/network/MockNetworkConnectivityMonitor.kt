@@ -4,9 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-/**
- * Mock implementation of NetworkConnectivityMonitor for testing.
- */
+/** Mock implementation of NetworkConnectivityMonitor for testing. */
 class MockNetworkConnectivityMonitor : NetworkConnectivityMonitor {
     private val _networkState = MutableStateFlow<NetworkState>(NetworkState.Connected)
     override val networkState: StateFlow<NetworkState> = _networkState.asStateFlow()

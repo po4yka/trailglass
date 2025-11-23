@@ -4,10 +4,7 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import kotlin.test.Test
 import kotlin.time.measureTime
 
-/**
- * Quick benchmark test that can be run to get performance data.
- * Remove @Ignore to execute.
- */
+/** Quick benchmark test that can be run to get performance data. Remove @Ignore to execute. */
 class QuickBenchmark {
     @Test
     fun quickPerformanceCheck() {

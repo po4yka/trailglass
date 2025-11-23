@@ -1,6 +1,11 @@
 package com.po4yka.trailglass.di
 
-import com.po4yka.trailglass.data.repository.*
+import com.po4yka.trailglass.data.repository.GeocodingCacheRepository
+import com.po4yka.trailglass.data.repository.LocationRepository
+import com.po4yka.trailglass.data.repository.PhotoRepository
+import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.data.repository.RouteSegmentRepository
+import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.feature.auth.AuthController
 import com.po4yka.trailglass.feature.devices.DeviceManagementController
 import com.po4yka.trailglass.feature.export.ExportController
@@ -33,8 +38,8 @@ import me.tatarka.inject.annotations.Component
  * - Feature controllers
  * - Sync and backend API components
  *
- * Platform-specific implementations should create a component that includes
- * this interface along with platform-specific modules.
+ * Platform-specific implementations should create a component that includes this interface along with platform-specific
+ * modules.
  */
 @AppScope
 @Component
@@ -46,15 +51,12 @@ abstract class AppComponent(
     PermissionModule,
     AuthModule {
     /**
-     * Provides a CoroutineScope for application-level background work.
-     * Platform-specific implementation should provide this.
+     * Provides a CoroutineScope for application-level background work. Platform-specific implementation should provide
+     * this.
      */
     abstract val applicationScope: kotlinx.coroutines.CoroutineScope
 
-    /**
-     * Provides the current user ID.
-     * Platform-specific implementation should provide this.
-     */
+    /** Provides the current user ID. Platform-specific implementation should provide this. */
     abstract val userId: String
 
     // Repositories (from DataModule)

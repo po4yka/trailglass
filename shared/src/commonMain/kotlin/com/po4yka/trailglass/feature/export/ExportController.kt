@@ -14,8 +14,7 @@ import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for managing export operations.
- * Handles exporting data to various formats with progress tracking.
+ * Controller for managing export operations. Handles exporting data to various formats with progress tracking.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -32,9 +31,7 @@ class ExportController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Export state.
-     */
+    /** Export state. */
     data class ExportState(
         val isExporting: Boolean = false,
         val progress: Float = 0f,
@@ -46,9 +43,7 @@ class ExportController(
         val selectedDataType: DataTypeSelection = DataTypeSelection.AllTrips
     )
 
-    /**
-     * Data type selection for UI.
-     */
+    /** Data type selection for UI. */
     sealed class DataTypeSelection {
         object AllTrips : DataTypeSelection()
 
@@ -71,17 +66,13 @@ class ExportController(
     private val _state = MutableStateFlow(ExportState())
     val state: StateFlow<ExportState> = _state.asStateFlow()
 
-    /**
-     * Show export dialog.
-     */
+    /** Show export dialog. */
     fun showDialog() {
         logger.debug { "Showing export dialog" }
         _state.update { it.copy(showDialog = true) }
     }
 
-    /**
-     * Hide export dialog.
-     */
+    /** Hide export dialog. */
     fun dismissDialog() {
         logger.debug { "Dismissing export dialog" }
         _state.update {
@@ -92,17 +83,13 @@ class ExportController(
         }
     }
 
-    /**
-     * Set selected export format.
-     */
+    /** Set selected export format. */
     fun setFormat(format: ExportDataUseCase.Format) {
         logger.debug { "Setting export format to $format" }
         _state.update { it.copy(selectedFormat = format) }
     }
 
-    /**
-     * Set selected data type.
-     */
+    /** Set selected data type. */
     fun setDataType(dataType: DataTypeSelection) {
         logger.debug { "Setting data type to $dataType" }
         _state.update { it.copy(selectedDataType = dataType) }
@@ -197,16 +184,12 @@ class ExportController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
-    /**
-     * Reset export state.
-     */
+    /** Reset export state. */
     fun reset() {
         logger.debug { "Resetting export state" }
         _state.update {
@@ -218,8 +201,8 @@ class ExportController(
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      */
     override fun cleanup() {
         logger.info { "Cleaning up ExportController" }

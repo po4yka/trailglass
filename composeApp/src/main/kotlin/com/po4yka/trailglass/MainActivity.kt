@@ -13,10 +13,7 @@ import com.po4yka.trailglass.ui.navigation.AppRootComponent
 import com.po4yka.trailglass.ui.navigation.DefaultAppRootComponent
 
 class MainActivity : ComponentActivity() {
-    /**
-     * Access to the application-level DI component.
-     * Use this to get dependencies like controllers and repositories.
-     */
+    /** Access to the application-level DI component. Use this to get dependencies like controllers and repositories. */
     private val appComponent: AppComponent by lazy {
         (application as TrailGlassApplication).appComponent
     }
@@ -51,17 +48,14 @@ class MainActivity : ComponentActivity() {
         handleIntent(intent)
     }
 
-    /**
-     * Handle deep link intents.
-     * Supports both trailglass:// and https://trailglass.app URLs.
-     */
+    /** Handle deep link intents. Supports both trailglass:// and https://trailglass.app URLs. */
     private fun handleIntent(intent: Intent) {
         val data = intent.data ?: return
 
         // Extract path from the URI
         // For trailglass://app/stats -> path = "stats"
         // For https://trailglass.app/timeline -> path = "timeline"
-        val path = data.path?.removePrefix("/") ?: data.host ?: return
+        data.path?.removePrefix("/") ?: data.host ?: return
 
         // Deep links only work when user is authenticated and in main app
         // TODO: Handle deep linking to main screens once authenticated

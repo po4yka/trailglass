@@ -1,6 +1,15 @@
 package com.po4yka.trailglass.feature.permission
 
-import com.po4yka.trailglass.domain.permission.*
+import com.po4yka.trailglass.domain.permission.PermissionManager
+import com.po4yka.trailglass.domain.permission.PermissionRationale
+import com.po4yka.trailglass.domain.permission.PermissionRationaleProvider
+import com.po4yka.trailglass.domain.permission.PermissionRequestState
+import com.po4yka.trailglass.domain.permission.PermissionResult
+import com.po4yka.trailglass.domain.permission.PermissionState
+import com.po4yka.trailglass.domain.permission.PermissionType
+import com.po4yka.trailglass.domain.permission.SettingsInstructions
+import com.po4yka.trailglass.domain.permission.isGranted
+import com.po4yka.trailglass.domain.permission.requiresSettings
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
@@ -14,8 +23,8 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for managing permission request flows with user-friendly explanations.
- * Orchestrates the complete permission request experience:
+ * Controller for managing permission request flows with user-friendly explanations. Orchestrates the complete
+ * permission request experience:
  * 1. Check current permission state
  * 2. Show rationale if needed
  * 3. Request permission
@@ -38,9 +47,7 @@ class PermissionFlowController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * UI state for permission flow.
-     */
+    /** UI state for permission flow. */
     data class PermissionFlowState(
         val currentRequest: PermissionRequestState? = null,
         val isRequesting: Boolean = false,
@@ -55,10 +62,7 @@ class PermissionFlowController(
     private val _state = MutableStateFlow(PermissionFlowState())
     val state: StateFlow<PermissionFlowState> = _state.asStateFlow()
 
-    /**
-     * Start a permission request flow.
-     * This checks the current state and shows appropriate UI.
-     */
+    /** Start a permission request flow. This checks the current state and shows appropriate UI. */
     fun startPermissionFlow(permissionType: PermissionType) {
         logger.info { "Starting permission flow for $permissionType" }
 
@@ -138,9 +142,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * User confirmed they want to grant the permission after seeing rationale.
-     */
+    /** User confirmed they want to grant the permission after seeing rationale. */
     fun onRationaleAccepted() {
         logger.debug { "User accepted rationale" }
 
@@ -155,9 +157,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * User declined to grant permission after seeing rationale.
-     */
+    /** User declined to grant permission after seeing rationale. */
     fun onRationaleDenied() {
         logger.debug { "User declined rationale" }
 
@@ -170,9 +170,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * User chose to open settings.
-     */
+    /** User chose to open settings. */
     fun onOpenSettingsClicked() {
         logger.info { "User chose to open settings" }
 
@@ -194,9 +192,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * User chose to continue without the permission.
-     */
+    /** User chose to continue without the permission. */
     fun onContinueWithoutPermission() {
         logger.info { "User chose to continue without permission" }
 
@@ -211,9 +207,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * Retry permission request after denial.
-     */
+    /** Retry permission request after denial. */
     fun onRetryPermission() {
         logger.info { "User chose to retry permission" }
 
@@ -226,9 +220,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * Dismiss any dialog.
-     */
+    /** Dismiss any dialog. */
     fun dismissDialogs() {
         _state.update {
             it.copy(
@@ -239,23 +231,17 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
-    /**
-     * Clear the last result.
-     */
+    /** Clear the last result. */
     fun clearResult() {
         _state.update { it.copy(lastResult = null) }
     }
 
-    /**
-     * Internal function to request permission.
-     */
+    /** Internal function to request permission. */
     private fun requestPermissionInternal(
         permissionType: PermissionType,
         rationale: PermissionRationale
@@ -344,9 +330,7 @@ class PermissionFlowController(
         }
     }
 
-    /**
-     * Check if a specific permission is granted.
-     */
+    /** Check if a specific permission is granted. */
     suspend fun isPermissionGranted(permissionType: PermissionType): Boolean =
         try {
             permissionManager.checkPermission(permissionType).isGranted
@@ -355,9 +339,7 @@ class PermissionFlowController(
             false
         }
 
-    /**
-     * Get the current state of a permission without starting a flow.
-     */
+    /** Get the current state of a permission without starting a flow. */
     suspend fun getPermissionState(permissionType: PermissionType): PermissionState =
         try {
             permissionManager.checkPermission(permissionType)
@@ -367,8 +349,8 @@ class PermissionFlowController(
         }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

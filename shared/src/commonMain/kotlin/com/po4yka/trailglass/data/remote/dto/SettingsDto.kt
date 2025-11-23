@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * Tracking preferences DTO.
- */
+/** Tracking preferences DTO. */
 @Serializable
 data class TrackingPreferencesDto(
     val accuracy: String,
@@ -14,9 +12,7 @@ data class TrackingPreferencesDto(
     val minimumDistance: Int
 )
 
-/**
- * Privacy settings DTO.
- */
+/** Privacy settings DTO. */
 @Serializable
 data class PrivacySettingsDto(
     val dataRetentionDays: Int,
@@ -26,9 +22,7 @@ data class PrivacySettingsDto(
     val autoBackup: Boolean
 )
 
-/**
- * Unit preferences DTO.
- */
+/** Unit preferences DTO. */
 @Serializable
 data class UnitPreferencesDto(
     val distanceUnit: String,
@@ -37,9 +31,7 @@ data class UnitPreferencesDto(
     val firstDayOfWeek: String
 )
 
-/**
- * Appearance settings DTO.
- */
+/** Appearance settings DTO. */
 @Serializable
 data class AppearanceSettingsDto(
     val theme: String,
@@ -48,9 +40,7 @@ data class AppearanceSettingsDto(
     val enableAnimations: Boolean
 )
 
-/**
- * Settings DTO (complete settings object).
- */
+/** Settings DTO (complete settings object). */
 @Serializable
 data class SettingsDto(
     val trackingPreferences: TrackingPreferencesDto? = null,
@@ -61,9 +51,7 @@ data class SettingsDto(
     val lastModified: String? = null
 )
 
-/**
- * Update settings request (partial update supported).
- */
+/** Update settings request (partial update supported). */
 @Serializable
 data class UpdateSettingsRequest(
     val trackingPreferences: TrackingPreferencesDto? = null,
@@ -73,9 +61,7 @@ data class UpdateSettingsRequest(
     val expectedVersion: Long
 )
 
-/**
- * Settings response (for updates).
- */
+/** Settings response (for updates). */
 @Serializable
 data class SettingsResponse(
     val serverVersion: Long,

@@ -1,9 +1,31 @@
 package com.po4yka.trailglass.ui.components
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.TopAppBarState
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -125,7 +147,7 @@ fun LargeFlexibleTopAppBar(
     // Calculate current height based on scroll
     val currentHeight =
         if (scrollBehavior != null) {
-            val maxOffset = expandedHeight - collapsedHeight
+            expandedHeight - collapsedHeight
             val offset = scrollBehavior.state.heightOffset
             max(collapsedHeight.value, expandedHeight.value + offset)
         } else {
@@ -285,8 +307,8 @@ fun LargeFlexibleTopAppBar(
 /**
  * Medium Flexible Top App Bar for Trailglass detail screens.
  *
- * A more compact variant than LargeFlexibleTopAppBar, suitable for place details
- * and secondary screens. Collapses from medium to small size.
+ * A more compact variant than LargeFlexibleTopAppBar, suitable for place details and secondary screens. Collapses from
+ * medium to small size.
  *
  * Features:
  * - Collapses from medium to compact size on scroll
@@ -365,7 +387,7 @@ fun MediumFlexibleTopAppBar(
     // Calculate current height
     val currentHeight =
         if (scrollBehavior != null) {
-            val maxOffset = expandedHeight - collapsedHeight
+            expandedHeight - collapsedHeight
             val offset = scrollBehavior.state.heightOffset
             max(collapsedHeight.value, expandedHeight.value + offset)
         } else {
@@ -489,8 +511,8 @@ fun MediumFlexibleTopAppBar(
 /**
  * Compact Flexible Top App Bar for Trailglass list screens.
  *
- * A simple, non-collapsing app bar for list and overview screens.
- * Maintains consistent height and provides standard navigation + actions layout.
+ * A simple, non-collapsing app bar for list and overview screens. Maintains consistent height and provides standard
+ * navigation + actions layout.
  *
  * Usage example:
  * ```kotlin
@@ -545,23 +567,17 @@ fun CompactFlexibleTopAppBar(
     )
 }
 
-/**
- * Helper object providing default values and utilities for FlexibleTopAppBar components.
- */
+/** Helper object providing default values and utilities for FlexibleTopAppBar components. */
 object FlexibleTopAppBarDefaults {
-    /**
-     * Default expanded height for LargeFlexibleTopAppBar.
-     */
+    /** Default expanded height for LargeFlexibleTopAppBar. */
     val LargeExpandedHeight = 180.dp
 
-    /**
-     * Default expanded height for MediumFlexibleTopAppBar.
-     */
+    /** Default expanded height for MediumFlexibleTopAppBar. */
     val MediumExpandedHeight = 128.dp
 
     /**
-     * Creates a TopAppBarScrollBehavior for exit-until-collapsed behavior.
-     * This is the recommended scroll behavior for flexible top app bars.
+     * Creates a TopAppBarScrollBehavior for exit-until-collapsed behavior. This is the recommended scroll behavior for
+     * flexible top app bars.
      */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -571,8 +587,8 @@ object FlexibleTopAppBarDefaults {
     ): TopAppBarScrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(state, canScroll)
 
     /**
-     * Creates colors for a top app bar with hero background.
-     * Makes the container transparent to show the background content.
+     * Creates colors for a top app bar with hero background. Makes the container transparent to show the background
+     * content.
      */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
@@ -591,9 +607,7 @@ object FlexibleTopAppBarDefaults {
             actionIconContentColor = actionIconContentColor
         )
 
-    /**
-     * Creates colors for a top app bar with Silent Waters theme.
-     */
+    /** Creates colors for a top app bar with Silent Waters theme. */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun silentWatersColors(
@@ -611,10 +625,7 @@ object FlexibleTopAppBarDefaults {
             actionIconContentColor = actionIconContentColor
         )
 
-    /**
-     * Creates standard top app bar colors.
-     * Helper function to provide a cleaner API.
-     */
+    /** Creates standard top app bar colors. Helper function to provide a cleaner API. */
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun topAppBarColors(

@@ -1,16 +1,23 @@
 package com.po4yka.trailglass.service
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
 import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
 /**
  * WorkManager Worker for periodic background location tracking.
  *
- * This worker runs periodically (default: every 15 minutes) to collect location samples
- * even when the app is in the background. It respects battery optimization settings and
- * can be configured for different tracking accuracies.
+ * This worker runs periodically (default: every 15 minutes) to collect location samples even when the app is in the
+ * background. It respects battery optimization settings and can be configured for different tracking accuracies.
  *
  * For continuous tracking, use [LocationTrackingService] instead.
  */
@@ -63,9 +70,7 @@ class LocationTrackingWorker(
             )
         }
 
-        /**
-         * Cancels periodic background tracking.
-         */
+        /** Cancels periodic background tracking. */
         fun cancelPeriodicTracking(context: Context) {
             WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
         }

@@ -191,9 +191,7 @@ object MapMarkerBitmapGenerator {
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
-    /**
-     * Adjust color alpha channel.
-     */
+    /** Adjust color alpha channel. */
     private fun adjustAlpha(
         color: Int,
         factor: Float
@@ -205,9 +203,7 @@ object MapMarkerBitmapGenerator {
         return (alpha shl 24) or (red shl 16) or (green shl 8) or blue
     }
 
-    /**
-     * Generate a route waypoint marker.
-     */
+    /** Generate a route waypoint marker. */
     fun generateWaypointBitmap(
         label: String,
         color: Int
@@ -259,14 +255,10 @@ object MapMarkerBitmapGenerator {
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
-    /**
-     * Cache for generated bitmaps to avoid regenerating identical markers.
-     */
+    /** Cache for generated bitmaps to avoid regenerating identical markers. */
     private val bitmapCache = mutableMapOf<String, BitmapDescriptor>()
 
-    /**
-     * Get or create a marker bitmap with caching.
-     */
+    /** Get or create a marker bitmap with caching. */
     fun getCachedMarkerBitmap(
         color: Int,
         isSelected: Boolean
@@ -277,9 +269,7 @@ object MapMarkerBitmapGenerator {
         }
     }
 
-    /**
-     * Get or create a cluster bitmap with caching.
-     */
+    /** Get or create a cluster bitmap with caching. */
     fun getCachedClusterBitmap(
         count: Int,
         color: Int,
@@ -291,9 +281,7 @@ object MapMarkerBitmapGenerator {
         }
     }
 
-    /**
-     * Clear the bitmap cache to free memory.
-     */
+    /** Clear the bitmap cache to free memory. */
     fun clearCache() {
         bitmapCache.clear()
     }

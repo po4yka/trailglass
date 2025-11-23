@@ -4,12 +4,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import me.tatarka.inject.annotations.Inject
-import platform.Network.*
+import platform.Network.nw_interface_type_cellular
+import platform.Network.nw_interface_type_wifi
+import platform.Network.nw_interface_type_wired
+import platform.Network.nw_path_get_status
+import platform.Network.nw_path_is_constrained
+import platform.Network.nw_path_is_expensive
+import platform.Network.nw_path_monitor_cancel
+import platform.Network.nw_path_monitor_create
+import platform.Network.nw_path_monitor_set_queue
+import platform.Network.nw_path_monitor_set_update_handler
+import platform.Network.nw_path_monitor_start
+import platform.Network.nw_path_status_satisfiable
+import platform.Network.nw_path_status_satisfied
+import platform.Network.nw_path_status_unsatisfied
+import platform.Network.nw_path_t
+import platform.Network.nw_path_uses_interface_type
 import platform.darwin.dispatch_queue_create
 
-/**
- * iOS implementation of NetworkConnectivityMonitor using NWPathMonitor.
- */
+/** iOS implementation of NetworkConnectivityMonitor using NWPathMonitor. */
 @Inject
 class IOSNetworkConnectivityMonitor : NetworkConnectivityMonitor {
     private val pathMonitor = nw_path_monitor_create()

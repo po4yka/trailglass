@@ -4,8 +4,8 @@ import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
 /**
- * Represents a frequently visited place, aggregating multiple PlaceVisits.
- * This is used to identify and track places like home, work, favorite cafe, etc.
+ * Represents a frequently visited place, aggregating multiple PlaceVisits. This is used to identify and track places
+ * like home, work, favorite cafe, etc.
  */
 data class FrequentPlace(
     val id: String,
@@ -35,16 +35,11 @@ data class FrequentPlace(
     val createdAt: Instant,
     val updatedAt: Instant
 ) {
-    /**
-     * Average duration per visit.
-     */
+    /** Average duration per visit. */
     val averageDuration: Duration
         get() = if (visitCount > 0) totalDuration / visitCount else Duration.ZERO
 
-    /**
-     * Display name for this frequent place.
-     * Priority: userLabel > name > address > coordinates
-     */
+    /** Display name for this frequent place. Priority: userLabel > name > address > coordinates */
     val displayName: String
         get() =
             userLabel
@@ -52,9 +47,7 @@ data class FrequentPlace(
                 ?: address
                 ?: "${centerLatitude.roundToDecimals(4)}, ${centerLongitude.roundToDecimals(4)}"
 
-    /**
-     * Whether this place is significant (visited frequently).
-     */
+    /** Whether this place is significant (visited frequently). */
     val isSignificant: Boolean
         get() =
             significance == PlaceSignificance.PRIMARY ||

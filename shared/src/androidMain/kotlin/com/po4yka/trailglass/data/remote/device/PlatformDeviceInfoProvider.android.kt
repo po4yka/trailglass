@@ -6,9 +6,7 @@ import com.po4yka.trailglass.data.remote.DeviceInfoProvider
 import me.tatarka.inject.annotations.Inject
 import java.util.UUID
 
-/**
- * Android implementation of DeviceInfoProvider.
- */
+/** Android implementation of DeviceInfoProvider. */
 @Inject
 actual class PlatformDeviceInfoProvider(
     private val context: Context

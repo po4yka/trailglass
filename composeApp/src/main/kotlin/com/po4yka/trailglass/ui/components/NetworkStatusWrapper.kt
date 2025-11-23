@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 
 /**
- * Wrapper composable that displays network status banner and content.
- * Shows a banner at the top when network is disconnected or limited.
+ * Wrapper composable that displays network status banner and content. Shows a banner at the top when network is
+ * disconnected or limited.
  */
 @Composable
 fun NetworkStatusWrapper(

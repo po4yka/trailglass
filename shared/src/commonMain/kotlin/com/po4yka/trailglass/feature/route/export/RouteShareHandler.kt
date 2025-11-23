@@ -1,8 +1,8 @@
 package com.po4yka.trailglass.feature.route.export
 
 /**
- * Platform-specific handler for sharing route files and map snapshots.
- * Implementations should use platform-specific sharing mechanisms.
+ * Platform-specific handler for sharing route files and map snapshots. Implementations should use platform-specific
+ * sharing mechanisms.
  */
 interface RouteShareHandler {
     /**

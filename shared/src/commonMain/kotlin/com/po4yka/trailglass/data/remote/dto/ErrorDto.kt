@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * API error response.
- */
+/** API error response. */
 @Serializable
 data class ApiErrorResponse(
     val error: String,
@@ -14,9 +12,7 @@ data class ApiErrorResponse(
     val requestId: String? = null
 )
 
-/**
- * Common API error codes.
- */
+/** Common API error codes. */
 object ApiErrorCode {
     const val UNAUTHORIZED = "UNAUTHORIZED"
     const val FORBIDDEN = "FORBIDDEN"

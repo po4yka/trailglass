@@ -1,7 +1,15 @@
 package com.po4yka.trailglass.ui.components.charts
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,9 +24,7 @@ import androidx.compose.ui.unit.sp
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.DayOfWeek
 
-/**
- * Heatmap showing activity intensity by hour and day of week.
- */
+/** Heatmap showing activity intensity by hour and day of week. */
 @Composable
 fun ActivityHeatmap(
     data: Map<DayOfWeek, Map<Int, Int>>, // day -> hour -> activity count
@@ -117,12 +123,16 @@ fun ActivityHeatmap(
             )
 
             Row(
-                modifier = Modifier.weight(1f).height(12.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 (0..4).forEach { index ->
                     val intensity = index / 4f
-                    Canvas(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    Canvas(modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()) {
                         val color = blendColors(lowColor, highColor, intensity)
                         drawRoundRect(
                             color = color,
@@ -143,9 +153,7 @@ fun ActivityHeatmap(
     }
 }
 
-/**
- * Blend two colors based on intensity.
- */
+/** Blend two colors based on intensity. */
 private fun blendColors(
     low: Color,
     high: Color,

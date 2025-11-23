@@ -2,9 +2,7 @@ package com.po4yka.trailglass.domain.model
 
 import kotlinx.datetime.Instant
 
-/**
- * Transport type inferred from speed and movement patterns.
- */
+/** Transport type inferred from speed and movement patterns. */
 enum class TransportType {
     WALK,
     BIKE,
@@ -17,6 +15,7 @@ enum class TransportType {
     companion object {
         /**
          * Infer transport type from average speed.
+         *
          * @param speedMps Speed in meters per second
          */
         fun inferFromSpeed(speedMps: Double?): TransportType {
@@ -33,10 +32,7 @@ enum class TransportType {
     }
 }
 
-/**
- * A route segment between two locations (places or day boundaries).
- * Represents movement from point A to point B.
- */
+/** A route segment between two locations (places or day boundaries). Represents movement from point A to point B. */
 data class RouteSegment(
     val id: String,
     val startTime: Instant,

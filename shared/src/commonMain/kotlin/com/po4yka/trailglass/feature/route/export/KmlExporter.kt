@@ -3,8 +3,8 @@ package com.po4yka.trailglass.feature.route.export
 import com.po4yka.trailglass.domain.model.TripRoute
 
 /**
- * KML (Keyhole Markup Language) exporter for trip routes.
- * Exports route data to KML format for Google Earth and other mapping applications.
+ * KML (Keyhole Markup Language) exporter for trip routes. Exports route data to KML format for Google Earth and other
+ * mapping applications.
  */
 class KmlExporter {
     /**
@@ -79,18 +79,26 @@ class KmlExporter {
                     if (segment.simplifiedPath.isNotEmpty()) {
                         appendLine("      <Placemark>")
                         appendLine(
-                            "        <name>${transportType.name.lowercase().replaceFirstChar {
-                                it.uppercase()
-                            }} - ${formatDistance(
-                                segment.distanceMeters
-                            )}</name>"
+                            "        <name>${
+                                transportType.name.lowercase().replaceFirstChar {
+                                    it.uppercase()
+                                }
+                            } - ${
+                                formatDistance(
+                                    segment.distanceMeters
+                                )
+                            }</name>"
                         )
                         appendLine(
-                            "        <description>Distance: ${formatDistance(
-                                segment.distanceMeters
-                            )}, Duration: ${formatDuration(
-                                segment.endTime.toEpochMilliseconds() - segment.startTime.toEpochMilliseconds()
-                            )}</description>"
+                            "        <description>Distance: ${
+                                formatDistance(
+                                    segment.distanceMeters
+                                )
+                            }, Duration: ${
+                                formatDuration(
+                                    segment.endTime.toEpochMilliseconds() - segment.startTime.toEpochMilliseconds()
+                                )
+                            }</description>"
                         )
                         appendLine("        <styleUrl>#${transportType.name.lowercase()}</styleUrl>")
                         appendLine("        <LineString>")
@@ -111,9 +119,7 @@ class KmlExporter {
             appendLine("</kml>")
         }
 
-    /**
-     * Append KML styles for different transport types.
-     */
+    /** Append KML styles for different transport types. */
     private fun StringBuilder.appendTransportStyles() {
         val styles =
             mapOf(
@@ -136,9 +142,7 @@ class KmlExporter {
         }
     }
 
-    /**
-     * Format distance for display.
-     */
+    /** Format distance for display. */
     private fun formatDistance(meters: Double): String =
         when {
             meters < 1000 -> "${meters.toInt()} m"
@@ -149,9 +153,7 @@ class KmlExporter {
             }
         }
 
-    /**
-     * Format duration for display.
-     */
+    /** Format duration for display. */
     private fun formatDuration(millis: Long): String {
         val seconds = millis / 1000
         val hours = seconds / 3600
@@ -164,9 +166,7 @@ class KmlExporter {
         }
     }
 
-    /**
-     * Escape XML special characters.
-     */
+    /** Escape XML special characters. */
     private fun escapeXml(text: String): String =
         text
             .replace("&", "&amp;")

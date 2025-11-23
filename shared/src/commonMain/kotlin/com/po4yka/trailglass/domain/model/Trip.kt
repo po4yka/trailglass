@@ -4,10 +4,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlin.time.Duration
 
-/**
- * A trip or vacation - a logical grouping of movement and visits.
- * Can be auto-detected or manually created.
- */
+/** A trip or vacation - a logical grouping of movement and visits. Can be auto-detected or manually created. */
 data class Trip(
     val id: String,
     val name: String? = null,
@@ -33,25 +30,18 @@ data class Trip(
     val createdAt: Instant? = null,
     val updatedAt: Instant? = null
 ) {
-    /**
-     * Calculate trip duration.
-     */
+    /** Calculate trip duration. */
     val duration: Duration?
         get() = if (endTime != null) endTime - startTime else null
 
-    /**
-     * Get display name for the trip.
-     * Priority: name > primaryCountry > "Unnamed Trip"
-     */
+    /** Get display name for the trip. Priority: name > primaryCountry > "Unnamed Trip" */
     val displayName: String
         get() =
             name
                 ?: primaryCountry?.let { "$it Trip" }
                 ?: "Unnamed Trip"
 
-    /**
-     * Get a summary of the trip.
-     */
+    /** Get a summary of the trip. */
     val summary: String
         get() =
             buildString {
@@ -70,10 +60,7 @@ data class Trip(
             }
 }
 
-/**
- * A single day within a trip.
- * Contains all timeline items (visits, routes, etc.) for that day.
- */
+/** A single day within a trip. Contains all timeline items (visits, routes, etc.) for that day. */
 data class TripDay(
     val id: String,
     val tripId: String,
@@ -81,9 +68,7 @@ data class TripDay(
     val items: List<TimelineItem> = emptyList()
 )
 
-/**
- * Timeline item - represents an event in a day's timeline.
- */
+/** Timeline item - represents an event in a day's timeline. */
 sealed class TimelineItem {
     abstract val id: String
     abstract val timestamp: Instant

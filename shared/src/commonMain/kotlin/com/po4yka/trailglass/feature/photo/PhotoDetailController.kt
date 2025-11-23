@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for photo detail view.
- * Handles loading and displaying a single photo with full metadata.
+ * Controller for photo detail view. Handles loading and displaying a single photo with full metadata.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -37,9 +36,7 @@ class PhotoDetailController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Photo detail UI state.
-     */
+    /** Photo detail UI state. */
     data class DetailState(
         val photo: PhotoWithMetadata? = null,
         val isLoading: Boolean = false,
@@ -52,9 +49,7 @@ class PhotoDetailController(
     private val _state = MutableStateFlow(DetailState())
     val state: StateFlow<DetailState> = _state.asStateFlow()
 
-    /**
-     * Load photo by ID with full metadata.
-     */
+    /** Load photo by ID with full metadata. */
     fun loadPhoto(photoId: String) {
         logger.debug { "Loading photo: $photoId" }
 
@@ -127,24 +122,18 @@ class PhotoDetailController(
         }
     }
 
-    /**
-     * Show dialog to attach photo to a visit.
-     */
+    /** Show dialog to attach photo to a visit. */
     fun showAttachmentDialog() {
         logger.info { "Showing attachment dialog" }
         _state.update { it.copy(showAttachDialog = true) }
     }
 
-    /**
-     * Hide attachment dialog.
-     */
+    /** Hide attachment dialog. */
     fun dismissAttachmentDialog() {
         _state.update { it.copy(showAttachDialog = false) }
     }
 
-    /**
-     * Attach photo to a visit.
-     */
+    /** Attach photo to a visit. */
     fun attachToVisit(
         visitId: String,
         caption: String? = null
@@ -177,6 +166,7 @@ class PhotoDetailController(
                         )
                     }
                 }
+
                 is AttachPhotoToVisitUseCase.Result.AlreadyAttached -> {
                     logger.warn { "Photo $photoId already attached to visit $visitId" }
                     _state.update {
@@ -186,6 +176,7 @@ class PhotoDetailController(
                         )
                     }
                 }
+
                 is AttachPhotoToVisitUseCase.Result.Error -> {
                     logger.error { "Failed to attach photo: ${result.message}" }
                     _state.update {
@@ -199,39 +190,29 @@ class PhotoDetailController(
         }
     }
 
-    /**
-     * Share photo (platform-specific implementation required).
-     */
+    /** Share photo (platform-specific implementation required). */
     fun sharePhoto() {
         logger.info { "User requested to share photo" }
         _state.update { it.copy(showShareSheet = true) }
     }
 
-    /**
-     * Hide share sheet.
-     */
+    /** Hide share sheet. */
     fun dismissShareSheet() {
         _state.update { it.copy(showShareSheet = false) }
     }
 
-    /**
-     * Show delete confirmation dialog.
-     */
+    /** Show delete confirmation dialog. */
     fun showDeleteConfirmation() {
         logger.info { "Showing delete confirmation" }
         _state.update { it.copy(showDeleteConfirmation = true) }
     }
 
-    /**
-     * Hide delete confirmation dialog.
-     */
+    /** Hide delete confirmation dialog. */
     fun dismissDeleteConfirmation() {
         _state.update { it.copy(showDeleteConfirmation = false) }
     }
 
-    /**
-     * Delete photo.
-     */
+    /** Delete photo. */
     fun deletePhoto() {
         val photoId =
             _state.value.photo
@@ -277,16 +258,14 @@ class PhotoDetailController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

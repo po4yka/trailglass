@@ -12,9 +12,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * SQLDelight-based persistent implementation of ConflictRepository.
- */
+/** SQLDelight-based persistent implementation of ConflictRepository. */
 @Inject
 class ConflictRepositoryImpl(
     private val database: Database

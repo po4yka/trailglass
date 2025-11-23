@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.StateFlow
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Android implementation of PermissionManager.
- * Uses Android's permission system (Manifest.permission) and ActivityCompat.
+ * Android implementation of PermissionManager. Uses Android's permission system (Manifest.permission) and
+ * ActivityCompat.
  */
 @Inject
 actual class PermissionManager(
@@ -24,9 +24,7 @@ actual class PermissionManager(
 ) {
     private val permissionStates = mutableMapOf<PermissionType, MutableStateFlow<PermissionState>>()
 
-    /**
-     * Check the current state of a permission.
-     */
+    /** Check the current state of a permission. */
     actual suspend fun checkPermission(permissionType: PermissionType): PermissionState {
         val androidPermission = getAndroidPermission(permissionType)
 
@@ -58,9 +56,8 @@ actual class PermissionManager(
     /**
      * Request a permission from the user.
      *
-     * Note: This implementation checks permission status and provides guidance.
-     * The actual permission request dialog must be triggered from UI layer using
-     * Activity Result API (recommended) or via Activity.requestPermissions().
+     * Note: This implementation checks permission status and provides guidance. The actual permission request dialog
+     * must be triggered from UI layer using Activity Result API (recommended) or via Activity.requestPermissions().
      *
      * Integration pattern:
      * 1. Call this method to get current status
@@ -96,18 +93,14 @@ actual class PermissionManager(
         }
     }
 
-    /**
-     * Check if we should show a rationale before requesting.
-     */
+    /** Check if we should show a rationale before requesting. */
     actual suspend fun shouldShowRationale(permissionType: PermissionType): Boolean {
         val androidPermission = getAndroidPermission(permissionType) ?: return false
 
         return shouldShowRequestPermissionRationale(androidPermission)
     }
 
-    /**
-     * Open system settings for the app.
-     */
+    /** Open system settings for the app. */
     actual suspend fun openAppSettings() {
         val intent =
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -117,17 +110,13 @@ actual class PermissionManager(
         context.startActivity(intent)
     }
 
-    /**
-     * Observable state for permission changes.
-     */
+    /** Observable state for permission changes. */
     actual fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
         permissionStates.getOrPut(permissionType) {
             MutableStateFlow(PermissionState.NotDetermined)
         }
 
-    /**
-     * Map PermissionType to Android permission string.
-     */
+    /** Map PermissionType to Android permission string. */
     private fun getAndroidPermission(permissionType: PermissionType): String? =
         when (permissionType) {
             PermissionType.LOCATION_FINE -> Manifest.permission.ACCESS_FINE_LOCATION
@@ -161,18 +150,13 @@ actual class PermissionManager(
             }
         }
 
-    /**
-     * Check if should show rationale using Activity.
-     * This is a helper that tries to get the Activity from context.
-     */
+    /** Check if should show rationale using Activity. This is a helper that tries to get the Activity from context. */
     private fun shouldShowRequestPermissionRationale(permission: String): Boolean {
         val activity = context as? Activity ?: return false
         return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)
     }
 
-    /**
-     * Update the cached permission state.
-     */
+    /** Update the cached permission state. */
     private fun updatePermissionState(
         permissionType: PermissionType,
         state: PermissionState

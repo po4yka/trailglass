@@ -10,9 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Android implementation of NetworkConnectivityMonitor using ConnectivityManager.
- */
+/** Android implementation of NetworkConnectivityMonitor using ConnectivityManager. */
 @Inject
 class AndroidNetworkConnectivityMonitor(
     private val context: Context

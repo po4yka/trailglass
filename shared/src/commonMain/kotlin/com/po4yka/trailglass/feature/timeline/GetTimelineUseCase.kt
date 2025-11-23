@@ -2,14 +2,21 @@ package com.po4yka.trailglass.feature.timeline
 
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.PlaceCategory
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.domain.model.RouteSegment
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.*
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Enhanced use case for getting timeline with zoom levels and filtering.
- */
+/** Enhanced use case for getting timeline with zoom levels and filtering. */
 @Inject
 class GetTimelineUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
@@ -18,9 +25,7 @@ class GetTimelineUseCase(
 ) {
     private val logger = logger()
 
-    /**
-     * Timeline item for UI display with enhanced metadata.
-     */
+    /** Timeline item for UI display with enhanced metadata. */
     sealed class TimelineItemUI {
         abstract val timestamp: Instant
         abstract val id: String
@@ -122,9 +127,7 @@ class GetTimelineUseCase(
         }
     }
 
-    /**
-     * Get detailed timeline for a single day.
-     */
+    /** Get detailed timeline for a single day. */
     private suspend fun getDayTimeline(
         date: LocalDate,
         userId: String,
@@ -170,9 +173,7 @@ class GetTimelineUseCase(
         return items.sortedBy { it.timestamp }
     }
 
-    /**
-     * Get weekly summary timeline.
-     */
+    /** Get weekly summary timeline. */
     private suspend fun getWeekTimeline(
         referenceDate: LocalDate,
         userId: String,
@@ -219,9 +220,7 @@ class GetTimelineUseCase(
         return items.sortedBy { it.timestamp }
     }
 
-    /**
-     * Get monthly summary timeline.
-     */
+    /** Get monthly summary timeline. */
     private suspend fun getMonthTimeline(
         referenceDate: LocalDate,
         userId: String,
@@ -289,9 +288,7 @@ class GetTimelineUseCase(
         return items.sortedBy { it.timestamp }
     }
 
-    /**
-     * Get yearly summary timeline.
-     */
+    /** Get yearly summary timeline. */
     private suspend fun getYearTimeline(
         referenceDate: LocalDate,
         userId: String,
@@ -353,17 +350,15 @@ class GetTimelineUseCase(
     }
 
     /**
-     * Get the start of the week (Monday) for a given date.
-     * Uses ISO 8601 week definition where Monday is the first day of the week.
+     * Get the start of the week (Monday) for a given date. Uses ISO 8601 week definition where Monday is the first day
+     * of the week.
      */
     private fun getWeekStart(date: LocalDate): LocalDate {
         val dayOfWeek = date.dayOfWeek.ordinal // Monday = 0, Sunday = 6
         return date.minus(dayOfWeek, DateTimeUnit.DAY)
     }
 
-    /**
-     * Check if a place visit matches the filter criteria.
-     */
+    /** Check if a place visit matches the filter criteria. */
     private fun matchesFilter(
         visit: PlaceVisit,
         filter: TimelineFilter
@@ -412,9 +407,7 @@ class GetTimelineUseCase(
         return true
     }
 
-    /**
-     * Check if a route segment matches the filter criteria.
-     */
+    /** Check if a route segment matches the filter criteria. */
     private fun matchesFilter(
         route: RouteSegment,
         filter: TimelineFilter

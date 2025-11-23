@@ -10,9 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
-/**
- * Helper class for managing location permissions.
- */
+/** Helper class for managing location permissions. */
 class LocationPermissions(
     private val activity: ComponentActivity
 ) {
@@ -27,9 +25,7 @@ class LocationPermissions(
             onPermissionsResult = null
         }
 
-    /**
-     * Check if all required location permissions are granted.
-     */
+    /** Check if all required location permissions are granted. */
     fun hasLocationPermissions(): Boolean {
         val fineLocation =
             ContextCompat.checkSelfPermission(
@@ -46,9 +42,7 @@ class LocationPermissions(
         return fineLocation && coarseLocation
     }
 
-    /**
-     * Check if background location permission is granted (Android 10+).
-     */
+    /** Check if background location permission is granted (Android 10+). */
     fun hasBackgroundLocationPermission(): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContextCompat.checkSelfPermission(
@@ -59,9 +53,7 @@ class LocationPermissions(
             true // Not required on older versions
         }
 
-    /**
-     * Request foreground location permissions (fine and coarse).
-     */
+    /** Request foreground location permissions (fine and coarse). */
     fun requestLocationPermissions(onResult: (Boolean) -> Unit) {
         onPermissionsResult = onResult
 
@@ -75,8 +67,7 @@ class LocationPermissions(
     }
 
     /**
-     * Request background location permission (Android 10+).
-     * Should be called after foreground permissions are granted.
+     * Request background location permission (Android 10+). Should be called after foreground permissions are granted.
      */
     fun requestBackgroundLocationPermission(onResult: (Boolean) -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -90,16 +81,12 @@ class LocationPermissions(
         }
     }
 
-    /**
-     * Check if we should show rationale for location permissions.
-     */
+    /** Check if we should show rationale for location permissions. */
     fun shouldShowLocationRationale(): Boolean =
         activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
             activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
 
-    /**
-     * Check if we should show rationale for background location permission.
-     */
+    /** Check if we should show rationale for background location permission. */
     fun shouldShowBackgroundLocationRationale(): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             activity.shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
@@ -107,9 +94,7 @@ class LocationPermissions(
             false
         }
 
-    /**
-     * Open app settings to allow user to manually grant permissions.
-     */
+    /** Open app settings to allow user to manually grant permissions. */
     fun openAppSettings() {
         val intent =
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -120,9 +105,7 @@ class LocationPermissions(
     }
 
     companion object {
-        /**
-         * Get required permissions for location tracking based on Android version.
-         */
+        /** Get required permissions for location tracking based on Android version. */
         fun getRequiredPermissions(includeBackground: Boolean = true): List<String> {
             val permissions =
                 mutableListOf(

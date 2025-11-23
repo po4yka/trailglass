@@ -25,8 +25,7 @@ import kotlinx.coroutines.launch
 /**
  * Enhanced Foreground Service for location tracking with live notification updates.
  *
- * Displays real-time tracking metrics (distance, duration, speed) in a notification,
- * similar to iOS Live Activities.
+ * Displays real-time tracking metrics (distance, duration, speed) in a notification, similar to iOS Live Activities.
  *
  * Features:
  * - Real-time distance, duration, and speed display
@@ -101,6 +100,7 @@ class EnhancedLocationTrackingService : Service() {
                     }
                 startLocationTracking(mode)
             }
+
             ACTION_STOP_TRACKING -> {
                 stopLocationTracking()
             }

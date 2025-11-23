@@ -4,8 +4,25 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.DirectionsBike
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Hotel
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.TheaterComedy
+import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -15,8 +32,8 @@ import com.po4yka.trailglass.ui.theme.CategoryShapes
 import com.po4yka.trailglass.ui.theme.animateShapeMorph
 
 /**
- * Category badge with shape morphing based on category type.
- * Follows Material 3 Expressive design with semantic shape associations.
+ * Category badge with shape morphing based on category type. Follows Material 3 Expressive design with semantic shape
+ * associations.
  *
  * Shape mappings:
  * - Water activities: Wave shape
@@ -77,8 +94,7 @@ fun CategoryBadge(
 }
 
 /**
- * Compact category badge for dense layouts.
- * Shows only icon with morphing shape.
+ * Compact category badge for dense layouts. Shows only icon with morphing shape.
  *
  * @param category Category name or type
  * @param modifier Modifier for the badge
@@ -116,8 +132,8 @@ fun CompactCategoryBadge(
 }
 
 /**
- * Category badge with morphing animation between different categories.
- * Useful for interactive category selection or filtering.
+ * Category badge with morphing animation between different categories. Useful for interactive category selection or
+ * filtering.
  *
  * @param selectedCategory Currently selected category
  * @param categories Available categories
@@ -142,10 +158,7 @@ fun CategoryBadgeGroup(
     }
 }
 
-/**
- * Get icon for category type.
- * Maps common category names to appropriate Material Icons.
- */
+/** Get icon for category type. Maps common category names to appropriate Material Icons. */
 private fun getCategoryIcon(category: String): ImageVector? =
     when (category.lowercase()) {
         "water", "swimming", "beach", "ocean" -> Icons.Default.WaterDrop
@@ -164,21 +177,22 @@ private fun getCategoryIcon(category: String): ImageVector? =
         else -> Icons.Default.Place
     }
 
-/**
- * Category color mapping for additional visual differentiation.
- * Returns appropriate color scheme based on category.
- */
+/** Category color mapping for additional visual differentiation. Returns appropriate color scheme based on category. */
 @Composable
 fun getCategoryColors(category: String): Pair<androidx.compose.ui.graphics.Color, androidx.compose.ui.graphics.Color> =
     when (category.lowercase()) {
         "water", "swimming", "beach", "ocean" ->
             MaterialTheme.colorScheme.tertiaryContainer to MaterialTheme.colorScheme.onTertiaryContainer
+
         "transport", "car", "bus", "train", "flight", "bike" ->
             MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
+
         "food", "restaurant", "dining", "cafe" ->
             MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
+
         "work", "office", "meeting" ->
             MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
+
         else ->
             MaterialTheme.colorScheme.secondaryContainer to MaterialTheme.colorScheme.onSecondaryContainer
     }

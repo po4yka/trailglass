@@ -2,14 +2,20 @@ package com.po4yka.trailglass.feature.timeline
 
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.domain.model.RouteSegment
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.*
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Use case for getting the timeline for a specific day.
- * Combines place visits and route segments into a chronological timeline.
+ * Use case for getting the timeline for a specific day. Combines place visits and route segments into a chronological
+ * timeline.
  */
 @Inject
 class GetTimelineForDayUseCase(
@@ -19,9 +25,7 @@ class GetTimelineForDayUseCase(
 ) {
     private val logger = logger()
 
-    /**
-     * Timeline item for UI display.
-     */
+    /** Timeline item for UI display. */
     sealed class TimelineItemUI {
         abstract val timestamp: Instant
         abstract val id: String

@@ -2,13 +2,19 @@ package com.po4yka.trailglass.domain.model
 
 import com.po4yka.trailglass.domain.algorithm.InterpolationAlgorithm
 import com.po4yka.trailglass.domain.algorithm.SphericalInterpolation
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * Utility for calculating arc trajectories for camera animations.
  *
- * Provides smooth, visually appealing camera movements that zoom out,
- * follow a curved path, and zoom back in - similar to Google Maps' fly-to animation.
+ * Provides smooth, visually appealing camera movements that zoom out, follow a curved path, and zoom back in - similar
+ * to Google Maps' fly-to animation.
  */
 object ArcTrajectoryCalculator {
     /**
@@ -75,8 +81,7 @@ object ArcTrajectoryCalculator {
     }
 
     /**
-     * Calculate distance between two coordinates in degrees.
-     * Uses haversine formula for great circle distance.
+     * Calculate distance between two coordinates in degrees. Uses haversine formula for great circle distance.
      *
      * @param start Starting coordinate
      * @param end Ending coordinate

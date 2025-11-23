@@ -2,13 +2,10 @@ package com.po4yka.trailglass.data.repository
 
 import com.po4yka.trailglass.domain.model.GeocodedLocation
 
-/**
- * Repository for managing geocoding cache.
- */
+/** Repository for managing geocoding cache. */
 interface GeocodingCacheRepository {
     /**
-     * Get a cached geocoded location near the specified coordinates.
-     * Uses spatial proximity matching.
+     * Get a cached geocoded location near the specified coordinates. Uses spatial proximity matching.
      *
      * @param latitude The latitude to search near
      * @param longitude The longitude to search near
@@ -32,18 +29,12 @@ interface GeocodingCacheRepository {
         ttlSeconds: Long = 2592000
     )
 
-    /**
-     * Clear all expired cache entries.
-     */
+    /** Clear all expired cache entries. */
     suspend fun clearExpired()
 
-    /**
-     * Clear all cache entries.
-     */
+    /** Clear all cache entries. */
     suspend fun clear()
 
-    /**
-     * Get count of valid cached entries.
-     */
+    /** Get count of valid cached entries. */
     suspend fun count(): Long
 }

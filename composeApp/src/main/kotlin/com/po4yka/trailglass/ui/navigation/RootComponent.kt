@@ -12,29 +12,19 @@ import com.arkivanov.decompose.value.Value
 import com.po4yka.trailglass.di.AppComponent
 import kotlinx.serialization.Serializable
 
-/**
- * Root component for the application navigation.
- * Manages the main navigation stack with bottom navigation screens.
- */
+/** Root component for the application navigation. Manages the main navigation stack with bottom navigation screens. */
 interface RootComponent {
-    /**
-     * Access to the application component for DI.
-     */
+    /** Access to the application component for DI. */
     val appComponent: AppComponent
 
-    /**
-     * Child stack representing the navigation stack.
-     */
+    /** Child stack representing the navigation stack. */
     val childStack: Value<ChildStack<*, Child>>
 
-    /**
-     * Navigate to a specific screen.
-     */
+    /** Navigate to a specific screen. */
     fun navigateToScreen(config: Config)
 
     /**
-     * Handle deep link navigation.
-     * Parses deep link paths and navigates to the appropriate screen.
+     * Handle deep link navigation. Parses deep link paths and navigates to the appropriate screen.
      *
      * Supported deep links:
      * - trailglass://app/stats
@@ -44,9 +34,7 @@ interface RootComponent {
      */
     fun handleDeepLink(path: String)
 
-    /**
-     * Sealed class representing the navigation configurations.
-     */
+    /** Sealed class representing the navigation configurations. */
     @Serializable
     sealed interface Config {
         @Serializable
@@ -107,9 +95,7 @@ interface RootComponent {
         data object AlgorithmSettings : Config
     }
 
-    /**
-     * Sealed class representing the child components.
-     */
+    /** Sealed class representing the child components. */
     sealed class Child {
         data class Stats(
             val component: StatsComponent
@@ -173,9 +159,7 @@ interface RootComponent {
     }
 }
 
-/**
- * Default implementation of RootComponent.
- */
+/** Default implementation of RootComponent. */
 class DefaultRootComponent(
     componentContext: ComponentContext,
     override val appComponent: AppComponent
@@ -224,8 +208,8 @@ class DefaultRootComponent(
     }
 
     /**
-     * Parse deep link path to navigation configuration.
-     * Supports paths like: /stats, /timeline, /map, /photos, /settings
+     * Parse deep link path to navigation configuration. Supports paths like: /stats, /timeline, /map, /photos,
+     * /settings
      */
     private fun parseDeepLink(path: String): RootComponent.Config? {
         val cleanPath = path.trim('/').lowercase()

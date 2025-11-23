@@ -3,11 +3,18 @@ package com.po4yka.trailglass.location
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.logging.logger
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
- * Simplifies paths using the Douglas-Peucker algorithm.
- * Reduces the number of points while preserving the shape of the path.
+ * Simplifies paths using the Douglas-Peucker algorithm. Reduces the number of points while preserving the shape of the
+ * path.
  */
 class PathSimplifier(
     private val epsilonMeters: Double = 50.0
@@ -36,9 +43,8 @@ class PathSimplifier(
     }
 
     /**
-     * Douglas-Peucker algorithm implementation.
-     * Recursively simplifies a polyline by removing points that deviate
-     * less than epsilon from the line between endpoints.
+     * Douglas-Peucker algorithm implementation. Recursively simplifies a polyline by removing points that deviate less
+     * than epsilon from the line between endpoints.
      */
     private fun douglasPeucker(
         points: List<Coordinate>,
@@ -76,8 +82,8 @@ class PathSimplifier(
     }
 
     /**
-     * Calculate perpendicular distance from a point to a line segment.
-     * Uses proper spherical geometry for accuracy at all latitudes.
+     * Calculate perpendicular distance from a point to a line segment. Uses proper spherical geometry for accuracy at
+     * all latitudes.
      *
      * @param point The point to measure from
      * @param lineStart Start of the line segment

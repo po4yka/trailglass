@@ -3,16 +3,27 @@ package com.po4yka.trailglass.feature.stats
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.repository.TripRepository
-import com.po4yka.trailglass.feature.stats.calculators.*
+import com.po4yka.trailglass.feature.stats.calculators.DistanceStatisticsCalculator
+import com.po4yka.trailglass.feature.stats.calculators.GeographicStatisticsCalculator
+import com.po4yka.trailglass.feature.stats.calculators.PlaceStatisticsCalculator
+import com.po4yka.trailglass.feature.stats.calculators.TravelPatternAnalyzer
 import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.*
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration
 
-/**
- * Use case for getting comprehensive statistics for a time period.
- */
+/** Use case for getting comprehensive statistics for a time period. */
 @Inject
 class GetComprehensiveStatsUseCase(
     private val tripRepository: TripRepository,
@@ -26,9 +37,7 @@ class GetComprehensiveStatsUseCase(
 ) {
     private val logger = logger()
 
-    /**
-     * Get comprehensive statistics for a time period.
-     */
+    /** Get comprehensive statistics for a time period. */
     suspend fun execute(
         period: GetStatsUseCase.Period,
         userId: String
@@ -78,9 +87,7 @@ class GetComprehensiveStatsUseCase(
         return stats
     }
 
-    /**
-     * Get time range for a period.
-     */
+    /** Get time range for a period. */
     private fun getTimeRange(period: GetStatsUseCase.Period): Pair<Instant, Instant> =
         when (period) {
             is GetStatsUseCase.Period.Year -> {
@@ -88,6 +95,7 @@ class GetComprehensiveStatsUseCase(
                 val end = LocalDate(period.year, 12, 31).atTime(23, 59, 59).toInstant(timeZone)
                 start to end
             }
+
             is GetStatsUseCase.Period.Month -> {
                 val start = LocalDate(period.year, period.month, 1).atStartOfDayIn(timeZone)
                 val lastDay =
@@ -99,6 +107,7 @@ class GetComprehensiveStatsUseCase(
                 val end = lastDay.atTime(23, 59, 59).toInstant(timeZone)
                 start to end
             }
+
             is GetStatsUseCase.Period.Custom -> {
                 val start = period.startDate.atStartOfDayIn(timeZone)
                 val end = period.endDate.atTime(23, 59, 59).toInstant(timeZone)
@@ -106,9 +115,7 @@ class GetComprehensiveStatsUseCase(
             }
         }
 
-    /**
-     * Calculate number of unique active days.
-     */
+    /** Calculate number of unique active days. */
     private fun calculateActiveDays(
         visits: List<com.po4yka.trailglass.domain.model.PlaceVisit>,
         routes: List<com.po4yka.trailglass.domain.model.RouteSegment>
@@ -126,9 +133,7 @@ class GetComprehensiveStatsUseCase(
         return activeDates.size
     }
 
-    /**
-     * Calculate total time spent tracking (visits + routes).
-     */
+    /** Calculate total time spent tracking (visits + routes). */
     private fun calculateTotalTrackingTime(
         visits: List<com.po4yka.trailglass.domain.model.PlaceVisit>,
         routes: List<com.po4yka.trailglass.domain.model.RouteSegment>
@@ -141,9 +146,7 @@ class GetComprehensiveStatsUseCase(
         return visitTime + routeTime
     }
 
-    /**
-     * Format period as string.
-     */
+    /** Format period as string. */
     private fun formatPeriod(period: GetStatsUseCase.Period): String =
         when (period) {
             is GetStatsUseCase.Period.Year -> "${period.year}"
@@ -155,6 +158,7 @@ class GetComprehensiveStatsUseCase(
                         .replaceFirstChar { it.uppercase() }
                 "$month ${period.year}"
             }
+
             is GetStatsUseCase.Period.Custom -> {
                 "${period.startDate} to ${period.endDate}"
             }

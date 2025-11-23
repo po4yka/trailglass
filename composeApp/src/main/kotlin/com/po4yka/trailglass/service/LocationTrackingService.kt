@@ -22,12 +22,10 @@ import kotlinx.coroutines.launch
 /**
  * Foreground Service for continuous location tracking.
  *
- * This service runs in the foreground with a persistent notification, allowing
- * continuous location tracking even when the app is in the background or the
- * screen is off. It's suitable for active trip recording.
+ * This service runs in the foreground with a persistent notification, allowing continuous location tracking even when
+ * the app is in the background or the screen is off. It's suitable for active trip recording.
  *
- * The service respects Android's battery optimization and doze mode by using
- * a foreground service with a notification.
+ * The service respects Android's battery optimization and doze mode by using a foreground service with a notification.
  */
 class LocationTrackingService : Service() {
     companion object {
@@ -62,9 +60,7 @@ class LocationTrackingService : Service() {
             }
         }
 
-        /**
-         * Stops the location tracking service.
-         */
+        /** Stops the location tracking service. */
         fun stopService(context: Context) {
             val intent =
                 Intent(context, LocationTrackingService::class.java).apply {
@@ -84,8 +80,8 @@ class LocationTrackingService : Service() {
      * 2. Manual Factory: Create tracker manually with required dependencies
      * 3. Assisted Injection: Use @AssistedInject with AssistedFactory
      *
-     * For simplicity, services typically use pattern #2 (manual creation) or
-     * store the component in Application and retrieve it here.
+     * For simplicity, services typically use pattern #2 (manual creation) or store the component in Application and
+     * retrieve it here.
      */
     private val locationTracker: LocationTracker? by lazy {
         // Example: (application as MyApplication).appComponent.locationTracker
@@ -111,6 +107,7 @@ class LocationTrackingService : Service() {
                 val mode = TrackingMode.valueOf(modeName)
                 startLocationTracking(mode)
             }
+
             ACTION_STOP_TRACKING -> {
                 stopLocationTracking()
             }

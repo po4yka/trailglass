@@ -4,61 +4,36 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * Configuration for location tracking behavior.
- */
+/** Configuration for location tracking behavior. */
 data class TrackingConfiguration(
-    /**
-     * Minimum time interval between location updates in PASSIVE mode.
-     */
+    /** Minimum time interval between location updates in PASSIVE mode. */
     val passiveInterval: Duration = 5.minutes,
-    /**
-     * Minimum distance between location updates in PASSIVE mode (meters).
-     */
+    /** Minimum distance between location updates in PASSIVE mode (meters). */
     val passiveDistance: Double = 500.0,
-    /**
-     * Minimum time interval between location updates in ACTIVE mode.
-     */
+    /** Minimum time interval between location updates in ACTIVE mode. */
     val activeInterval: Duration = 30.seconds,
-    /**
-     * Minimum distance between location updates in ACTIVE mode (meters).
-     */
+    /** Minimum distance between location updates in ACTIVE mode (meters). */
     val activeDistance: Double = 10.0,
     /**
-     * Desired accuracy for location in ACTIVE mode (meters).
-     * Platform-specific implementations will use their best approximation.
+     * Desired accuracy for location in ACTIVE mode (meters). Platform-specific implementations will use their best
+     * approximation.
      */
     val activeAccuracy: Double = 10.0,
-    /**
-     * Desired accuracy for location in PASSIVE mode (meters).
-     */
+    /** Desired accuracy for location in PASSIVE mode (meters). */
     val passiveAccuracy: Double = 100.0,
-    /**
-     * Whether to request background location permission.
-     */
+    /** Whether to request background location permission. */
     val requireBackgroundLocation: Boolean = true,
-    /**
-     * Whether to show a notification during active tracking (Android).
-     */
+    /** Whether to show a notification during active tracking (Android). */
     val showNotification: Boolean = true,
-    /**
-     * Notification title for active tracking (Android).
-     */
+    /** Notification title for active tracking (Android). */
     val notificationTitle: String = "TrailGlass",
-    /**
-     * Notification message for active tracking (Android).
-     */
+    /** Notification message for active tracking (Android). */
     val notificationMessage: String = "Recording your location"
 )
 
-/**
- * Default tracking configurations for common scenarios.
- */
+/** Default tracking configurations for common scenarios. */
 object TrackingConfigurations {
-    /**
-     * Battery-optimized configuration.
-     * Suitable for all-day background tracking.
-     */
+    /** Battery-optimized configuration. Suitable for all-day background tracking. */
     val BATTERY_OPTIMIZED =
         TrackingConfiguration(
             passiveInterval = 10.minutes,
@@ -69,10 +44,7 @@ object TrackingConfigurations {
             passiveAccuracy = 200.0
         )
 
-    /**
-     * Balanced configuration.
-     * Good compromise between accuracy and battery life.
-     */
+    /** Balanced configuration. Good compromise between accuracy and battery life. */
     val BALANCED =
         TrackingConfiguration(
             passiveInterval = 5.minutes,
@@ -83,10 +55,7 @@ object TrackingConfigurations {
             passiveAccuracy = 100.0
         )
 
-    /**
-     * High accuracy configuration.
-     * Best for active trip recording, higher battery usage.
-     */
+    /** High accuracy configuration. Best for active trip recording, higher battery usage. */
     val HIGH_ACCURACY =
         TrackingConfiguration(
             passiveInterval = 2.minutes,

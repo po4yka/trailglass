@@ -58,59 +58,41 @@ class AndroidPlatformModule(
             android.provider.Settings.Secure.ANDROID_ID
         ) ?: "unknown_device"
 
-    /**
-     * Provides Android-specific secure token storage.
-     */
+    /** Provides Android-specific secure token storage. */
     @Provides
     override fun secureTokenStorage(): SecureTokenStorage = SecureTokenStorage(context)
 
-    /**
-     * Provides Android-specific device info provider.
-     */
+    /** Provides Android-specific device info provider. */
     @Provides
     override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider = PlatformDeviceInfoProvider(context)
 
-    /**
-     * Provides Android-specific sync state repository.
-     */
+    /** Provides Android-specific sync state repository. */
     @Provides
     override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl = SyncStateRepositoryImpl(context)
 
-    /**
-     * Provides Android-specific network connectivity monitor.
-     */
+    /** Provides Android-specific network connectivity monitor. */
     @Provides
     override fun networkConnectivityMonitor(): NetworkConnectivityMonitor = AndroidNetworkConnectivityMonitor(context)
 
-    /**
-     * Provides Android-specific permission manager.
-     */
+    /** Provides Android-specific permission manager. */
     @Provides
     override fun permissionManager(): PermissionManager = PermissionManager(context)
 
-    /**
-     * Provides Android-specific encryption service.
-     */
+    /** Provides Android-specific encryption service. */
     @Provides
     override fun encryptionService(): EncryptionService = EncryptionService()
 
-    /**
-     * Provides Android-specific photo metadata extractor.
-     */
+    /** Provides Android-specific photo metadata extractor. */
     @Provides
     override fun photoMetadataExtractor(): PhotoMetadataExtractor = AndroidPhotoMetadataExtractor(context)
 
-    /**
-     * Provides Android-specific settings storage.
-     */
+    /** Provides Android-specific settings storage. */
     @Provides
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
         com.po4yka.trailglass.data.storage
             .SettingsStorage(context)
 
-    /**
-     * Provides Android-specific photo directory provider.
-     */
+    /** Provides Android-specific photo directory provider. */
     @Provides
     override fun photoDirectoryProvider(): PhotoDirectoryProvider = AndroidPhotoDirectoryProvider(context)
 }

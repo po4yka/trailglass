@@ -2,9 +2,7 @@ package com.po4yka.trailglass.photo
 
 import com.po4yka.trailglass.domain.model.PhotoMetadata
 
-/**
- * Platform-specific photo metadata extractor.
- */
+/** Platform-specific photo metadata extractor. */
 interface PhotoMetadataExtractor {
     /**
      * Extract EXIF and metadata from a photo URI.

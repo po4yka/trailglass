@@ -5,11 +5,10 @@ import com.po4yka.trailglass.domain.model.GeocodedLocation
 /**
  * Compass-based reverse geocoder implementation (PLACEHOLDER).
  *
- * NOTE: This is a placeholder implementation. The Compass library integration
- * requires platform-specific setup for Android and iOS geocoding services.
+ * NOTE: This is a placeholder implementation. The Compass library integration requires platform-specific setup for
+ * Android and iOS geocoding services.
  *
- * For full Compass integration, see the documentation at:
- * https://compass.jordond.dev/docs/geocoding/
+ * For full Compass integration, see the documentation at: https://compass.jordond.dev/docs/geocoding/
  *
  * Benefits of Compass (when fully integrated):
  * - Works in common code (reduced expect/actual)
@@ -17,9 +16,8 @@ import com.po4yka.trailglass.domain.model.GeocodedLocation
  * - Better error handling
  * - Built-in rate limiting
  *
- * Current state: Dependencies are added but platform-specific implementation
- * is needed. The existing AndroidReverseGeocoder and IOSReverseGeocoder
- * remain the active implementations.
+ * Current state: Dependencies are added but platform-specific implementation is needed. The existing
+ * AndroidReverseGeocoder and IOSReverseGeocoder remain the active implementations.
  *
  * TODO: Complete Compass integration with proper platform setup
  */

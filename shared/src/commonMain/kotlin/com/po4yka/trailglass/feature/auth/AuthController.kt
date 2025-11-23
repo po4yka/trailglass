@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for authentication feature.
- * Manages authentication state, login, registration, and logout flows.
+ * Controller for authentication feature. Manages authentication state, login, registration, and logout flows.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -35,45 +34,33 @@ class AuthController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Authentication state.
-     */
+    /** Authentication state. */
     sealed class AuthState {
-        /**
-         * Initial state - checking if user is already authenticated.
-         */
+        /** Initial state - checking if user is already authenticated. */
         object Initializing : AuthState()
 
-        /**
-         * User is not authenticated.
-         */
+        /** User is not authenticated. */
         object Unauthenticated : AuthState()
 
         /**
-         * User is using the app in guest mode (no account required).
-         * All data is stored locally only, no sync functionality.
+         * User is using the app in guest mode (no account required). All data is stored locally only, no sync
+         * functionality.
          */
         object Guest : AuthState()
 
-        /**
-         * User is authenticated with an account.
-         */
+        /** User is authenticated with an account. */
         data class Authenticated(
             val userId: String,
             val email: String,
             val displayName: String
         ) : AuthState()
 
-        /**
-         * Authentication in progress (login or register).
-         */
+        /** Authentication in progress (login or register). */
         data class Loading(
             val operation: String
         ) : AuthState()
 
-        /**
-         * Authentication error.
-         */
+        /** Authentication error. */
         data class Error(
             val message: String,
             val previousState: AuthState
@@ -88,9 +75,7 @@ class AuthController(
         checkAuthStatus()
     }
 
-    /**
-     * Check if user is already authenticated.
-     */
+    /** Check if user is already authenticated. */
     fun checkAuthStatus() {
         logger.debug { "Checking authentication status" }
 
@@ -119,9 +104,7 @@ class AuthController(
         }
     }
 
-    /**
-     * Login with email and password.
-     */
+    /** Login with email and password. */
     fun login(
         email: String,
         password: String
@@ -150,9 +133,11 @@ class AuthController(
                                 error.message?.contains("401") == true ||
                                     error.message?.contains("Unauthorized") == true ->
                                     "Invalid email or password"
+
                                 error.message?.contains("network") == true ||
                                     error.message?.contains("timeout") == true ->
                                     "Network error. Please check your connection."
+
                                 else -> error.message ?: "Login failed. Please try again."
                             }
                         _state.value = AuthState.Error(errorMessage, previousState)
@@ -169,9 +154,7 @@ class AuthController(
         }
     }
 
-    /**
-     * Register a new user.
-     */
+    /** Register a new user. */
     fun register(
         email: String,
         password: String,
@@ -201,13 +184,17 @@ class AuthController(
                                 error.message?.contains("409") == true ||
                                     error.message?.contains("already exists") == true ->
                                     "An account with this email already exists"
+
                                 error.message?.contains("Invalid email") == true ->
                                     "Please enter a valid email address"
+
                                 error.message?.contains("Password must") == true ->
                                     error.message!!
+
                                 error.message?.contains("network") == true ||
                                     error.message?.contains("timeout") == true ->
                                     "Network error. Please check your connection."
+
                                 else -> error.message ?: "Registration failed. Please try again."
                             }
                         _state.value = AuthState.Error(errorMessage, previousState)
@@ -224,9 +211,7 @@ class AuthController(
         }
     }
 
-    /**
-     * Logout the current user.
-     */
+    /** Logout the current user. */
     fun logout() {
         logger.info { "Logout requested" }
 
@@ -244,8 +229,8 @@ class AuthController(
     }
 
     /**
-     * Continue using the app as a guest (without creating an account).
-     * All data will be stored locally only, with no cloud sync.
+     * Continue using the app as a guest (without creating an account). All data will be stored locally only, with no
+     * cloud sync.
      */
     fun continueAsGuest() {
         logger.info { "User continuing as guest" }
@@ -268,16 +253,12 @@ class AuthController(
         }
     }
 
-    /**
-     * Check if user is currently in guest mode.
-     */
+    /** Check if user is currently in guest mode. */
     fun isGuest(): Boolean =
         _state.value is AuthState.Guest ||
             userSession.getCurrentUserId() == UserSession.GUEST_USER_ID
 
-    /**
-     * Clear error state and return to previous state.
-     */
+    /** Clear error state and return to previous state. */
     fun clearError() {
         val currentState = _state.value
         if (currentState is AuthState.Error) {
@@ -286,8 +267,8 @@ class AuthController(
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      */
     override fun cleanup() {
         logger.info { "Cleaning up AuthController" }

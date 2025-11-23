@@ -6,9 +6,7 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for updating place visit information (user labels, categories, etc.).
- */
+/** Use case for updating place visit information (user labels, categories, etc.). */
 @Inject
 class UpdatePlaceVisitUseCase(
     private val placeVisitRepository: PlaceVisitRepository

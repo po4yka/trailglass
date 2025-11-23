@@ -9,9 +9,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-/**
- * Android implementation of NetworkConnectivity.
- */
+/** Android implementation of NetworkConnectivity. */
 class AndroidNetworkConnectivity(
     private val context: Context
 ) : NetworkConnectivity {

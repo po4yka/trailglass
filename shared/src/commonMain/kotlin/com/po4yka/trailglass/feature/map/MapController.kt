@@ -1,6 +1,14 @@
 package com.po4yka.trailglass.feature.map
 
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.CameraMove
+import com.po4yka.trailglass.domain.model.CameraPosition
+import com.po4yka.trailglass.domain.model.Coordinate
+import com.po4yka.trailglass.domain.model.MapDisplayData
+import com.po4yka.trailglass.domain.model.MapEvent
+import com.po4yka.trailglass.domain.model.MapEventSink
+import com.po4yka.trailglass.domain.model.MapMarker
+import com.po4yka.trailglass.domain.model.MapRegion
+import com.po4yka.trailglass.domain.model.MapRoute
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
 import com.po4yka.trailglass.domain.service.LocationService
@@ -24,8 +32,7 @@ import me.tatarka.inject.annotations.Inject
 /**
  * Controller for map visualization.
  *
- * Implements [MapEventSink] to handle events from the map UI in a decoupled,
- * testable manner.
+ * Implements [MapEventSink] to handle events from the map UI in a decoupled, testable manner.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -49,18 +56,14 @@ class MapController(
     private var locationTrackingJob: Job? = null
     private var pendingFollowModeParams: FollowModeParams? = null
 
-    /**
-     * Follow mode parameters.
-     */
+    /** Follow mode parameters. */
     private data class FollowModeParams(
         val zoom: Float,
         val tilt: Float,
         val bearing: Float
     )
 
-    /**
-     * Map UI state.
-     */
+    /** Map UI state. */
     data class MapState(
         val mapData: MapDisplayData = MapDisplayData(),
         val cameraMove: CameraMove? = null,
@@ -92,6 +95,7 @@ class MapController(
                             _state.update { it.copy(hasLocationPermission = true) }
                         }
                     }
+
                     is PermissionResult.Denied,
                     is PermissionResult.PermanentlyDenied -> {
                         logger.warn { "Location permission denied for follow mode" }
@@ -103,15 +107,18 @@ class MapController(
                             )
                         }
                     }
+
                     is PermissionResult.Cancelled -> {
                         logger.info { "Location permission request cancelled" }
                         pendingFollowModeParams = null
                     }
+
                     is PermissionResult.Error -> {
                         logger.error { "Permission error: ${permState.lastResult.message}" }
                         pendingFollowModeParams = null
                         _state.update { it.copy(error = permState.lastResult.message) }
                     }
+
                     null -> {
                         // No result yet
                     }
@@ -123,9 +130,7 @@ class MapController(
         checkPermissions()
     }
 
-    /**
-     * Load map data for a time range.
-     */
+    /** Load map data for a time range. */
     fun loadMapData(
         startTime: Instant,
         endTime: Instant
@@ -170,32 +175,24 @@ class MapController(
         }
     }
 
-    /**
-     * Select a marker on the map.
-     */
+    /** Select a marker on the map. */
     fun selectMarker(marker: MapMarker) {
         logger.debug { "Marker selected: ${marker.title}" }
         _state.update { it.copy(selectedMarker = marker) }
     }
 
-    /**
-     * Deselect the current marker.
-     */
+    /** Deselect the current marker. */
     fun deselectMarker() {
         _state.update { it.copy(selectedMarker = null) }
     }
 
-    /**
-     * Select a route on the map.
-     */
+    /** Select a route on the map. */
     fun selectRoute(route: MapRoute) {
         logger.debug { "Route selected: ${route.transportType}" }
         _state.update { it.copy(selectedRoute = route) }
     }
 
-    /**
-     * Deselect the current route.
-     */
+    /** Deselect the current route. */
     fun deselectRoute() {
         _state.update { it.copy(selectedRoute = null) }
     }
@@ -260,18 +257,14 @@ class MapController(
         }
     }
 
-    /**
-     * Refresh map data.
-     */
+    /** Refresh map data. */
     fun refresh() {
         // Re-load with current time range (would need to store it)
         // For now, just trigger a refresh signal
         logger.debug { "Map refresh requested" }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
@@ -279,9 +272,8 @@ class MapController(
     /**
      * Toggle follow mode on/off.
      *
-     * When enabled, the camera will track the user's current location.
-     * When disabled, location tracking stops.
-     * This will request location permission if not already granted.
+     * When enabled, the camera will track the user's current location. When disabled, location tracking stops. This
+     * will request location permission if not already granted.
      *
      * @param zoom Zoom level to use when following (default: 15f - street level)
      * @param tilt Camera tilt angle in degrees (default: 45f - perspective view)
@@ -317,9 +309,7 @@ class MapController(
         }
     }
 
-    /**
-     * Enable follow mode after permission is confirmed granted.
-     */
+    /** Enable follow mode after permission is confirmed granted. */
     private fun enableFollowModeInternal(
         zoom: Float,
         tilt: Float,
@@ -368,9 +358,7 @@ class MapController(
      */
     suspend fun hasLocationPermission(): Boolean = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
 
-    /**
-     * Check permissions.
-     */
+    /** Check permissions. */
     fun checkPermissions() {
         controllerScope.launch {
             val hasPermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
@@ -382,8 +370,7 @@ class MapController(
     /**
      * Handle map events from the UI layer.
      *
-     * This implements the [MapEventSink] interface, providing a clean
-     * event-driven API for map interactions.
+     * This implements the [MapEventSink] interface, providing a clean event-driven API for map interactions.
      */
     override fun send(event: MapEvent) {
         logger.debug { "Map event received: ${event::class.simpleName}" }
@@ -400,6 +387,7 @@ class MapController(
                     logger.warn { "Marker not found: ${event.markerId}" }
                 }
             }
+
             is MapEvent.RouteTapped -> {
                 // Find and select the route
                 val route =
@@ -411,11 +399,13 @@ class MapController(
                     logger.warn { "Route not found: ${event.routeId}" }
                 }
             }
+
             is MapEvent.MapTapped -> {
                 // Deselect any selected markers or routes
                 deselectMarker()
                 deselectRoute()
             }
+
             is MapEvent.CameraMoved -> {
                 // Update camera position in state for tracking
                 // Note: This is informational only, we don't update cameraMove
@@ -425,6 +415,7 @@ class MapController(
                         "${event.position.target.longitude}"
                 }
             }
+
             is MapEvent.MapReady -> {
                 logger.info { "Map is ready for interaction" }
                 // Could trigger initial data load or other setup here
@@ -432,10 +423,7 @@ class MapController(
         }
     }
 
-    /**
-     * Calculate appropriate zoom level for a region.
-     * Higher latitudeDelta = lower zoom.
-     */
+    /** Calculate appropriate zoom level for a region. Higher latitudeDelta = lower zoom. */
     private fun calculateZoomLevel(region: MapRegion): Float {
         // Rough approximation: zoom levels from 1 (world) to 20 (building)
         val delta = maxOf(region.latitudeDelta, region.longitudeDelta)
@@ -452,8 +440,8 @@ class MapController(
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors and location tracking.
      */

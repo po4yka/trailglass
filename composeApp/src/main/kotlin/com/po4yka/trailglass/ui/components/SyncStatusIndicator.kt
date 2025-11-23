@@ -1,9 +1,16 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDone
@@ -11,8 +18,14 @@ import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,9 +37,7 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-/**
- * Compact sync status indicator that can be placed in app bar or bottom bar.
- */
+/** Compact sync status indicator that can be placed in app bar or bottom bar. */
 @Composable
 fun SyncStatusIndicator(
     syncStatus: SyncStatusUiModel,
@@ -113,9 +124,7 @@ fun SyncStatusIndicator(
     }
 }
 
-/**
- * Detailed sync status card with full information.
- */
+/** Detailed sync status card with full information. */
 @Composable
 fun SyncStatusCard(
     syncStatus: SyncStatusUiModel,
@@ -165,6 +174,7 @@ fun SyncStatusCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+
                 is SyncProgress.InProgress -> {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         WavyLinearProgressIndicator(
@@ -178,6 +188,7 @@ fun SyncStatusCard(
                         )
                     }
                 }
+
                 is SyncProgress.Completed -> {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
@@ -201,6 +212,7 @@ fun SyncStatusCard(
                         }
                     }
                 }
+
                 is SyncProgress.Failed -> {
                     Text(
                         text = "Sync failed: ${progress.error}",

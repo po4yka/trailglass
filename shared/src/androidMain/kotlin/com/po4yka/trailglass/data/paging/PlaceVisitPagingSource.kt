@@ -58,9 +58,7 @@ class PlaceVisitPagingSource(
     }
 }
 
-/**
- * Extension function to convert database entity to domain model.
- */
+/** Extension function to convert database entity to domain model. */
 private fun com.po4yka.trailglass.db.Place_visits.toPlaceVisit(): PlaceVisit =
     PlaceVisit(
         id = id,

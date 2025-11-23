@@ -7,8 +7,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
 /**
- * Database-backed geocoding cache that persists across app restarts.
- * Replaces the in-memory GeocodingCache with persistent storage.
+ * Database-backed geocoding cache that persists across app restarts. Replaces the in-memory GeocodingCache with
+ * persistent storage.
  */
 @Inject
 class DatabaseGeocodingCache(
@@ -38,22 +38,16 @@ class DatabaseGeocodingCache(
         repository.put(location, ttlSeconds)
     }
 
-    /**
-     * Clear expired entries from the cache.
-     */
+    /** Clear expired entries from the cache. */
     suspend fun clearExpired() {
         repository.clearExpired()
     }
 
-    /**
-     * Clear all cache entries.
-     */
+    /** Clear all cache entries. */
     suspend fun clear() {
         repository.clear()
     }
 
-    /**
-     * Get count of valid cached entries.
-     */
+    /** Get count of valid cached entries. */
     suspend fun count(): Long = repository.count()
 }

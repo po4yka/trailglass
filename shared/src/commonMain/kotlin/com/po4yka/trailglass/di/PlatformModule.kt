@@ -10,75 +10,45 @@ import com.po4yka.trailglass.domain.service.LocationService
 import kotlinx.coroutines.CoroutineScope
 
 interface PlatformModule {
-    /**
-     * Platform-specific database driver factory.
-     */
+    /** Platform-specific database driver factory. */
     fun databaseDriverFactory(): DatabaseDriverFactory
 
-    /**
-     * Platform-specific location service.
-     * Provides real-time location tracking functionality.
-     */
+    /** Platform-specific location service. Provides real-time location tracking functionality. */
     fun locationService(): LocationService
 
-    /**
-     * Application-level coroutine scope.
-     * Should be tied to application lifecycle.
-     */
+    /** Application-level coroutine scope. Should be tied to application lifecycle. */
     fun applicationScope(): CoroutineScope
 
-    /**
-     * Current user ID.
-     */
+    /** Current user ID. */
     fun userId(): String
 
-    /**
-     * Device identifier.
-     */
+    /** Device identifier. */
     fun deviceId(): String
 
-    /**
-     * Platform-specific secure token storage.
-     */
+    /** Platform-specific secure token storage. */
     fun secureTokenStorage(): SecureTokenStorage
 
-    /**
-     * Platform-specific device info provider.
-     */
+    /** Platform-specific device info provider. */
     fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider
 
-    /**
-     * Platform-specific sync state repository.
-     */
+    /** Platform-specific sync state repository. */
     fun syncStateRepositoryImpl(): SyncStateRepositoryImpl
 
-    /**
-     * Platform-specific network connectivity monitor.
-     */
+    /** Platform-specific network connectivity monitor. */
     fun networkConnectivityMonitor(): NetworkConnectivityMonitor
 
-    /**
-     * Platform-specific permission manager.
-     */
+    /** Platform-specific permission manager. */
     fun permissionManager(): PermissionManager
 
-    /**
-     * Platform-specific encryption service.
-     */
+    /** Platform-specific encryption service. */
     fun encryptionService(): com.po4yka.trailglass.data.security.EncryptionService
 
-    /**
-     * Platform-specific photo metadata extractor.
-     */
+    /** Platform-specific photo metadata extractor. */
     fun photoMetadataExtractor(): com.po4yka.trailglass.photo.PhotoMetadataExtractor
 
-    /**
-     * Platform-specific settings storage.
-     */
+    /** Platform-specific settings storage. */
     fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage
 
-    /**
-     * Platform-specific photo directory provider.
-     */
+    /** Platform-specific photo directory provider. */
     fun photoDirectoryProvider(): com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 }

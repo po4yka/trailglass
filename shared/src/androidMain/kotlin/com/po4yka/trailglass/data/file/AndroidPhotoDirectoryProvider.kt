@@ -3,10 +3,7 @@ package com.po4yka.trailglass.data.file
 import android.content.Context
 import java.io.File
 
-/**
- * Android implementation of PhotoDirectoryProvider.
- * Uses app-specific internal storage directories.
- */
+/** Android implementation of PhotoDirectoryProvider. Uses app-specific internal storage directories. */
 class AndroidPhotoDirectoryProvider(
     private val context: Context
 ) : PhotoDirectoryProvider {

@@ -3,12 +3,12 @@ package com.po4yka.trailglass.location.geocoding
 import com.po4yka.trailglass.domain.model.GeocodedLocation
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.suspendCancellableCoroutine
-import platform.CoreLocation.*
+import platform.CoreLocation.CLGeocoder
+import platform.CoreLocation.CLLocation
+import platform.CoreLocation.CLPlacemark
 import kotlin.coroutines.resume
 
-/**
- * iOS implementation of ReverseGeocoder using CoreLocation's CLGeocoder.
- */
+/** iOS implementation of ReverseGeocoder using CoreLocation's CLGeocoder. */
 class IOSReverseGeocoder : ReverseGeocoder {
     private val geocoder = CLGeocoder()
     private val logger = logger()
@@ -87,7 +87,5 @@ class IOSReverseGeocoder : ReverseGeocoder {
     }
 }
 
-/**
- * Factory function to create IOSReverseGeocoder.
- */
+/** Factory function to create IOSReverseGeocoder. */
 actual fun createReverseGeocoder(): ReverseGeocoder = IOSReverseGeocoder()

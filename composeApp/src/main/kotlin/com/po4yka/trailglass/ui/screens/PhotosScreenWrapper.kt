@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 import com.po4yka.trailglass.feature.photo.PhotoGalleryController as SharedPhotoGalleryController
 
 /**
- * Wrapper for PhotoGalleryScreen that adapts shared PhotoGalleryController to Android interface.
- * Bridges the shared Kotlin PhotoGalleryController to the Android-specific PhotoGalleryController interface.
+ * Wrapper for PhotoGalleryScreen that adapts shared PhotoGalleryController to Android interface. Bridges the shared
+ * Kotlin PhotoGalleryController to the Android-specific PhotoGalleryController interface.
  */
 @Composable
 fun PhotosScreenWrapper(

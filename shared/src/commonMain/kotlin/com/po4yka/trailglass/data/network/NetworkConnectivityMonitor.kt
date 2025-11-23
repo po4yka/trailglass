@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.network
 
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * Network connectivity state.
- */
+/** Network connectivity state. */
 sealed class NetworkState {
     data object Connected : NetworkState()
 
@@ -15,9 +13,7 @@ sealed class NetworkState {
     ) : NetworkState() // e.g., metered connection
 }
 
-/**
- * Network connectivity information.
- */
+/** Network connectivity information. */
 data class NetworkInfo(
     val state: NetworkState,
     val type: NetworkType,
@@ -27,46 +23,29 @@ data class NetworkInfo(
 /**
  * Monitors network connectivity status.
  *
- * Platform-specific implementations track network state changes
- * and provide real-time updates through StateFlow.
+ * Platform-specific implementations track network state changes and provide real-time updates through StateFlow.
  */
 interface NetworkConnectivityMonitor {
-    /**
-     * Current network connectivity state.
-     */
+    /** Current network connectivity state. */
     val networkState: StateFlow<NetworkState>
 
-    /**
-     * Current network information.
-     */
+    /** Current network information. */
     val networkInfo: StateFlow<NetworkInfo>
 
-    /**
-     * Check if currently connected to network.
-     */
+    /** Check if currently connected to network. */
     fun isConnected(): Boolean
 
-    /**
-     * Check if current network is metered (e.g., cellular data).
-     */
+    /** Check if current network is metered (e.g., cellular data). */
     fun isMetered(): Boolean
 
-    /**
-     * Start monitoring network connectivity.
-     * Should be called when app starts or component is initialized.
-     */
+    /** Start monitoring network connectivity. Should be called when app starts or component is initialized. */
     fun startMonitoring()
 
-    /**
-     * Stop monitoring network connectivity.
-     * Should be called when app stops or component is destroyed.
-     */
+    /** Stop monitoring network connectivity. Should be called when app stops or component is destroyed. */
     fun stopMonitoring()
 }
 
-/**
- * Extension to check if network state allows sync.
- */
+/** Extension to check if network state allows sync. */
 fun NetworkState.allowsSync(): Boolean =
     when (this) {
         is NetworkState.Connected -> true

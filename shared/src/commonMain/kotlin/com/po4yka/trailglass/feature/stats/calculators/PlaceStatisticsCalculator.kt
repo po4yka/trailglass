@@ -8,14 +8,10 @@ import com.po4yka.trailglass.feature.stats.models.VisitRecord
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration
 
-/**
- * Calculator for place visit statistics.
- */
+/** Calculator for place visit statistics. */
 @Inject
 class PlaceStatisticsCalculator {
-    /**
-     * Calculate comprehensive place statistics from visits.
-     */
+    /** Calculate comprehensive place statistics from visits. */
     fun calculate(visits: List<PlaceVisit>): PlaceStatistics {
         if (visits.isEmpty()) {
             return PlaceStatistics(
@@ -33,7 +29,7 @@ class PlaceStatisticsCalculator {
         val placeGroups =
             visits.groupBy { visit ->
                 visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-                    ?: "${visit.centerLatitude},${visit.centerLongitude}"
+                ?: "${visit.centerLatitude},${visit.centerLongitude}"
             }
 
         val totalPlaces = placeGroups.size
@@ -98,9 +94,7 @@ class PlaceStatisticsCalculator {
         )
     }
 
-    /**
-     * Get category distribution as percentages.
-     */
+    /** Get category distribution as percentages. */
     fun getCategoryDistribution(visits: List<PlaceVisit>): Map<PlaceCategory, Double> {
         if (visits.isEmpty()) return emptyMap()
 
@@ -112,9 +106,7 @@ class PlaceStatisticsCalculator {
             }
     }
 
-    /**
-     * Calculate time spent by category.
-     */
+    /** Calculate time spent by category. */
     fun getTimeByCategory(visits: List<PlaceVisit>): Map<PlaceCategory, Duration> =
         visits
             .groupBy { it.category }
@@ -122,9 +114,7 @@ class PlaceStatisticsCalculator {
                 categoryVisits.fold(Duration.ZERO) { acc, visit -> acc + visit.duration }
             }
 
-    /**
-     * Get top places by total time spent.
-     */
+    /** Get top places by total time spent. */
     fun getTopPlacesByDuration(
         visits: List<PlaceVisit>,
         limit: Int = 5
@@ -132,7 +122,7 @@ class PlaceStatisticsCalculator {
         val placeGroups =
             visits.groupBy { visit ->
                 visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-                    ?: "${visit.centerLatitude},${visit.centerLongitude}"
+                ?: "${visit.centerLatitude},${visit.centerLongitude}"
             }
 
         return placeGroups

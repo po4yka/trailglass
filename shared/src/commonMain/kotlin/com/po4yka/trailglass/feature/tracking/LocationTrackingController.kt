@@ -11,13 +11,15 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for location tracking feature.
- * Manages tracking state, user actions, and permission requests.
+ * Controller for location tracking feature. Manages tracking state, user actions, and permission requests.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -37,9 +39,7 @@ class LocationTrackingController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Location tracking UI state.
-     */
+    /** Location tracking UI state. */
     data class LocationTrackingUIState(
         val trackingState: TrackingState = TrackingState(),
         val hasPermissions: Boolean = false,
@@ -74,6 +74,7 @@ class LocationTrackingController(
                             _uiState.update { it.copy(hasPermissions = true) }
                         }
                     }
+
                     is PermissionResult.Denied,
                     is PermissionResult.PermanentlyDenied -> {
                         logger.warn { "Permission denied" }
@@ -86,6 +87,7 @@ class LocationTrackingController(
                             )
                         }
                     }
+
                     is PermissionResult.Cancelled -> {
                         logger.info { "Permission request cancelled" }
                         _uiState.update {
@@ -95,6 +97,7 @@ class LocationTrackingController(
                             )
                         }
                     }
+
                     is PermissionResult.Error -> {
                         logger.error { "Permission error: ${permState.lastResult.message}" }
                         _uiState.update {
@@ -105,6 +108,7 @@ class LocationTrackingController(
                             )
                         }
                     }
+
                     null -> {
                         // No result yet
                     }
@@ -116,10 +120,7 @@ class LocationTrackingController(
         checkPermissions()
     }
 
-    /**
-     * Start tracking with the specified mode.
-     * This will request permissions if needed before starting.
-     */
+    /** Start tracking with the specified mode. This will request permissions if needed before starting. */
     fun startTracking(mode: TrackingMode) {
         logger.info { "User requested to start tracking: $mode" }
 
@@ -147,10 +148,7 @@ class LocationTrackingController(
         }
     }
 
-    /**
-     * Start tracking for background mode.
-     * This requires both foreground and background location permissions.
-     */
+    /** Start tracking for background mode. This requires both foreground and background location permissions. */
     fun startBackgroundTracking(mode: TrackingMode) {
         logger.info { "User requested to start background tracking: $mode" }
 
@@ -193,9 +191,7 @@ class LocationTrackingController(
         }
     }
 
-    /**
-     * Internal method to actually start tracking (after permissions are granted).
-     */
+    /** Internal method to actually start tracking (after permissions are granted). */
     private fun startTrackingInternal(mode: TrackingMode) {
         _uiState.update { it.copy(isProcessing = true, error = null) }
 
@@ -205,6 +201,7 @@ class LocationTrackingController(
                     logger.info { "Tracking started successfully" }
                     _uiState.update { it.copy(isProcessing = false) }
                 }
+
                 is StartTrackingUseCase.Result.PermissionDenied -> {
                     logger.warn { "Permission denied during tracking start" }
                     _uiState.update {
@@ -215,6 +212,7 @@ class LocationTrackingController(
                         )
                     }
                 }
+
                 is StartTrackingUseCase.Result.Error -> {
                     logger.error { "Failed to start tracking: ${result.message}" }
                     _uiState.update { it.copy(isProcessing = false, error = result.message) }
@@ -223,9 +221,7 @@ class LocationTrackingController(
         }
     }
 
-    /**
-     * Stop tracking.
-     */
+    /** Stop tracking. */
     fun stopTracking() {
         logger.info { "User requested to stop tracking" }
 
@@ -237,9 +233,7 @@ class LocationTrackingController(
         }
     }
 
-    /**
-     * Check if permissions are granted.
-     */
+    /** Check if permissions are granted. */
     fun checkPermissions() {
         controllerScope.launch {
             val hasFinePermission = permissionFlow.isPermissionGranted(PermissionType.LOCATION_FINE)
@@ -248,26 +242,21 @@ class LocationTrackingController(
         }
     }
 
-    /**
-     * Request permissions using the permission flow.
-     * This shows the user-friendly permission dialogs.
-     */
+    /** Request permissions using the permission flow. This shows the user-friendly permission dialogs. */
     fun requestPermissions() {
         logger.info { "Requesting location permissions" }
         permissionFlow.startPermissionFlow(PermissionType.LOCATION_FINE)
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _uiState.update { it.copy(error = null) }
         permissionFlow.clearError()
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

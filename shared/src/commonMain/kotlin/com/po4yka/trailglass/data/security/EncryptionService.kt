@@ -3,8 +3,8 @@ package com.po4yka.trailglass.data.security
 /**
  * Service for end-to-end encryption of user data.
  *
- * Uses AES-256-GCM encryption for data confidentiality and integrity.
- * Keys are stored securely on the device and never sent to the server.
+ * Uses AES-256-GCM encryption for data confidentiality and integrity. Keys are stored securely on the device and never
+ * sent to the server.
  *
  * Platform implementations:
  * - Android: Uses Android Keystore with hardware-backed keys
@@ -27,20 +27,14 @@ expect class EncryptionService() {
      */
     suspend fun decrypt(encryptedData: EncryptedData): Result<String>
 
-    /**
-     * Check if encryption key exists.
-     */
+    /** Check if encryption key exists. */
     suspend fun hasEncryptionKey(): Boolean
 
-    /**
-     * Generate a new encryption key.
-     * This will overwrite any existing key.
-     */
+    /** Generate a new encryption key. This will overwrite any existing key. */
     suspend fun generateKey(): Result<Unit>
 
     /**
-     * Export the encryption key for backup.
-     * Returns a password-encrypted backup of the key.
+     * Export the encryption key for backup. Returns a password-encrypted backup of the key.
      *
      * @param password User password to encrypt the key backup
      * @return Base64-encoded encrypted key backup
@@ -58,40 +52,24 @@ expect class EncryptionService() {
         password: String
     ): Result<Unit>
 
-    /**
-     * Delete the encryption key.
-     * WARNING: This will make all encrypted data unrecoverable!
-     */
+    /** Delete the encryption key. WARNING: This will make all encrypted data unrecoverable! */
     suspend fun deleteKey(): Result<Unit>
 }
 
-/**
- * Encrypted data container with all components needed for decryption.
- */
+/** Encrypted data container with all components needed for decryption. */
 data class EncryptedData(
-    /**
-     * Base64-encoded ciphertext
-     */
+    /** Base64-encoded ciphertext */
     val ciphertext: String,
-    /**
-     * Base64-encoded initialization vector (12 bytes for GCM)
-     */
+    /** Base64-encoded initialization vector (12 bytes for GCM) */
     val iv: String,
-    /**
-     * Base64-encoded authentication tag (16 bytes for GCM)
-     */
+    /** Base64-encoded authentication tag (16 bytes for GCM) */
     val tag: String
 ) {
-    /**
-     * Combine into a single string for storage.
-     * Format: iv:tag:ciphertext
-     */
+    /** Combine into a single string for storage. Format: iv:tag:ciphertext */
     fun toStorageFormat(): String = "$iv:$tag:$ciphertext"
 
     companion object {
-        /**
-         * Parse from storage format.
-         */
+        /** Parse from storage format. */
         fun fromStorageFormat(data: String): EncryptedData? {
             val parts = data.split(":")
             if (parts.size != 3) return null
@@ -104,9 +82,7 @@ data class EncryptedData(
     }
 }
 
-/**
- * Exception thrown when encryption operations fail.
- */
+/** Exception thrown when encryption operations fail. */
 class EncryptionException(
     message: String,
     cause: Throwable? = null

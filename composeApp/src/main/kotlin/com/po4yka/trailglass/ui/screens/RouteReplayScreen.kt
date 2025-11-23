@@ -6,13 +6,42 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,9 +51,7 @@ import com.po4yka.trailglass.feature.route.PlaybackSpeed
 import com.po4yka.trailglass.feature.route.RouteReplayController
 import com.po4yka.trailglass.ui.components.RouteReplayMapView
 
-/**
- * Route Replay screen - full-screen animated playback of trip route.
- */
+/** Route Replay screen - full-screen animated playback of trip route. */
 @Composable
 fun RouteReplayScreen(
     tripId: String,
@@ -127,9 +154,7 @@ fun RouteReplayScreen(
     }
 }
 
-/**
- * Main replay content with map and controls.
- */
+/** Main replay content with map and controls. */
 @Composable
 private fun RouteReplayContent(
     controller: RouteReplayController,
@@ -181,9 +206,7 @@ private fun RouteReplayContent(
     }
 }
 
-/**
- * Replay control panel with play/pause, progress slider, and speed control.
- */
+/** Replay control panel with play/pause, progress slider, and speed control. */
 @Composable
 private fun ReplayControlPanel(
     isPlaying: Boolean,
@@ -277,7 +300,5 @@ private fun ReplayControlPanel(
     }
 }
 
-/**
- * Format progress as percentage.
- */
+/** Format progress as percentage. */
 private fun formatProgress(progress: Float): String = "${(progress * 100).toInt()}%"

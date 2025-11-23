@@ -9,8 +9,8 @@ import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Use case for exporting data to various formats using ExportManager.
- * Supports exporting trips and visits to CSV, GPX, and JSON formats.
+ * Use case for exporting data to various formats using ExportManager. Supports exporting trips and visits to CSV, GPX,
+ * and JSON formats.
  */
 @Inject
 class ExportDataUseCase(
@@ -20,18 +20,14 @@ class ExportDataUseCase(
 ) {
     private val logger = logger()
 
-    /**
-     * Export format options.
-     */
+    /** Export format options. */
     enum class Format {
         CSV,
         GPX,
         JSON
     }
 
-    /**
-     * Data type to export.
-     */
+    /** Data type to export. */
     sealed class DataType {
         object AllTrips : DataType()
 
@@ -96,6 +92,7 @@ class ExportDataUseCase(
                 val trips = tripRepository.getTripsForUser(userId)
                 exportManager.exportTripsToCSV(trips, outputPath)
             }
+
             Format.JSON -> {
                 logger.warn { "JSON export for all trips not supported, exporting first trip only" }
                 val trips = tripRepository.getTripsForUser(userId)
@@ -104,6 +101,7 @@ class ExportDataUseCase(
                 }
                 exportManager.exportTripToJSON(trips.first(), outputPath)
             }
+
             Format.GPX -> {
                 logger.warn { "GPX export for trips not supported, use visits instead" }
                 Result.failure(IllegalArgumentException("GPX format is only supported for visits"))
@@ -124,9 +122,11 @@ class ExportDataUseCase(
             Format.CSV -> {
                 exportManager.exportTripsToCSV(listOf(trip), outputPath)
             }
+
             Format.JSON -> {
                 exportManager.exportTripToJSON(trip, outputPath)
             }
+
             Format.GPX -> {
                 logger.warn { "GPX export for trips not supported, use visits instead" }
                 Result.failure(IllegalArgumentException("GPX format is only supported for visits"))

@@ -3,10 +3,7 @@ package com.po4yka.trailglass.domain.model
 import kotlinx.datetime.Instant
 import kotlin.time.Duration
 
-/**
- * A cluster of location points where the user stayed for a noticeable time.
- * Used in timelines and inside Memories.
- */
+/** A cluster of location points where the user stayed for a noticeable time. Used in timelines and inside Memories. */
 data class PlaceVisit(
     val id: String,
     val startTime: Instant,
@@ -33,22 +30,15 @@ data class PlaceVisit(
     val createdAt: Instant? = null,
     val updatedAt: Instant? = null
 ) {
-    /**
-     * Calculate the duration of this visit.
-     */
+    /** Calculate the duration of this visit. */
     val duration: Duration
         get() = endTime - startTime
 
-    /**
-     * Convenience property for accessing location as a Coordinate.
-     */
+    /** Convenience property for accessing location as a Coordinate. */
     val location: Coordinate
         get() = Coordinate(centerLatitude, centerLongitude)
 
-    /**
-     * Get a display name for this place.
-     * Priority: userLabel > poiName > approximateAddress > coordinates
-     */
+    /** Get a display name for this place. Priority: userLabel > poiName > approximateAddress > coordinates */
     val displayName: String
         get() =
             userLabel
@@ -56,9 +46,7 @@ data class PlaceVisit(
                 ?: approximateAddress
                 ?: "${centerLatitude.format(4)}, ${centerLongitude.format(4)}"
 
-    /**
-     * Get a short description of the visit.
-     */
+    /** Get a short description of the visit. */
     val shortDescription: String
         get() =
             buildString {

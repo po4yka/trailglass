@@ -1,14 +1,52 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.AddPhotoAlternate
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FitnessCenter
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.ShoppingBag
+import androidx.compose.material.icons.filled.Store
+import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -145,9 +183,7 @@ fun MarkerInfoCard(
     }
 }
 
-/**
- * Category badge with color based on place category.
- */
+/** Category badge with color based on place category. */
 @Composable
 private fun CategoryBadge(
     category: PlaceCategory,
@@ -172,9 +208,7 @@ private fun CategoryBadge(
     }
 }
 
-/**
- * Action button with spring animation on press.
- */
+/** Action button with spring animation on press. */
 @Composable
 private fun AnimatedActionButton(
     onClick: () -> Unit,
@@ -227,9 +261,7 @@ private fun AnimatedActionButton(
     }
 }
 
-/**
- * Get category color and icon from Silent Waters palette.
- */
+/** Get category color and icon from Silent Waters palette. */
 private fun getCategoryColorAndIcon(category: PlaceCategory): Pair<androidx.compose.ui.graphics.Color, ImageVector> =
     when (category) {
         PlaceCategory.HOME ->
@@ -238,78 +270,91 @@ private fun getCategoryColorAndIcon(category: PlaceCategory): Pair<androidx.comp
                     .Color(0xFF9DB4C0), // coolSteel
                 Icons.Default.Home
             )
+
         PlaceCategory.WORK ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF5C6B73), // blueSlate
                 Icons.Default.Work
             )
+
         PlaceCategory.FOOD ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF8BB5A1), // seaGlass
                 Icons.Default.Restaurant
             )
+
         PlaceCategory.SHOPPING ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFFA89968), // weatheredBrass
                 Icons.Default.ShoppingBag
             )
+
         PlaceCategory.FITNESS ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF8BB5A1), // seaGlass
                 Icons.Default.FitnessCenter
             )
+
         PlaceCategory.ENTERTAINMENT ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFFA8B5C7), // mistyLavender
                 Icons.Default.Theaters
             )
+
         PlaceCategory.TRAVEL ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF7A9CAF), // coastalPath
                 Icons.Default.Flight
             )
+
         PlaceCategory.HEALTHCARE ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFFC2DFE3), // lightBlue
                 Icons.Default.LocalHospital
             )
+
         PlaceCategory.EDUCATION ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFFA8B5C7), // mistyLavender
                 Icons.Default.School
             )
+
         PlaceCategory.RELIGIOUS ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF9DB4C0), // coolSteel
                 Icons.Default.Place
             )
+
         PlaceCategory.SOCIAL ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFFA89968), // weatheredBrass
                 Icons.Default.People
             )
+
         PlaceCategory.OUTDOOR ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF8BB5A1), // seaGlass
                 Icons.Default.Park
             )
+
         PlaceCategory.SERVICE ->
             Pair(
                 androidx.compose.ui.graphics
                     .Color(0xFF7A9CAF), // coastalPath
                 Icons.Default.Store
             )
+
         PlaceCategory.OTHER ->
             Pair(
                 androidx.compose.ui.graphics

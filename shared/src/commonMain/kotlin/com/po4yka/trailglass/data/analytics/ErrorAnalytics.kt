@@ -11,52 +11,38 @@ import kotlinx.datetime.Instant
  * Tracks errors for debugging, analytics, and user feedback.
  */
 interface ErrorAnalytics {
-    /**
-     * Log an error for analytics.
-     */
+    /** Log an error for analytics. */
     fun logError(
         error: TrailGlassError,
         context: Map<String, Any> = emptyMap()
     )
 
-    /**
-     * Log a non-fatal error.
-     */
+    /** Log a non-fatal error. */
     fun logNonFatal(
         error: TrailGlassError,
         context: Map<String, Any> = emptyMap()
     )
 
-    /**
-     * Log a fatal error (app crash).
-     */
+    /** Log a fatal error (app crash). */
     fun logFatal(
         error: TrailGlassError,
         context: Map<String, Any> = emptyMap()
     )
 
-    /**
-     * Set user identifier for error tracking.
-     */
+    /** Set user identifier for error tracking. */
     fun setUserId(userId: String?)
 
-    /**
-     * Add custom context data to all error reports.
-     */
+    /** Add custom context data to all error reports. */
     fun setCustomData(
         key: String,
         value: String
     )
 
-    /**
-     * Clear custom context data.
-     */
+    /** Clear custom context data. */
     fun clearCustomData()
 }
 
-/**
- * Default implementation of ErrorAnalytics using logging.
- */
+/** Default implementation of ErrorAnalytics using logging. */
 class LoggingErrorAnalytics : ErrorAnalytics {
     private val logger = logger()
     private val customData = mutableMapOf<String, String>()
@@ -132,16 +118,12 @@ class LoggingErrorAnalytics : ErrorAnalytics {
         }
 }
 
-/**
- * Error analytics factory.
- */
+/** Error analytics factory. */
 expect object ErrorAnalyticsFactory {
     fun create(): ErrorAnalytics
 }
 
-/**
- * Error event for tracking.
- */
+/** Error event for tracking. */
 data class ErrorEvent(
     val error: TrailGlassError,
     val timestamp: Instant = Clock.System.now(),
@@ -150,9 +132,7 @@ data class ErrorEvent(
     val severity: ErrorSeverity = ErrorSeverity.ERROR
 )
 
-/**
- * Error severity levels.
- */
+/** Error severity levels. */
 enum class ErrorSeverity {
     /** Informational errors that don't affect functionality */
     INFO,
@@ -167,9 +147,7 @@ enum class ErrorSeverity {
     FATAL
 }
 
-/**
- * Extension function to log errors with analytics.
- */
+/** Extension function to log errors with analytics. */
 fun TrailGlassError.logToAnalytics(
     analytics: ErrorAnalytics,
     context: Map<String, Any> = emptyMap(),
@@ -178,6 +156,7 @@ fun TrailGlassError.logToAnalytics(
     when (severity) {
         ErrorSeverity.INFO,
         ErrorSeverity.WARNING -> analytics.logNonFatal(this, context)
+
         ErrorSeverity.ERROR -> analytics.logError(this, context)
         ErrorSeverity.FATAL -> analytics.logFatal(this, context)
     }

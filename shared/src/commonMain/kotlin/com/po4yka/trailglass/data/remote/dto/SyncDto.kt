@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * Sync action type for delta synchronization.
- */
+/** Sync action type for delta synchronization. */
 @Serializable
 enum class SyncAction {
     CREATE,
@@ -12,9 +10,7 @@ enum class SyncAction {
     DELETE
 }
 
-/**
- * Conflict resolution strategy.
- */
+/** Conflict resolution strategy. */
 @Serializable
 enum class ConflictResolution {
     KEEP_LOCAL,
@@ -23,9 +19,7 @@ enum class ConflictResolution {
     MANUAL
 }
 
-/**
- * Entity type for sync operations.
- */
+/** Entity type for sync operations. */
 @Serializable
 enum class EntityType {
     LOCATION,
@@ -35,9 +29,7 @@ enum class EntityType {
     SETTINGS
 }
 
-/**
- * Conflict type enumeration.
- */
+/** Conflict type enumeration. */
 @Serializable
 enum class ConflictType {
     CONCURRENT_MODIFICATION,
@@ -45,9 +37,7 @@ enum class ConflictType {
     VERSION_MISMATCH
 }
 
-/**
- * Device sync information.
- */
+/** Device sync information. */
 @Serializable
 data class DeviceSyncInfoDto(
     val deviceId: String,
@@ -56,9 +46,7 @@ data class DeviceSyncInfoDto(
     val syncVersion: Long
 )
 
-/**
- * Pending changes count.
- */
+/** Pending changes count. */
 @Serializable
 data class PendingChangesDto(
     val locations: Int,
@@ -67,9 +55,7 @@ data class PendingChangesDto(
     val photos: Int
 )
 
-/**
- * Sync status response.
- */
+/** Sync status response. */
 @Serializable
 data class SyncStatusResponse(
     val userId: String,
@@ -79,9 +65,7 @@ data class SyncStatusResponse(
     val pendingChanges: PendingChangesDto
 )
 
-/**
- * Local changes for delta sync.
- */
+/** Local changes for delta sync. */
 @Serializable
 data class LocalChanges(
     val locations: List<LocationDto> = emptyList(),
@@ -91,9 +75,7 @@ data class LocalChanges(
     val settings: SettingsDto? = null
 )
 
-/**
- * Remote changes from server.
- */
+/** Remote changes from server. */
 @Serializable
 data class RemoteChanges(
     val locations: List<LocationDto> = emptyList(),
@@ -103,9 +85,7 @@ data class RemoteChanges(
     val deletedIds: DeletedIds = DeletedIds()
 )
 
-/**
- * Deleted entity IDs by type.
- */
+/** Deleted entity IDs by type. */
 @Serializable
 data class DeletedIds(
     val locations: List<String> = emptyList(),
@@ -114,9 +94,7 @@ data class DeletedIds(
     val photos: List<String> = emptyList()
 )
 
-/**
- * Sync conflict information.
- */
+/** Sync conflict information. */
 @Serializable
 data class SyncConflictDto(
     val entityType: EntityType,
@@ -127,9 +105,7 @@ data class SyncConflictDto(
     val suggestedResolution: ConflictResolution
 )
 
-/**
- * Rejected entity with reason.
- */
+/** Rejected entity with reason. */
 @Serializable
 data class RejectedEntity(
     val id: String,
@@ -137,9 +113,7 @@ data class RejectedEntity(
     val conflictId: String? = null
 )
 
-/**
- * Rejected entities by type.
- */
+/** Rejected entities by type. */
 @Serializable
 data class RejectedEntities(
     val locations: List<RejectedEntity> = emptyList(),
@@ -148,9 +122,7 @@ data class RejectedEntities(
     val photos: List<RejectedEntity> = emptyList()
 )
 
-/**
- * Accepted entity IDs by type.
- */
+/** Accepted entity IDs by type. */
 @Serializable
 data class AcceptedEntities(
     val locations: List<String> = emptyList(),
@@ -159,9 +131,7 @@ data class AcceptedEntities(
     val photos: List<String> = emptyList()
 )
 
-/**
- * Delta sync request.
- */
+/** Delta sync request. */
 @Serializable
 data class DeltaSyncRequest(
     val deviceId: String,
@@ -169,9 +139,7 @@ data class DeltaSyncRequest(
     val localChanges: LocalChanges
 )
 
-/**
- * Delta sync response.
- */
+/** Delta sync response. */
 @Serializable
 data class DeltaSyncResponse(
     val syncVersion: Long,
@@ -182,9 +150,7 @@ data class DeltaSyncResponse(
     val rejected: RejectedEntities
 )
 
-/**
- * Conflict resolution request.
- */
+/** Conflict resolution request. */
 @Serializable
 data class ResolveConflictRequest(
     val conflictId: String,
@@ -192,9 +158,7 @@ data class ResolveConflictRequest(
     val resolvedEntity: Map<String, String>
 )
 
-/**
- * Accepted entity response.
- */
+/** Accepted entity response. */
 @Serializable
 data class AcceptedEntityResponse(
     val id: String,
@@ -202,9 +166,7 @@ data class AcceptedEntityResponse(
     val syncTimestamp: String
 )
 
-/**
- * Conflict resolution response.
- */
+/** Conflict resolution response. */
 @Serializable
 data class ResolveConflictResponse(
     val success: Boolean,

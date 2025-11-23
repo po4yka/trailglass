@@ -3,7 +3,11 @@ package com.po4yka.trailglass.ui.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
@@ -74,8 +78,8 @@ private val DarkColorScheme =
  * - New expressive components (FloatingActionButtonMenu, SplitButton, LoadingIndicator, etc.)
  * - Advanced theming capabilities
  *
- * Note: Material3 Expressive APIs are experimental and marked with @ExperimentalMaterial3ExpressiveApi.
- * To use expressive components in your composables, add @OptIn(ExperimentalMaterial3ExpressiveApi::class).
+ * Note: Material3 Expressive APIs are experimental and marked with @ExperimentalMaterial3ExpressiveApi. To use
+ * expressive components in your composables, add @OptIn(ExperimentalMaterial3ExpressiveApi::class).
  *
  * Current Material3 version: 1.5.0-alpha08
  */
@@ -91,6 +95,7 @@ fun TrailGlassTheme(
                 val context = LocalContext.current
                 if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
             }
+
             darkTheme -> DarkColorScheme
             else -> LightColorScheme
         }

@@ -18,9 +18,7 @@ private val Context.syncStateDataStore: DataStore<Preferences> by preferencesDat
     name = "sync_state"
 )
 
-/**
- * Android implementation using DataStore.
- */
+/** Android implementation using DataStore. */
 @Inject
 actual class SyncStateRepositoryImpl(
     private val context: Context

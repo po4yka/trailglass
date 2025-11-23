@@ -2,9 +2,28 @@ package com.po4yka.trailglass.data.storage
 
 import android.content.Context
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.AccountSettings
+import com.po4yka.trailglass.domain.model.AppSettings
+import com.po4yka.trailglass.domain.model.AppTheme
+import com.po4yka.trailglass.domain.model.AppearanceSettings
+import com.po4yka.trailglass.domain.model.DataManagement
+import com.po4yka.trailglass.domain.model.DistanceUnit
+import com.po4yka.trailglass.domain.model.PrivacySettings
+import com.po4yka.trailglass.domain.model.TemperatureUnit
+import com.po4yka.trailglass.domain.model.TimeFormat
+import com.po4yka.trailglass.domain.model.TrackingAccuracy
+import com.po4yka.trailglass.domain.model.TrackingPreferences
+import com.po4yka.trailglass.domain.model.UnitPreferences
+import com.po4yka.trailglass.domain.model.UpdateInterval
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -13,9 +32,7 @@ import kotlinx.datetime.Instant
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-/**
- * Android implementation of SettingsStorage using DataStore.
- */
+/** Android implementation of SettingsStorage using DataStore. */
 actual class SettingsStorage(
     private val context: Context
 ) {

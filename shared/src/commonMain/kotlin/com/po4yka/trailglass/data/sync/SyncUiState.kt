@@ -4,9 +4,7 @@ import com.po4yka.trailglass.data.network.NetworkState
 import com.po4yka.trailglass.data.network.NetworkType
 import kotlinx.datetime.Instant
 
-/**
- * UI-friendly representation of sync conflicts.
- */
+/** UI-friendly representation of sync conflicts. */
 data class ConflictUiModel(
     val conflictId: String,
     val entityType: EntityType,
@@ -21,9 +19,7 @@ data class ConflictUiModel(
     val remotePreview: String
 )
 
-/**
- * Sync status with user-friendly information.
- */
+/** Sync status with user-friendly information. */
 data class SyncStatusUiModel(
     val isActive: Boolean,
     val progress: SyncProgress,
@@ -36,9 +32,7 @@ data class SyncStatusUiModel(
     val isNetworkMetered: Boolean = false
 )
 
-/**
- * Resolution choice for a conflict.
- */
+/** Resolution choice for a conflict. */
 enum class ConflictResolutionChoice {
     KEEP_LOCAL,
     KEEP_REMOTE,

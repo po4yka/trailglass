@@ -1,15 +1,23 @@
 package com.po4yka.trailglass.feature.route
 
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.LocationSample
+import com.po4yka.trailglass.domain.model.Photo
+import com.po4yka.trailglass.domain.model.PhotoMarker
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.domain.model.RouteBounds
+import com.po4yka.trailglass.domain.model.RoutePoint
+import com.po4yka.trailglass.domain.model.RouteSegment
+import com.po4yka.trailglass.domain.model.RouteStatistics
+import com.po4yka.trailglass.domain.model.TransportType
+import com.po4yka.trailglass.domain.model.Trip
+import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
 import kotlin.math.PI
-import kotlin.math.cos
-import kotlin.math.sqrt
 
 /**
- * Builds complete TripRoute from location samples, route segments, place visits, and photos.
- * This is the main service for constructing route data for visualization and replay.
+ * Builds complete TripRoute from location samples, route segments, place visits, and photos. This is the main service
+ * for constructing route data for visualization and replay.
  *
  * Includes performance optimizations for large routes:
  * - Adaptive point limiting based on route size
@@ -96,9 +104,7 @@ class TripRouteBuilder(
         )
     }
 
-    /**
-     * Build unified path from location samples with metadata from route segments.
-     */
+    /** Build unified path from location samples with metadata from route segments. */
     private fun buildFullPath(
         samples: List<LocationSample>,
         segments: List<RouteSegment>
@@ -136,9 +142,7 @@ class TripRouteBuilder(
         return routePoints
     }
 
-    /**
-     * Build photo markers from photos, associating them with place visits and route.
-     */
+    /** Build photo markers from photos, associating them with place visits and route. */
     private fun buildPhotoMarkers(
         photos: List<Photo>,
         placeVisits: List<PlaceVisit>
@@ -175,8 +179,8 @@ class TripRouteBuilder(
     }
 
     /**
-     * Find the nearest place visit to a photo location and timestamp.
-     * Returns null if no visit is close enough (spatially and temporally).
+     * Find the nearest place visit to a photo location and timestamp. Returns null if no visit is close enough
+     * (spatially and temporally).
      */
     private fun findNearestPlaceVisit(
         photoLat: Double,
@@ -209,9 +213,7 @@ class TripRouteBuilder(
             }
     }
 
-    /**
-     * Calculate bounding box for the route including all points and photos.
-     */
+    /** Calculate bounding box for the route including all points and photos. */
     private fun calculateBounds(
         routePoints: List<RoutePoint>,
         visits: List<PlaceVisit>,
@@ -248,9 +250,7 @@ class TripRouteBuilder(
         )
     }
 
-    /**
-     * Calculate comprehensive statistics for the route.
-     */
+    /** Calculate comprehensive statistics for the route. */
     private fun calculateStatistics(
         trip: Trip,
         segments: List<RouteSegment>,
@@ -302,9 +302,7 @@ class TripRouteBuilder(
         )
     }
 
-    /**
-     * Calculate Haversine distance between two coordinates.
-     */
+    /** Calculate Haversine distance between two coordinates. */
     private fun haversineDistance(
         lat1: Double,
         lon1: Double,
@@ -327,8 +325,8 @@ class TripRouteBuilder(
     }
 
     /**
-     * Downsample location samples to a target count using evenly-spaced sampling.
-     * This preserves temporal distribution while reducing point count for performance.
+     * Downsample location samples to a target count using evenly-spaced sampling. This preserves temporal distribution
+     * while reducing point count for performance.
      *
      * @param samples Full list of location samples (sorted by time)
      * @param targetCount Target number of points

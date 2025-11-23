@@ -1,14 +1,22 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.RoutePoint
 import com.po4yka.trailglass.domain.model.TransportType
@@ -16,10 +24,7 @@ import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.feature.route.MapStyle
 import com.po4yka.trailglass.ui.theme.extended
 
-/**
- * Map view component for displaying trip routes.
- * Shows route polyline, start/end markers, and photo markers.
- */
+/** Map view component for displaying trip routes. Shows route polyline, start/end markers, and photo markers. */
 @Composable
 fun RouteMapView(
     tripRoute: TripRoute,
@@ -122,9 +127,7 @@ fun RouteMapView(
     }
 }
 
-/**
- * Route polyline with color based on transport type.
- */
+/** Route polyline with color based on transport type. */
 @Composable
 private fun RoutePolyline(routePoints: List<RoutePoint>) {
     // Group consecutive points by transport type
@@ -148,9 +151,7 @@ private fun RoutePolyline(routePoints: List<RoutePoint>) {
     }
 }
 
-/**
- * Photo marker on the map.
- */
+/** Photo marker on the map. */
 @Composable
 private fun PhotoMarkerIcon(
     photoMarker: PhotoMarker,
@@ -174,9 +175,7 @@ private fun PhotoMarkerIcon(
     )
 }
 
-/**
- * Group route points by consecutive transport type for colored segments.
- */
+/** Group route points by consecutive transport type for colored segments. */
 private fun groupByTransportType(points: List<RoutePoint>): List<Pair<TransportType, List<RoutePoint>>> {
     if (points.isEmpty()) return emptyList()
 
@@ -204,10 +203,7 @@ private fun groupByTransportType(points: List<RoutePoint>): List<Pair<TransportT
     return segments
 }
 
-/**
- * Get polyline color based on transport type.
- * Uses Silent Waters palette: Harbor Blue for historical routes.
- */
+/** Get polyline color based on transport type. Uses Silent Waters palette: Harbor Blue for historical routes. */
 @Composable
 private fun getTransportColor(type: TransportType): Color {
     // Use Harbor Blue from Silent Waters palette for all route types
@@ -215,9 +211,7 @@ private fun getTransportColor(type: TransportType): Color {
     return MaterialTheme.colorScheme.extended.historicalRoute
 }
 
-/**
- * Get polyline width based on transport type.
- */
+/** Get polyline width based on transport type. */
 private fun getTransportWidth(type: TransportType): Float =
     when (type) {
         TransportType.WALK -> 5f

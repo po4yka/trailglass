@@ -1,10 +1,24 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.LocationCity
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Straighten
+import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,9 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.RouteStatistics
 import kotlin.math.roundToInt
 
-/**
- * Grid of metric cards showing trip statistics.
- */
+/** Grid of metric cards showing trip statistics. */
 @Composable
 fun StatisticsMetricCards(
     statistics: RouteStatistics,
@@ -106,9 +118,7 @@ fun StatisticsMetricCards(
     }
 }
 
-/**
- * Individual metric card.
- */
+/** Individual metric card. */
 @Composable
 private fun MetricCard(
     icon: ImageVector,
@@ -152,9 +162,7 @@ private fun MetricCard(
     }
 }
 
-/**
- * Format distance for display.
- */
+/** Format distance for display. */
 private fun formatDistance(kilometers: Double): String =
     when {
         kilometers < 1.0 -> "${(kilometers * 1000).roundToInt()} m"

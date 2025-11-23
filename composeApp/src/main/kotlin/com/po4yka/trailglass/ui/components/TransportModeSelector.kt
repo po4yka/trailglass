@@ -4,7 +4,15 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.DirectionsBike
@@ -13,7 +21,10 @@ import androidx.compose.material.icons.filled.DirectionsBoat
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Flight
 import androidx.compose.material.icons.filled.Train
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -26,8 +37,8 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.TransportType
 
 /**
- * Material 3 Expressive-style button group for selecting transport mode.
- * Implements single-selection toggle behavior with spring animations.
+ * Material 3 Expressive-style button group for selecting transport mode. Implements single-selection toggle behavior
+ * with spring animations.
  *
  * Uses Silent Waters color palette for consistent visual identity.
  *
@@ -73,8 +84,8 @@ fun TransportModeSelector(
 }
 
 /**
- * Individual transport mode button with Material 3 Expressive styling.
- * Features spring animations on selection and Silent Waters colors.
+ * Individual transport mode button with Material 3 Expressive styling. Features spring animations on selection and
+ * Silent Waters colors.
  */
 @Composable
 private fun TransportModeButton(
@@ -173,10 +184,7 @@ private fun TransportModeButton(
     }
 }
 
-/**
- * Compact transport mode selector with icon-only buttons.
- * Useful for toolbars and limited space scenarios.
- */
+/** Compact transport mode selector with icon-only buttons. Useful for toolbars and limited space scenarios. */
 @Composable
 fun CompactTransportModeSelector(
     selectedMode: TransportType?,
@@ -199,9 +207,7 @@ fun CompactTransportModeSelector(
     )
 }
 
-/**
- * Get Material icon for transport type.
- */
+/** Get Material icon for transport type. */
 private fun getTransportIcon(type: TransportType): ImageVector =
     when (type) {
         TransportType.WALK -> Icons.AutoMirrored.Filled.DirectionsWalk
@@ -213,9 +219,7 @@ private fun getTransportIcon(type: TransportType): ImageVector =
         TransportType.UNKNOWN -> Icons.Default.DirectionsCar
     }
 
-/**
- * Get display label for transport type.
- */
+/** Get display label for transport type. */
 private fun getTransportLabel(type: TransportType): String =
     when (type) {
         TransportType.WALK -> "Walk"

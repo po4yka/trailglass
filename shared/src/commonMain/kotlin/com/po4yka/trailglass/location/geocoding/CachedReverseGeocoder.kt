@@ -3,8 +3,8 @@ package com.po4yka.trailglass.location.geocoding
 import com.po4yka.trailglass.domain.model.GeocodedLocation
 
 /**
- * Wrapper around ReverseGeocoder that adds caching capabilities.
- * Reduces API calls and improves performance by caching results.
+ * Wrapper around ReverseGeocoder that adds caching capabilities. Reduces API calls and improves performance by caching
+ * results.
  */
 class CachedReverseGeocoder(
     private val geocoder: ReverseGeocoder,
@@ -26,16 +26,12 @@ class CachedReverseGeocoder(
         return result
     }
 
-    /**
-     * Clear expired cache entries.
-     */
+    /** Clear expired cache entries. */
     fun clearExpiredCache() {
         cache.clearExpired()
     }
 
-    /**
-     * Clear all cache entries.
-     */
+    /** Clear all cache entries. */
     fun clearCache() {
         cache.clear()
     }

@@ -5,11 +5,14 @@ import com.po4yka.trailglass.domain.model.EnhancedMapMarker
 import com.po4yka.trailglass.domain.model.HeatmapData
 import com.po4yka.trailglass.domain.model.HeatmapGradient
 import com.po4yka.trailglass.domain.model.HeatmapPoint
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Generates heatmap data from markers based on visit frequency.
- */
+/** Generates heatmap data from markers based on visit frequency. */
 class HeatmapGenerator {
     /**
      * Generate heatmap data from markers.
@@ -63,9 +66,7 @@ class HeatmapGenerator {
         )
     }
 
-    /**
-     * Generate heatmap data from coordinates with uniform intensity.
-     */
+    /** Generate heatmap data from coordinates with uniform intensity. */
     fun generateFromCoordinates(
         coordinates: List<Coordinate>,
         radius: Int = 20,
@@ -88,9 +89,7 @@ class HeatmapGenerator {
         )
     }
 
-    /**
-     * Generate weighted heatmap from coordinates with custom weights.
-     */
+    /** Generate weighted heatmap from coordinates with custom weights. */
     fun generateWeighted(
         coordinatesWithWeights: List<Pair<Coordinate, Float>>,
         radius: Int = 20,
@@ -119,9 +118,7 @@ class HeatmapGenerator {
         )
     }
 
-    /**
-     * Calculate density of markers around a specific marker.
-     */
+    /** Calculate density of markers around a specific marker. */
     private fun calculateDensity(
         marker: EnhancedMapMarker,
         allMarkers: List<EnhancedMapMarker>,
@@ -136,9 +133,7 @@ class HeatmapGenerator {
                 }
             }.toFloat()
 
-    /**
-     * Calculate maximum density across all markers.
-     */
+    /** Calculate maximum density across all markers. */
     private fun calculateMaxDensity(markers: List<EnhancedMapMarker>): Float {
         if (markers.isEmpty()) return 1f
 
@@ -147,9 +142,7 @@ class HeatmapGenerator {
         }
     }
 
-    /**
-     * Calculate haversine distance between two coordinates in degrees.
-     */
+    /** Calculate haversine distance between two coordinates in degrees. */
     private fun haversineDistance(
         c1: Coordinate,
         c2: Coordinate
@@ -169,23 +162,15 @@ class HeatmapGenerator {
         return c * 180.0 / PI
     }
 
-    /**
-     * Mode for calculating heatmap intensity values.
-     */
+    /** Mode for calculating heatmap intensity values. */
     enum class IntensityMode {
-        /**
-         * All points have equal intensity.
-         */
+        /** All points have equal intensity. */
         UNIFORM,
 
-        /**
-         * Intensity based on visit count.
-         */
+        /** Intensity based on visit count. */
         VISIT_COUNT,
 
-        /**
-         * Intensity based on marker density (number of nearby markers).
-         */
+        /** Intensity based on marker density (number of nearby markers). */
         DENSITY
     }
 }

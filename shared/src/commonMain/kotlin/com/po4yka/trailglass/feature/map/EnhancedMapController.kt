@@ -1,6 +1,11 @@
 package com.po4yka.trailglass.feature.map
 
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.EnhancedMapDisplayData
+import com.po4yka.trailglass.domain.model.EnhancedMapMarker
+import com.po4yka.trailglass.domain.model.MapRoute
+import com.po4yka.trailglass.domain.model.MapVisualizationMode
+import com.po4yka.trailglass.domain.model.MarkerCluster
+import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
@@ -34,9 +39,7 @@ class EnhancedMapController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Enhanced map UI state.
-     */
+    /** Enhanced map UI state. */
     data class EnhancedMapState(
         val mapData: EnhancedMapDisplayData = EnhancedMapDisplayData(),
         val visualizationMode: MapVisualizationMode = MapVisualizationMode.HYBRID,
@@ -53,9 +56,7 @@ class EnhancedMapController(
     private val _state = MutableStateFlow(EnhancedMapState())
     val state: StateFlow<EnhancedMapState> = _state.asStateFlow()
 
-    /**
-     * Load enhanced map data with clustering and heatmap.
-     */
+    /** Load enhanced map data with clustering and heatmap. */
     fun loadMapData(
         userId: String,
         startTime: Instant,
@@ -146,9 +147,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Update zoom level and re-cluster markers.
-     */
+    /** Update zoom level and re-cluster markers. */
     fun updateZoom(zoomLevel: Float) {
         val currentState = _state.value
         _state.update { it.copy(zoomLevel = zoomLevel) }
@@ -179,9 +178,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Toggle clustering on/off.
-     */
+    /** Toggle clustering on/off. */
     fun toggleClustering() {
         val newValue = !_state.value.clusteringEnabled
         _state.update { it.copy(clusteringEnabled = newValue) }
@@ -208,9 +205,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Toggle heatmap on/off.
-     */
+    /** Toggle heatmap on/off. */
     fun toggleHeatmap() {
         val newValue = !_state.value.heatmapEnabled
 
@@ -246,9 +241,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Change visualization mode.
-     */
+    /** Change visualization mode. */
     fun setVisualizationMode(mode: MapVisualizationMode) {
         _state.update { it.copy(visualizationMode = mode) }
 
@@ -262,6 +255,7 @@ class EnhancedMapController(
                     )
                 }
             }
+
             MapVisualizationMode.CLUSTERS -> {
                 // Enable clustering, disable heatmap
                 _state.update {
@@ -272,6 +266,7 @@ class EnhancedMapController(
                 }
                 toggleClustering()
             }
+
             MapVisualizationMode.HEATMAP -> {
                 // Enable heatmap, disable markers
                 _state.update {
@@ -282,6 +277,7 @@ class EnhancedMapController(
                 }
                 toggleHeatmap()
             }
+
             MapVisualizationMode.HYBRID -> {
                 // Enable both clustering and routes
                 _state.update {
@@ -295,9 +291,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Select a marker.
-     */
+    /** Select a marker. */
     fun selectMarker(marker: EnhancedMapMarker) {
         logger.debug { "Marker selected: ${marker.title}" }
         _state.update {
@@ -309,9 +303,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Select a cluster (expands to show markers).
-     */
+    /** Select a cluster (expands to show markers). */
     fun selectCluster(cluster: MarkerCluster) {
         logger.debug { "Cluster selected: ${cluster.count} markers" }
         _state.update {
@@ -323,9 +315,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Select a route.
-     */
+    /** Select a route. */
     fun selectRoute(route: MapRoute) {
         logger.debug { "Route selected: ${route.transportType}" }
         _state.update {
@@ -337,9 +327,7 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Clear all selections.
-     */
+    /** Clear all selections. */
     fun clearSelection() {
         _state.update {
             it.copy(
@@ -350,16 +338,14 @@ class EnhancedMapController(
         }
     }
 
-    /**
-     * Clear error.
-     */
+    /** Clear error. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

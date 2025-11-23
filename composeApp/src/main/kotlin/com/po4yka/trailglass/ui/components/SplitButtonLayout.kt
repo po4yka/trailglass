@@ -45,9 +45,9 @@ import com.po4yka.trailglass.ui.theme.scaleSpring
 /**
  * Material 3 Expressive SplitButton component with primary and secondary actions.
  *
- * A SplitButton visually combines a primary action button with a secondary action button,
- * separated by a subtle divider. This follows Material 3 Expressive design guidelines
- * with spring-based animations and the Silent Waters color palette.
+ * A SplitButton visually combines a primary action button with a secondary action button, separated by a subtle
+ * divider. This follows Material 3 Expressive design guidelines with spring-based animations and the Silent Waters
+ * color palette.
  *
  * Features:
  * - Spring animation on press (Material 3 Expressive)
@@ -144,6 +144,7 @@ fun SplitButton(
                         PrimaryButtonContent(primaryIcon, primaryText)
                     }
                 }
+
                 SplitButtonVariant.Outlined -> {
                     OutlinedButton(
                         onClick = onPrimaryClick,
@@ -167,6 +168,7 @@ fun SplitButton(
                         PrimaryButtonContent(primaryIcon, primaryText)
                     }
                 }
+
                 SplitButtonVariant.Text -> {
                     TextButton(
                         onClick = onPrimaryClick,
@@ -234,9 +236,7 @@ fun SplitButton(
     }
 }
 
-/**
- * Helper composable for primary button content (icon + text).
- */
+/** Helper composable for primary button content (icon + text). */
 @Composable
 private fun PrimaryButtonContent(
     icon: ImageVector?,
@@ -276,8 +276,8 @@ data class SplitButtonMenuItem(
 /**
  * Material 3 Expressive SplitButton with dropdown menu for secondary actions.
  *
- * This variant shows a primary action button on the left and a dropdown trigger on the right.
- * Clicking the dropdown reveals a menu with multiple options.
+ * This variant shows a primary action button on the left and a dropdown trigger on the right. Clicking the dropdown
+ * reveals a menu with multiple options.
  *
  * Features:
  * - Spring animations for press states and menu expansion
@@ -346,35 +346,24 @@ fun SplitButtonWithMenu(
     }
 }
 
-/**
- * Visual variants for SplitButton components.
- */
+/** Visual variants for SplitButton components. */
 enum class SplitButtonVariant {
-    /**
-     * Filled variant with solid background color.
-     * Default and most prominent variant.
-     */
+    /** Filled variant with solid background color. Default and most prominent variant. */
     Filled,
 
-    /**
-     * Outlined variant with transparent background and border.
-     * Medium emphasis variant.
-     */
+    /** Outlined variant with transparent background and border. Medium emphasis variant. */
     Outlined,
 
-    /**
-     * Text-only variant with no background or border.
-     * Lowest emphasis variant.
-     */
+    /** Text-only variant with no background or border. Lowest emphasis variant. */
     Text
 }
 
 /**
  * Creates ButtonColors for route-related actions using the CoastalPath color.
  *
- * This is a convenience function for creating split buttons that relate to map/route actions,
- * using the MaterialTheme.colorScheme.extended.activeRoute color if available,
- * or falling back to a custom CoastalPath color from the Silent Waters palette.
+ * This is a convenience function for creating split buttons that relate to map/route actions, using the
+ * MaterialTheme.colorScheme.extended.activeRoute color if available, or falling back to a custom CoastalPath color from
+ * the Silent Waters palette.
  */
 @Composable
 fun routeButtonColors(): ButtonColors {
@@ -387,9 +376,7 @@ fun routeButtonColors(): ButtonColors {
     )
 }
 
-/**
- * Preview helpers and example usage.
- */
+/** Preview helpers and example usage. */
 @Composable
 fun SplitButtonExamples() {
     // Example 1: Basic split button with filled style

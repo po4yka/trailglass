@@ -6,7 +6,11 @@ import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import platform.CoreLocation.*
@@ -14,9 +18,7 @@ import platform.darwin.NSObject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-/**
- * iOS implementation of LocationTracker using CLLocationManager.
- */
+/** iOS implementation of LocationTracker using CLLocationManager. */
 @OptIn(ExperimentalForeignApi::class, ExperimentalUuidApi::class)
 class IOSLocationTracker(
     private val repository: LocationRepository,
@@ -58,11 +60,13 @@ class IOSLocationTracker(
                 locationManager.startMonitoringVisits()
                 logger.debug { "Started significant location changes and visit monitoring" }
             }
+
             TrackingMode.ACTIVE -> {
                 // Use continuous location updates
                 locationManager.startUpdatingLocation()
                 logger.debug { "Started continuous location updates" }
             }
+
             TrackingMode.IDLE -> {
                 // Do nothing
             }
@@ -133,9 +137,7 @@ class IOSLocationTracker(
 
     override suspend fun getCurrentState(): TrackingState = _trackingState.value
 
-    /**
-     * Configure CLLocationManager based on tracking mode.
-     */
+    /** Configure CLLocationManager based on tracking mode. */
     private fun configureLocationManager(mode: TrackingMode) {
         when (mode) {
             TrackingMode.PASSIVE -> {
@@ -145,6 +147,7 @@ class IOSLocationTracker(
                 locationManager.pausesLocationUpdatesAutomatically = true
                 locationManager.activityType = CLActivityTypeOtherNavigation
             }
+
             TrackingMode.ACTIVE -> {
                 locationManager.desiredAccuracy = kCLLocationAccuracyBest
                 locationManager.distanceFilter = configuration.activeDistance
@@ -152,15 +155,14 @@ class IOSLocationTracker(
                 locationManager.pausesLocationUpdatesAutomatically = false
                 locationManager.activityType = CLActivityTypeFitness
             }
+
             TrackingMode.IDLE -> {
                 // No configuration needed
             }
         }
     }
 
-    /**
-     * Process a location update from CLLocationManager.
-     */
+    /** Process a location update from CLLocationManager. */
     internal fun processLocation(location: CLLocation) {
         val lat = location.coordinate.useContents { latitude }
         val lng = location.coordinate.useContents { longitude }
@@ -206,9 +208,7 @@ class IOSLocationTracker(
         }
     }
 
-    /**
-     * Process a visit from CLLocationManager.
-     */
+    /** Process a visit from CLLocationManager. */
     internal fun processVisit(visit: CLVisit) {
         val lat = visit.coordinate.useContents { latitude }
         val lng = visit.coordinate.useContents { longitude }
@@ -255,9 +255,7 @@ class IOSLocationTracker(
         }
     }
 
-    /**
-     * CLLocationManagerDelegate implementation.
-     */
+    /** CLLocationManagerDelegate implementation. */
     private class LocationManagerDelegate :
         NSObject(),
         CLLocationManagerDelegateProtocol {

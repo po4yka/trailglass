@@ -6,19 +6,28 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Build
 import androidx.core.content.ContextCompat
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import java.util.UUID
 
-/**
- * Android implementation of LocationTracker using FusedLocationProviderClient.
- */
+/** Android implementation of LocationTracker using FusedLocationProviderClient. */
 class AndroidLocationTracker(
     private val context: Context,
     private val repository: LocationRepository,
@@ -140,9 +149,7 @@ class AndroidLocationTracker(
 
     override suspend fun getCurrentState(): TrackingState = _trackingState.value
 
-    /**
-     * Create a LocationRequest based on the tracking mode.
-     */
+    /** Create a LocationRequest based on the tracking mode. */
     private fun createLocationRequest(mode: TrackingMode): LocationRequest {
         val (interval, distance, priority) =
             when (mode) {
@@ -152,12 +159,14 @@ class AndroidLocationTracker(
                         configuration.passiveDistance.toFloat(),
                         Priority.PRIORITY_BALANCED_POWER_ACCURACY
                     )
+
                 TrackingMode.ACTIVE ->
                     Triple(
                         configuration.activeInterval.inWholeMilliseconds,
                         configuration.activeDistance.toFloat(),
                         Priority.PRIORITY_HIGH_ACCURACY
                     )
+
                 TrackingMode.IDLE ->
                     Triple(
                         Long.MAX_VALUE,
@@ -173,9 +182,7 @@ class AndroidLocationTracker(
             .build()
     }
 
-    /**
-     * Create a LocationCallback that processes location updates.
-     */
+    /** Create a LocationCallback that processes location updates. */
     private fun createLocationCallback(): LocationCallback =
         object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
@@ -189,9 +196,7 @@ class AndroidLocationTracker(
             }
         }
 
-    /**
-     * Process a location update and save it.
-     */
+    /** Process a location update and save it. */
     private fun processLocation(location: Location) {
         logger.debug {
             "Received location: (${location.latitude}, ${location.longitude}), " +

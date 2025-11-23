@@ -9,9 +9,8 @@ import kotlin.time.measureTime
 /**
  * Performance benchmark tests for geographic algorithms.
  *
- * These tests measure execution time for different algorithm implementations
- * across various distance ranges and scenarios. They are marked with @Ignore
- * by default since they're for manual performance testing rather than CI/CD.
+ * These tests measure execution time for different algorithm implementations across various distance ranges and
+ * scenarios. They are marked with @Ignore by default since they're for manual performance testing rather than CI/CD.
  *
  * To run these benchmarks:
  * - Remove the @Ignore annotation
@@ -27,9 +26,7 @@ class AlgorithmPerformanceBenchmark {
         private const val WARMUP_ITERATIONS = 100
     }
 
-    /**
-     * Test scenarios covering different distance ranges.
-     */
+    /** Test scenarios covering different distance ranges. */
     data class DistanceScenario(
         val name: String,
         val from: Coordinate,
@@ -87,9 +84,7 @@ class AlgorithmPerformanceBenchmark {
             )
         )
 
-    /**
-     * Benchmark results for a single algorithm.
-     */
+    /** Benchmark results for a single algorithm. */
     data class BenchmarkResult(
         val algorithmName: String,
         val scenarioName: String,
@@ -121,9 +116,7 @@ class AlgorithmPerformanceBenchmark {
             }
     }
 
-    /**
-     * Run a benchmark for a given algorithm and scenario.
-     */
+    /** Run a benchmark for a given algorithm and scenario. */
     private fun benchmarkDistance(
         algorithm: DistanceAlgorithm,
         algorithmName: String,
@@ -162,9 +155,7 @@ class AlgorithmPerformanceBenchmark {
         )
     }
 
-    /**
-     * Run a benchmark for bearing algorithms.
-     */
+    /** Run a benchmark for bearing algorithms. */
     private fun benchmarkBearing(
         algorithm: BearingAlgorithm,
         algorithmName: String,
@@ -203,9 +194,7 @@ class AlgorithmPerformanceBenchmark {
         )
     }
 
-    /**
-     * Run a benchmark for interpolation algorithms.
-     */
+    /** Run a benchmark for interpolation algorithms. */
     private fun benchmarkInterpolation(
         algorithm: InterpolationAlgorithm,
         algorithmName: String,
@@ -467,22 +456,28 @@ class AlgorithmPerformanceBenchmark {
 
         println("Performance ratios (across all distances):")
         println(
-            "  Haversine vs Simple: ${String.format(
-                "%.2f",
-                haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
-            )}x"
+            "  Haversine vs Simple: ${
+                String.format(
+                    "%.2f",
+                    haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
+                )
+            }x"
         )
         println(
-            "  Vincenty vs Simple: ${String.format(
-                "%.2f",
-                vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
-            )}x"
+            "  Vincenty vs Simple: ${
+                String.format(
+                    "%.2f",
+                    vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
+                )
+            }x"
         )
         println(
-            "  Vincenty vs Haversine: ${String.format(
-                "%.2f",
-                vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds
-            )}x"
+            "  Vincenty vs Haversine: ${
+                String.format(
+                    "%.2f",
+                    vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds
+                )
+            }x"
         )
 
         println()

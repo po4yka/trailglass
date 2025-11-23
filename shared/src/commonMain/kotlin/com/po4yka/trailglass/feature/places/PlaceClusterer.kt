@@ -5,14 +5,19 @@ import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration
 
 /**
  * Clusters place visits to identify frequently visited places using DBSCAN-like algorithm.
  *
- * This helps identify places like "Home", "Work", "Favorite Cafe" by grouping
- * visits that are spatially close to each other.
+ * This helps identify places like "Home", "Work", "Favorite Cafe" by grouping visits that are spatially close to each
+ * other.
  */
 @Inject
 class PlaceClusterer(
@@ -88,9 +93,7 @@ class PlaceClusterer(
         return updatedPlaces.sortedByDescending { it.visitCount }
     }
 
-    /**
-     * Perform spatial clustering using a simple distance-based algorithm.
-     */
+    /** Perform spatial clustering using a simple distance-based algorithm. */
     private fun performClustering(visits: List<PlaceVisit>): List<List<PlaceVisit>> {
         val clusters = mutableListOf<MutableList<PlaceVisit>>()
         val visited = mutableSetOf<Int>()
@@ -127,9 +130,7 @@ class PlaceClusterer(
         return clusters
     }
 
-    /**
-     * Create a FrequentPlace from a cluster of visits.
-     */
+    /** Create a FrequentPlace from a cluster of visits. */
     private fun createFrequentPlace(
         cluster: List<PlaceVisit>,
         userId: String,
@@ -187,10 +188,7 @@ class PlaceClusterer(
         )
     }
 
-    /**
-     * Determine the best category for a cluster of visits.
-     * Uses voting from individual visit categorizations.
-     */
+    /** Determine the best category for a cluster of visits. Uses voting from individual visit categorizations. */
     private fun determineCategoryForCluster(
         cluster: List<PlaceVisit>
     ): Pair<PlaceCategory, com.po4yka.trailglass.domain.model.CategoryConfidence> {
@@ -223,9 +221,7 @@ class PlaceClusterer(
         return winningCategory to confidence
     }
 
-    /**
-     * Find the nearest frequent place to a visit.
-     */
+    /** Find the nearest frequent place to a visit. */
     private fun findNearestPlace(
         visit: PlaceVisit,
         places: List<FrequentPlace>
@@ -244,9 +240,7 @@ class PlaceClusterer(
             .minByOrNull { (_, distance) -> distance }
             ?.first
 
-    /**
-     * Update a frequent place with a new visit.
-     */
+    /** Update a frequent place with a new visit. */
     private fun updateFrequentPlaceWithVisit(
         place: FrequentPlace,
         visit: PlaceVisit

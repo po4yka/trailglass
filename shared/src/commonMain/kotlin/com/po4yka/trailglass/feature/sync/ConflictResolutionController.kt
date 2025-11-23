@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for Conflict Resolution screen.
- * Manages sync conflicts and user resolution choices.
+ * Controller for Conflict Resolution screen. Manages sync conflicts and user resolution choices.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -34,9 +33,7 @@ class ConflictResolutionController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Conflict Resolution UI state.
-     */
+    /** Conflict Resolution UI state. */
     data class ConflictResolutionState(
         val conflicts: List<SyncConflictDto> = emptyList(),
         val currentConflictIndex: Int = 0,
@@ -58,9 +55,7 @@ class ConflictResolutionController(
     private val _state = MutableStateFlow(ConflictResolutionState())
     val state: StateFlow<ConflictResolutionState> = _state.asStateFlow()
 
-    /**
-     * Set conflicts to be resolved.
-     */
+    /** Set conflicts to be resolved. */
     fun setConflicts(conflicts: List<SyncConflictDto>) {
         logger.info { "Setting ${conflicts.size} conflicts for resolution" }
 
@@ -73,9 +68,7 @@ class ConflictResolutionController(
         }
     }
 
-    /**
-     * Resolve current conflict with the chosen strategy.
-     */
+    /** Resolve current conflict with the chosen strategy. */
     fun resolveConflict(
         resolution: ConflictResolution,
         resolvedEntity: Map<String, String>
@@ -115,6 +108,7 @@ class ConflictResolutionController(
                         )
                     }
                 }
+
                 result.isFailure -> {
                     val error = result.exceptionOrNull()?.message ?: "Failed to resolve conflict"
                     logger.error { "Failed to resolve conflict: $error" }
@@ -130,25 +124,19 @@ class ConflictResolutionController(
         }
     }
 
-    /**
-     * Resolve conflict by keeping local version.
-     */
+    /** Resolve conflict by keeping local version. */
     fun resolveKeepLocal() {
         val conflict = _state.value.currentConflict ?: return
         resolveConflict(ConflictResolution.KEEP_LOCAL, conflict.localVersion)
     }
 
-    /**
-     * Resolve conflict by keeping remote version.
-     */
+    /** Resolve conflict by keeping remote version. */
     fun resolveKeepRemote() {
         val conflict = _state.value.currentConflict ?: return
         resolveConflict(ConflictResolution.KEEP_REMOTE, conflict.remoteVersion)
     }
 
-    /**
-     * Resolve conflict by merging versions (use suggested resolution).
-     */
+    /** Resolve conflict by merging versions (use suggested resolution). */
     fun resolveMerge() {
         val conflict = _state.value.currentConflict ?: return
 
@@ -163,9 +151,7 @@ class ConflictResolutionController(
         resolveConflict(ConflictResolution.MERGE, mergedEntity)
     }
 
-    /**
-     * Skip current conflict for manual resolution later.
-     */
+    /** Skip current conflict for manual resolution later. */
     fun skipConflict() {
         logger.debug { "Skipping current conflict" }
 
@@ -178,9 +164,7 @@ class ConflictResolutionController(
         }
     }
 
-    /**
-     * Go to previous conflict.
-     */
+    /** Go to previous conflict. */
     fun previousConflict() {
         _state.update { state ->
             if (state.currentConflictIndex > 0) {
@@ -191,9 +175,7 @@ class ConflictResolutionController(
         }
     }
 
-    /**
-     * Go to next conflict.
-     */
+    /** Go to next conflict. */
     fun nextConflict() {
         _state.update { state ->
             if (state.hasMoreConflicts) {
@@ -204,30 +186,24 @@ class ConflictResolutionController(
         }
     }
 
-    /**
-     * Reset to first conflict.
-     */
+    /** Reset to first conflict. */
     fun resetToFirst() {
         _state.update { it.copy(currentConflictIndex = 0) }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
-    /**
-     * Clear all conflicts and reset state.
-     */
+    /** Clear all conflicts and reset state. */
     fun clearConflicts() {
         _state.update { ConflictResolutionState() }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

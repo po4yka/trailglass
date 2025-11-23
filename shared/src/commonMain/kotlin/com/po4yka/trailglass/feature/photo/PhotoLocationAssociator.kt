@@ -5,12 +5,15 @@ import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.*
-import kotlin.time.Duration.Companion.hours
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.max
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Associates photos with place visits based on location and time.
- */
+/** Associates photos with place visits based on location and time. */
 @Inject
 class PhotoLocationAssociator {
     private val logger = logger()
@@ -93,10 +96,7 @@ class PhotoLocationAssociator {
             }.sortedByDescending { it.second }
     }
 
-    /**
-     * Calculate match score between photo and visit.
-     * Returns score from 0.0 (no match) to 1.0 (perfect match).
-     */
+    /** Calculate match score between photo and visit. Returns score from 0.0 (no match) to 1.0 (perfect match). */
     private fun calculateMatchScore(
         photoLat: Double,
         photoLon: Double,
@@ -178,10 +178,7 @@ class PhotoLocationAssociator {
         }
     }
 
-    /**
-     * Calculate distance between two coordinates using Haversine formula.
-     * Returns distance in meters.
-     */
+    /** Calculate distance between two coordinates using Haversine formula. Returns distance in meters. */
     private fun calculateDistance(
         lat1: Double,
         lon1: Double,

@@ -12,8 +12,8 @@ import kotlinx.coroutines.launch
 import com.po4yka.trailglass.feature.photo.PhotoDetailController as SharedPhotoDetailController
 
 /**
- * Wrapper for PhotoDetailScreen that adapts shared PhotoDetailController to Android interface.
- * Bridges the shared Kotlin PhotoDetailController to the Android-specific PhotoDetailController interface.
+ * Wrapper for PhotoDetailScreen that adapts shared PhotoDetailController to Android interface. Bridges the shared
+ * Kotlin PhotoDetailController to the Android-specific PhotoDetailController interface.
  */
 @Composable
 fun PhotoDetailScreenWrapper(

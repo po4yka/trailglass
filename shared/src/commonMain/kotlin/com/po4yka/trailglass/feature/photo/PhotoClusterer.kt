@@ -6,11 +6,14 @@ import com.po4yka.trailglass.logging.logger
 import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Clusters photos by location and time proximity using DBSCAN-like algorithm.
- */
+/** Clusters photos by location and time proximity using DBSCAN-like algorithm. */
 @Inject
 class PhotoClusterer(
     private val maxDistanceMeters: Double = 200.0, // Max distance between photos in cluster
@@ -69,9 +72,7 @@ class PhotoClusterer(
         }
     }
 
-    /**
-     * Expand cluster starting from a seed photo.
-     */
+    /** Expand cluster starting from a seed photo. */
     private fun expandCluster(
         seed: PhotoWithMetadata,
         allPhotos: List<PhotoWithMetadata>,
@@ -98,9 +99,7 @@ class PhotoClusterer(
         return cluster
     }
 
-    /**
-     * Find neighboring photos within distance and time thresholds.
-     */
+    /** Find neighboring photos within distance and time thresholds. */
     private fun findNeighbors(
         photo: PhotoWithMetadata,
         allPhotos: List<PhotoWithMetadata>,
@@ -116,10 +115,10 @@ class PhotoClusterer(
 
             val candidateLat =
                 candidate.metadata?.exifLatitude ?: candidate.photo.latitude
-                    ?: return@filter false
+                ?: return@filter false
             val candidateLon =
                 candidate.metadata?.exifLongitude ?: candidate.photo.longitude
-                    ?: return@filter false
+                ?: return@filter false
             val candidateTime = candidate.photo.timestamp
 
             // Check distance
@@ -134,9 +133,7 @@ class PhotoClusterer(
         }
     }
 
-    /**
-     * Create PhotoCluster from a list of photos.
-     */
+    /** Create PhotoCluster from a list of photos. */
     private fun createPhotoCluster(
         photos: MutableList<PhotoWithMetadata>,
         index: Int
@@ -168,9 +165,7 @@ class PhotoClusterer(
         )
     }
 
-    /**
-     * Calculate distance between two coordinates using Haversine formula.
-     */
+    /** Calculate distance between two coordinates using Haversine formula. */
     private fun calculateDistance(
         lat1: Double,
         lon1: Double,

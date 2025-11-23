@@ -3,8 +3,8 @@ package com.po4yka.trailglass.domain.model
 import kotlinx.datetime.Instant
 
 /**
- * Complete route for a trip, combining all route segments and place visits
- * into a unified structure optimized for map visualization and replay.
+ * Complete route for a trip, combining all route segments and place visits into a unified structure optimized for map
+ * visualization and replay.
  */
 data class TripRoute(
     val tripId: String,
@@ -24,9 +24,7 @@ data class TripRoute(
     val statistics: RouteStatistics
 )
 
-/**
- * A point along the route with timing information for replay animation.
- */
+/** A point along the route with timing information for replay animation. */
 data class RoutePoint(
     val latitude: Double,
     val longitude: Double,
@@ -38,9 +36,7 @@ data class RoutePoint(
     val transportType: TransportType = TransportType.UNKNOWN
 )
 
-/**
- * Photo marker on the map with location and metadata.
- */
+/** Photo marker on the map with location and metadata. */
 data class PhotoMarker(
     val photoId: String,
     val latitude: Double,
@@ -51,9 +47,7 @@ data class PhotoMarker(
     val caption: String? = null
 )
 
-/**
- * Geographic bounding box for a route.
- */
+/** Geographic bounding box for a route. */
 data class RouteBounds(
     val minLatitude: Double,
     val maxLatitude: Double,
@@ -73,9 +67,7 @@ data class RouteBounds(
         get() = maxLongitude - minLongitude
 
     companion object {
-        /**
-         * Calculate bounding box from a list of coordinates.
-         */
+        /** Calculate bounding box from a list of coordinates. */
         fun fromCoordinates(coordinates: List<Coordinate>): RouteBounds? {
             if (coordinates.isEmpty()) return null
 
@@ -94,9 +86,7 @@ data class RouteBounds(
             return RouteBounds(minLat, maxLat, minLon, maxLon)
         }
 
-        /**
-         * Calculate bounding box from route points.
-         */
+        /** Calculate bounding box from route points. */
         fun fromRoutePoints(points: List<RoutePoint>): RouteBounds? {
             if (points.isEmpty()) return null
 
@@ -117,9 +107,7 @@ data class RouteBounds(
     }
 }
 
-/**
- * Aggregated statistics for a trip route.
- */
+/** Aggregated statistics for a trip route. */
 data class RouteStatistics(
     val totalDistanceMeters: Double,
     val totalDurationSeconds: Long,

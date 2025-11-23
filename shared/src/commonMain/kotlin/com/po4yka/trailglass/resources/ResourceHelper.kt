@@ -7,8 +7,8 @@ import dev.icerock.moko.resources.desc.desc
 /**
  * Helper object for accessing Moko-Resources strings in common code.
  *
- * Moko-Resources provides a unified way to access resources (strings, images, fonts, etc.)
- * across all platforms without using expect/actual pattern.
+ * Moko-Resources provides a unified way to access resources (strings, images, fonts, etc.) across all platforms without
+ * using expect/actual pattern.
  *
  * Usage examples:
  *
@@ -34,8 +34,8 @@ import dev.icerock.moko.resources.desc.desc
  */
 object ResourceHelper {
     /**
-     * Get a StringDesc for the given string resource.
-     * StringDesc can be converted to platform-specific string using toString(context) or localized().
+     * Get a StringDesc for the given string resource. StringDesc can be converted to platform-specific string using
+     * toString(context) or localized().
      *
      * @param resource The string resource to get
      * @return StringDesc that can be converted to platform-specific string
@@ -45,8 +45,8 @@ object ResourceHelper {
     /**
      * Get a StringDesc with formatted arguments.
      *
-     * Note: For string formatting, use string resources with placeholders
-     * and pass arguments when converting to string on the platform side.
+     * Note: For string formatting, use string resources with placeholders and pass arguments when converting to string
+     * on the platform side.
      *
      * @param resource The string resource
      * @return StringDesc for the resource

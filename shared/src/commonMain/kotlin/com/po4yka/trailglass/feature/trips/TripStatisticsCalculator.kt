@@ -5,15 +5,16 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.RouteSegment
 import com.po4yka.trailglass.domain.model.Trip
 import kotlinx.datetime.Clock
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Calculates statistics for trips based on location data, visits, and routes.
- */
+/** Calculates statistics for trips based on location data, visits, and routes. */
 class TripStatisticsCalculator {
-    /**
-     * Trip statistics result.
-     */
+    /** Trip statistics result. */
     data class TripStatistics(
         val totalDistanceMeters: Double,
         val visitedPlaceCount: Int,
@@ -76,10 +77,7 @@ class TripStatisticsCalculator {
         )
     }
 
-    /**
-     * Calculate total distance from location samples.
-     * Uses Haversine formula for accuracy.
-     */
+    /** Calculate total distance from location samples. Uses Haversine formula for accuracy. */
     private fun calculateDistanceFromSamples(samples: List<LocationSample>): Double {
         if (samples.size < 2) return 0.0
 
@@ -128,9 +126,7 @@ class TripStatisticsCalculator {
         return earthRadiusMeters * c
     }
 
-    /**
-     * Update an existing trip with calculated statistics.
-     */
+    /** Update an existing trip with calculated statistics. */
     fun updateTripWithStatistics(
         trip: Trip,
         statistics: TripStatistics

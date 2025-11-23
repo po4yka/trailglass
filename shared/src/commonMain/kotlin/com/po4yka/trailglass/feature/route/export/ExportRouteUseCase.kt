@@ -4,17 +4,13 @@ import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Export format options.
- */
+/** Export format options. */
 enum class ExportFormat {
     GPX,
     KML
 }
 
-/**
- * Privacy information for export.
- */
+/** Privacy information for export. */
 data class PrivacyInfo(
     val containsGpsData: Boolean,
     val containsPhotoLocations: Boolean,
@@ -24,9 +20,7 @@ data class PrivacyInfo(
     val warningMessage: String
 )
 
-/**
- * Result of export operation.
- */
+/** Result of export operation. */
 data class ExportResult(
     val fileName: String,
     val content: String,
@@ -34,9 +28,7 @@ data class ExportResult(
     val privacyInfo: PrivacyInfo
 )
 
-/**
- * Use case for exporting trip routes to various formats.
- */
+/** Use case for exporting trip routes to various formats. */
 @Inject
 class ExportRouteUseCase(
     private val gpxExporter: GpxExporter = GpxExporter(),
@@ -98,9 +90,7 @@ class ExportRouteUseCase(
             Result.failure(e)
         }
 
-    /**
-     * Generate privacy information for the export.
-     */
+    /** Generate privacy information for the export. */
     private fun generatePrivacyInfo(tripRoute: TripRoute): PrivacyInfo {
         val hasGps = tripRoute.fullPath.isNotEmpty()
         val hasPhotos = tripRoute.photoMarkers.isNotEmpty()
@@ -131,9 +121,7 @@ class ExportRouteUseCase(
         )
     }
 
-    /**
-     * Sanitize file name by removing invalid characters.
-     */
+    /** Sanitize file name by removing invalid characters. */
     private fun sanitizeFileName(name: String): String =
         name
             .replace(Regex("[^a-zA-Z0-9_\\-]"), "_")

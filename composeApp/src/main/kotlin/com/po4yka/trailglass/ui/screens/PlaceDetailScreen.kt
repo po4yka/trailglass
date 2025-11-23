@@ -1,6 +1,14 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,8 +37,15 @@ import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material.icons.filled.Timelapse
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material.icons.filled.Work
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -46,9 +61,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Duration
 
-/**
- * Screen showing detailed information about a frequent place.
- */
+/** Screen showing detailed information about a frequent place. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlaceDetailScreen(
@@ -124,11 +137,13 @@ fun PlaceDetailScreen(
                                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                                     scrolledContainerColor = MaterialTheme.colorScheme.surface
                                 )
+
                             PlaceSignificance.FREQUENT ->
                                 FlexibleTopAppBarDefaults.topAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                                     scrolledContainerColor = MaterialTheme.colorScheme.surface
                                 )
+
                             else ->
                                 FlexibleTopAppBarDefaults.topAppBarColors(
                                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -386,6 +401,7 @@ private fun formatDuration(duration: Duration): String {
             val remainingHours = hours % 24
             if (remainingHours > 0) "$days days, ${remainingHours}h" else "$days days"
         }
+
         hours > 0 && minutes > 0 -> "${hours}h ${minutes}m"
         hours > 0 -> "${hours}h"
         else -> "${minutes}m"
@@ -394,9 +410,11 @@ private fun formatDuration(duration: Duration): String {
 
 private fun formatDate(instant: Instant): String {
     val dateTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
-    return "${dateTime.month.name.lowercase().replaceFirstChar {
-        it.uppercase()
-    }} ${dateTime.dayOfMonth}, ${dateTime.year}"
+    return "${
+        dateTime.month.name.lowercase().replaceFirstChar {
+            it.uppercase()
+        }
+    } ${dateTime.dayOfMonth}, ${dateTime.year}"
 }
 
 private fun Double.format(decimals: Int) = "%.${decimals}f".format(this)

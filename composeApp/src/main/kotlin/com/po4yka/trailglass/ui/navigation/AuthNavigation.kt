@@ -12,9 +12,7 @@ import com.po4yka.trailglass.ui.screens.auth.ForgotPasswordScreen
 import com.po4yka.trailglass.ui.screens.auth.LoginScreen
 import com.po4yka.trailglass.ui.screens.auth.RegisterScreen
 
-/**
- * Main composable for authentication flow navigation.
- */
+/** Main composable for authentication flow navigation. */
 @Composable
 fun AuthNavigation(
     authRootComponent: AuthRootComponent,
@@ -34,6 +32,7 @@ fun AuthNavigation(
             is AuthController.AuthState.Guest -> {
                 authRootComponent.onAuthenticated()
             }
+
             else -> {
                 // Stay on auth screens
             }

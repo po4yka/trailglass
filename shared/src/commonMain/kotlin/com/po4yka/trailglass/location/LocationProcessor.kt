@@ -1,13 +1,17 @@
 package com.po4yka.trailglass.location
 
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.LocationSample
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.domain.model.RouteSegment
+import com.po4yka.trailglass.domain.model.Trip
+import com.po4yka.trailglass.domain.model.TripDay
 import com.po4yka.trailglass.location.trip.TripDayAggregator
 import com.po4yka.trailglass.location.trip.TripDetector
 import com.po4yka.trailglass.logging.logger
 
 /**
- * Coordinates the entire location processing pipeline.
- * Takes raw location samples and produces structured timeline data.
+ * Coordinates the entire location processing pipeline. Takes raw location samples and produces structured timeline
+ * data.
  */
 class LocationProcessor(
     private val placeVisitProcessor: PlaceVisitProcessor,
@@ -17,9 +21,7 @@ class LocationProcessor(
 ) {
     private val logger = logger()
 
-    /**
-     * Result of processing location data.
-     */
+    /** Result of processing location data. */
     data class ProcessingResult(
         val visits: List<PlaceVisit>,
         val routes: List<RouteSegment>,
@@ -96,8 +98,7 @@ class LocationProcessor(
     }
 
     /**
-     * Reprocess a specific date range.
-     * Useful for incremental updates when new data arrives.
+     * Reprocess a specific date range. Useful for incremental updates when new data arrives.
      *
      * @param samples Location samples in the date range
      * @param existingVisits Previously detected visits (for context)

@@ -1,8 +1,6 @@
 package com.po4yka.trailglass.photo
 
-/**
- * Factory for creating platform-specific PhotoPicker instances.
- */
+/** Factory for creating platform-specific PhotoPicker instances. */
 expect class PhotoPickerFactory {
     /**
      * Create a PhotoPicker instance for the current platform.

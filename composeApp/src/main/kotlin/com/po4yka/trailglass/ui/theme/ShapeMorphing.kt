@@ -21,11 +21,11 @@ import kotlin.math.sin
 /**
  * Material 3 Expressive Shape Morphing Utilities
  *
- * Provides custom shape morphing capabilities for organic, fluid animations
- * following Material 3 Expressive design guidelines.
+ * Provides custom shape morphing capabilities for organic, fluid animations following Material 3 Expressive design
+ * guidelines.
  *
- * Since androidx.graphics.shapes (RoundedPolygon, Morph) is not available in current
- * dependencies, this implementation uses custom path-based morphing with spring animations.
+ * Since androidx.graphics.shapes (RoundedPolygon, Morph) is not available in current dependencies, this implementation
+ * uses custom path-based morphing with spring animations.
  *
  * Key Features:
  * - Predefined organic shapes (circle, triangle, hexagon, etc.)
@@ -45,20 +45,12 @@ data class MorphableShape(
     val radiusFunction: (angle: Float, baseRadius: Float) -> Float
 )
 
-/**
- * Predefined morphable shapes for common use cases.
- */
+/** Predefined morphable shapes for common use cases. */
 object MorphableShapes {
-    /**
-     * Perfect circle shape.
-     * Use for: Default FAB state, loading indicators, badges.
-     */
+    /** Perfect circle shape. Use for: Default FAB state, loading indicators, badges. */
     val Circle = MorphableShape(60) { _, baseRadius -> baseRadius }
 
-    /**
-     * Triangle pointing up.
-     * Use for: Active tracking indicator, navigation arrows, direction indicators.
-     */
+    /** Triangle pointing up. Use for: Active tracking indicator, navigation arrows, direction indicators. */
     val Triangle =
         MorphableShape(60) { angle, baseRadius ->
             val normalizedAngle = (angle % (2 * PI.toFloat()))
@@ -76,10 +68,7 @@ object MorphableShapes {
             baseRadius * (1.0f + cornerRadius * (1.0f - distToCorner))
         }
 
-    /**
-     * Hexagon shape.
-     * Use for: Category badges, transport mode indicators, status chips.
-     */
+    /** Hexagon shape. Use for: Category badges, transport mode indicators, status chips. */
     val Hexagon =
         MorphableShape(60) { angle, baseRadius ->
             val normalizedAngle = (angle % (PI.toFloat() / 3))
@@ -88,10 +77,7 @@ object MorphableShapes {
             baseRadius * (0.95f + 0.05f * distToCorner)
         }
 
-    /**
-     * Diamond (rotated square) shape.
-     * Use for: Loading indicator states, emphasis markers.
-     */
+    /** Diamond (rotated square) shape. Use for: Loading indicator states, emphasis markers. */
     val Diamond =
         MorphableShape(60) { angle, baseRadius ->
             val normalizedAngle = (angle % (PI.toFloat() / 2))
@@ -100,10 +86,7 @@ object MorphableShapes {
             baseRadius * (0.92f + 0.08f * distToCorner) * 1.15f
         }
 
-    /**
-     * Square with rounded corners.
-     * Use for: Work category, formal contexts, grid layouts.
-     */
+    /** Square with rounded corners. Use for: Work category, formal contexts, grid layouts. */
     val RoundedSquare =
         MorphableShape(60) { angle, baseRadius ->
             val normalizedAngle = (angle % (PI.toFloat() / 2))
@@ -112,10 +95,7 @@ object MorphableShapes {
             baseRadius * (0.90f + 0.10f * distToCorner)
         }
 
-    /**
-     * Organic wave-like shape.
-     * Use for: Water category, fluid animations, nature-themed elements.
-     */
+    /** Organic wave-like shape. Use for: Water category, fluid animations, nature-themed elements. */
     val Wave =
         MorphableShape(60) { angle, baseRadius ->
             val waveCount = 3f
@@ -124,10 +104,7 @@ object MorphableShapes {
             baseRadius * (1.0f + wave)
         }
 
-    /**
-     * Petal/flower-like organic shape.
-     * Use for: Food category, organic content, nature elements.
-     */
+    /** Petal/flower-like organic shape. Use for: Food category, organic content, nature elements. */
     val Petal =
         MorphableShape(60) { angle, baseRadius ->
             val petalCount = 5f
@@ -232,10 +209,7 @@ fun animateShapeMorph(
     }
 }
 
-/**
- * Spring animation spec optimized for shape morphing.
- * Uses Material 3 Expressive motion timing.
- */
+/** Spring animation spec optimized for shape morphing. Uses Material 3 Expressive motion timing. */
 fun shapeMorphSpring() =
     spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -243,10 +217,7 @@ fun shapeMorphSpring() =
         visibilityThreshold = 0.001f
     )
 
-/**
- * Quick spring animation for rapid shape transitions.
- * Use for immediate feedback interactions.
- */
+/** Quick spring animation for rapid shape transitions. Use for immediate feedback interactions. */
 fun quickShapeMorphSpring() =
     spring<Float>(
         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -254,10 +225,7 @@ fun quickShapeMorphSpring() =
         visibilityThreshold = 0.001f
     )
 
-/**
- * Expressive spring with more bounce for emphasis.
- * Use for attention-grabbing morphs.
- */
+/** Expressive spring with more bounce for emphasis. Use for attention-grabbing morphs. */
 fun expressiveShapeMorphSpring() =
     spring<Float>(
         dampingRatio = Spring.DampingRatioLowBouncy,
@@ -265,38 +233,24 @@ fun expressiveShapeMorphSpring() =
         visibilityThreshold = 0.001f
     )
 
-/**
- * Category-specific shape mappings for semantic shape morphing.
- */
+/** Category-specific shape mappings for semantic shape morphing. */
 object CategoryShapes {
-    /**
-     * Water-related activities: wave shape
-     */
+    /** Water-related activities: wave shape */
     val Water = MorphableShapes.Wave
 
-    /**
-     * Transport/movement: hexagon
-     */
+    /** Transport/movement: hexagon */
     val Transport = MorphableShapes.Hexagon
 
-    /**
-     * Food/dining: petal/organic shape
-     */
+    /** Food/dining: petal/organic shape */
     val Food = MorphableShapes.Petal
 
-    /**
-     * Work/office: rounded square
-     */
+    /** Work/office: rounded square */
     val Work = MorphableShapes.RoundedSquare
 
-    /**
-     * Default/generic: circle
-     */
+    /** Default/generic: circle */
     val Default = MorphableShapes.Circle
 
-    /**
-     * Get shape for a category name.
-     */
+    /** Get shape for a category name. */
     fun forCategory(category: String?): MorphableShape =
         when (category?.lowercase()) {
             "water", "swimming", "beach", "ocean" -> Water

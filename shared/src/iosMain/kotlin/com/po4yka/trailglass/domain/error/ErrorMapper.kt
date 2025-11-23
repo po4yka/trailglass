@@ -2,14 +2,9 @@ package com.po4yka.trailglass.domain.error
 
 import kotlinx.coroutines.TimeoutCancellationException
 
-/**
- * iOS implementation of ErrorMapper.
- * Maps iOS/Darwin-specific exceptions to TrailGlassError instances.
- */
+/** iOS implementation of ErrorMapper. Maps iOS/Darwin-specific exceptions to TrailGlassError instances. */
 actual object ErrorMapper {
-    /**
-     * Map a generic exception to TrailGlassError.
-     */
+    /** Map a generic exception to TrailGlassError. */
     actual fun mapException(exception: Throwable): TrailGlassError =
         when (exception) {
             // Network errors
@@ -21,6 +16,7 @@ actual object ErrorMapper {
                     fieldName = "input",
                     technicalMessage = exception.message ?: "Invalid argument"
                 )
+
             is IllegalStateException ->
                 TrailGlassError.ValidationError.InvalidInput(
                     fieldName = "state",
@@ -41,9 +37,11 @@ actual object ErrorMapper {
                             cause = exception
                         )
                     }
+
                     message.contains("timeout", ignoreCase = true) -> {
                         TrailGlassError.NetworkError.Timeout(exception)
                     }
+
                     message.contains("database", ignoreCase = true) ||
                         message.contains("sql", ignoreCase = true) -> {
                         TrailGlassError.DatabaseError.QueryFailed(
@@ -51,10 +49,12 @@ actual object ErrorMapper {
                             cause = exception
                         )
                     }
+
                     message.contains("permission", ignoreCase = true) ||
                         message.contains("denied", ignoreCase = true) -> {
                         TrailGlassError.LocationError.PermissionDenied(exception)
                     }
+
                     else ->
                         TrailGlassError.Unknown(
                             technicalMessage = message,
@@ -64,9 +64,7 @@ actual object ErrorMapper {
             }
         }
 
-    /**
-     * Map a database exception to TrailGlassError.
-     */
+    /** Map a database exception to TrailGlassError. */
     actual fun mapDatabaseException(
         exception: Throwable,
         operation: DatabaseOperation
@@ -79,16 +77,19 @@ actual object ErrorMapper {
                     technicalMessage = technicalMessage,
                     cause = exception
                 )
+
             DatabaseOperation.INSERT ->
                 TrailGlassError.DatabaseError.InsertFailed(
                     technicalMessage = technicalMessage,
                     cause = exception
                 )
+
             DatabaseOperation.UPDATE ->
                 TrailGlassError.DatabaseError.UpdateFailed(
                     technicalMessage = technicalMessage,
                     cause = exception
                 )
+
             DatabaseOperation.DELETE ->
                 TrailGlassError.DatabaseError.DeleteFailed(
                     technicalMessage = technicalMessage,
@@ -97,9 +98,7 @@ actual object ErrorMapper {
         }
     }
 
-    /**
-     * Map a location exception to TrailGlassError.
-     */
+    /** Map a location exception to TrailGlassError. */
     actual fun mapLocationException(
         exception: Throwable,
         context: LocationContext
@@ -112,6 +111,7 @@ actual object ErrorMapper {
                     technicalMessage = exception.message ?: "Tracking failed",
                     cause = exception
                 )
+
             LocationContext.GEOCODING ->
                 TrailGlassError.LocationError.GeocodingFailed(
                     technicalMessage = exception.message ?: "Geocoding failed",
@@ -119,9 +119,7 @@ actual object ErrorMapper {
                 )
         }
 
-    /**
-     * Map a photo exception to TrailGlassError.
-     */
+    /** Map a photo exception to TrailGlassError. */
     actual fun mapPhotoException(
         exception: Throwable,
         context: PhotoContext
@@ -133,11 +131,13 @@ actual object ErrorMapper {
                     technicalMessage = exception.message ?: "Load failed",
                     cause = exception
                 )
+
             PhotoContext.ATTACH ->
                 TrailGlassError.PhotoError.AttachmentFailed(
                     technicalMessage = exception.message ?: "Attachment failed",
                     cause = exception
                 )
+
             PhotoContext.INVALID ->
                 TrailGlassError.PhotoError.InvalidPhoto(
                     technicalMessage = exception.message ?: "Invalid photo",
@@ -145,9 +145,7 @@ actual object ErrorMapper {
                 )
         }
 
-    /**
-     * Execute a block and map any exception to TrailGlassError.
-     */
+    /** Execute a block and map any exception to TrailGlassError. */
     actual inline fun <T> mapToResult(block: () -> T): Result<T> =
         try {
             Result.Success(block())
@@ -155,9 +153,7 @@ actual object ErrorMapper {
             Result.Error(mapException(e))
         }
 
-    /**
-     * Execute a suspending block and map any exception to TrailGlassError.
-     */
+    /** Execute a suspending block and map any exception to TrailGlassError. */
     actual suspend inline fun <T> mapToResultSuspend(crossinline block: suspend () -> T): Result<T> =
         try {
             Result.Success(block())

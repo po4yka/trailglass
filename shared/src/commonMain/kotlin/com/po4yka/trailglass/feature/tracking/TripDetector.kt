@@ -4,7 +4,12 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * Detects trip start and end based on location patterns.
@@ -57,9 +62,7 @@ class TripDetector {
         }
     }
 
-    /**
-     * Check if a trip should start based on movement.
-     */
+    /** Check if a trip should start based on movement. */
     private fun checkTripStart(
         location: Location,
         now: Instant
@@ -101,9 +104,7 @@ class TripDetector {
         return null
     }
 
-    /**
-     * Check if a trip should end based on stationary period.
-     */
+    /** Check if a trip should end based on stationary period. */
     private fun checkTripEnd(
         location: Location,
         now: Instant
@@ -146,9 +147,7 @@ class TripDetector {
         return null
     }
 
-    /**
-     * Reset detector state (e.g., when manually stopping tracking).
-     */
+    /** Reset detector state (e.g., when manually stopping tracking). */
     fun reset() {
         lastTripStartLocation = null
         lastTripStartTime = null
@@ -158,10 +157,7 @@ class TripDetector {
         logger.debug { "Trip detector reset" }
     }
 
-    /**
-     * Calculate distance between two coordinates in meters.
-     * Uses Haversine formula.
-     */
+    /** Calculate distance between two coordinates in meters. Uses Haversine formula. */
     private fun calculateDistance(
         start: Coordinate,
         end: Coordinate
@@ -182,21 +178,15 @@ class TripDetector {
     }
 }
 
-/**
- * Events emitted by trip detector.
- */
+/** Events emitted by trip detector. */
 sealed class TripEvent {
-    /**
-     * Trip has started.
-     */
+    /** Trip has started. */
     data class TripStarted(
         val startLocation: Coordinate,
         val startTime: Instant
     ) : TripEvent()
 
-    /**
-     * Trip has ended.
-     */
+    /** Trip has ended. */
     data class TripEnded(
         val endLocation: Coordinate,
         val endTime: Instant

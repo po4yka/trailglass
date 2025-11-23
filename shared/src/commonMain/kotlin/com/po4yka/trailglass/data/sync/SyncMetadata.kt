@@ -3,8 +3,7 @@ package com.po4yka.trailglass.data.sync
 import kotlinx.datetime.Instant
 
 /**
- * Metadata tracking sync state for any entity.
- * Stored separately from the actual entity data to avoid schema changes.
+ * Metadata tracking sync state for any entity. Stored separately from the actual entity data to avoid schema changes.
  */
 data class SyncMetadata(
     val entityId: String,
@@ -20,9 +19,7 @@ data class SyncMetadata(
     val deviceId: String
 )
 
-/**
- * Entity types that can be synced.
- */
+/** Entity types that can be synced. */
 enum class EntityType {
     LOCATION_SAMPLE,
     PLACE_VISIT,
@@ -32,9 +29,7 @@ enum class EntityType {
     SETTINGS
 }
 
-/**
- * Repository interface for managing sync metadata.
- */
+/** Repository interface for managing sync metadata. */
 interface SyncMetadataRepository {
     suspend fun upsertMetadata(metadata: SyncMetadata)
 

@@ -5,13 +5,10 @@ import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.AppSettings
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Implementation of SettingsRepository using platform-specific storage.
- */
+/** Implementation of SettingsRepository using platform-specific storage. */
 @Inject
 class SettingsRepositoryImpl(
     private val storage: SettingsStorage,

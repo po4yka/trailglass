@@ -2,47 +2,29 @@ package com.po4yka.trailglass.domain.permission
 
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * Platform-agnostic permission manager.
- * Handles permission checking, requesting, and providing rationales.
- */
+/** Platform-agnostic permission manager. Handles permission checking, requesting, and providing rationales. */
 expect class PermissionManager {
-    /**
-     * Check the current state of a permission.
-     */
+    /** Check the current state of a permission. */
     suspend fun checkPermission(permissionType: PermissionType): PermissionState
 
-    /**
-     * Request a permission from the user.
-     * May show system permission dialog.
-     */
+    /** Request a permission from the user. May show system permission dialog. */
     suspend fun requestPermission(permissionType: PermissionType): PermissionResult
 
     /**
-     * Check if we should show a rationale before requesting.
-     * Returns true if the user has denied the permission before.
+     * Check if we should show a rationale before requesting. Returns true if the user has denied the permission before.
      */
     suspend fun shouldShowRationale(permissionType: PermissionType): Boolean
 
-    /**
-     * Open system settings for the app.
-     * Used when permission is permanently denied.
-     */
+    /** Open system settings for the app. Used when permission is permanently denied. */
     suspend fun openAppSettings()
 
-    /**
-     * Observable state for permission changes.
-     */
+    /** Observable state for permission changes. */
     fun observePermission(permissionType: PermissionType): StateFlow<PermissionState>
 }
 
-/**
- * Provides user-friendly permission rationales.
- */
+/** Provides user-friendly permission rationales. */
 class PermissionRationaleProvider {
-    /**
-     * Get rationale for a specific permission type.
-     */
+    /** Get rationale for a specific permission type. */
     fun getRationale(permissionType: PermissionType): PermissionRationale =
         when (permissionType) {
             PermissionType.LOCATION_FINE ->
@@ -133,9 +115,7 @@ class PermissionRationaleProvider {
                 )
         }
 
-    /**
-     * Get a user-friendly explanation for why permission was denied.
-     */
+    /** Get a user-friendly explanation for why permission was denied. */
     fun getDeniedExplanation(
         permissionType: PermissionType,
         isPermanent: Boolean
@@ -156,9 +136,7 @@ class PermissionRationaleProvider {
         }
     }
 
-    /**
-     * Get settings navigation instructions for the platform.
-     */
+    /** Get settings navigation instructions for the platform. */
     fun getSettingsInstructions(permissionType: PermissionType): SettingsInstructions {
         val permissionName =
             when (permissionType) {
@@ -183,9 +161,7 @@ class PermissionRationaleProvider {
     }
 }
 
-/**
- * Instructions for enabling permission in system settings.
- */
+/** Instructions for enabling permission in system settings. */
 data class SettingsInstructions(
     val permissionType: PermissionType,
     val steps: List<String>,

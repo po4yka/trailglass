@@ -1,15 +1,44 @@
 package com.po4yka.trailglass.ui.screens
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Straighten
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -19,9 +48,8 @@ import com.po4yka.trailglass.domain.algorithm.InterpolationAlgorithmType
 import com.po4yka.trailglass.feature.settings.SettingsController
 
 /**
- * Screen for configuring geographic calculation algorithms.
- * Allows users to choose between different distance, bearing, and interpolation algorithms
- * based on their accuracy and performance needs.
+ * Screen for configuring geographic calculation algorithms. Allows users to choose between different distance, bearing,
+ * and interpolation algorithms based on their accuracy and performance needs.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -393,8 +421,10 @@ private fun getDistanceAlgorithmDescription(algorithm: DistanceAlgorithmType): S
     when (algorithm) {
         DistanceAlgorithmType.HAVERSINE ->
             "Fast and accurate (~0.5% error). Best for most uses. Assumes spherical Earth."
+
         DistanceAlgorithmType.VINCENTY ->
             "Most accurate (~0.5mm error) but slower. Use for precise measurements. Accounts for Earth's ellipsoidal shape."
+
         DistanceAlgorithmType.SIMPLE ->
             "Fastest but only accurate for short distances (<1km). Error increases with distance and latitude."
     }
@@ -403,8 +433,10 @@ private fun getBearingAlgorithmDescription(algorithm: BearingAlgorithmType): Str
     when (algorithm) {
         BearingAlgorithmType.INITIAL ->
             "Direction at start point (most common for navigation). Shows compass heading at departure."
+
         BearingAlgorithmType.FINAL ->
             "Direction at end point. Useful for arrival headings, can differ from initial bearing on long distances."
+
         BearingAlgorithmType.RHUMB_LINE ->
             "Constant compass bearing throughout journey. Not the shortest path but simpler navigation."
     }
@@ -413,8 +445,10 @@ private fun getInterpolationAlgorithmDescription(algorithm: InterpolationAlgorit
     when (algorithm) {
         InterpolationAlgorithmType.LINEAR ->
             "Simple straight line, fast but not geographically accurate over long distances. Good for animations."
+
         InterpolationAlgorithmType.SLERP ->
             "Spherical interpolation, follows great circle (most accurate). Best for geographic paths."
+
         InterpolationAlgorithmType.CUBIC ->
             "Smooth curved path with easing. Aesthetically pleasing for animated transitions."
     }

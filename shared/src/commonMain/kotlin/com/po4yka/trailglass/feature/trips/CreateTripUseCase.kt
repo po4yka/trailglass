@@ -9,9 +9,7 @@ import me.tatarka.inject.annotations.Inject
 import kotlin.random.Random
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
 
-/**
- * Use case for creating a new trip (manual or from detection).
- */
+/** Use case for creating a new trip (manual or from detection). */
 @Inject
 class CreateTripUseCase(
     private val tripRepository: TripRepository

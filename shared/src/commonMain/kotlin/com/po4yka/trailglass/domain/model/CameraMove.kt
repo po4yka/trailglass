@@ -3,8 +3,8 @@ package com.po4yka.trailglass.domain.model
 /**
  * Sealed class representing different types of camera movements.
  *
- * This provides a command-based API for controlling map camera animations,
- * allowing platform-specific implementations to handle animations appropriately.
+ * This provides a command-based API for controlling map camera animations, allowing platform-specific implementations
+ * to handle animations appropriately.
  */
 sealed class CameraMove {
     /**
@@ -30,8 +30,7 @@ sealed class CameraMove {
     /**
      * Fly-to animation with arc trajectory.
      *
-     * Creates a smooth arc-like movement between two positions,
-     * similar to Google Maps' "fly to" animation.
+     * Creates a smooth arc-like movement between two positions, similar to Google Maps' "fly to" animation.
      *
      * @param position The target camera position
      * @param durationMs Animation duration in milliseconds (default: 2000ms)

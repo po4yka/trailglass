@@ -12,44 +12,26 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-/**
- * Retry policy configuration for failed operations.
- */
+/** Retry policy configuration for failed operations. */
 data class RetryPolicy(
-    /**
-     * Maximum number of retry attempts.
-     */
+    /** Maximum number of retry attempts. */
     val maxAttempts: Int = 3,
-    /**
-     * Initial delay before first retry.
-     */
+    /** Initial delay before first retry. */
     val initialDelay: Duration = 1.seconds,
-    /**
-     * Maximum delay between retries.
-     */
+    /** Maximum delay between retries. */
     val maxDelay: Duration = 30.seconds,
-    /**
-     * Multiplier for exponential backoff.
-     */
+    /** Multiplier for exponential backoff. */
     val multiplier: Double = 2.0,
-    /**
-     * Whether to retry on all errors or only specific types.
-     */
+    /** Whether to retry on all errors or only specific types. */
     val retryOnAllErrors: Boolean = false,
-    /**
-     * Custom predicate to determine if an error should be retried.
-     */
+    /** Custom predicate to determine if an error should be retried. */
     val shouldRetry: ((TrailGlassError) -> Boolean)? = null
 ) {
     companion object {
-        /**
-         * Default retry policy with 3 attempts and exponential backoff.
-         */
+        /** Default retry policy with 3 attempts and exponential backoff. */
         val DEFAULT = RetryPolicy()
 
-        /**
-         * Aggressive retry policy for critical operations.
-         */
+        /** Aggressive retry policy for critical operations. */
         val AGGRESSIVE =
             RetryPolicy(
                 maxAttempts = 5,
@@ -57,9 +39,7 @@ data class RetryPolicy(
                 multiplier = 1.5
             )
 
-        /**
-         * Conservative retry policy for non-critical operations.
-         */
+        /** Conservative retry policy for non-critical operations. */
         val CONSERVATIVE =
             RetryPolicy(
                 maxAttempts = 2,
@@ -67,14 +47,10 @@ data class RetryPolicy(
                 multiplier = 2.0
             )
 
-        /**
-         * No retry policy.
-         */
+        /** No retry policy. */
         val NONE = RetryPolicy(maxAttempts = 0)
 
-        /**
-         * Network-specific retry policy.
-         */
+        /** Network-specific retry policy. */
         val NETWORK =
             RetryPolicy(
                 maxAttempts = 3,
@@ -87,21 +63,17 @@ data class RetryPolicy(
             )
     }
 
-    /**
-     * Calculate delay for a specific attempt.
-     */
+    /** Calculate delay for a specific attempt. */
     fun getDelay(attempt: Int): Duration {
         val exponentialDelay =
             (
                 initialDelay.inWholeMilliseconds *
                     multiplier.pow(attempt.toDouble())
-            ).toLong().milliseconds
+                ).toLong().milliseconds
         return min(exponentialDelay.inWholeMilliseconds, maxDelay.inWholeMilliseconds).milliseconds
     }
 
-    /**
-     * Determine if an error should be retried.
-     */
+    /** Determine if an error should be retried. */
     fun shouldRetry(error: TrailGlassError): Boolean =
         when {
             shouldRetry != null -> shouldRetry.invoke(error)
@@ -110,9 +82,7 @@ data class RetryPolicy(
         }
 }
 
-/**
- * Retry state for tracking retry progress.
- */
+/** Retry state for tracking retry progress. */
 data class RetryState(
     val attempt: Int = 0,
     val lastError: TrailGlassError? = null,
@@ -162,6 +132,7 @@ suspend fun <T> retryWithPolicy(
                 }
                 return result
             }
+
             is Result.Error -> {
                 lastError = result.error
 
@@ -233,9 +204,7 @@ suspend fun <T> retryWithNetwork(
     )
 }
 
-/**
- * Extension function to add retry capability to suspending functions.
- */
+/** Extension function to add retry capability to suspending functions. */
 suspend fun <T> (suspend () -> T).withRetry(
     policy: RetryPolicy = RetryPolicy.DEFAULT,
     onRetry: ((RetryState) -> Unit)? = null

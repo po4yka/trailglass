@@ -13,28 +13,19 @@ import com.po4yka.trailglass.location.trip.TripDayAggregator
 import com.po4yka.trailglass.location.trip.TripDetector
 import me.tatarka.inject.annotations.Provides
 
-/**
- * Location processing dependency injection module.
- * Provides location processors and geocoding services.
- */
+/** Location processing dependency injection module. Provides location processors and geocoding services. */
 interface LocationModule {
-    /**
-     * Provides platform-specific ReverseGeocoder.
-     */
+    /** Provides platform-specific ReverseGeocoder. */
     @AppScope
     @Provides
     fun provideReverseGeocoder(): ReverseGeocoder = createReverseGeocoder()
 
-    /**
-     * Provides GeocodingCache for in-memory geocoding cache.
-     */
+    /** Provides GeocodingCache for in-memory geocoding cache. */
     @AppScope
     @Provides
     fun provideGeocodingCache(): GeocodingCache = GeocodingCache()
 
-    /**
-     * Provides cached reverse geocoder.
-     */
+    /** Provides cached reverse geocoder. */
     @AppScope
     @Provides
     fun provideCachedReverseGeocoder(
@@ -42,37 +33,28 @@ interface LocationModule {
         cache: GeocodingCache
     ): CachedReverseGeocoder = CachedReverseGeocoder(geocoder, cache)
 
-    /**
-     * Provides PlaceVisitProcessor.
-     */
+    /** Provides PlaceVisitProcessor. */
     @AppScope
     @Provides
-    fun providePlaceVisitProcessor(reverseGeocoder: CachedReverseGeocoder): PlaceVisitProcessor = PlaceVisitProcessor(reverseGeocoder)
+    fun providePlaceVisitProcessor(reverseGeocoder: CachedReverseGeocoder): PlaceVisitProcessor =
+        PlaceVisitProcessor(reverseGeocoder)
 
-    /**
-     * Provides RouteSegmentBuilder.
-     */
+    /** Provides RouteSegmentBuilder. */
     @AppScope
     @Provides
     fun provideRouteSegmentBuilder(): RouteSegmentBuilder = RouteSegmentBuilder()
 
-    /**
-     * Provides TripDetector.
-     */
+    /** Provides TripDetector. */
     @AppScope
     @Provides
     fun provideTripDetector(): TripDetector = TripDetector()
 
-    /**
-     * Provides TripDayAggregator.
-     */
+    /** Provides TripDayAggregator. */
     @AppScope
     @Provides
     fun provideTripDayAggregator(): TripDayAggregator = TripDayAggregator()
 
-    /**
-     * Provides LocationProcessor.
-     */
+    /** Provides LocationProcessor. */
     @AppScope
     @Provides
     fun provideLocationProcessor(
@@ -88,9 +70,7 @@ interface LocationModule {
             tripDayAggregator = tripDayAggregator
         )
 
-    /**
-     * Provides LocationTracker.
-     */
+    /** Provides LocationTracker. */
     @AppScope
     @Provides
     fun provideLocationTracker(

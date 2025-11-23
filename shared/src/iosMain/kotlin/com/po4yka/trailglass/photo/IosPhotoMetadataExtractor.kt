@@ -4,21 +4,42 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.domain.model.PhotoMetadata
 import com.po4yka.trailglass.logging.logger
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.useContents
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import platform.CoreFoundation.CFDataRef
 import platform.CoreLocation.CLLocation
-import platform.Foundation.*
-import platform.ImageIO.*
-import platform.Photos.*
+import platform.Foundation.NSArray
+import platform.Foundation.NSData
+import platform.Foundation.NSDate
+import platform.Foundation.NSDictionary
+import platform.Foundation.NSNumber
+import platform.Foundation.timeIntervalSince1970
+import platform.ImageIO.CGImageSourceCopyPropertiesAtIndex
+import platform.ImageIO.CGImageSourceCreateWithData
+import platform.ImageIO.kCGImagePropertyExifColorSpace
+import platform.ImageIO.kCGImagePropertyExifDictionary
+import platform.ImageIO.kCGImagePropertyExifExposureTime
+import platform.ImageIO.kCGImagePropertyExifFNumber
+import platform.ImageIO.kCGImagePropertyExifFlash
+import platform.ImageIO.kCGImagePropertyExifFocalLength
+import platform.ImageIO.kCGImagePropertyExifISOSpeedRatings
+import platform.ImageIO.kCGImagePropertyExifLensModel
+import platform.ImageIO.kCGImagePropertyOrientation
+import platform.ImageIO.kCGImagePropertyTIFFDictionary
+import platform.Photos.PHAsset
+import platform.Photos.PHImageManager
+import platform.Photos.PHImageRequestOptions
+import platform.Photos.PHImageRequestOptionsDeliveryModeHighQualityFormat
+import platform.Photos.PHImageRequestOptionsVersionCurrent
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 /**
- * iOS implementation of photo metadata extractor using Photos and ImageIO frameworks.
- * Provides full EXIF extraction including camera details.
+ * iOS implementation of photo metadata extractor using Photos and ImageIO frameworks. Provides full EXIF extraction
+ * including camera details.
  */
 @OptIn(ExperimentalForeignApi::class)
 @Inject
@@ -231,9 +252,7 @@ class IosPhotoMetadataExtractor : PhotoMetadataExtractor {
         }
     }
 
-    /**
-     * Container for extracted EXIF data.
-     */
+    /** Container for extracted EXIF data. */
     private data class ExifData(
         val cameraMake: String? = null,
         val cameraModel: String? = null,

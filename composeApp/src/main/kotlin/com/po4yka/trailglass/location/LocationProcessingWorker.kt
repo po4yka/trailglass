@@ -1,14 +1,24 @@
 package com.po4yka.trailglass.location
 
 import android.content.Context
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
 /**
- * WorkManager worker for periodic location data processing.
- * Processes raw location samples into place visits, routes, and trips.
+ * WorkManager worker for periodic location data processing. Processes raw location samples into place visits, routes,
+ * and trips.
  */
 class LocationProcessingWorker(
     context: Context,
@@ -99,16 +109,12 @@ class LocationProcessingWorker(
             )
         }
 
-        /**
-         * Cancel scheduled processing.
-         */
+        /** Cancel scheduled processing. */
         fun cancel(context: Context) {
             WorkManager.getInstance(context).cancelUniqueWork(WORK_NAME)
         }
 
-        /**
-         * Trigger an immediate processing run.
-         */
+        /** Trigger an immediate processing run. */
         fun triggerImmediate(context: Context) {
             val request =
                 OneTimeWorkRequestBuilder<LocationProcessingWorker>()

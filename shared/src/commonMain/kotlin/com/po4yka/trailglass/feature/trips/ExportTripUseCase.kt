@@ -8,9 +8,7 @@ import com.po4yka.trailglass.feature.trips.export.KmlExporter
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for exporting trips to various formats.
- */
+/** Use case for exporting trips to various formats. */
 @Inject
 class ExportTripUseCase(
     private val tripRepository: TripRepository,

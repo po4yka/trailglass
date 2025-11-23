@@ -14,8 +14,7 @@ import kotlinx.datetime.LocalDate
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for timeline feature.
- * Manages timeline state and user actions.
+ * Controller for timeline feature. Manages timeline state and user actions.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -33,9 +32,7 @@ class TimelineController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Timeline UI state.
-     */
+    /** Timeline UI state. */
     data class TimelineState(
         val selectedDate: LocalDate? = null,
         val items: List<GetTimelineForDayUseCase.TimelineItemUI> = emptyList(),
@@ -46,9 +43,7 @@ class TimelineController(
     private val _state = MutableStateFlow(TimelineState())
     val state: StateFlow<TimelineState> = _state.asStateFlow()
 
-    /**
-     * Load timeline for a specific day.
-     */
+    /** Load timeline for a specific day. */
     fun loadDay(date: LocalDate) {
         logger.debug { "Loading timeline for $date" }
 
@@ -66,25 +61,21 @@ class TimelineController(
         }
     }
 
-    /**
-     * Refresh the current day.
-     */
+    /** Refresh the current day. */
     fun refresh() {
         _state.value.selectedDate?.let { date ->
             loadDay(date)
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

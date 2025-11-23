@@ -10,15 +10,29 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import platform.Foundation.NSDate
-import platform.Photos.*
+import platform.Photos.PHAsset
+import platform.Photos.PHAssetMediaSubtypePhotoDepthEffect
+import platform.Photos.PHAssetMediaSubtypePhotoHDR
+import platform.Photos.PHAssetMediaSubtypePhotoLive
+import platform.Photos.PHAssetMediaSubtypePhotoPanorama
+import platform.Photos.PHAssetMediaSubtypePhotoScreenshot
+import platform.Photos.PHAssetMediaTypeAudio
+import platform.Photos.PHAssetMediaTypeImage
+import platform.Photos.PHAssetMediaTypeVideo
+import platform.Photos.PHAssetResource
+import platform.Photos.PHAuthorizationStatusAuthorized
+import platform.Photos.PHAuthorizationStatusLimited
+import platform.Photos.PHImageManager
+import platform.Photos.PHImageRequestOptions
+import platform.Photos.PHImageRequestOptionsDeliveryModeHighQualityFormat
+import platform.Photos.PHPhotoLibrary
 import kotlin.coroutines.resume
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
 /**
- * iOS implementation of PhotoPicker using PHPicker and Photos framework.
- * Note: This class handles metadata extraction. UI-based photo selection
- * must be handled by the iOS app layer using PHPickerViewController.
+ * iOS implementation of PhotoPicker using PHPicker and Photos framework. Note: This class handles metadata extraction.
+ * UI-based photo selection must be handled by the iOS app layer using PHPickerViewController.
  */
 @OptIn(ExperimentalUuidApi::class)
 class IOSPhotoPicker(
@@ -53,6 +67,7 @@ class IOSPhotoPicker(
                 PHAuthorizationStatusAuthorized, PHAuthorizationStatusLimited -> {
                     true
                 }
+
                 else -> {
                     // Request permission - result comes asynchronously
                     PHPhotoLibrary.requestAuthorization { status ->
@@ -65,8 +80,8 @@ class IOSPhotoPicker(
     }
 
     /**
-     * Extract photo metadata from a PHAsset.
-     * This is called after the user has selected photos via PHPickerViewController.
+     * Extract photo metadata from a PHAsset. This is called after the user has selected photos via
+     * PHPickerViewController.
      */
     suspend fun extractPhotoFromAsset(asset: PHAsset): Photo? =
         withContext(Dispatchers.Default) {
@@ -94,9 +109,7 @@ class IOSPhotoPicker(
             }
         }
 
-    /**
-     * Extract multiple photos from PHAssets.
-     */
+    /** Extract multiple photos from PHAssets. */
     suspend fun extractPhotosFromAssets(assets: List<PHAsset>): List<Photo> =
         withContext(Dispatchers.Default) {
             logger.debug { "Extracting ${assets.size} photos from PHAssets" }
@@ -106,9 +119,7 @@ class IOSPhotoPicker(
             }
         }
 
-    /**
-     * Extract metadata from a PHAsset.
-     */
+    /** Extract metadata from a PHAsset. */
     @OptIn(ExperimentalForeignApi::class)
     private suspend fun extractMetadataFromAsset(asset: PHAsset): PhotoMetadata {
         // Extract timestamp
@@ -153,8 +164,8 @@ class IOSPhotoPicker(
     }
 
     /**
-     * Extract file size from PHAsset using PHImageManager.
-     * This requests the image resource info to get the actual file size.
+     * Extract file size from PHAsset using PHImageManager. This requests the image resource info to get the actual file
+     * size.
      */
     @OptIn(ExperimentalForeignApi::class)
     private suspend fun extractFileSizeFromAsset(asset: PHAsset): Long? =
@@ -200,8 +211,8 @@ class IOSPhotoPicker(
         }
 
     /**
-     * Determine MIME type from PHAsset.
-     * Uses media type and format information to determine the most appropriate MIME type.
+     * Determine MIME type from PHAsset. Uses media type and format information to determine the most appropriate MIME
+     * type.
      */
     private fun determineMimeType(asset: PHAsset): String {
         // Check media type first
@@ -240,8 +251,8 @@ class IOSPhotoPicker(
     }
 
     /**
-     * Internal data class for extracting photo metadata from PHAsset.
-     * This is separate from the domain PhotoMetadata which contains EXIF data.
+     * Internal data class for extracting photo metadata from PHAsset. This is separate from the domain PhotoMetadata
+     * which contains EXIF data.
      */
     private data class PhotoMetadata(
         val uri: String,

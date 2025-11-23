@@ -4,7 +4,12 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.logging.logger
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * Detects mode of transport based on location patterns.
@@ -66,7 +71,7 @@ class TransportModeDetector {
                 (
                     curr.timestamp.toEpochMilliseconds() -
                         prev.timestamp.toEpochMilliseconds()
-                ) / 1000.0
+                    ) / 1000.0
 
             if (timeDiffSeconds > 0) {
                 val speedKmh = (distance / timeDiffSeconds) * 3.6 // m/s to km/h
@@ -120,17 +125,13 @@ class TransportModeDetector {
         return mode
     }
 
-    /**
-     * Reset detector state.
-     */
+    /** Reset detector state. */
     fun reset() {
         recentLocations.clear()
         logger.debug { "Transport mode detector reset" }
     }
 
-    /**
-     * Calculate distance between two coordinates in meters.
-     */
+    /** Calculate distance between two coordinates in meters. */
     private fun calculateDistance(
         start: Coordinate,
         end: Coordinate
@@ -150,18 +151,14 @@ class TransportModeDetector {
         return earthRadiusMeters * c
     }
 
-    /**
-     * Calculate variance of speeds.
-     */
+    /** Calculate variance of speeds. */
     private fun calculateVariance(speeds: List<Double>): Double {
         val mean = speeds.average()
         val squaredDiffs = speeds.map { (it - mean).pow(2) }
         return squaredDiffs.average()
     }
 
-    /**
-     * Check for significant altitude changes (plane detection).
-     */
+    /** Check for significant altitude changes (plane detection). */
     private fun checkAltitudeChange(): Double {
         if (recentLocations.size < 2) return 0.0
 

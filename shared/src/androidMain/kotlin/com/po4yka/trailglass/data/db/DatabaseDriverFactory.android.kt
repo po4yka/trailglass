@@ -5,17 +5,12 @@ import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 import com.po4yka.trailglass.db.TrailGlassDatabase
 
-/**
- * Android implementation of DatabaseDriverFactory.
- * Uses AndroidSqliteDriver for database access.
- */
+/** Android implementation of DatabaseDriverFactory. Uses AndroidSqliteDriver for database access. */
 actual interface DatabaseDriverFactory {
     actual fun createDriver(): SqlDriver
 }
 
-/**
- * Android implementation that requires Context.
- */
+/** Android implementation that requires Context. */
 class AndroidDatabaseDriverFactory(private val context: Context) : DatabaseDriverFactory {
     override fun createDriver(): SqlDriver {
         return AndroidSqliteDriver(

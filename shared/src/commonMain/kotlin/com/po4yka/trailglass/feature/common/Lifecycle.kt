@@ -3,8 +3,8 @@ package com.po4yka.trailglass.feature.common
 /**
  * Interface for components that require lifecycle management and cleanup.
  *
- * Components implementing this interface have resources that must be released
- * when they are no longer needed (e.g., coroutines, observers, platform resources).
+ * Components implementing this interface have resources that must be released when they are no longer needed (e.g.,
+ * coroutines, observers, platform resources).
  *
  * Similar to java.io.Closeable but available in KMP common code.
  */

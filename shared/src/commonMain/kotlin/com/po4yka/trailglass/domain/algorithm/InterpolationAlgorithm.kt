@@ -1,19 +1,24 @@
 package com.po4yka.trailglass.domain.algorithm
 
 import com.po4yka.trailglass.domain.model.Coordinate
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.acos
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 // Extension functions for degrees/radians conversion
 private fun Double.toRadians(): Double = this * PI / 180.0
 
 private fun Double.toDegrees(): Double = this * 180.0 / PI
 
-/**
- * Algorithm for interpolating between two geographic coordinates.
- */
+/** Algorithm for interpolating between two geographic coordinates. */
 interface InterpolationAlgorithm {
     /**
      * Interpolate between two coordinates.
+     *
      * @param from Starting coordinate
      * @param to Ending coordinate
      * @param fraction Interpolation fraction (0.0 to 1.0)
@@ -27,6 +32,7 @@ interface InterpolationAlgorithm {
 
     /**
      * Generate multiple intermediate points along the path.
+     *
      * @param from Starting coordinate
      * @param to Ending coordinate
      * @param steps Number of intermediate steps (excluding start and end)
@@ -50,35 +56,30 @@ interface InterpolationAlgorithm {
     }
 }
 
-/**
- * Available interpolation algorithms.
- */
+/** Available interpolation algorithms. */
 enum class InterpolationAlgorithmType {
     /**
-     * Linear interpolation - straight line in lat/lon space.
-     * Fast but not geographically accurate, especially over long distances.
-     * Good for very short distances or simple animations.
+     * Linear interpolation - straight line in lat/lon space. Fast but not geographically accurate, especially over long
+     * distances. Good for very short distances or simple animations.
      */
     LINEAR,
 
     /**
-     * Spherical Linear Interpolation (SLERP) - great circle path.
-     * Follows the shortest path on a sphere between two points.
-     * Most accurate for geographic paths, used for smooth camera animations.
+     * Spherical Linear Interpolation (SLERP) - great circle path. Follows the shortest path on a sphere between two
+     * points. Most accurate for geographic paths, used for smooth camera animations.
      */
     SLERP,
 
     /**
-     * Cubic Hermite interpolation - smooth curved path with control points.
-     * Creates smooth, aesthetically pleasing curves.
-     * Useful for animated transitions with easing.
+     * Cubic Hermite interpolation - smooth curved path with control points. Creates smooth, aesthetically pleasing
+     * curves. Useful for animated transitions with easing.
      */
     CUBIC
 }
 
 /**
- * Linear interpolation - simple straight line in coordinate space.
- * Fast but not geographically accurate over long distances.
+ * Linear interpolation - simple straight line in coordinate space. Fast but not geographically accurate over long
+ * distances.
  */
 class LinearInterpolation : InterpolationAlgorithm {
     override fun interpolate(
@@ -95,8 +96,8 @@ class LinearInterpolation : InterpolationAlgorithm {
 }
 
 /**
- * Spherical Linear Interpolation (SLERP) - great circle path on a sphere.
- * Most accurate for geographic interpolation, follows shortest path.
+ * Spherical Linear Interpolation (SLERP) - great circle path on a sphere. Most accurate for geographic interpolation,
+ * follows shortest path.
  */
 class SphericalInterpolation : InterpolationAlgorithm {
     override fun interpolate(
@@ -151,10 +152,7 @@ class SphericalInterpolation : InterpolationAlgorithm {
     }
 }
 
-/**
- * Cubic Hermite interpolation - smooth curve with easing.
- * Creates aesthetically pleasing curves for animations.
- */
+/** Cubic Hermite interpolation - smooth curve with easing. Creates aesthetically pleasing curves for animations. */
 class CubicInterpolation : InterpolationAlgorithm {
     override fun interpolate(
         from: Coordinate,
@@ -198,9 +196,7 @@ class CubicInterpolation : InterpolationAlgorithm {
     }
 }
 
-/**
- * Factory for creating interpolation algorithm instances.
- */
+/** Factory for creating interpolation algorithm instances. */
 object InterpolationAlgorithmFactory {
     fun create(type: InterpolationAlgorithmType): InterpolationAlgorithm =
         when (type) {

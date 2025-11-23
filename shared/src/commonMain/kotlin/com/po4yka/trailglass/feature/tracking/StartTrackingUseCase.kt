@@ -5,18 +5,14 @@ import com.po4yka.trailglass.location.tracking.TrackingMode
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for starting location tracking.
- */
+/** Use case for starting location tracking. */
 @Inject
 class StartTrackingUseCase(
     private val locationTracker: LocationTracker
 ) {
     private val logger = logger()
 
-    /**
-     * Result of starting tracking.
-     */
+    /** Result of starting tracking. */
     sealed class Result {
         object Success : Result()
 

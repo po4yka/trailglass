@@ -10,9 +10,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 
-/**
- * Helper class for managing photo library permissions.
- */
+/** Helper class for managing photo library permissions. */
 class PhotoPermissions(
     private val activity: ComponentActivity
 ) {
@@ -27,9 +25,7 @@ class PhotoPermissions(
             onPermissionsResult = null
         }
 
-    /**
-     * Check if photo library permissions are granted.
-     */
+    /** Check if photo library permissions are granted. */
     fun hasPhotoPermissions(): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // Android 13+ uses granular media permissions
@@ -45,9 +41,7 @@ class PhotoPermissions(
             ) == PackageManager.PERMISSION_GRANTED
         }
 
-    /**
-     * Request photo library permissions.
-     */
+    /** Request photo library permissions. */
     fun requestPhotoPermissions(onResult: (Boolean) -> Unit) {
         onPermissionsResult = onResult
 
@@ -61,9 +55,7 @@ class PhotoPermissions(
         permissionLauncher.launch(permissions)
     }
 
-    /**
-     * Check if we should show rationale for photo permissions.
-     */
+    /** Check if we should show rationale for photo permissions. */
     fun shouldShowPhotoRationale(): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             activity.shouldShowRequestPermissionRationale(Manifest.permission.READ_MEDIA_IMAGES)
@@ -71,9 +63,7 @@ class PhotoPermissions(
             activity.shouldShowRequestPermissionRationale(Manifest.permission.READ_EXTERNAL_STORAGE)
         }
 
-    /**
-     * Open app settings to allow user to manually grant permissions.
-     */
+    /** Open app settings to allow user to manually grant permissions. */
     fun openAppSettings() {
         val intent =
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -84,9 +74,7 @@ class PhotoPermissions(
     }
 
     companion object {
-        /**
-         * Get required permissions for photo access based on Android version.
-         */
+        /** Get required permissions for photo access based on Android version. */
         fun getRequiredPermissions(): List<String> =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 listOf(Manifest.permission.READ_MEDIA_IMAGES)

@@ -6,7 +6,10 @@ import com.po4yka.trailglass.data.analytics.logToAnalytics
 import com.po4yka.trailglass.data.network.NetworkConnectivity
 import com.po4yka.trailglass.data.network.RetryPolicy
 import com.po4yka.trailglass.data.network.retryWithPolicy
-import com.po4yka.trailglass.domain.error.*
+import com.po4yka.trailglass.domain.error.DatabaseOperation
+import com.po4yka.trailglass.domain.error.ErrorMapper
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.Flow
@@ -241,9 +244,7 @@ class PlaceVisitRepositoryWithErrorHandling(
             Result.Error(error)
         }
 
-    /**
-     * Validate place visit input.
-     */
+    /** Validate place visit input. */
     private fun validatePlaceVisit(visit: PlaceVisit): Result<Unit> {
         // Validate coordinates
         if (visit.centerLatitude < -90 || visit.centerLatitude > 90) {
@@ -275,9 +276,7 @@ class PlaceVisitRepositoryWithErrorHandling(
     }
 }
 
-/**
- * Extension function demonstrating Flow error handling.
- */
+/** Extension function demonstrating Flow error handling. */
 fun <T> Flow<T>.handleErrors(errorAnalytics: ErrorAnalytics): Flow<Result<T>> =
     this
         .map { Result.Success(it) as Result<T> }

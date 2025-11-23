@@ -9,11 +9,16 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
- * SQLDelight implementation of GeocodingCacheRepository.
- * Uses spatial bounding box queries followed by Haversine distance calculation.
+ * SQLDelight implementation of GeocodingCacheRepository. Uses spatial bounding box queries followed by Haversine
+ * distance calculation.
  */
 @Inject
 class GeocodingCacheRepositoryImpl(
@@ -124,8 +129,7 @@ class GeocodingCacheRepositoryImpl(
         }
 
     /**
-     * Calculate bounding box coordinates for a given center point and radius.
-     * Returns (minLat, maxLat, minLon, maxLon)
+     * Calculate bounding box coordinates for a given center point and radius. Returns (minLat, maxLat, minLon, maxLon)
      */
     private fun calculateBoundingBox(
         centerLat: Double,
@@ -149,10 +153,7 @@ class GeocodingCacheRepositoryImpl(
         return BoundingBox(minLat, maxLat, minLon, maxLon)
     }
 
-    /**
-     * Calculate distance between two coordinates using Haversine formula.
-     * Returns distance in meters.
-     */
+    /** Calculate distance between two coordinates using Haversine formula. Returns distance in meters. */
     private fun calculateDistance(
         lat1: Double,
         lon1: Double,

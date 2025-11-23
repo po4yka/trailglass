@@ -7,16 +7,19 @@ The `NetworkStatusBanner` component has been created to match iOS functionality,
 ## Components
 
 ### 1. NetworkStatusBanner
+
 Full banner shown at the top of screens when network is unavailable or limited.
 
 **File:** `composeApp/src/androidMain/kotlin/com/po4yka/trailglass/ui/components/NetworkStatusBanner.kt`
 
 ### 2. NetworkStatusIndicatorCompact
+
 Compact indicator for toolbars showing network status with an icon.
 
 **File:** `composeApp/src/androidMain/kotlin/com/po4yka/trailglass/ui/components/NetworkStatusBanner.kt`
 
 ### 3. NetworkStatusWrapper
+
 Wrapper composable to easily add network banner to any screen.
 
 **File:** `composeApp/src/androidMain/kotlin/com/po4yka/trailglass/ui/components/NetworkStatusWrapper.kt`
@@ -201,14 +204,14 @@ When connected via metered network (cellular), shows "Using cellular (metered)" 
 
 This implementation matches the iOS `NetworkStatusBanner.swift` functionality:
 
-| Feature | iOS | Android |
-|---------|-----|---------|
-| Disconnected banner | ✅ | ✅ |
-| Limited connectivity banner | ✅ | ✅ |
-| Network type indicator | ✅ | ✅ |
-| Metered connection warning | ✅ | ✅ |
-| Compact indicator | ✅ | ✅ |
-| Animated show/hide | ✅ | ✅ |
+| Feature                     | iOS | Android |
+|-----------------------------|-----|---------|
+| Disconnected banner         | ✅   | ✅       |
+| Limited connectivity banner | ✅   | ✅       |
+| Network type indicator      | ✅   | ✅       |
+| Metered connection warning  | ✅   | ✅       |
+| Compact indicator           | ✅   | ✅       |
+| Animated show/hide          | ✅   | ✅       |
 
 ## Testing
 

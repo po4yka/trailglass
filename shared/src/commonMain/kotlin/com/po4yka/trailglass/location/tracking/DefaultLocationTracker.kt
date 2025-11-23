@@ -1,7 +1,10 @@
 package com.po4yka.trailglass.location.tracking
 
 import com.po4yka.trailglass.data.repository.LocationRepository
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.Coordinate
+import com.po4yka.trailglass.domain.model.Location
+import com.po4yka.trailglass.domain.model.LocationSample
+import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.feature.tracking.PlaceVisitDetector
 import com.po4yka.trailglass.feature.tracking.PlaceVisitEvent
@@ -11,7 +14,13 @@ import com.po4yka.trailglass.feature.tracking.TripEvent
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -21,8 +30,7 @@ import kotlin.random.Random
 /**
  * Default implementation of LocationTracker.
  *
- * Coordinates location updates with trip detection, place visit detection,
- * and transport mode detection.
+ * Coordinates location updates with trip detection, place visit detection, and transport mode detection.
  */
 @Inject
 class DefaultLocationTracker(
@@ -120,9 +128,7 @@ class DefaultLocationTracker(
         return granted
     }
 
-    /**
-     * Process a new location update.
-     */
+    /** Process a new location update. */
     private suspend fun processLocation(
         coordinate: Coordinate,
         mode: TrackingMode
@@ -188,9 +194,7 @@ class DefaultLocationTracker(
         logger.debug { "Location processed: ${coordinate.latitude}, ${coordinate.longitude}" }
     }
 
-    /**
-     * Handle trip events (start/end).
-     */
+    /** Handle trip events (start/end). */
     private suspend fun handleTripEvent(
         event: TripEvent?,
         coordinate: Coordinate,
@@ -205,6 +209,7 @@ class DefaultLocationTracker(
                 // Save trip to repository would happen here
                 // For now, just track the ID
             }
+
             is TripEvent.TripEnded -> {
                 // End current trip
                 logger.info { "Trip ended: $currentTripId" }
@@ -212,15 +217,14 @@ class DefaultLocationTracker(
 
                 // Update trip end time in repository would happen here
             }
+
             null -> {
                 // No trip event
             }
         }
     }
 
-    /**
-     * Handle place visit events.
-     */
+    /** Handle place visit events. */
     private suspend fun handlePlaceVisitEvent(event: PlaceVisitEvent?) {
         when (event) {
             is PlaceVisitEvent.VisitDetected -> {
@@ -231,19 +235,16 @@ class DefaultLocationTracker(
                 // Create PlaceVisit object and save to repository would happen here
                 // For now, just log
             }
+
             null -> {
                 // No place visit event
             }
         }
     }
 
-    /**
-     * Generate unique location ID.
-     */
+    /** Generate unique location ID. */
     private fun generateLocationId(): String = "loc_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(1000)}"
 
-    /**
-     * Generate unique trip ID.
-     */
+    /** Generate unique trip ID. */
     private fun generateTripId(): String = "trip_${Clock.System.now().toEpochMilliseconds()}_${Random.nextInt(1000)}"
 }

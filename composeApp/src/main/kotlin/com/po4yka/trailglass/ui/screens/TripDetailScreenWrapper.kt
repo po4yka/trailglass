@@ -1,7 +1,12 @@
 package com.po4yka.trailglass.ui.screens
 
 import androidx.activity.ComponentActivity
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.po4yka.trailglass.domain.model.Trip
@@ -10,10 +15,7 @@ import com.po4yka.trailglass.feature.export.ExportDataUseCase
 import com.po4yka.trailglass.ui.components.ExportDialog
 import com.po4yka.trailglass.ui.util.FilePickerHelper
 
-/**
- * Wrapper screen that integrates TripDetailScreen with export functionality.
- * Manages export state and file picking.
- */
+/** Wrapper screen that integrates TripDetailScreen with export functionality. Manages export state and file picking. */
 @Composable
 fun TripDetailScreenWrapper(
     trip: Trip,

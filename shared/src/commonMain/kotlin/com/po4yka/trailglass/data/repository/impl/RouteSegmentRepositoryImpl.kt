@@ -18,9 +18,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * SQLDelight implementation of RouteSegmentRepository.
- */
+/** SQLDelight implementation of RouteSegmentRepository. */
 @Inject
 class RouteSegmentRepositoryImpl(
     private val database: Database
@@ -246,9 +244,7 @@ class RouteSegmentRepositoryImpl(
             }
         }
 
-    /**
-     * Map database row to RouteSegment domain object.
-     */
+    /** Map database row to RouteSegment domain object. */
     private fun mapToRouteSegment(
         row: com.po4yka.trailglass.db.Route_segments,
         sampleIds: List<String>,

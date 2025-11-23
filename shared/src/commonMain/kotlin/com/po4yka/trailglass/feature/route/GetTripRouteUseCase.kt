@@ -1,6 +1,10 @@
 package com.po4yka.trailglass.feature.route
 
-import com.po4yka.trailglass.data.repository.*
+import com.po4yka.trailglass.data.repository.LocationRepository
+import com.po4yka.trailglass.data.repository.PhotoRepository
+import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.data.repository.RouteSegmentRepository
+import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.logging.logger
@@ -10,8 +14,8 @@ import me.tatarka.inject.annotations.Inject
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
 
 /**
- * Use case for retrieving a complete trip route with all associated data.
- * This is the main entry point for getting route data for visualization and replay.
+ * Use case for retrieving a complete trip route with all associated data. This is the main entry point for getting
+ * route data for visualization and replay.
  *
  * Includes caching to avoid reprocessing the same trip multiple times.
  */
@@ -198,8 +202,8 @@ class GetTripRouteUseCase(
     }
 
     /**
-     * Get route data for a memory (date range).
-     * Memories are not yet implemented, but this provides the interface for future support.
+     * Get route data for a memory (date range). Memories are not yet implemented, but this provides the interface for
+     * future support.
      *
      * @param memoryId Memory identifier
      * @return Result containing TripRoute or error
@@ -212,8 +216,7 @@ class GetTripRouteUseCase(
     }
 
     /**
-     * Invalidate cached route for a specific trip.
-     * Call this when trip data has been modified.
+     * Invalidate cached route for a specific trip. Call this when trip data has been modified.
      *
      * @param tripId Trip identifier to invalidate
      */
@@ -224,9 +227,7 @@ class GetTripRouteUseCase(
         }
     }
 
-    /**
-     * Clear all cached routes.
-     */
+    /** Clear all cached routes. */
     suspend fun clearCache() {
         cacheMutex.withLock {
             val size = cache.size
@@ -235,9 +236,7 @@ class GetTripRouteUseCase(
         }
     }
 
-    /**
-     * Get current cache statistics.
-     */
+    /** Get current cache statistics. */
     suspend fun getCacheStats(): CacheStats =
         cacheMutex.withLock {
             CacheStats(

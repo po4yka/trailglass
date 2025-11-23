@@ -5,9 +5,7 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for retrieving place visits for a user within a time range.
- */
+/** Use case for retrieving place visits for a user within a time range. */
 @Inject
 class GetPlaceVisitsUseCase(
     private val placeVisitRepository: PlaceVisitRepository

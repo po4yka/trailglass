@@ -17,6 +17,7 @@ Enhanced foreground service with live notification updates for location tracking
 Main foreground service that displays live tracking updates in a notification.
 
 **Features:**
+
 - Auto-updating notification with real-time metrics
 - Pause/Resume functionality
 - Compact and expanded notification layouts
@@ -25,6 +26,7 @@ Main foreground service that displays live tracking updates in a notification.
 ### Notification Display
 
 **Compact View:**
+
 ```
 TrailGlass - Tracking
 2.54 km  •  30:47  •  4.2 km/h
@@ -32,6 +34,7 @@ TrailGlass - Tracking
 ```
 
 **Expanded View:**
+
 ```
 TrailGlass - Tracking
 
@@ -113,6 +116,7 @@ Add to `AndroidManifest.xml`:
 ## Notification Channel
 
 Channel configuration:
+
 - **ID**: `location_tracking_channel`
 - **Name**: Location Tracking
 - **Importance**: LOW (minimal interruption)
@@ -122,6 +126,7 @@ Channel configuration:
 ## Integration with LocationTracker
 
 The service observes `LocationTracker.trackingState` flow and updates the notification when:
+
 - Distance changes
 - Duration updates (every second)
 - Speed changes
@@ -130,14 +135,17 @@ The service observes `LocationTracker.trackingState` flow and updates the notifi
 ## Metrics Format
 
 ### Distance
+
 - `< 1000m`: Displays in meters (e.g., "542 m")
 - `>= 1000m`: Displays in kilometers (e.g., "2.54 km")
 
 ### Duration
+
 - `< 1 hour`: MM:SS format (e.g., "30:47")
 - `>= 1 hour`: H:MM:SS format (e.g., "1:05:23")
 
 ### Speed
+
 - Converted from m/s to km/h
 - Format: "X.X km/h" (e.g., "4.2 km/h")
 
@@ -153,6 +161,7 @@ The service uses several techniques to minimize battery drain:
 ## Error Handling
 
 The service handles common errors:
+
 - Permission denied → Shows error and stops service
 - Location unavailable → Logs error and continues
 - Tracker initialization failed → Stops service gracefully
@@ -160,6 +169,7 @@ The service handles common errors:
 ## Testing
 
 ### Manual Testing
+
 1. Start tracking from the app
 2. Navigate away or lock the device
 3. Verify notification appears with live updates
@@ -167,6 +177,7 @@ The service handles common errors:
 5. Test stop button
 
 ### Automated Testing
+
 ```kotlin
 @Test
 fun testServiceStartsWithNotification() {
@@ -181,15 +192,15 @@ fun testServiceStartsWithNotification() {
 
 ## Comparison with iOS Live Activities
 
-| Feature | iOS Live Activities | Android Enhanced Service |
-|---------|-------------------|------------------------|
-| Lock Screen Display | ✅ | ✅ |
-| Expandable Content | ✅ | ✅ |
-| Action Buttons | Limited | ✅ (Pause/Resume/Stop) |
-| Real-time Updates | ✅ | ✅ |
-| Dynamic Island | ✅ (iPhone 14 Pro+) | N/A |
-| Battery Impact | Very Low | Low |
-| Persistence | Session only | Session + START_STICKY |
+| Feature             | iOS Live Activities | Android Enhanced Service |
+|---------------------|---------------------|--------------------------|
+| Lock Screen Display | ✅                   | ✅                        |
+| Expandable Content  | ✅                   | ✅                        |
+| Action Buttons      | Limited             | ✅ (Pause/Resume/Stop)    |
+| Real-time Updates   | ✅                   | ✅                        |
+| Dynamic Island      | ✅ (iPhone 14 Pro+)  | N/A                      |
+| Battery Impact      | Very Low            | Low                      |
+| Persistence         | Session only        | Session + START_STICKY   |
 
 ## Required Drawable Resources
 
@@ -203,6 +214,7 @@ ic_stop.xml      (stop button)
 ```
 
 Example `ic_location.xml`:
+
 ```xml
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
@@ -227,16 +239,19 @@ Example `ic_location.xml`:
 ## Troubleshooting
 
 **Notification not showing:**
+
 - Check POST_NOTIFICATIONS permission (Android 13+)
 - Verify notification channel is created
 - Check if app is in battery optimization whitelist
 
 **Updates not appearing:**
+
 - Verify LocationTracker is emitting state updates
 - Check if service is running (adb shell dumpsys activity services)
 - Look for crashes in logcat
 
 **High battery usage:**
+
 - Review location update frequency
 - Check if service is stopping properly
 - Consider using IDLE or PASSIVE tracking mode

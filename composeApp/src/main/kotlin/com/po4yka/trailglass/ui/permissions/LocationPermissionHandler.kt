@@ -12,13 +12,17 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 
-/**
- * Location permission state holder.
- */
+/** Location permission state holder. */
 open class LocationPermissionState(
     private val context: Context,
     private val onPermissionResult: (Boolean) -> Unit
@@ -38,9 +42,7 @@ open class LocationPermissionState(
     var backgroundPermissionGranted by mutableStateOf(checkBackgroundPermission())
         private set
 
-    /**
-     * Check if all required location permissions are granted.
-     */
+    /** Check if all required location permissions are granted. */
     fun checkPermissions(): Boolean {
         val fineLocation =
             ContextCompat.checkSelfPermission(
@@ -57,9 +59,7 @@ open class LocationPermissionState(
         return fineLocation || coarseLocation
     }
 
-    /**
-     * Check if background location permission is granted (Android 10+).
-     */
+    /** Check if background location permission is granted (Android 10+). */
     fun checkBackgroundPermission(): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             ContextCompat.checkSelfPermission(
@@ -118,9 +118,8 @@ open class LocationPermissionState(
     }
 
     /**
-     * Request background location permission with proper educational flow.
-     * This follows Android best practices by showing education first,
-     * then redirecting to settings (required on Android 11+).
+     * Request background location permission with proper educational flow. This follows Android best practices by
+     * showing education first, then redirecting to settings (required on Android 11+).
      */
     fun requestBackgroundPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -241,9 +240,7 @@ fun rememberLocationPermissionState(onPermissionResult: (Boolean) -> Unit = {}):
     return state
 }
 
-/**
- * Request location permissions.
- */
+/** Request location permissions. */
 fun LocationPermissionState.requestPermissions() {
     (this as? LocationPermissionStateWithRequest)?.requestFunction?.invoke()
 }
@@ -283,8 +280,7 @@ private fun LocationPermissionRationaleDialog(
 }
 
 /**
- * Simple launcher-based approach for requesting location permissions.
- * Use this as a helper in your Composable screens.
+ * Simple launcher-based approach for requesting location permissions. Use this as a helper in your Composable screens.
  *
  * Example:
  * ```

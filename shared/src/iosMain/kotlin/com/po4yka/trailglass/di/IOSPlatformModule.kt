@@ -49,31 +49,23 @@ class IOSPlatformModule : PlatformModule {
     @Provides
     override fun deviceId(): String = UIDevice.currentDevice.identifierForVendor?.UUIDString ?: "unknown_device"
 
-    /**
-     * Provides iOS-specific permission manager.
-     */
+    /** Provides iOS-specific permission manager. */
     @Provides
     override fun permissionManager(): PermissionManager = PermissionManager()
 
-    /**
-     * Provides iOS-specific encryption service.
-     */
+    /** Provides iOS-specific encryption service. */
     @Provides
     override fun encryptionService(): com.po4yka.trailglass.data.security.EncryptionService =
         com.po4yka.trailglass.data.security
             .EncryptionService()
 
-    /**
-     * Provides iOS-specific photo metadata extractor.
-     */
+    /** Provides iOS-specific photo metadata extractor. */
     @Provides
     override fun photoMetadataExtractor(): com.po4yka.trailglass.photo.PhotoMetadataExtractor =
         com.po4yka.trailglass.photo
             .IosPhotoMetadataExtractor()
 
-    /**
-     * Provides iOS-specific settings storage.
-     */
+    /** Provides iOS-specific settings storage. */
     @Provides
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
         com.po4yka.trailglass.data.storage
@@ -91,9 +83,7 @@ class IOSPlatformModule : PlatformModule {
     @Provides
     override fun networkConnectivityMonitor(): NetworkConnectivityMonitor = IOSNetworkConnectivityMonitor()
 
-    /**
-     * Provides iOS-specific photo directory provider.
-     */
+    /** Provides iOS-specific photo directory provider. */
     @Provides
     override fun photoDirectoryProvider(): PhotoDirectoryProvider = IOSPhotoDirectoryProvider()
 }

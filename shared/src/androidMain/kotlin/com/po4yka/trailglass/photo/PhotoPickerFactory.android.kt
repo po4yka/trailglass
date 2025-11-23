@@ -2,9 +2,7 @@ package com.po4yka.trailglass.photo
 
 import android.content.Context
 
-/**
- * Android implementation of PhotoPickerFactory.
- */
+/** Android implementation of PhotoPickerFactory. */
 actual class PhotoPickerFactory(
     private val context: Context
 ) {

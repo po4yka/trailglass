@@ -6,9 +6,7 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.LocalDate
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for getting photos taken on a specific day.
- */
+/** Use case for getting photos taken on a specific day. */
 @Inject
 class GetPhotosForDayUseCase(
     private val photoRepository: PhotoRepository

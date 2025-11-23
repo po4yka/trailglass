@@ -32,9 +32,7 @@ class EnhancedStatsController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Enhanced stats UI state.
-     */
+    /** Enhanced stats UI state. */
     data class EnhancedStatsState(
         val period: GetStatsUseCase.Period? = null,
         val stats: ComprehensiveStatistics? = null,
@@ -45,9 +43,7 @@ class EnhancedStatsController(
     private val _state = MutableStateFlow(EnhancedStatsState())
     val state: StateFlow<EnhancedStatsState> = _state.asStateFlow()
 
-    /**
-     * Load comprehensive stats for a specific period.
-     */
+    /** Load comprehensive stats for a specific period. */
     fun loadPeriod(period: GetStatsUseCase.Period) {
         logger.debug { "Loading comprehensive stats for period: $period" }
 
@@ -73,25 +69,21 @@ class EnhancedStatsController(
         }
     }
 
-    /**
-     * Refresh the current period.
-     */
+    /** Refresh the current period. */
     fun refresh() {
         _state.value.period?.let { period ->
             loadPeriod(period)
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

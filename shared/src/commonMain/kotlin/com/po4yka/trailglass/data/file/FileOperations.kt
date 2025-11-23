@@ -7,10 +7,7 @@ import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 import kotlinx.io.readString
 
-/**
- * Cross-platform file operations using Kotlinx IO.
- * Provides a unified API for file I/O across Android and iOS.
- */
+/** Cross-platform file operations using Kotlinx IO. Provides a unified API for file I/O across Android and iOS. */
 class FileOperations {
     /**
      * Read file contents as a ByteArray.
@@ -183,8 +180,8 @@ class FileOperations {
     }
 
     /**
-     * Read a file in chunks using a buffer.
-     * Useful for processing large files without loading them entirely into memory.
+     * Read a file in chunks using a buffer. Useful for processing large files without loading them entirely into
+     * memory.
      *
      * @param path Absolute file path
      * @param chunkSize Size of each chunk in bytes

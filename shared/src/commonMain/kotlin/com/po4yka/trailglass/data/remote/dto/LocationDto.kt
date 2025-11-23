@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * Location data transfer object.
- */
+/** Location data transfer object. */
 @Serializable
 data class LocationDto(
     val id: String,
@@ -24,18 +22,14 @@ data class LocationDto(
     val deviceId: String? = null
 )
 
-/**
- * Batch location upload request.
- */
+/** Batch location upload request. */
 @Serializable
 data class BatchLocationRequest(
     val locations: List<LocationDto>,
     val deviceId: String
 )
 
-/**
- * Batch location upload response.
- */
+/** Batch location upload response. */
 @Serializable
 data class BatchLocationResponse(
     val accepted: Int,
@@ -44,9 +38,7 @@ data class BatchLocationResponse(
     val syncVersion: Long
 )
 
-/**
- * Pagination metadata.
- */
+/** Pagination metadata. */
 @Serializable
 data class Pagination(
     val total: Int,
@@ -55,9 +47,7 @@ data class Pagination(
     val hasMore: Boolean
 )
 
-/**
- * Locations query response.
- */
+/** Locations query response. */
 @Serializable
 data class LocationsResponse(
     val locations: List<LocationDto>,

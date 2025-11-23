@@ -15,8 +15,8 @@ import com.po4yka.trailglass.ui.navigation.MainScaffold
 import com.po4yka.trailglass.ui.theme.TrailGlassTheme
 
 /**
- * Main application composable with authentication support.
- * This is the entry point for the UI, integrating Decompose navigation.
+ * Main application composable with authentication support. This is the entry point for the UI, integrating Decompose
+ * navigation.
  */
 @Composable
 fun App(
@@ -37,9 +37,7 @@ fun App(
     }
 }
 
-/**
- * App-level navigation that switches between Auth and Main flows.
- */
+/** App-level navigation that switches between Auth and Main flows. */
 @Composable
 fun AppNavigation(
     appRootComponent: AppRootComponent,

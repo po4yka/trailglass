@@ -1,12 +1,24 @@
 package com.po4yka.trailglass.ui.screens
 
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -15,10 +27,7 @@ import com.po4yka.trailglass.feature.export.ExportController
 import com.po4yka.trailglass.ui.components.ExportDialog
 import com.po4yka.trailglass.ui.util.FilePickerHelper
 
-/**
- * Wrapper screen that integrates TripsScreen with export functionality.
- * Adds export capabilities to the trips list.
- */
+/** Wrapper screen that integrates TripsScreen with export functionality. Adds export capabilities to the trips list. */
 @Composable
 fun TripsScreenWrapper(
     trips: List<Trip>,

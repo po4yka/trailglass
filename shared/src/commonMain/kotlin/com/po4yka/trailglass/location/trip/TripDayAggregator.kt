@@ -1,12 +1,21 @@
 package com.po4yka.trailglass.location.trip
 
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.domain.model.RouteSegment
+import com.po4yka.trailglass.domain.model.TimelineItem
+import com.po4yka.trailglass.domain.model.Trip
+import com.po4yka.trailglass.domain.model.TripDay
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.*
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.plus
+import kotlinx.datetime.toLocalDateTime
 
 /**
- * Aggregates trips into daily timelines.
- * Builds TripDay objects containing ordered timeline items (visits and routes).
+ * Aggregates trips into daily timelines. Builds TripDay objects containing ordered timeline items (visits and routes).
  */
 class TripDayAggregator(
     private val timeZone: TimeZone = TimeZone.UTC
@@ -67,9 +76,7 @@ class TripDayAggregator(
         return tripDays
     }
 
-    /**
-     * Build a single TripDay for a specific date.
-     */
+    /** Build a single TripDay for a specific date. */
     private fun buildTripDay(
         tripId: String,
         date: LocalDate,
@@ -105,9 +112,7 @@ class TripDayAggregator(
         )
     }
 
-    /**
-     * Build ordered timeline items for a day.
-     */
+    /** Build ordered timeline items for a day. */
     private fun buildTimelineItems(
         date: LocalDate,
         visits: List<PlaceVisit>,
@@ -159,9 +164,7 @@ class TripDayAggregator(
         return items
     }
 
-    /**
-     * Generate a range of dates from start to end (inclusive).
-     */
+    /** Generate a range of dates from start to end (inclusive). */
     private fun generateDayRange(
         start: LocalDate,
         end: LocalDate
@@ -177,17 +180,13 @@ class TripDayAggregator(
         return days
     }
 
-    /**
-     * Generate a deterministic ID for a TripDay.
-     */
+    /** Generate a deterministic ID for a TripDay. */
     private fun generateTripDayId(
         tripId: String,
         date: LocalDate
     ): String = "trip_day_${tripId}_$date"
 
-    /**
-     * Generate a deterministic ID for a timeline item.
-     */
+    /** Generate a deterministic ID for a timeline item. */
     private fun generateTimelineItemId(
         type: String,
         identifier: Any

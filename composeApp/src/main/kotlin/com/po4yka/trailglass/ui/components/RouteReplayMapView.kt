@@ -1,21 +1,28 @@
 package com.po4yka.trailglass.ui.components
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.feature.route.VehicleState
 import com.po4yka.trailglass.ui.theme.extended
 
-/**
- * Map view for route replay with animated vehicle and camera following.
- */
+/** Map view for route replay with animated vehicle and camera following. */
 @Composable
 fun RouteReplayMapView(
     tripRoute: TripRoute,
@@ -78,8 +85,8 @@ fun RouteReplayMapView(
 }
 
 /**
- * Route polyline for replay (draws the entire route).
- * Uses Silent Waters palette: Coastal Path for active/replaying routes.
+ * Route polyline for replay (draws the entire route). Uses Silent Waters palette: Coastal Path for active/replaying
+ * routes.
  */
 @Composable
 private fun RoutePolylineReplay(routePoints: List<com.po4yka.trailglass.domain.model.RoutePoint>) {
@@ -95,9 +102,7 @@ private fun RoutePolylineReplay(routePoints: List<com.po4yka.trailglass.domain.m
     )
 }
 
-/**
- * Animated vehicle marker.
- */
+/** Animated vehicle marker. */
 @Composable
 private fun VehicleMarker(
     vehicleState: VehicleState,
@@ -123,9 +128,7 @@ private fun VehicleMarker(
     )
 }
 
-/**
- * Format vehicle information for marker snippet.
- */
+/** Format vehicle information for marker snippet. */
 private fun formatVehicleInfo(
     vehicleState: VehicleState,
     transportType: TransportType

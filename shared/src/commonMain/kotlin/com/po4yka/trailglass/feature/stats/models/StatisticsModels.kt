@@ -4,9 +4,7 @@ import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.TransportType
 import kotlinx.datetime.DayOfWeek
 
-/**
- * Distance statistics broken down by transport type.
- */
+/** Distance statistics broken down by transport type. */
 data class DistanceStatistics(
     val totalDistanceMeters: Double,
     val byTransportType: Map<TransportType, Double>, // meters per transport type
@@ -21,9 +19,7 @@ data class DistanceStatistics(
         byTransportType.maxByOrNull { it.value }?.key
 }
 
-/**
- * Place visit statistics and patterns.
- */
+/** Place visit statistics and patterns. */
 data class PlaceStatistics(
     val totalPlaces: Int,
     val totalVisits: Int,
@@ -53,9 +49,7 @@ data class VisitRecord(
     val category: PlaceCategory
 )
 
-/**
- * Travel patterns based on time analysis.
- */
+/** Travel patterns based on time analysis. */
 data class TravelPatterns(
     val hourlyActivity: Map<Int, ActivityCount>, // hour (0-23) to activity count
     val weekdayActivity: Map<DayOfWeek, ActivityCount>, // day of week to activity count
@@ -90,9 +84,7 @@ data class WeekdaySplit(
     val weekendPercentage: Double = 100.0 - weekdayPercentage
 }
 
-/**
- * Geographic statistics.
- */
+/** Geographic statistics. */
 data class GeographicStatistics(
     val countries: Set<String>,
     val cities: Set<String>,
@@ -124,9 +116,7 @@ data class LocationRecord(
     val longitude: Double
 )
 
-/**
- * Comprehensive statistics combining all metrics.
- */
+/** Comprehensive statistics combining all metrics. */
 data class ComprehensiveStatistics(
     val period: String,
     val distanceStats: DistanceStatistics,

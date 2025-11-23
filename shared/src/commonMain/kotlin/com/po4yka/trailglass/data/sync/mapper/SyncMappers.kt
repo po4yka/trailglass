@@ -1,12 +1,40 @@
 package com.po4yka.trailglass.data.sync.mapper
 
-import com.po4yka.trailglass.data.remote.dto.*
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.data.remote.dto.AppearanceSettingsDto
+import com.po4yka.trailglass.data.remote.dto.CoordinateDto
+import com.po4yka.trailglass.data.remote.dto.LocationDto
+import com.po4yka.trailglass.data.remote.dto.PhotoMetadataDto
+import com.po4yka.trailglass.data.remote.dto.PlaceVisitDto
+import com.po4yka.trailglass.data.remote.dto.PrivacySettingsDto
+import com.po4yka.trailglass.data.remote.dto.SettingsDto
+import com.po4yka.trailglass.data.remote.dto.SyncAction
+import com.po4yka.trailglass.data.remote.dto.TrackingPreferencesDto
+import com.po4yka.trailglass.data.remote.dto.TripDto
+import com.po4yka.trailglass.data.remote.dto.UnitPreferencesDto
+import com.po4yka.trailglass.domain.model.AccountSettings
+import com.po4yka.trailglass.domain.model.AppSettings
+import com.po4yka.trailglass.domain.model.AppTheme
+import com.po4yka.trailglass.domain.model.AppearanceSettings
+import com.po4yka.trailglass.domain.model.CategoryConfidence
+import com.po4yka.trailglass.domain.model.DataManagement
+import com.po4yka.trailglass.domain.model.DistanceUnit
+import com.po4yka.trailglass.domain.model.LocationSample
+import com.po4yka.trailglass.domain.model.LocationSource
+import com.po4yka.trailglass.domain.model.Photo
+import com.po4yka.trailglass.domain.model.PlaceCategory
+import com.po4yka.trailglass.domain.model.PlaceSignificance
+import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.domain.model.PrivacySettings
+import com.po4yka.trailglass.domain.model.TemperatureUnit
+import com.po4yka.trailglass.domain.model.TimeFormat
+import com.po4yka.trailglass.domain.model.TrackingAccuracy
+import com.po4yka.trailglass.domain.model.TrackingPreferences
+import com.po4yka.trailglass.domain.model.Trip
+import com.po4yka.trailglass.domain.model.UnitPreferences
+import com.po4yka.trailglass.domain.model.UpdateInterval
 import kotlinx.datetime.Instant
 
-/**
- * Mappers for converting between domain models and sync DTOs.
- */
+/** Mappers for converting between domain models and sync DTOs. */
 
 // PlaceVisit Mappers
 

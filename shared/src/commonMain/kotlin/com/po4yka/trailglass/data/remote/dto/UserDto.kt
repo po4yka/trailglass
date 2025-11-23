@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * User statistics DTO.
- */
+/** User statistics DTO. */
 @Serializable
 data class UserStatisticsDto(
     val totalLocations: Long,
@@ -15,9 +13,7 @@ data class UserStatisticsDto(
     val totalDistance: Double
 )
 
-/**
- * User profile DTO.
- */
+/** User profile DTO. */
 @Serializable
 data class UserProfileDto(
     val userId: String,
@@ -28,18 +24,14 @@ data class UserProfileDto(
     val statistics: UserStatisticsDto? = null
 )
 
-/**
- * Update user profile request.
- */
+/** Update user profile request. */
 @Serializable
 data class UpdateUserProfileRequest(
     val displayName: String? = null,
     val profilePhoto: String? = null // Base64 encoded image
 )
 
-/**
- * Update user profile response.
- */
+/** Update user profile response. */
 @Serializable
 data class UpdateUserProfileResponse(
     val userId: String,
@@ -47,9 +39,7 @@ data class UpdateUserProfileResponse(
     val updatedAt: String
 )
 
-/**
- * Device info DTO (for listing devices).
- */
+/** Device info DTO (for listing devices). */
 @Serializable
 data class DeviceDto(
     val deviceId: String,
@@ -62,17 +52,13 @@ data class DeviceDto(
     val isActive: Boolean
 )
 
-/**
- * User devices response.
- */
+/** User devices response. */
 @Serializable
 data class UserDevicesResponse(
     val devices: List<DeviceDto>
 )
 
-/**
- * Data export request.
- */
+/** Data export request. */
 @Serializable
 data class DataExportRequest(
     val format: String, // JSON, CSV, KML, etc.
@@ -81,9 +67,7 @@ data class DataExportRequest(
     val endDate: String? = null
 )
 
-/**
- * Data export status.
- */
+/** Data export status. */
 @Serializable
 enum class ExportStatus {
     PENDING,
@@ -92,9 +76,7 @@ enum class ExportStatus {
     FAILED
 }
 
-/**
- * Data export response.
- */
+/** Data export response. */
 @Serializable
 data class DataExportResponse(
     val exportId: String,
@@ -102,9 +84,7 @@ data class DataExportResponse(
     val estimatedCompletionTime: String? = null
 )
 
-/**
- * Export status response.
- */
+/** Export status response. */
 @Serializable
 data class ExportStatusResponse(
     val exportId: String,

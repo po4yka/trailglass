@@ -6,14 +6,10 @@ import com.po4yka.trailglass.feature.stats.models.DistanceStatistics
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration
 
-/**
- * Calculator for distance-related statistics.
- */
+/** Calculator for distance-related statistics. */
 @Inject
 class DistanceStatisticsCalculator {
-    /**
-     * Calculate distance statistics from route segments.
-     */
+    /** Calculate distance statistics from route segments. */
     fun calculate(routes: List<RouteSegment>): DistanceStatistics {
         if (routes.isEmpty()) {
             return DistanceStatistics(
@@ -56,9 +52,7 @@ class DistanceStatisticsCalculator {
         )
     }
 
-    /**
-     * Calculate distance statistics for a specific transport type.
-     */
+    /** Calculate distance statistics for a specific transport type. */
     fun calculateForType(
         routes: List<RouteSegment>,
         type: TransportType
@@ -67,9 +61,7 @@ class DistanceStatisticsCalculator {
         return calculate(filteredRoutes)
     }
 
-    /**
-     * Get transport type distribution as percentages.
-     */
+    /** Get transport type distribution as percentages. */
     fun getTransportTypeDistribution(routes: List<RouteSegment>): Map<TransportType, Double> {
         if (routes.isEmpty()) return emptyMap()
 
@@ -84,9 +76,7 @@ class DistanceStatisticsCalculator {
             }
     }
 
-    /**
-     * Calculate average speed by transport type.
-     */
+    /** Calculate average speed by transport type. */
     fun getAverageSpeedByType(routes: List<RouteSegment>): Map<TransportType, Double> =
         routes
             .groupBy { it.transportType }

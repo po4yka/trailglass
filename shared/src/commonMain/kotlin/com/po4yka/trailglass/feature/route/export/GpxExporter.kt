@@ -2,10 +2,7 @@ package com.po4yka.trailglass.feature.route.export
 
 import com.po4yka.trailglass.domain.model.TripRoute
 
-/**
- * GPX (GPS Exchange Format) exporter for trip routes.
- * Exports route data to standard GPX 1.1 XML format.
- */
+/** GPX (GPS Exchange Format) exporter for trip routes. Exports route data to standard GPX 1.1 XML format. */
 class GpxExporter {
     /**
      * Export trip route to GPX format.
@@ -100,16 +97,12 @@ class GpxExporter {
             appendLine("</gpx>")
         }
 
-    /**
-     * Format instant to GPX time format (ISO 8601).
-     */
+    /** Format instant to GPX time format (ISO 8601). */
     private fun formatGpxTime(instant: kotlinx.datetime.Instant): String {
         return instant.toString() // Already ISO 8601 format
     }
 
-    /**
-     * Escape XML special characters.
-     */
+    /** Escape XML special characters. */
     private fun escapeXml(text: String): String =
         text
             .replace("&", "&amp;")

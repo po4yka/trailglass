@@ -136,8 +136,7 @@ val Typography =
 /**
  * Material 3 Expressive Emphasized Typography
  *
- * Provides emphasized variants of baseline typography for visual hierarchy and emphasis.
- * Emphasized styles feature:
+ * Provides emphasized variants of baseline typography for visual hierarchy and emphasis. Emphasized styles feature:
  * - Slightly larger font sizes (1-2 sp increase)
  * - Bolder font weights (e.g., Normal → Medium, Medium → SemiBold)
  * - Optionally increased letter spacing for prominence

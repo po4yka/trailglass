@@ -19,9 +19,7 @@ import kotlinx.datetime.atStartOfDayIn
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration.Companion.days
 
-/**
- * SQLDelight implementation of PhotoRepository.
- */
+/** SQLDelight implementation of PhotoRepository. */
 @Inject
 class PhotoRepositoryImpl(
     private val database: Database,
@@ -317,9 +315,7 @@ class PhotoRepositoryImpl(
             }
         }
 
-    /**
-     * Map database row to Photo domain object.
-     */
+    /** Map database row to Photo domain object. */
     private fun mapToPhoto(row: com.po4yka.trailglass.db.Photos): Photo =
         Photo(
             id = row.id,
@@ -350,9 +346,7 @@ class PhotoRepositoryImpl(
             addedAt = Instant.fromEpochMilliseconds(row.added_at)
         )
 
-    /**
-     * Map database row to PhotoAttachment domain object.
-     */
+    /** Map database row to PhotoAttachment domain object. */
     private fun mapToPhotoAttachment(row: com.po4yka.trailglass.db.Photo_attachments): PhotoAttachment =
         PhotoAttachment(
             id = row.id,

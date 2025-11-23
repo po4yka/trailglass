@@ -1,13 +1,19 @@
 package com.po4yka.trailglass.domain.permission
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import me.tatarka.inject.annotations.Inject
-import platform.CoreLocation.*
-import platform.Foundation.*
+import platform.CoreLocation.CLLocationManager
+import platform.CoreLocation.CLLocationManagerDelegateProtocol
+import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
+import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
+import platform.CoreLocation.kCLAuthorizationStatusDenied
+import platform.CoreLocation.kCLAuthorizationStatusNotDetermined
+import platform.CoreLocation.kCLAuthorizationStatusRestricted
+import platform.Foundation.NSURL
 import platform.Photos.PHAuthorizationStatusAuthorized
 import platform.Photos.PHAuthorizationStatusDenied
 import platform.Photos.PHAuthorizationStatusNotDetermined
@@ -23,11 +29,10 @@ import platform.darwin.NSObject
 import kotlin.coroutines.resume
 
 /**
- * iOS implementation of PermissionManager.
- * Uses iOS permission APIs (CoreLocation, Photos, UserNotifications).
+ * iOS implementation of PermissionManager. Uses iOS permission APIs (CoreLocation, Photos, UserNotifications).
  *
- * Properly implements CLLocationManagerDelegate to wait for user responses
- * instead of immediately checking stale permission status.
+ * Properly implements CLLocationManagerDelegate to wait for user responses instead of immediately checking stale
+ * permission status.
  */
 @Inject
 @OptIn(ExperimentalForeignApi::class)
@@ -39,9 +44,7 @@ actual class PermissionManager {
     private var locationPermissionContinuation: CancellableContinuation<PermissionResult>? = null
     private var backgroundLocationContinuation: CancellableContinuation<PermissionResult>? = null
 
-    /**
-     * Delegate to receive location authorization callbacks from iOS.
-     */
+    /** Delegate to receive location authorization callbacks from iOS. */
     private val locationDelegate =
         object : NSObject(), CLLocationManagerDelegateProtocol {
             override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
@@ -56,14 +59,17 @@ actual class PermissionManager {
                                 updatePermissionState(PermissionType.LOCATION_FINE, PermissionState.Granted)
                                 PermissionResult.Granted
                             }
+
                             kCLAuthorizationStatusDenied -> {
                                 updatePermissionState(PermissionType.LOCATION_FINE, PermissionState.PermanentlyDenied)
                                 PermissionResult.PermanentlyDenied
                             }
+
                             kCLAuthorizationStatusRestricted -> {
                                 updatePermissionState(PermissionType.LOCATION_FINE, PermissionState.Restricted)
                                 PermissionResult.Denied
                             }
+
                             else -> PermissionResult.Cancelled
                         }
                     continuation.resume(result)
@@ -78,10 +84,12 @@ actual class PermissionManager {
                                 updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.Granted)
                                 PermissionResult.Granted
                             }
+
                             kCLAuthorizationStatusAuthorizedWhenInUse -> {
                                 updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.Denied)
                                 PermissionResult.Denied
                             }
+
                             kCLAuthorizationStatusDenied -> {
                                 updatePermissionState(
                                     PermissionType.LOCATION_BACKGROUND,
@@ -89,10 +97,12 @@ actual class PermissionManager {
                                 )
                                 PermissionResult.PermanentlyDenied
                             }
+
                             kCLAuthorizationStatusRestricted -> {
                                 updatePermissionState(PermissionType.LOCATION_BACKGROUND, PermissionState.Restricted)
                                 PermissionResult.Denied
                             }
+
                             else -> PermissionResult.Cancelled
                         }
                     continuation.resume(result)
@@ -106,9 +116,7 @@ actual class PermissionManager {
         locationManager.delegate = locationDelegate
     }
 
-    /**
-     * Check the current state of a permission.
-     */
+    /** Check the current state of a permission. */
     actual suspend fun checkPermission(permissionType: PermissionType): PermissionState {
         val state =
             when (permissionType) {
@@ -138,9 +146,7 @@ actual class PermissionManager {
         return state
     }
 
-    /**
-     * Request a permission from the user.
-     */
+    /** Request a permission from the user. */
     actual suspend fun requestPermission(permissionType: PermissionType): PermissionResult =
         when (permissionType) {
             PermissionType.LOCATION_FINE,
@@ -166,17 +172,15 @@ actual class PermissionManager {
         }
 
     /**
-     * Check if we should show a rationale before requesting.
-     * On iOS, this is typically only relevant if permission was previously denied.
+     * Check if we should show a rationale before requesting. On iOS, this is typically only relevant if permission was
+     * previously denied.
      */
     actual suspend fun shouldShowRationale(permissionType: PermissionType): Boolean {
         val state = checkPermission(permissionType)
         return state is PermissionState.Denied
     }
 
-    /**
-     * Open system settings for the app.
-     */
+    /** Open system settings for the app. */
     actual suspend fun openAppSettings() {
         val settingsUrl = NSURL.URLWithString(UIApplicationOpenSettingsURLString)
         if (settingsUrl != null) {
@@ -184,18 +188,13 @@ actual class PermissionManager {
         }
     }
 
-    /**
-     * Observable state for permission changes.
-     */
+    /** Observable state for permission changes. */
     actual fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
         permissionStates.getOrPut(permissionType) {
             MutableStateFlow(PermissionState.NotDetermined)
         }
 
-    /**
-     * Cleanup method to release resources.
-     * Should be called when PermissionManager is no longer needed.
-     */
+    /** Cleanup method to release resources. Should be called when PermissionManager is no longer needed. */
     fun cleanup() {
         locationManager.delegate = null
         locationPermissionContinuation?.cancel()
@@ -244,12 +243,15 @@ actual class PermissionManager {
             kCLAuthorizationStatusAuthorizedAlways -> {
                 return PermissionResult.Granted
             }
+
             kCLAuthorizationStatusDenied -> {
                 return PermissionResult.PermanentlyDenied
             }
+
             kCLAuthorizationStatusRestricted -> {
                 return PermissionResult.Denied
             }
+
             else -> {
                 // Need to request - continue below
             }
@@ -275,12 +277,15 @@ actual class PermissionManager {
             kCLAuthorizationStatusAuthorizedAlways -> {
                 return PermissionResult.Granted
             }
+
             kCLAuthorizationStatusDenied -> {
                 return PermissionResult.PermanentlyDenied
             }
+
             kCLAuthorizationStatusRestricted -> {
                 return PermissionResult.Denied
             }
+
             else -> {
                 // Need to request - continue below
             }

@@ -3,7 +3,9 @@ package com.po4yka.trailglass.data.repository
 import com.po4yka.trailglass.TestDatabaseHelper
 import com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.PlaceVisitRepositoryImpl
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.LocationSample
+import com.po4yka.trailglass.domain.model.PlaceCategory
+import com.po4yka.trailglass.domain.model.PlaceVisit
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
@@ -11,7 +13,9 @@ import io.kotest.matchers.shouldNotBe
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlin.test.*
+import kotlin.test.AfterTest
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 

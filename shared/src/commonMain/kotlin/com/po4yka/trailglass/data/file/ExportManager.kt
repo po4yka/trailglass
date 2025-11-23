@@ -8,8 +8,8 @@ import kotlinx.datetime.Instant
 private val logger = KotlinLogging.logger {}
 
 /**
- * Manages exporting data to various formats using Kotlinx IO.
- * Provides cross-platform export functionality for trips, visits, and location data.
+ * Manages exporting data to various formats using Kotlinx IO. Provides cross-platform export functionality for trips,
+ * visits, and location data.
  */
 class ExportManager(
     private val fileOperations: FileOperations
@@ -120,11 +120,13 @@ class ExportManager(
                     appendLine("  <metadata>")
                     appendLine("    <name>Trailglass Export</name>")
                     appendLine(
-                        "    <time>${Instant.fromEpochMilliseconds(
-                            kotlinx.datetime.Clock.System
-                                .now()
-                                .toEpochMilliseconds()
-                        )}</time>"
+                        "    <time>${
+                            Instant.fromEpochMilliseconds(
+                                kotlinx.datetime.Clock.System
+                                    .now()
+                                    .toEpochMilliseconds()
+                            )
+                        }</time>"
                     )
                     appendLine("  </metadata>")
 

@@ -8,9 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 
-/**
- * Android implementation of RouteShareHandler using Android sharing APIs.
- */
+/** Android implementation of RouteShareHandler using Android sharing APIs. */
 class AndroidRouteShareHandler(
     private val context: Context
 ) : RouteShareHandler {

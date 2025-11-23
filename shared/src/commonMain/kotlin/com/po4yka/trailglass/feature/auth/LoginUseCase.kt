@@ -9,8 +9,7 @@ import me.tatarka.inject.annotations.Inject
 /**
  * Use case for user login.
  *
- * Authenticates user with email and password, stores tokens,
- * and updates the user session.
+ * Authenticates user with email and password, stores tokens, and updates the user session.
  */
 @Inject
 class LoginUseCase(
@@ -63,8 +62,6 @@ class LoginUseCase(
         }
     }
 
-    /**
-     * Simple email validation.
-     */
+    /** Simple email validation. */
     private fun isValidEmail(email: String): Boolean = email.contains("@") && email.contains(".")
 }

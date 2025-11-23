@@ -5,9 +5,7 @@ import com.po4yka.trailglass.domain.algorithm.DistanceAlgorithmType
 import com.po4yka.trailglass.domain.algorithm.InterpolationAlgorithmType
 import kotlinx.serialization.Serializable
 
-/**
- * Application settings and user preferences.
- */
+/** Application settings and user preferences. */
 @Serializable
 data class AppSettings(
     // Tracking preferences
@@ -26,9 +24,7 @@ data class AppSettings(
     val algorithmPreferences: AlgorithmPreferences = AlgorithmPreferences()
 )
 
-/**
- * Tracking preferences for location accuracy and frequency.
- */
+/** Tracking preferences for location accuracy and frequency. */
 @Serializable
 data class TrackingPreferences(
     val accuracy: TrackingAccuracy = TrackingAccuracy.BALANCED,
@@ -52,9 +48,7 @@ enum class UpdateInterval {
     BATTERY_SAVER // Every 10 minutes
 }
 
-/**
- * Privacy settings for data retention and sharing.
- */
+/** Privacy settings for data retention and sharing. */
 @Serializable
 data class PrivacySettings(
     val dataRetentionDays: Int = 365, // 0 = forever
@@ -65,9 +59,7 @@ data class PrivacySettings(
     val enableE2EEncryption: Boolean = false // End-to-end encryption for synced data
 )
 
-/**
- * Unit preferences for displaying measurements.
- */
+/** Unit preferences for displaying measurements. */
 @Serializable
 data class UnitPreferences(
     val distanceUnit: DistanceUnit = DistanceUnit.METRIC,
@@ -93,9 +85,7 @@ enum class TimeFormat {
     TWENTY_FOUR_HOUR
 }
 
-/**
- * Appearance settings for theme and display.
- */
+/** Appearance settings for theme and display. */
 @Serializable
 data class AppearanceSettings(
     val theme: AppTheme = AppTheme.SYSTEM,
@@ -111,9 +101,7 @@ enum class AppTheme {
     SYSTEM
 }
 
-/**
- * Account settings and sync preferences.
- */
+/** Account settings and sync preferences. */
 @Serializable
 data class AccountSettings(
     val email: String? = null,
@@ -122,9 +110,7 @@ data class AccountSettings(
     val lastSyncTime: kotlinx.datetime.Instant? = null
 )
 
-/**
- * Data management settings for export and import.
- */
+/** Data management settings for export and import. */
 @Serializable
 data class DataManagement(
     val lastExportTime: kotlinx.datetime.Instant? = null,
@@ -133,8 +119,8 @@ data class DataManagement(
 )
 
 /**
- * Algorithm preferences for geographic calculations.
- * Allows users to choose different calculation methods based on their needs.
+ * Algorithm preferences for geographic calculations. Allows users to choose different calculation methods based on
+ * their needs.
  */
 @Serializable
 data class AlgorithmPreferences(

@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for stats feature.
- * Manages statistics state and period selection.
+ * Controller for stats feature. Manages statistics state and period selection.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -32,9 +31,7 @@ class StatsController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Stats UI state.
-     */
+    /** Stats UI state. */
     data class StatsState(
         val period: GetStatsUseCase.Period? = null,
         val stats: GetStatsUseCase.Stats? = null,
@@ -45,9 +42,7 @@ class StatsController(
     private val _state = MutableStateFlow(StatsState())
     val state: StateFlow<StatsState> = _state.asStateFlow()
 
-    /**
-     * Load stats for a specific period.
-     */
+    /** Load stats for a specific period. */
     fun loadPeriod(period: GetStatsUseCase.Period) {
         logger.debug { "Loading stats for period: $period" }
 
@@ -68,25 +63,21 @@ class StatsController(
         }
     }
 
-    /**
-     * Refresh the current period.
-     */
+    /** Refresh the current period. */
     fun refresh() {
         _state.value.period?.let { period ->
             loadPeriod(period)
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

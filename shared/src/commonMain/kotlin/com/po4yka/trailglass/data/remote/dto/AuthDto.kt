@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * Device information for registration and authentication.
- */
+/** Device information for registration and authentication. */
 @Serializable
 data class DeviceInfoDto(
     val deviceId: String,
@@ -14,9 +12,7 @@ data class DeviceInfoDto(
     val appVersion: String
 )
 
-/**
- * User registration request.
- */
+/** User registration request. */
 @Serializable
 data class RegisterRequest(
     val email: String,
@@ -25,9 +21,7 @@ data class RegisterRequest(
     val deviceInfo: DeviceInfoDto
 )
 
-/**
- * User registration response.
- */
+/** User registration response. */
 @Serializable
 data class RegisterResponse(
     val userId: String,
@@ -39,9 +33,7 @@ data class RegisterResponse(
     val createdAt: String
 )
 
-/**
- * Login request.
- */
+/** Login request. */
 @Serializable
 data class LoginRequest(
     val email: String,
@@ -49,9 +41,7 @@ data class LoginRequest(
     val deviceInfo: DeviceInfoDto
 )
 
-/**
- * Login response.
- */
+/** Login response. */
 @Serializable
 data class LoginResponse(
     val userId: String,
@@ -63,17 +53,13 @@ data class LoginResponse(
     val lastSyncTimestamp: String?
 )
 
-/**
- * Token refresh request.
- */
+/** Token refresh request. */
 @Serializable
 data class RefreshTokenRequest(
     val refreshToken: String
 )
 
-/**
- * Token refresh response.
- */
+/** Token refresh response. */
 @Serializable
 data class RefreshTokenResponse(
     val accessToken: String,
@@ -81,9 +67,7 @@ data class RefreshTokenResponse(
     val expiresIn: Long
 )
 
-/**
- * Logout request.
- */
+/** Logout request. */
 @Serializable
 data class LogoutRequest(
     val deviceId: String

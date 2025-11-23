@@ -26,19 +26,19 @@ implementation(libs.androidx.paging.compose)
 The paging implementation follows this pattern:
 
 1. **PagingSource** (already implemented in `shared/src/androidMain/kotlin/com/po4yka/trailglass/data/paging/`):
-   - `PlaceVisitPagingSource` - Loads place visits from the database
-   - `TripPagingSource` - Loads trips from the database
+    - `PlaceVisitPagingSource` - Loads place visits from the database
+    - `TripPagingSource` - Loads trips from the database
 
 2. **Pager Configuration**:
-   - Page size: 20 items
-   - Prefetch distance: 5 items
-   - Placeholders: Disabled for better UX
+    - Page size: 20 items
+    - Prefetch distance: 5 items
+    - Placeholders: Disabled for better UX
 
 3. **Screen Integration**:
-   - Screens receive `Database` and `userId` as parameters
-   - Create a `Pager` with the appropriate `PagingSource`
-   - Use `collectAsLazyPagingItems()` to collect paging data
-   - Display items in a `LazyColumn` with proper state handling
+    - Screens receive `Database` and `userId` as parameters
+    - Create a `Pager` with the appropriate `PagingSource`
+    - Use `collectAsLazyPagingItems()` to collect paging data
+    - Display items in a `LazyColumn` with proper state handling
 
 ### Features
 
@@ -46,13 +46,13 @@ Both paging screens include:
 
 1. **Pull-to-Refresh**: Using Material's `ExperimentalMaterialApi.pullRefresh`
 2. **Loading States**:
-   - Initial loading with centered progress indicator
-   - Append loading with smaller progress indicator at bottom
-   - Refresh loading with pull-to-refresh indicator
+    - Initial loading with centered progress indicator
+    - Append loading with smaller progress indicator at bottom
+    - Refresh loading with pull-to-refresh indicator
 3. **Error Handling**:
-   - Error view for initial load failures
-   - Retry button for append errors
-   - Uses existing `ErrorView` component
+    - Error view for initial load failures
+    - Retry button for append errors
+    - Uses existing `ErrorView` component
 4. **Empty State**: Custom empty state views when no data exists
 5. **Animations**: All animations use `MotionConfig.standardSpring()` for consistency with Material 3 Expressive design
 6. **Item Animations**: Fade in/out animations when items appear/disappear
@@ -124,21 +124,21 @@ To use these paging screens in your navigation:
 - **Original**: Loads all timeline items at once using `GetTimelineUseCase`
 - **Paging**: Loads place visits incrementally using `PlaceVisitPagingSource`
 - **Removed Features** (simplified for paging implementation):
-  - Zoom levels (Day/Week/Month/Year)
-  - Date navigation
-  - Filtering by category/transport
-  - Search functionality
-  - Route segments and summary cards
+    - Zoom levels (Day/Week/Month/Year)
+    - Date navigation
+    - Filtering by category/transport
+    - Search functionality
+    - Route segments and summary cards
 
 ### TripsScreen vs TripsScreenPaging
 
 - **Original**: Accepts a `List<Trip>` parameter
 - **Paging**: Directly queries database using `TripPagingSource`
 - **Preserved Features**:
-  - Ongoing/completed trip grouping
-  - Shape morphing animations
-  - Auto-detection badges
-  - Tags display
+    - Ongoing/completed trip grouping
+    - Shape morphing animations
+    - Auto-detection badges
+    - Tags display
 
 ## Performance Benefits
 
@@ -165,10 +165,10 @@ To test the paging implementation:
 1. **Build the app**: `./gradlew :composeApp:assembleDebug`
 2. **Test with small dataset**: Verify empty state and single page
 3. **Test with large dataset**: Import test data and verify:
-   - Initial page loads correctly
-   - Scrolling loads more items
-   - Pull-to-refresh works
-   - Error states display correctly
+    - Initial page loads correctly
+    - Scrolling loads more items
+    - Pull-to-refresh works
+    - Error states display correctly
 4. **Test animations**: Verify all transitions use MotionConfig springs
 
 ## Notes
@@ -176,5 +176,5 @@ To test the paging implementation:
 - The original `EnhancedTimelineScreen.kt` and `TripsScreen.kt` are preserved for backward compatibility
 - These paging screens are alternative implementations that can be used when performance is a concern
 - Choose the appropriate screen based on your use case:
-  - Use original screens for feature-rich experience with filters/search
-  - Use paging screens for better performance with large datasets
+    - Use original screens for feature-rich experience with filters/search
+    - Use paging screens for better performance with large datasets

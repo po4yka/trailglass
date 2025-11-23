@@ -1,7 +1,15 @@
 package com.po4yka.trailglass.data.sync
 
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
-import com.po4yka.trailglass.data.remote.dto.*
+import com.po4yka.trailglass.data.remote.dto.AcceptedEntities
+import com.po4yka.trailglass.data.remote.dto.ConflictResolution
+import com.po4yka.trailglass.data.remote.dto.DeltaSyncRequest
+import com.po4yka.trailglass.data.remote.dto.DeltaSyncResponse
+import com.po4yka.trailglass.data.remote.dto.LocalChanges
+import com.po4yka.trailglass.data.remote.dto.RejectedEntities
+import com.po4yka.trailglass.data.remote.dto.ResolveConflictRequest
+import com.po4yka.trailglass.data.remote.dto.ResolveConflictResponse
+import com.po4yka.trailglass.data.remote.dto.SyncStatusResponse
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -11,18 +19,14 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Repository for storing sync state.
- */
+/** Repository for storing sync state. */
 interface SyncStateRepository {
     suspend fun getSyncState(): SyncState
 
     suspend fun updateSyncState(state: SyncState)
 }
 
-/**
- * Coordinates synchronization between local and remote data.
- */
+/** Coordinates synchronization between local and remote data. */
 @Inject
 class SyncCoordinator(
     private val apiClient: TrailGlassApiClient,
@@ -43,9 +47,7 @@ class SyncCoordinator(
         _syncState.value = savedState
     }
 
-    /**
-     * Perform full delta synchronization.
-     */
+    /** Perform full delta synchronization. */
     suspend fun performSync(
         deviceId: String,
         localChanges: LocalChanges
@@ -109,9 +111,7 @@ class SyncCoordinator(
         }
     }
 
-    /**
-     * Resolve a specific conflict.
-     */
+    /** Resolve a specific conflict. */
     suspend fun resolveConflict(
         conflictId: String,
         resolution: ConflictResolution,
@@ -148,9 +148,7 @@ class SyncCoordinator(
         return result
     }
 
-    /**
-     * Get current sync status from server.
-     */
+    /** Get current sync status from server. */
     suspend fun refreshSyncStatus(): Result<SyncStatusResponse> {
         logger.debug { "Refreshing sync status from server" }
 
@@ -172,18 +170,14 @@ class SyncCoordinator(
         return result
     }
 
-    /**
-     * Mark sync as needed (e.g., when local changes are made).
-     */
+    /** Mark sync as needed (e.g., when local changes are made). */
     suspend fun markSyncNeeded() {
         _syncState.update {
             it.copy(pendingChanges = it.pendingChanges + 1)
         }
     }
 
-    /**
-     * Clear sync error.
-     */
+    /** Clear sync error. */
     suspend fun clearError() {
         _syncState.update { it.copy(error = null) }
     }
@@ -221,9 +215,7 @@ class SyncCoordinator(
             rejected.photos.size
 }
 
-/**
- * Sync state repository implementation using local storage.
- */
+/** Sync state repository implementation using local storage. */
 expect class SyncStateRepositoryImpl : SyncStateRepository {
     override suspend fun getSyncState(): SyncState
 

@@ -7,8 +7,8 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 
 /**
- * iOS implementation of PhotoDirectoryProvider.
- * Uses NSDocumentDirectory for photos and NSCachesDirectory for temporary files.
+ * iOS implementation of PhotoDirectoryProvider. Uses NSDocumentDirectory for photos and NSCachesDirectory for temporary
+ * files.
  */
 class IOSPhotoDirectoryProvider : PhotoDirectoryProvider {
     override fun getPhotosDirectory(): String {

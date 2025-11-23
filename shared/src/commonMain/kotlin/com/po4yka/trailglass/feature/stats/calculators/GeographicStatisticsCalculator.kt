@@ -6,17 +6,17 @@ import com.po4yka.trailglass.feature.stats.models.CountryStats
 import com.po4yka.trailglass.feature.stats.models.GeographicStatistics
 import com.po4yka.trailglass.feature.stats.models.LocationRecord
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration
 
-/**
- * Calculator for geographic statistics.
- */
+/** Calculator for geographic statistics. */
 @Inject
 class GeographicStatisticsCalculator {
-    /**
-     * Calculate comprehensive geographic statistics.
-     */
+    /** Calculate comprehensive geographic statistics. */
     fun calculate(visits: List<PlaceVisit>): GeographicStatistics {
         if (visits.isEmpty()) {
             return GeographicStatistics(
@@ -48,9 +48,7 @@ class GeographicStatisticsCalculator {
         )
     }
 
-    /**
-     * Calculate top countries by visit count.
-     */
+    /** Calculate top countries by visit count. */
     private fun calculateTopCountries(visits: List<PlaceVisit>): List<CountryStats> =
         visits
             .filter { it.countryCode != null }
@@ -68,9 +66,7 @@ class GeographicStatisticsCalculator {
             }.sortedByDescending { it.visitCount }
             .take(10)
 
-    /**
-     * Calculate top cities by visit count.
-     */
+    /** Calculate top cities by visit count. */
     private fun calculateTopCities(visits: List<PlaceVisit>): List<CityStats> =
         visits
             .filter { it.city != null }
@@ -88,9 +84,7 @@ class GeographicStatisticsCalculator {
             }.sortedByDescending { it.visitCount }
             .take(10)
 
-    /**
-     * Find home base (most visited location).
-     */
+    /** Find home base (most visited location). */
     private fun findHomeBase(visits: List<PlaceVisit>): LocationRecord? {
         if (visits.isEmpty()) return null
 
@@ -115,9 +109,7 @@ class GeographicStatisticsCalculator {
         )
     }
 
-    /**
-     * Find furthest location from home base using Haversine formula.
-     */
+    /** Find furthest location from home base using Haversine formula. */
     private fun findFurthestLocation(
         visits: List<PlaceVisit>,
         homeBase: LocationRecord?
@@ -143,9 +135,7 @@ class GeographicStatisticsCalculator {
         )
     }
 
-    /**
-     * Calculate distance between two coordinates using Haversine formula (in meters).
-     */
+    /** Calculate distance between two coordinates using Haversine formula (in meters). */
     private fun calculateDistance(
         lat1: Double,
         lon1: Double,
@@ -167,9 +157,7 @@ class GeographicStatisticsCalculator {
         return earthRadiusKm * c * 1000.0 // Convert to meters
     }
 
-    /**
-     * Get distance distribution by country.
-     */
+    /** Get distance distribution by country. */
     fun getDistanceByCountry(visits: List<PlaceVisit>): Map<String, Double> {
         // This would require route segments, returning empty for now
         // In a real implementation, you'd correlate routes with countries

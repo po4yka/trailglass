@@ -19,8 +19,8 @@ import kotlinx.datetime.LocalDate
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for photo management.
- * Handles photo loading, selection, capture, and attachment with permission management.
+ * Controller for photo management. Handles photo loading, selection, capture, and attachment with permission
+ * management.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -41,17 +41,13 @@ class PhotoController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Photo action that is pending permission grant.
-     */
+    /** Photo action that is pending permission grant. */
     enum class PendingPhotoAction {
         TAKE_PHOTO,
         SELECT_FROM_LIBRARY
     }
 
-    /**
-     * Photo UI state.
-     */
+    /** Photo UI state. */
     data class PhotoState(
         val selectedDate: LocalDate? = null,
         val photos: List<Photo> = emptyList(),
@@ -92,6 +88,7 @@ class PhotoController(
                             }
                         }
                     }
+
                     is PermissionResult.Denied,
                     is PermissionResult.PermanentlyDenied -> {
                         logger.warn { "Photo permission denied" }
@@ -107,10 +104,12 @@ class PhotoController(
                             )
                         }
                     }
+
                     is PermissionResult.Cancelled -> {
                         logger.info { "Photo permission request cancelled" }
                         _state.update { it.copy(pendingAction = null) }
                     }
+
                     is PermissionResult.Error -> {
                         logger.error { "Photo permission error: ${permState.lastResult.message}" }
                         _state.update {
@@ -120,6 +119,7 @@ class PhotoController(
                             )
                         }
                     }
+
                     null -> {
                         // No result yet
                     }
@@ -131,9 +131,7 @@ class PhotoController(
         checkPermissions()
     }
 
-    /**
-     * Load photos for a specific day.
-     */
+    /** Load photos for a specific day. */
     fun loadPhotosForDay(date: LocalDate) {
         logger.debug { "Loading photos for $date" }
 
@@ -151,10 +149,7 @@ class PhotoController(
         }
     }
 
-    /**
-     * Load suggested photos for a visit.
-     * This requires photo library permission.
-     */
+    /** Load suggested photos for a visit. This requires photo library permission. */
     fun loadSuggestionsForVisit(visit: PlaceVisit) {
         logger.debug { "Loading photo suggestions for visit ${visit.id}" }
 
@@ -186,10 +181,7 @@ class PhotoController(
         }
     }
 
-    /**
-     * Take a photo using the camera.
-     * This will request camera permission if not already granted.
-     */
+    /** Take a photo using the camera. This will request camera permission if not already granted. */
     fun takePhoto() {
         logger.info { "User requested to take photo" }
 
@@ -211,10 +203,7 @@ class PhotoController(
         }
     }
 
-    /**
-     * Select a photo from the photo library.
-     * This will request photo library permission if not already granted.
-     */
+    /** Select a photo from the photo library. This will request photo library permission if not already granted. */
     fun selectFromLibrary() {
         logger.info { "User requested to select from library" }
 
@@ -237,8 +226,8 @@ class PhotoController(
     }
 
     /**
-     * Execute photo capture after permission is granted.
-     * Platform-specific implementation would handle the actual camera capture.
+     * Execute photo capture after permission is granted. Platform-specific implementation would handle the actual
+     * camera capture.
      */
     private fun executePhotoCapture() {
         logger.info { "Executing photo capture" }
@@ -253,8 +242,8 @@ class PhotoController(
     }
 
     /**
-     * Execute photo selection after permission is granted.
-     * Platform-specific implementation would handle the actual picker.
+     * Execute photo selection after permission is granted. Platform-specific implementation would handle the actual
+     * picker.
      */
     private fun executePhotoSelection() {
         logger.info { "Executing photo selection" }
@@ -268,18 +257,13 @@ class PhotoController(
         logger.debug { "Photo picker would be opened here (platform-specific)" }
     }
 
-    /**
-     * Add a photo that was captured or selected.
-     * Called by platform-specific code after photo is obtained.
-     */
+    /** Add a photo that was captured or selected. Called by platform-specific code after photo is obtained. */
     fun addPhoto(photo: Photo) {
         logger.info { "Adding photo: ${photo.id}" }
         _state.update { it.copy(photos = it.photos + photo) }
     }
 
-    /**
-     * Attach a photo to the current visit.
-     */
+    /** Attach a photo to the current visit. */
     fun attachPhotoToVisit(
         photoId: String,
         caption: String? = null
@@ -302,10 +286,12 @@ class PhotoController(
                     // Refresh suggestions to remove attached photo
                     loadSuggestionsForVisit(visit)
                 }
+
                 is AttachPhotoToVisitUseCase.Result.AlreadyAttached -> {
                     logger.warn { "Photo $photoId already attached" }
                     _state.update { it.copy(error = "Photo already attached", isLoading = false) }
                 }
+
                 is AttachPhotoToVisitUseCase.Result.Error -> {
                     logger.error { "Failed to attach photo: ${result.message}" }
                     _state.update { it.copy(error = result.message, isLoading = false) }
@@ -314,9 +300,7 @@ class PhotoController(
         }
     }
 
-    /**
-     * Check if permissions are granted.
-     */
+    /** Check if permissions are granted. */
     fun checkPermissions() {
         controllerScope.launch {
             val hasCameraPermission = permissionFlow.isPermissionGranted(PermissionType.CAMERA)
@@ -333,9 +317,7 @@ class PhotoController(
         }
     }
 
-    /**
-     * Refresh current view.
-     */
+    /** Refresh current view. */
     fun refresh() {
         _state.value.selectedDate?.let { date ->
             loadPhotosForDay(date)
@@ -345,17 +327,15 @@ class PhotoController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
         permissionFlow.clearError()
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

@@ -4,18 +4,14 @@ import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for stopping location tracking.
- */
+/** Use case for stopping location tracking. */
 @Inject
 class StopTrackingUseCase(
     private val locationTracker: LocationTracker
 ) {
     private val logger = logger()
 
-    /**
-     * Stop location tracking.
-     */
+    /** Stop location tracking. */
     suspend fun execute() {
         logger.info { "Stopping tracking" }
 

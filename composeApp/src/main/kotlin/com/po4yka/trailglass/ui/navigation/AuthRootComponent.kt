@@ -11,39 +11,24 @@ import com.arkivanov.decompose.value.Value
 import com.po4yka.trailglass.feature.auth.AuthController
 import kotlinx.serialization.Serializable
 
-/**
- * Root component for authentication flow.
- * Manages navigation between Login, Register, and ForgotPassword screens.
- */
+/** Root component for authentication flow. Manages navigation between Login, Register, and ForgotPassword screens. */
 interface AuthRootComponent {
-    /**
-     * Child stack for auth navigation.
-     */
+    /** Child stack for auth navigation. */
     val childStack: Value<ChildStack<*, Child>>
 
-    /**
-     * Navigate to register screen.
-     */
+    /** Navigate to register screen. */
     fun navigateToRegister()
 
-    /**
-     * Navigate to forgot password screen.
-     */
+    /** Navigate to forgot password screen. */
     fun navigateToForgotPassword()
 
-    /**
-     * Navigate back.
-     */
+    /** Navigate back. */
     fun navigateBack()
 
-    /**
-     * Callback when user successfully authenticates.
-     */
+    /** Callback when user successfully authenticates. */
     val onAuthenticated: () -> Unit
 
-    /**
-     * Sealed class representing auth navigation configurations.
-     */
+    /** Sealed class representing auth navigation configurations. */
     @Serializable
     sealed interface Config {
         @Serializable
@@ -56,9 +41,7 @@ interface AuthRootComponent {
         data object ForgotPassword : Config
     }
 
-    /**
-     * Sealed class representing child components.
-     */
+    /** Sealed class representing child components. */
     sealed class Child {
         data class Login(
             val component: LoginComponent
@@ -74,9 +57,7 @@ interface AuthRootComponent {
     }
 }
 
-/**
- * Default implementation of AuthRootComponent.
- */
+/** Default implementation of AuthRootComponent. */
 class DefaultAuthRootComponent(
     componentContext: ComponentContext,
     private val authController: AuthController,

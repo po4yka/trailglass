@@ -9,10 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.po4yka.trailglass.feature.export.ExportDataUseCase
 import java.io.File
 
-/**
- * Helper for Android file picking and export file creation.
- * Handles platform-specific file access patterns.
- */
+/** Helper for Android file picking and export file creation. Handles platform-specific file access patterns. */
 class FilePickerHelper(
     private val activity: ComponentActivity
 ) {
@@ -27,8 +24,7 @@ class FilePickerHelper(
         }
 
     /**
-     * Request file creation for export.
-     * Opens the system file picker to let user choose where to save the file.
+     * Request file creation for export. Opens the system file picker to let user choose where to save the file.
      *
      * @param format Export format to determine file extension
      * @param defaultFileName Default name for the exported file
@@ -72,8 +68,7 @@ class FilePickerHelper(
     }
 
     /**
-     * Get default export directory for the app.
-     * Returns a path that's accessible without SAF on older Android versions.
+     * Get default export directory for the app. Returns a path that's accessible without SAF on older Android versions.
      */
     fun getDefaultExportDirectory(): File =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -89,9 +84,7 @@ class FilePickerHelper(
             mkdirs()
         }
 
-    /**
-     * Generate a default file name for export based on data type and format.
-     */
+    /** Generate a default file name for export based on data type and format. */
     fun generateDefaultFileName(
         dataTypeName: String,
         format: ExportDataUseCase.Format,
@@ -113,9 +106,8 @@ class FilePickerHelper(
     }
 
     /**
-     * Convert URI to file path.
-     * This is a simplified version that works with most URIs.
-     * For production use, consider using a more robust solution.
+     * Convert URI to file path. This is a simplified version that works with most URIs. For production use, consider
+     * using a more robust solution.
      */
     private fun getPathFromUri(uri: Uri): String? =
         try {
@@ -141,9 +133,7 @@ class FilePickerHelper(
             null
         }
 
-    /**
-     * Get file name from content URI.
-     */
+    /** Get file name from content URI. */
     private fun getFileNameFromUri(uri: Uri): String? =
         activity.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameIndex = cursor.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)

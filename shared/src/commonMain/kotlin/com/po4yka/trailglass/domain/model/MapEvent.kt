@@ -3,8 +3,8 @@ package com.po4yka.trailglass.domain.model
 /**
  * Sealed class representing events that can occur on the map.
  *
- * This provides an event-driven API for handling user interactions with the map,
- * allowing better separation of concerns and testability.
+ * This provides an event-driven API for handling user interactions with the map, allowing better separation of concerns
+ * and testability.
  */
 sealed class MapEvent {
     /**
@@ -43,17 +43,15 @@ sealed class MapEvent {
         val position: CameraPosition
     ) : MapEvent()
 
-    /**
-     * Map has finished loading and is ready for interaction.
-     */
+    /** Map has finished loading and is ready for interaction. */
     data object MapReady : MapEvent()
 }
 
 /**
  * Interface for sending map events from the UI layer to the business logic layer.
  *
- * This decouples the map view from the controller, making it easier to test
- * and allowing for more flexible event handling.
+ * This decouples the map view from the controller, making it easier to test and allowing for more flexible event
+ * handling.
  */
 interface MapEventSink {
     /**

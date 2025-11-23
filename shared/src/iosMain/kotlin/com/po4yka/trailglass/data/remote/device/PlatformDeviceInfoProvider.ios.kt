@@ -2,14 +2,13 @@ package com.po4yka.trailglass.data.remote.device
 
 import com.po4yka.trailglass.data.remote.DeviceInfoProvider
 import me.tatarka.inject.annotations.Inject
-import platform.Foundation.*
+import platform.Foundation.NSBundle
+import platform.Foundation.NSUserDefaults
 import platform.UIKit.UIDevice
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-/**
- * iOS implementation of DeviceInfoProvider.
- */
+/** iOS implementation of DeviceInfoProvider. */
 @Inject
 actual class PlatformDeviceInfoProvider : DeviceInfoProvider {
     private val cachedDeviceId: String by lazy {

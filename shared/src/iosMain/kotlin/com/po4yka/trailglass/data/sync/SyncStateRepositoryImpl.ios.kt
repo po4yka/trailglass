@@ -4,9 +4,7 @@ import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import platform.Foundation.NSUserDefaults
 
-/**
- * iOS implementation using UserDefaults.
- */
+/** iOS implementation using UserDefaults. */
 @Inject
 actual class SyncStateRepositoryImpl : SyncStateRepository {
     private val userDefaults = NSUserDefaults.standardUserDefaults

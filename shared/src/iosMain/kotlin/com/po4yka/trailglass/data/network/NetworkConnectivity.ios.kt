@@ -3,13 +3,23 @@ package com.po4yka.trailglass.data.network
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import platform.Network.*
+import platform.Network.nw_interface_type_cellular
+import platform.Network.nw_interface_type_wifi
+import platform.Network.nw_interface_type_wired
+import platform.Network.nw_path_get_status
+import platform.Network.nw_path_monitor_cancel
+import platform.Network.nw_path_monitor_create
+import platform.Network.nw_path_monitor_set_queue
+import platform.Network.nw_path_monitor_set_update_handler
+import platform.Network.nw_path_monitor_start
+import platform.Network.nw_path_status_satisfiable
+import platform.Network.nw_path_status_satisfied
+import platform.Network.nw_path_t
+import platform.Network.nw_path_uses_interface_type
 import platform.darwin.dispatch_queue_create
 import kotlin.concurrent.Volatile
 
-/**
- * iOS implementation of NetworkConnectivity using Network framework.
- */
+/** iOS implementation of NetworkConnectivity using Network framework. */
 class IOSNetworkConnectivity : NetworkConnectivity {
     private val monitor = nw_path_monitor_create()
     private val queue = dispatch_queue_create("com.po4yka.trailglass.network", null)

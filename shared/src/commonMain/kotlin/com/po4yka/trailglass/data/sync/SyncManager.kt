@@ -20,7 +20,6 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -77,9 +76,7 @@ class SyncManager(
         }
     }
 
-    /**
-     * Handle network state changes and auto-trigger sync when online.
-     */
+    /** Handle network state changes and auto-trigger sync when online. */
     private fun handleNetworkStateChange(state: NetworkState) {
         logger.info { "Network state changed: $state" }
 
@@ -93,18 +90,18 @@ class SyncManager(
                     shouldAutoSyncWhenOnline = false
                 }
             }
+
             is NetworkState.Disconnected -> {
                 logger.warn { "Network disconnected" }
             }
+
             is NetworkState.Limited -> {
                 logger.warn { "Network limited: ${state.reason}" }
             }
         }
     }
 
-    /**
-     * Perform full synchronization of all entity types.
-     */
+    /** Perform full synchronization of all entity types. */
     suspend fun performFullSync(): Result<SyncResultSummary> {
         // Skip sync for guest users (no account, local-only mode)
         if (userId == UserSession.GUEST_USER_ID) {
@@ -205,9 +202,7 @@ class SyncManager(
         }
     }
 
-    /**
-     * Collect local changes that need to be synced.
-     */
+    /** Collect local changes that need to be synced. */
     private suspend fun collectLocalChanges(): LocalChanges {
         val placeVisits = mutableListOf<PlaceVisitDto>()
         val trips = mutableListOf<TripDto>()
@@ -304,9 +299,7 @@ class SyncManager(
         )
     }
 
-    /**
-     * Apply remote changes to local database.
-     */
+    /** Apply remote changes to local database. */
     private suspend fun applyRemoteChanges(remoteChanges: com.po4yka.trailglass.data.remote.dto.RemoteChanges) {
         // Apply place visit changes
         for (visitDto in remoteChanges.placeVisits) {
@@ -366,9 +359,7 @@ class SyncManager(
         }
     }
 
-    /**
-     * Update sync metadata for successfully synced entities.
-     */
+    /** Update sync metadata for successfully synced entities. */
     private suspend fun updateSyncMetadata(response: com.po4yka.trailglass.data.remote.dto.DeltaSyncResponse) {
         // Mark accepted place visits as synced
         for (visitId in response.accepted.placeVisits) {
@@ -406,10 +397,7 @@ class SyncManager(
         }
     }
 
-    /**
-     * Handle sync conflicts.
-     * Stores conflicts for manual resolution through UI.
-     */
+    /** Handle sync conflicts. Stores conflicts for manual resolution through UI. */
     private suspend fun handleConflicts(conflicts: List<com.po4yka.trailglass.data.remote.dto.SyncConflictDto>): Int {
         var resolved = 0
 
@@ -450,9 +438,7 @@ class SyncManager(
         return resolved
     }
 
-    /**
-     * Automatically resolve a conflict without user interaction.
-     */
+    /** Automatically resolve a conflict without user interaction. */
     private suspend fun resolveConflictAutomatically(
         conflict: com.po4yka.trailglass.data.remote.dto.SyncConflictDto,
         choice: ConflictResolutionChoice
@@ -474,6 +460,7 @@ class SyncManager(
                     serverVersion = conflict.remoteVersion["version"]?.toLongOrNull() ?: 0L
                 )
             }
+
             ConflictResolutionChoice.KEEP_LOCAL -> {
                 // Local wins - force upload local version
                 // Mark for re-sync
@@ -491,6 +478,7 @@ class SyncManager(
                     )
                 }
             }
+
             ConflictResolutionChoice.MERGE -> {
                 // Merge resolution - use last-write-wins strategy
                 // In a more sophisticated implementation, this would merge fields
@@ -502,6 +490,7 @@ class SyncManager(
                     resolveConflictAutomatically(conflict, ConflictResolutionChoice.KEEP_LOCAL)
                 }
             }
+
             ConflictResolutionChoice.MANUAL -> {
                 // Should not happen in automatic resolution
                 // Store for manual resolution
@@ -510,9 +499,7 @@ class SyncManager(
         }
     }
 
-    /**
-     * Mark an entity as needing sync.
-     */
+    /** Mark an entity as needing sync. */
     suspend fun markForSync(
         entityId: String,
         entityType: EntityType
@@ -539,14 +526,10 @@ class SyncManager(
         syncCoordinator.markSyncNeeded()
     }
 
-    /**
-     * Get count of pending sync items.
-     */
+    /** Get count of pending sync items. */
     suspend fun getPendingSyncCount(): Int = syncMetadataRepository.getPendingSyncCount()
 
-    /**
-     * Get current sync status for UI display.
-     */
+    /** Get current sync status for UI display. */
     suspend fun getSyncStatus(): SyncStatusUiModel {
         val pendingCount = getPendingSyncCount()
         val conflictCount = conflictRepository.getConflictCount()
@@ -566,17 +549,13 @@ class SyncManager(
         )
     }
 
-    /**
-     * Get list of unresolved conflicts for UI.
-     */
+    /** Get list of unresolved conflicts for UI. */
     suspend fun getUnresolvedConflicts(): List<ConflictUiModel> =
         conflictRepository.getPendingConflicts().map { conflict ->
             convertToUiModel(conflict)
         }
 
-    /**
-     * Convert StoredConflict to UI-friendly ConflictUiModel.
-     */
+    /** Convert StoredConflict to UI-friendly ConflictUiModel. */
     private suspend fun convertToUiModel(conflict: StoredConflict): ConflictUiModel {
         // Get entity name based on type
         val entityName =
@@ -584,9 +563,11 @@ class SyncManager(
                 EntityType.PLACE_VISIT -> {
                     placeVisitRepository.getVisitById(conflict.entityId)?.displayName ?: conflict.entityId
                 }
+
                 EntityType.TRIP -> {
                     tripRepository.getTripById(conflict.entityId)?.name ?: conflict.entityId
                 }
+
                 else -> conflict.entityId
             }
 
@@ -621,9 +602,7 @@ class SyncManager(
         }
     }
 
-    /**
-     * Resolve a conflict with the given choice.
-     */
+    /** Resolve a conflict with the given choice. */
     suspend fun resolveConflict(
         conflictId: String,
         choice: ConflictResolutionChoice
@@ -652,6 +631,7 @@ class SyncManager(
                         )
                     }
                 }
+
                 ConflictResolutionChoice.KEEP_REMOTE -> {
                     // Remote wins - fetch and apply remote version
                     // Mark local as synced with remote version
@@ -664,6 +644,7 @@ class SyncManager(
                     // Trigger a sync to get the remote data
                     syncCoordinator.markSyncNeeded()
                 }
+
                 ConflictResolutionChoice.MERGE -> {
                     // Merge using last-write-wins
                     if (conflict.remoteVersion > conflict.localVersion) {
@@ -673,6 +654,7 @@ class SyncManager(
                     }
                     return Result.success(Unit)
                 }
+
                 ConflictResolutionChoice.MANUAL -> {
                     // User needs to manually resolve - keep conflict stored
                     return Result.failure(Exception("Manual resolution not implemented"))
@@ -691,8 +673,7 @@ class SyncManager(
     }
 
     /**
-     * Cleanup method to release resources.
-     * MUST be called when SyncManager is no longer needed to prevent memory leaks.
+     * Cleanup method to release resources. MUST be called when SyncManager is no longer needed to prevent memory leaks.
      *
      * This method:
      * - Stops network monitoring
@@ -712,9 +693,7 @@ class SyncManager(
     }
 }
 
-/**
- * Sync progress state.
- */
+/** Sync progress state. */
 sealed class SyncProgress {
     data object Idle : SyncProgress()
 
@@ -732,9 +711,7 @@ sealed class SyncProgress {
     ) : SyncProgress()
 }
 
-/**
- * Sync result summary.
- */
+/** Sync result summary. */
 data class SyncResultSummary(
     val uploaded: Int,
     val downloaded: Int,

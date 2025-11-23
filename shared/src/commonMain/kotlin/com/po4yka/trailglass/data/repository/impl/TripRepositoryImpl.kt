@@ -14,9 +14,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * SQLDelight implementation of TripRepository.
- */
+/** SQLDelight implementation of TripRepository. */
 @Inject
 class TripRepositoryImpl(
     private val database: Database
@@ -188,9 +186,7 @@ class TripRepositoryImpl(
             }
         }
 
-    /**
-     * Map database row to Trip domain object.
-     */
+    /** Map database row to Trip domain object. */
     private fun mapToTrip(row: com.po4yka.trailglass.db.Trips): Trip =
         Trip(
             id = row.id,

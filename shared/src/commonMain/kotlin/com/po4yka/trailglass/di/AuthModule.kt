@@ -17,9 +17,7 @@ import me.tatarka.inject.annotations.Provides
  * - UserSession for tracking the current user
  */
 interface AuthModule {
-    /**
-     * Provides UserSession for tracking authenticated user.
-     */
+    /** Provides UserSession for tracking authenticated user. */
     @Provides
     @AppScope
     fun provideUserSession(): UserSession {
@@ -38,33 +36,18 @@ interface AuthModule {
         }
     }
 
-    /**
-     * Provides LoginUseCase.
-     * Dependencies are automatically injected by kotlin-inject.
-     */
+    /** Provides LoginUseCase. Dependencies are automatically injected by kotlin-inject. */
     val loginUseCase: LoginUseCase
 
-    /**
-     * Provides RegisterUseCase.
-     * Dependencies are automatically injected by kotlin-inject.
-     */
+    /** Provides RegisterUseCase. Dependencies are automatically injected by kotlin-inject. */
     val registerUseCase: RegisterUseCase
 
-    /**
-     * Provides LogoutUseCase.
-     * Dependencies are automatically injected by kotlin-inject.
-     */
+    /** Provides LogoutUseCase. Dependencies are automatically injected by kotlin-inject. */
     val logoutUseCase: LogoutUseCase
 
-    /**
-     * Provides CheckAuthStatusUseCase.
-     * Dependencies are automatically injected by kotlin-inject.
-     */
+    /** Provides CheckAuthStatusUseCase. Dependencies are automatically injected by kotlin-inject. */
     val checkAuthStatusUseCase: CheckAuthStatusUseCase
 
-    /**
-     * Provides AuthController.
-     * Dependencies are automatically injected by kotlin-inject.
-     */
+    /** Provides AuthController. Dependencies are automatically injected by kotlin-inject. */
     val authController: AuthController
 }

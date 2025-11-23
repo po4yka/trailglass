@@ -1,27 +1,51 @@
 package com.po4yka.trailglass.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.GpsFixed
 import androidx.compose.material.icons.filled.GpsNotFixed
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
-import com.po4yka.trailglass.domain.model.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.Polyline
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.po4yka.trailglass.domain.model.ArcTrajectoryCalculator
+import com.po4yka.trailglass.domain.model.CameraMove
+import com.po4yka.trailglass.domain.model.Coordinate
+import com.po4yka.trailglass.domain.model.MapDisplayData
+import com.po4yka.trailglass.domain.model.MapEvent
+import com.po4yka.trailglass.domain.model.MapEventSink
+import com.po4yka.trailglass.domain.model.MapMarker
+import com.po4yka.trailglass.domain.model.MapRoute
+import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.coroutines.launch
 
-/**
- * Google Maps view with markers and routes.
- */
+/** Google Maps view with markers and routes. */
 @Composable
 fun MapView(
     controller: MapController,
@@ -124,6 +148,7 @@ private fun GoogleMapContent(
                     // Instant movement - no animation
                     cameraPositionState.position = move.position.toGmsCameraPosition()
                 }
+
                 is CameraMove.Ease -> {
                     // Smooth easing animation
                     cameraPositionState.animate(
@@ -134,6 +159,7 @@ private fun GoogleMapContent(
                         durationMs = move.durationMs
                     )
                 }
+
                 is CameraMove.Fly -> {
                     // Fly-to animation with arc trajectory
                     // Get current position
@@ -161,6 +187,7 @@ private fun GoogleMapContent(
                         )
                     }
                 }
+
                 is CameraMove.FollowUser -> {
                     // Follow user mode - centers camera on user location
                     // Note: Continuous tracking requires periodic location updates from MapController
@@ -303,9 +330,7 @@ private fun MapErrorView(
     }
 }
 
-/**
- * Get route width based on transport type.
- */
+/** Get route width based on transport type. */
 private fun getRouteWidth(transportType: TransportType): Float =
     when (transportType) {
         TransportType.WALK -> 8f
@@ -317,9 +342,7 @@ private fun getRouteWidth(transportType: TransportType): Float =
         TransportType.UNKNOWN -> 8f
     }
 
-/**
- * Convert domain CameraPosition to Google Maps CameraPosition.
- */
+/** Convert domain CameraPosition to Google Maps CameraPosition. */
 private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPosition(): CameraPosition =
     CameraPosition
         .Builder()
@@ -329,9 +352,7 @@ private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPositio
         .bearing(bearing)
         .build()
 
-/**
- * Convert Google Maps CameraPosition to domain CameraPosition.
- */
+/** Convert Google Maps CameraPosition to domain CameraPosition. */
 private fun CameraPosition.toDomainCameraPosition(): com.po4yka.trailglass.domain.model.CameraPosition =
     com.po4yka.trailglass.domain.model.CameraPosition(
         target =

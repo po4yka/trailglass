@@ -3,14 +3,16 @@ package com.po4yka.trailglass.location.geocoding
 import com.po4yka.trailglass.domain.model.GeocodedLocation
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 
-/**
- * In-memory cache for geocoding results.
- * Uses spatial proximity to return cached results for nearby coordinates.
- */
+/** In-memory cache for geocoding results. Uses spatial proximity to return cached results for nearby coordinates. */
 class GeocodingCache(
     private val proximityThresholdMeters: Double = 100.0,
     private val cacheDuration: Duration = 30.days
@@ -65,9 +67,7 @@ class GeocodingCache(
         cache[key] = CacheEntry(location, Clock.System.now())
     }
 
-    /**
-     * Clear expired entries from the cache.
-     */
+    /** Clear expired entries from the cache. */
     fun clearExpired() {
         val now = Clock.System.now()
         val keysToRemove =
@@ -77,9 +77,7 @@ class GeocodingCache(
         keysToRemove.forEach { cache.remove(it) }
     }
 
-    /**
-     * Clear all cache entries.
-     */
+    /** Clear all cache entries. */
     fun clear() {
         cache.clear()
     }

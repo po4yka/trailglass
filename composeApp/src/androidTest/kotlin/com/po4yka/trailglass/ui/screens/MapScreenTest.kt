@@ -1,14 +1,11 @@
 package com.po4yka.trailglass.ui.screens
 
-import androidx.compose.ui.test.assertDoesNotExist
-import androidx.compose.ui.test.assertExists
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.waitForIdle
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.MapDisplayData
 import com.po4yka.trailglass.domain.model.MapMarker
@@ -25,9 +22,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-/**
- * UI tests for MapScreen.
- */
+/** UI tests for MapScreen. */
 class MapScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()

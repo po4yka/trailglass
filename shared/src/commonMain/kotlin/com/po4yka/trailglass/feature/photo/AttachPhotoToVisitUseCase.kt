@@ -7,9 +7,7 @@ import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for attaching a photo to a place visit.
- */
+/** Use case for attaching a photo to a place visit. */
 @Inject
 class AttachPhotoToVisitUseCase(
     private val photoRepository: PhotoRepository

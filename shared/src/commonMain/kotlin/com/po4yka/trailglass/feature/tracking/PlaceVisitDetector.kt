@@ -4,7 +4,12 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * Detects when user visits and stays at a place.
@@ -86,9 +91,7 @@ class PlaceVisitDetector {
         return null
     }
 
-    /**
-     * Reset detector state.
-     */
+    /** Reset detector state. */
     fun reset() {
         potentialVisitLocation = null
         potentialVisitStartTime = null
@@ -96,9 +99,7 @@ class PlaceVisitDetector {
         logger.debug { "Place visit detector reset" }
     }
 
-    /**
-     * Calculate distance between two coordinates in meters.
-     */
+    /** Calculate distance between two coordinates in meters. */
     private fun calculateDistance(
         start: Coordinate,
         end: Coordinate
@@ -119,13 +120,9 @@ class PlaceVisitDetector {
     }
 }
 
-/**
- * Events emitted by place visit detector.
- */
+/** Events emitted by place visit detector. */
 sealed class PlaceVisitEvent {
-    /**
-     * Place visit was detected.
-     */
+    /** Place visit was detected. */
     data class VisitDetected(
         val location: Coordinate,
         val arrivalTime: Instant,

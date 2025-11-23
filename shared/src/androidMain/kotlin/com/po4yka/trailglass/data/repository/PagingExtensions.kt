@@ -9,8 +9,8 @@ import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.Trip
 
 /**
- * Android-specific extension functions for Paging 3 support.
- * These extensions add pagination capabilities to repositories on Android.
+ * Android-specific extension functions for Paging 3 support. These extensions add pagination capabilities to
+ * repositories on Android.
  */
 
 /**

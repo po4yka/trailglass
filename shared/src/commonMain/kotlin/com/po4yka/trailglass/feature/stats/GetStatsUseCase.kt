@@ -3,12 +3,20 @@ package com.po4yka.trailglass.feature.stats
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.logging.logger
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.plus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for getting statistics for a time period.
- */
+/** Use case for getting statistics for a time period. */
 @Inject
 class GetStatsUseCase(
     private val tripRepository: TripRepository,
@@ -17,9 +25,7 @@ class GetStatsUseCase(
 ) {
     private val logger = logger()
 
-    /**
-     * Statistics for a time period.
-     */
+    /** Statistics for a time period. */
     data class Stats(
         val period: Period,
         val countriesVisited: Set<String>,
@@ -31,9 +37,7 @@ class GetStatsUseCase(
         val topCities: List<Pair<String, Int>> // city to visit count
     )
 
-    /**
-     * Time period for statistics.
-     */
+    /** Time period for statistics. */
     sealed class Period {
         data class Year(
             val year: Int
@@ -50,9 +54,7 @@ class GetStatsUseCase(
         ) : Period()
     }
 
-    /**
-     * Get statistics for a time period.
-     */
+    /** Get statistics for a time period. */
     suspend fun execute(
         period: Period,
         userId: String
@@ -116,9 +118,7 @@ class GetStatsUseCase(
         return stats
     }
 
-    /**
-     * Get time range for a period.
-     */
+    /** Get time range for a period. */
     private fun getTimeRange(period: Period): Pair<Instant, Instant> =
         when (period) {
             is Period.Year -> {
@@ -126,6 +126,7 @@ class GetStatsUseCase(
                 val end = LocalDate(period.year, 12, 31).atTime(23, 59, 59).toInstant(timeZone)
                 start to end
             }
+
             is Period.Month -> {
                 val start = LocalDate(period.year, period.month, 1).atStartOfDayIn(timeZone)
                 val lastDay =
@@ -137,6 +138,7 @@ class GetStatsUseCase(
                 val end = lastDay.atTime(23, 59, 59).toInstant(timeZone)
                 start to end
             }
+
             is Period.Custom -> {
                 val start = period.startDate.atStartOfDayIn(timeZone)
                 val end = period.endDate.atTime(23, 59, 59).toInstant(timeZone)
@@ -144,9 +146,7 @@ class GetStatsUseCase(
             }
         }
 
-    /**
-     * Calculate total days covered by trips.
-     */
+    /** Calculate total days covered by trips. */
     private fun calculateTotalDays(
         trips: List<com.po4yka.trailglass.domain.model.Trip>,
         period: Period

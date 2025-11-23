@@ -1,31 +1,75 @@
 package com.po4yka.trailglass.data.remote
 
-import com.po4yka.trailglass.data.remote.dto.*
+import com.po4yka.trailglass.data.remote.dto.BatchLocationRequest
+import com.po4yka.trailglass.data.remote.dto.BatchLocationResponse
+import com.po4yka.trailglass.data.remote.dto.CreatePlaceVisitRequest
+import com.po4yka.trailglass.data.remote.dto.CreateTripRequest
+import com.po4yka.trailglass.data.remote.dto.DataExportRequest
+import com.po4yka.trailglass.data.remote.dto.DataExportResponse
+import com.po4yka.trailglass.data.remote.dto.DeltaSyncRequest
+import com.po4yka.trailglass.data.remote.dto.DeltaSyncResponse
+import com.po4yka.trailglass.data.remote.dto.DeviceInfoDto
+import com.po4yka.trailglass.data.remote.dto.ExportStatusResponse
+import com.po4yka.trailglass.data.remote.dto.LocationsResponse
+import com.po4yka.trailglass.data.remote.dto.LoginRequest
+import com.po4yka.trailglass.data.remote.dto.LoginResponse
+import com.po4yka.trailglass.data.remote.dto.LogoutRequest
+import com.po4yka.trailglass.data.remote.dto.PlaceVisitDto
+import com.po4yka.trailglass.data.remote.dto.PlaceVisitResponse
+import com.po4yka.trailglass.data.remote.dto.PlaceVisitsResponse
+import com.po4yka.trailglass.data.remote.dto.RefreshTokenRequest
+import com.po4yka.trailglass.data.remote.dto.RefreshTokenResponse
+import com.po4yka.trailglass.data.remote.dto.RegisterRequest
+import com.po4yka.trailglass.data.remote.dto.RegisterResponse
+import com.po4yka.trailglass.data.remote.dto.ResolveConflictRequest
+import com.po4yka.trailglass.data.remote.dto.ResolveConflictResponse
+import com.po4yka.trailglass.data.remote.dto.SettingsDto
+import com.po4yka.trailglass.data.remote.dto.SettingsResponse
+import com.po4yka.trailglass.data.remote.dto.SyncStatusResponse
+import com.po4yka.trailglass.data.remote.dto.TripResponse
+import com.po4yka.trailglass.data.remote.dto.TripsResponse
+import com.po4yka.trailglass.data.remote.dto.UpdatePlaceVisitRequest
+import com.po4yka.trailglass.data.remote.dto.UpdateSettingsRequest
+import com.po4yka.trailglass.data.remote.dto.UpdateTripRequest
+import com.po4yka.trailglass.data.remote.dto.UpdateUserProfileRequest
+import com.po4yka.trailglass.data.remote.dto.UpdateUserProfileResponse
+import com.po4yka.trailglass.data.remote.dto.UserDevicesResponse
+import com.po4yka.trailglass.data.remote.dto.UserProfileDto
 import com.po4yka.trailglass.logging.logger
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Configuration for TrailGlass API client.
- */
+/** Configuration for TrailGlass API client. */
 data class ApiConfig(
     val baseUrl: String = "https://trailglass.po4yka.com/api/v1",
     val timeout: Long = 30000,
     val enableLogging: Boolean = true
 )
 
-/**
- * Token provider interface for authentication.
- */
+/** Token provider interface for authentication. */
 interface TokenProvider {
     suspend fun getAccessToken(): String?
 
@@ -40,9 +84,7 @@ interface TokenProvider {
     suspend fun clearTokens()
 }
 
-/**
- * Device info provider interface.
- */
+/** Device info provider interface. */
 interface DeviceInfoProvider {
     fun getDeviceId(): String
 
@@ -55,9 +97,7 @@ interface DeviceInfoProvider {
     fun getAppVersion(): String
 }
 
-/**
- * Main API client for TrailGlass backend.
- */
+/** Main API client for TrailGlass backend. */
 @Inject
 class TrailGlassApiClient(
     private val config: ApiConfig,
@@ -114,9 +154,7 @@ class TrailGlassApiClient(
             }
         }
 
-    /**
-     * Execute an authenticated request with automatic token refresh.
-     */
+    /** Execute an authenticated request with automatic token refresh. */
     private suspend inline fun <reified T> authenticatedRequest(
         crossinline block: suspend (HttpClient, String) -> T
     ): Result<T> {
@@ -149,9 +187,7 @@ class TrailGlassApiClient(
         }
     }
 
-    /**
-     * Refresh the access token using the refresh token.
-     */
+    /** Refresh the access token using the refresh token. */
     private suspend fun refreshAccessToken(): Boolean {
         return try {
             val refreshToken = tokenProvider.getRefreshToken() ?: return false

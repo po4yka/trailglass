@@ -9,9 +9,7 @@ import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
 import kotlin.time.Duration.Companion.days
 
-/**
- * Use case for getting and managing frequent places.
- */
+/** Use case for getting and managing frequent places. */
 @Inject
 class GetFrequentPlacesUseCase(
     private val frequentPlaceRepository: FrequentPlaceRepository,
@@ -54,8 +52,8 @@ class GetFrequentPlacesUseCase(
         }
 
     /**
-     * Refresh frequent places by re-clustering all place visits.
-     * This should be run periodically to update the frequent places based on new visits.
+     * Refresh frequent places by re-clustering all place visits. This should be run periodically to update the frequent
+     * places based on new visits.
      *
      * @param userId User ID
      * @return Updated list of frequent places

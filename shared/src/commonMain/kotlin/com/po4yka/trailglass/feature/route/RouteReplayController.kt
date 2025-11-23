@@ -21,9 +21,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-/**
- * Playback speed multiplier options.
- */
+/** Playback speed multiplier options. */
 enum class PlaybackSpeed(
     val multiplier: Float,
     val displayName: String
@@ -42,9 +40,7 @@ enum class PlaybackSpeed(
         }
 }
 
-/**
- * Current vehicle state during replay.
- */
+/** Current vehicle state during replay. */
 data class VehicleState(
     val position: Coordinate,
     val bearing: Double,
@@ -53,8 +49,7 @@ data class VehicleState(
 )
 
 /**
- * Controller for Route Replay Mode.
- * Manages animated playback of route with vehicle movement and camera following.
+ * Controller for Route Replay Mode. Manages animated playback of route with vehicle movement and camera following.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -71,9 +66,7 @@ class RouteReplayController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * State for Route Replay screen.
-     */
+    /** State for Route Replay screen. */
     data class ReplayState(
         val tripRoute: TripRoute? = null,
         val isLoading: Boolean = false,
@@ -99,9 +92,7 @@ class RouteReplayController(
     private var animationJob: Job? = null
     private val animationFrameMs = 16L // ~60 FPS
 
-    /**
-     * Load route data for replay.
-     */
+    /** Load route data for replay. */
     fun loadRoute(tripId: String) {
         controllerScope.launch {
             logger.info { "Loading route for replay: $tripId" }
@@ -132,9 +123,7 @@ class RouteReplayController(
         }
     }
 
-    /**
-     * Start or resume playback.
-     */
+    /** Start or resume playback. */
     fun play() {
         val route = _state.value.tripRoute ?: return
         if (route.fullPath.isEmpty()) return
@@ -152,18 +141,14 @@ class RouteReplayController(
             }
     }
 
-    /**
-     * Pause playback.
-     */
+    /** Pause playback. */
     fun pause() {
         logger.debug { "Pausing playback" }
         _state.value = _state.value.copy(isPlaying = false)
         animationJob?.cancel()
     }
 
-    /**
-     * Toggle play/pause.
-     */
+    /** Toggle play/pause. */
     fun togglePlayPause() {
         if (_state.value.isPlaying) {
             pause()
@@ -172,9 +157,7 @@ class RouteReplayController(
         }
     }
 
-    /**
-     * Seek to a specific position (0.0 to 1.0).
-     */
+    /** Seek to a specific position (0.0 to 1.0). */
     fun seekTo(progress: Float) {
         val clampedProgress = progress.coerceIn(0f, 1f)
         logger.debug { "Seeking to ${clampedProgress * 100}%" }
@@ -194,27 +177,21 @@ class RouteReplayController(
             )
     }
 
-    /**
-     * Cycle through playback speeds.
-     */
+    /** Cycle through playback speeds. */
     fun cyclePlaybackSpeed() {
         val newSpeed = _state.value.playbackSpeed.next()
         logger.debug { "Changing playback speed to ${newSpeed.displayName}" }
         _state.value = _state.value.copy(playbackSpeed = newSpeed)
     }
 
-    /**
-     * Restart playback from the beginning.
-     */
+    /** Restart playback from the beginning. */
     fun restart() {
         logger.debug { "Restarting playback" }
         seekTo(0f)
         play()
     }
 
-    /**
-     * Toggle controls visibility.
-     */
+    /** Toggle controls visibility. */
     fun toggleControls() {
         _state.value =
             _state.value.copy(
@@ -222,24 +199,18 @@ class RouteReplayController(
             )
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.value = _state.value.copy(error = null)
     }
 
-    /**
-     * Stop and cleanup.
-     */
+    /** Stop and cleanup. */
     fun stop() {
         pause()
         _state.value = ReplayState()
     }
 
-    /**
-     * Animation loop that updates vehicle position.
-     */
+    /** Animation loop that updates vehicle position. */
     private suspend fun animateRoute() {
         val route = _state.value.tripRoute ?: return
         if (route.fullPath.isEmpty()) return
@@ -279,8 +250,8 @@ class RouteReplayController(
     }
 
     /**
-     * Calculate vehicle state at a given progress (0.0 to 1.0).
-     * Uses linear interpolation for smooth animation between route points.
+     * Calculate vehicle state at a given progress (0.0 to 1.0). Uses linear interpolation for smooth animation between
+     * route points.
      */
     private fun calculateVehicleStateAtProgress(
         route: TripRoute,
@@ -344,6 +315,7 @@ class RouteReplayController(
 
     /**
      * Linear interpolation between two values.
+     *
      * @param a Start value
      * @param b End value
      * @param t Interpolation factor (0.0 to 1.0)
@@ -355,18 +327,13 @@ class RouteReplayController(
         t: Double
     ): Double = a + (b - a) * t
 
-    /**
-     * Create initial vehicle state at the start of the route.
-     */
+    /** Create initial vehicle state at the start of the route. */
     private fun createInitialVehicleState(route: TripRoute): VehicleState? {
         if (route.fullPath.isEmpty()) return null
         return calculateVehicleStateAtProgress(route, 0f)
     }
 
-    /**
-     * Calculate bearing (direction) between two coordinates.
-     * Returns bearing in degrees (0-360).
-     */
+    /** Calculate bearing (direction) between two coordinates. Returns bearing in degrees (0-360). */
     private fun calculateBearing(
         lat1: Double,
         lon1: Double,
@@ -388,8 +355,8 @@ class RouteReplayController(
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including the animation job and flow collectors.
      */

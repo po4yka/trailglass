@@ -3,7 +3,12 @@ package com.po4yka.trailglass.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudDone
 import androidx.compose.material.icons.filled.CloudOff
@@ -11,8 +16,11 @@ import androidx.compose.material.icons.filled.SettingsEthernet
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,10 +28,7 @@ import com.po4yka.trailglass.data.network.NetworkState
 import com.po4yka.trailglass.data.network.NetworkType
 import com.po4yka.trailglass.ui.theme.extended
 
-/**
- * Banner showing network connectivity status.
- * Appears at top of screen when offline or network is limited.
- */
+/** Banner showing network connectivity status. Appears at top of screen when offline or network is limited. */
 @Composable
 fun NetworkStatusBanner(
     networkState: NetworkState,
@@ -61,6 +66,7 @@ private fun NetworkBannerContent(
                     MaterialTheme.colorScheme.onErrorContainer
                 )
             }
+
             is NetworkState.Limited -> {
                 Tuple4(
                     Icons.Default.Warning,
@@ -69,6 +75,7 @@ private fun NetworkBannerContent(
                     MaterialTheme.colorScheme.extended.onWarning
                 )
             }
+
             is NetworkState.Connected -> {
                 // Should not be visible when connected
                 return
@@ -113,9 +120,7 @@ private fun NetworkBannerContent(
     }
 }
 
-/**
- * Inline network status indicator for app bar or bottom bar.
- */
+/** Inline network status indicator for app bar or bottom bar. */
 @Composable
 fun NetworkStatusIndicatorCompact(
     networkState: NetworkState,
@@ -135,9 +140,11 @@ fun NetworkStatusIndicatorCompact(
                     }
                 networkIcon to MaterialTheme.colorScheme.primary
             }
+
             is NetworkState.Disconnected -> {
                 Icons.Default.CloudOff to MaterialTheme.colorScheme.error
             }
+
             is NetworkState.Limited -> {
                 Icons.Default.Warning to MaterialTheme.colorScheme.extended.warningEmphasis
             }

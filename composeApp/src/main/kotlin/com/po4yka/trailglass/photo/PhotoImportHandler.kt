@@ -2,6 +2,7 @@ package com.po4yka.trailglass.photo
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -14,13 +15,12 @@ import com.po4yka.trailglass.feature.photo.ImportPhotoUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.util.Log
 
 private const val TAG = "PhotoImportHandler"
 
 /**
- * Handler for photo import operations on Android.
- * Manages photo picker integration and coordinates with ImportPhotoUseCase.
+ * Handler for photo import operations on Android. Manages photo picker integration and coordinates with
+ * ImportPhotoUseCase.
  */
 class PhotoImportHandler(
     private val context: Context,
@@ -57,6 +57,7 @@ class PhotoImportHandler(
                     Log.i(TAG, "Successfully imported photo ${result.photo.id}")
                     onImportSuccess(result.photo.id)
                 }
+
                 is ImportPhotoUseCase.ImportResult.Error -> {
                     Log.e(TAG, "Failed to import photo: ${result.message}")
                     onImportError(result.message)
@@ -100,6 +101,7 @@ class PhotoImportHandler(
                         Log.i(TAG, "Successfully imported photo ${result.photo.id}")
                         successCount++
                     }
+
                     is ImportPhotoUseCase.ImportResult.Error -> {
                         Log.e(TAG, "Failed to import photo: ${result.message}")
                         errorCount++

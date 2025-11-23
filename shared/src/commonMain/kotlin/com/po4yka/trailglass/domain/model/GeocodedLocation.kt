@@ -1,9 +1,6 @@
 package com.po4yka.trailglass.domain.model
 
-/**
- * Result of reverse geocoding a coordinate.
- * Contains human-readable address components.
- */
+/** Result of reverse geocoding a coordinate. Contains human-readable address components. */
 data class GeocodedLocation(
     val latitude: Double,
     val longitude: Double,

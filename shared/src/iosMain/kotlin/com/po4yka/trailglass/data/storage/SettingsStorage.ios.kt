@@ -1,6 +1,18 @@
 package com.po4yka.trailglass.data.storage
 
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.AccountSettings
+import com.po4yka.trailglass.domain.model.AppSettings
+import com.po4yka.trailglass.domain.model.AppTheme
+import com.po4yka.trailglass.domain.model.AppearanceSettings
+import com.po4yka.trailglass.domain.model.DataManagement
+import com.po4yka.trailglass.domain.model.DistanceUnit
+import com.po4yka.trailglass.domain.model.PrivacySettings
+import com.po4yka.trailglass.domain.model.TemperatureUnit
+import com.po4yka.trailglass.domain.model.TimeFormat
+import com.po4yka.trailglass.domain.model.TrackingAccuracy
+import com.po4yka.trailglass.domain.model.TrackingPreferences
+import com.po4yka.trailglass.domain.model.UnitPreferences
+import com.po4yka.trailglass.domain.model.UpdateInterval
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,9 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Instant
 import platform.Foundation.NSUserDefaults
 
-/**
- * iOS implementation of SettingsStorage using UserDefaults.
- */
+/** iOS implementation of SettingsStorage using UserDefaults. */
 actual class SettingsStorage {
     private val logger = logger()
     private val userDefaults = NSUserDefaults.standardUserDefaults

@@ -5,12 +5,15 @@ import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Use case for suggesting photos that might belong to a place visit.
- * Uses time and location matching.
- */
+/** Use case for suggesting photos that might belong to a place visit. Uses time and location matching. */
 @Inject
 class SuggestPhotosForVisitUseCase(
     private val photoRepository: PhotoRepository,
@@ -63,8 +66,7 @@ class SuggestPhotosForVisitUseCase(
     }
 
     /**
-     * Calculate relevance score for a photo-visit pair.
-     * Higher score = better match.
+     * Calculate relevance score for a photo-visit pair. Higher score = better match.
      *
      * Score factors:
      * - Time overlap (1.0 if exact overlap)
@@ -114,9 +116,7 @@ class SuggestPhotosForVisitUseCase(
         return score
     }
 
-    /**
-     * Calculate Haversine distance between two coordinates.
-     */
+    /** Calculate Haversine distance between two coordinates. */
     private fun haversineDistance(
         lat1: Double,
         lon1: Double,

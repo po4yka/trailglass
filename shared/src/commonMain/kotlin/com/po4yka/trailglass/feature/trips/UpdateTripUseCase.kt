@@ -8,9 +8,7 @@ import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
 
-/**
- * Use case for updating trip information.
- */
+/** Use case for updating trip information. */
 @Inject
 class UpdateTripUseCase(
     private val tripRepository: TripRepository

@@ -70,8 +70,6 @@ class RegisterUseCase(
         }
     }
 
-    /**
-     * Simple email validation.
-     */
+    /** Simple email validation. */
     private fun isValidEmail(email: String): Boolean = email.contains("@") && email.contains(".")
 }

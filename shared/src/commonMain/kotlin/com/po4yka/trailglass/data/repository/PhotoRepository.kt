@@ -5,37 +5,25 @@ import com.po4yka.trailglass.domain.model.PhotoAttachment
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 
-/**
- * Repository for photo data.
- */
+/** Repository for photo data. */
 interface PhotoRepository {
-    /**
-     * Insert or update a photo.
-     */
+    /** Insert or update a photo. */
     suspend fun insertPhoto(photo: Photo)
 
-    /**
-     * Get a photo by ID.
-     */
+    /** Get a photo by ID. */
     suspend fun getPhotoById(photoId: String): Photo?
 
-    /**
-     * Get all photos for a user.
-     */
+    /** Get all photos for a user. */
     suspend fun getPhotosForUser(userId: String): List<Photo>
 
-    /**
-     * Get photos within a time range.
-     */
+    /** Get photos within a time range. */
     suspend fun getPhotosInTimeRange(
         userId: String,
         startTime: Instant,
         endTime: Instant
     ): List<Photo>
 
-    /**
-     * Get photos for a specific day.
-     */
+    /** Get photos for a specific day. */
     suspend fun getPhotosForDay(
         userId: String,
         date: LocalDate
@@ -57,58 +45,38 @@ interface PhotoRepository {
         maxLon: Double
     ): List<Photo>
 
-    /**
-     * Delete a photo.
-     */
+    /** Delete a photo. */
     suspend fun deletePhoto(photoId: String)
 
-    /**
-     * Get total photo count for user.
-     */
+    /** Get total photo count for user. */
     suspend fun getPhotoCount(userId: String): Long
 
     // Photo Attachments
 
-    /**
-     * Attach a photo to a place visit.
-     */
+    /** Attach a photo to a place visit. */
     suspend fun attachPhotoToVisit(attachment: PhotoAttachment)
 
-    /**
-     * Get attachments for a photo.
-     */
+    /** Get attachments for a photo. */
     suspend fun getAttachmentsForPhoto(photoId: String): List<PhotoAttachment>
 
-    /**
-     * Get attachments for a visit.
-     */
+    /** Get attachments for a visit. */
     suspend fun getAttachmentsForVisit(visitId: String): List<PhotoAttachment>
 
-    /**
-     * Get photos for a visit.
-     */
+    /** Get photos for a visit. */
     suspend fun getPhotosForVisit(visitId: String): List<Photo>
 
-    /**
-     * Check if a photo is attached to a visit.
-     */
+    /** Check if a photo is attached to a visit. */
     suspend fun isPhotoAttachedToVisit(
         photoId: String,
         visitId: String
     ): Boolean
 
-    /**
-     * Delete an attachment.
-     */
+    /** Delete an attachment. */
     suspend fun deleteAttachment(attachmentId: String)
 
-    /**
-     * Delete all attachments for a photo.
-     */
+    /** Delete all attachments for a photo. */
     suspend fun deleteAttachmentsForPhoto(photoId: String)
 
-    /**
-     * Delete all attachments for a visit.
-     */
+    /** Delete all attachments for a visit. */
     suspend fun deleteAttachmentsForVisit(visitId: String)
 }

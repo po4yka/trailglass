@@ -13,11 +13,14 @@ import androidx.core.app.NotificationCompat
 import com.po4yka.trailglass.R
 import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.location.tracking.TrackingMode
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 /**
- * Foreground service for continuous location tracking.
- * Displays a persistent notification to keep the service alive.
+ * Foreground service for continuous location tracking. Displays a persistent notification to keep the service alive.
  */
 class LocationTrackingService : Service() {
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -103,7 +106,7 @@ class LocationTrackingService : Service() {
                     setShowBadge(false)
                 }
 
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
@@ -156,9 +159,7 @@ class LocationTrackingService : Service() {
         private const val ACTION_STOP_TRACKING = "com.po4yka.trailglass.STOP_TRACKING"
         private const val EXTRA_TRACKING_MODE = "tracking_mode"
 
-        /**
-         * Start the location tracking service.
-         */
+        /** Start the location tracking service. */
         fun start(
             context: Context,
             mode: TrackingMode = TrackingMode.ACTIVE
@@ -176,9 +177,7 @@ class LocationTrackingService : Service() {
             }
         }
 
-        /**
-         * Stop the location tracking service.
-         */
+        /** Stop the location tracking service. */
         fun stop(context: Context) {
             val intent =
                 Intent(context, LocationTrackingService::class.java).apply {

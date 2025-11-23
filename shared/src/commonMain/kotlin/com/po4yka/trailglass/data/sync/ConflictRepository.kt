@@ -3,9 +3,7 @@ package com.po4yka.trailglass.data.sync
 import com.po4yka.trailglass.data.remote.dto.SyncConflictDto
 import kotlinx.datetime.Instant
 
-/**
- * Stored conflict requiring manual resolution.
- */
+/** Stored conflict requiring manual resolution. */
 data class StoredConflict(
     val conflictId: String,
     val entityType: EntityType,
@@ -20,18 +18,14 @@ data class StoredConflict(
     val status: ConflictStatus = ConflictStatus.PENDING
 )
 
-/**
- * Status of a conflict.
- */
+/** Status of a conflict. */
 enum class ConflictStatus {
     PENDING,
     RESOLVED,
     IGNORED
 }
 
-/**
- * Repository for managing conflicts that need manual resolution.
- */
+/** Repository for managing conflicts that need manual resolution. */
 interface ConflictRepository {
     suspend fun storeConflict(conflict: StoredConflict)
 
@@ -50,9 +44,7 @@ interface ConflictRepository {
     suspend fun clearResolvedConflicts()
 }
 
-/**
- * Extension to convert SyncConflictDto to StoredConflict.
- */
+/** Extension to convert SyncConflictDto to StoredConflict. */
 fun SyncConflictDto.toStoredConflict(): StoredConflict {
     // Convert remote EntityType to sync EntityType
     val syncEntityType =

@@ -1,13 +1,39 @@
 package com.po4yka.trailglass.ui.permissions
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.*
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -16,8 +42,8 @@ import androidx.compose.ui.unit.dp
 /**
  * Educational screen explaining background location permissions.
  *
- * This screen helps users understand why background location is needed
- * and guides them through the permission process on both platforms.
+ * This screen helps users understand why background location is needed and guides them through the permission process
+ * on both platforms.
  */
 @Composable
 fun BackgroundLocationEducationScreen(
@@ -177,10 +203,7 @@ private fun BenefitItem(
     }
 }
 
-/**
- * Dialog explaining how to enable background location in system settings.
- * Shows platform-specific instructions.
- */
+/** Dialog explaining how to enable background location in system settings. Shows platform-specific instructions. */
 @Composable
 fun BackgroundLocationInstructionsDialog(
     onOpenSettings: () -> Unit,
@@ -263,9 +286,7 @@ private fun InstructionStep(
     }
 }
 
-/**
- * Bottom sheet explaining background location with platform-specific guidance.
- */
+/** Bottom sheet explaining background location with platform-specific guidance. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackgroundLocationBottomSheet(
@@ -279,7 +300,8 @@ fun BackgroundLocationBottomSheet(
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .padding(24.dp),
+                    .padding(horizontal = 24.dp)
+                    .padding(top = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
@@ -357,6 +379,7 @@ fun BackgroundLocationBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.navigationBarsPadding())
         }
     }
 }

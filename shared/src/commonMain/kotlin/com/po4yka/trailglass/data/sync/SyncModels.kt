@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.sync
 
 import kotlinx.datetime.Instant
 
-/**
- * Sync state for tracking synchronization status.
- */
+/** Sync state for tracking synchronization status. */
 data class SyncState(
     val lastSyncTimestamp: Instant? = null,
     val lastSyncVersion: Long = 0,
@@ -13,9 +11,7 @@ data class SyncState(
     val error: String? = null
 )
 
-/**
- * Syncable entity interface for entities that can be synced.
- */
+/** Syncable entity interface for entities that can be synced. */
 interface SyncableEntity {
     val id: String
     val localVersion: Long
@@ -26,9 +22,7 @@ interface SyncableEntity {
     val isPendingSync: Boolean
 }
 
-/**
- * Sync operation type.
- */
+/** Sync operation type. */
 enum class SyncOperation {
     CREATE,
     UPDATE,
@@ -36,34 +30,22 @@ enum class SyncOperation {
     NO_CHANGE
 }
 
-/**
- * Conflict resolution strategy.
- */
+/** Conflict resolution strategy. */
 enum class ResolutionStrategy {
-    /**
-     * Keep the local version and reject remote changes.
-     */
+    /** Keep the local version and reject remote changes. */
     KEEP_LOCAL,
 
-    /**
-     * Accept the remote version and discard local changes.
-     */
+    /** Accept the remote version and discard local changes. */
     KEEP_REMOTE,
 
-    /**
-     * Attempt to merge both versions (if possible).
-     */
+    /** Attempt to merge both versions (if possible). */
     MERGE,
 
-    /**
-     * Let the user manually resolve the conflict.
-     */
+    /** Let the user manually resolve the conflict. */
     MANUAL
 }
 
-/**
- * Sync conflict information.
- */
+/** Sync conflict information. */
 data class SyncConflict<T : SyncableEntity>(
     val entityId: String,
     val entityType: String,
@@ -74,34 +56,22 @@ data class SyncConflict<T : SyncableEntity>(
     val suggestedResolution: ResolutionStrategy = ResolutionStrategy.MANUAL
 )
 
-/**
- * Type of conflict detected.
- */
+/** Type of conflict detected. */
 enum class ConflictType {
-    /**
-     * Both local and remote versions were modified since last sync.
-     */
+    /** Both local and remote versions were modified since last sync. */
     CONCURRENT_MODIFICATION,
 
-    /**
-     * Entity was deleted remotely but modified locally.
-     */
+    /** Entity was deleted remotely but modified locally. */
     DELETE_MODIFY_CONFLICT,
 
-    /**
-     * Entity was deleted locally but modified remotely.
-     */
+    /** Entity was deleted locally but modified remotely. */
     MODIFY_DELETE_CONFLICT,
 
-    /**
-     * Server version doesn't match expected version.
-     */
+    /** Server version doesn't match expected version. */
     VERSION_MISMATCH
 }
 
-/**
- * Sync result for a single entity.
- */
+/** Sync result for a single entity. */
 sealed class SyncResult<T : SyncableEntity> {
     data class Success<T : SyncableEntity>(
         val entity: T,
@@ -118,9 +88,7 @@ sealed class SyncResult<T : SyncableEntity> {
     ) : SyncResult<T>()
 }
 
-/**
- * Batch sync result.
- */
+/** Batch sync result. */
 data class BatchSyncResult<T : SyncableEntity>(
     val successful: List<SyncResult.Success<T>>,
     val conflicts: List<SyncConflict<T>>,
@@ -133,9 +101,7 @@ data class BatchSyncResult<T : SyncableEntity>(
     val isFullySuccessful: Boolean get() = !hasConflicts && !hasFailures
 }
 
-/**
- * Sync statistics.
- */
+/** Sync statistics. */
 data class SyncStatistics(
     val totalEntities: Int,
     val created: Int,

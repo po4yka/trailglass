@@ -1,18 +1,41 @@
 package com.po4yka.trailglass.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudSync
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,8 +53,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * Material 3 Expressive-style loading indicator with wave animation.
- * Features organic, fluid motion inspired by natural water movements.
+ * Material 3 Expressive-style loading indicator with wave animation. Features organic, fluid motion inspired by natural
+ * water movements.
  *
  * Uses Silent Waters color palette for visual consistency.
  *
@@ -113,8 +136,7 @@ fun WavyLoadingIndicator(
 }
 
 /**
- * Enhanced circular progress indicator with spring-based size animation
- * and fade in/out transitions.
+ * Enhanced circular progress indicator with spring-based size animation and fade in/out transitions.
  *
  * @param visible Whether the indicator is visible
  * @param modifier Modifier for the indicator
@@ -169,8 +191,8 @@ fun AnimatedLoadingIndicator(
 }
 
 /**
- * Wavy linear progress indicator for route processing and file uploads.
- * Features organic wave motion along the progress bar.
+ * Wavy linear progress indicator for route processing and file uploads. Features organic wave motion along the progress
+ * bar.
  *
  * @param progress Current progress (0.0 to 1.0)
  * @param modifier Modifier for the indicator
@@ -196,15 +218,16 @@ fun WavyLinearProgressIndicator(
 
     LinearProgressIndicator(
         progress = { animatedProgress },
-        modifier = modifier.fillMaxWidth().height(6.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(6.dp),
         color = color,
         trackColor = trackColor
     )
 }
 
 /**
- * Contained loading indicator with background card and optional message.
- * Useful for sync operations and photo uploads.
+ * Contained loading indicator with background card and optional message. Useful for sync operations and photo uploads.
  *
  * @param visible Whether the indicator is visible
  * @param message Optional message to display
@@ -263,8 +286,8 @@ fun ContainedLoadingIndicator(
 }
 
 /**
- * Sync operation loading indicator with icon and status message.
- * Combines wavy animation with sync icon for visual feedback.
+ * Sync operation loading indicator with icon and status message. Combines wavy animation with sync icon for visual
+ * feedback.
  *
  * @param isActive Whether sync is currently active
  * @param message Status message to display
@@ -317,8 +340,7 @@ fun SyncOperationIndicator(
 }
 
 /**
- * Photo upload loading indicator with progress bar.
- * Optimized for displaying upload status with file count.
+ * Photo upload loading indicator with progress bar. Optimized for displaying upload status with file count.
  *
  * @param isUploading Whether upload is in progress
  * @param currentFile Current file being uploaded (1-indexed)
@@ -361,8 +383,8 @@ fun RouteProcessingIndicator(
 }
 
 /**
- * Shape-morphing loading indicator for Material 3 Expressive design.
- * Cycles through different shapes: Circle → Diamond → Square → Circle.
+ * Shape-morphing loading indicator for Material 3 Expressive design. Cycles through different shapes: Circle → Diamond
+ * → Square → Circle.
  *
  * Provides visual interest and confirms ongoing activity with organic motion.
  *
@@ -446,8 +468,7 @@ fun MorphingLoadingIndicator(
 }
 
 /**
- * Sync loading indicator with shape morphing.
- * Enhanced version of standard sync indicator with organic shape changes.
+ * Sync loading indicator with shape morphing. Enhanced version of standard sync indicator with organic shape changes.
  *
  * @param isActive Whether sync is active
  * @param modifier Modifier for the component

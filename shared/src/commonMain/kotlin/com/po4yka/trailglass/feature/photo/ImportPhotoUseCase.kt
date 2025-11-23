@@ -12,8 +12,8 @@ import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Use case for importing a photo into TrailGlass.
- * Extracts metadata, copies photo to app storage, and stores photo record.
+ * Use case for importing a photo into TrailGlass. Extracts metadata, copies photo to app storage, and stores photo
+ * record.
  */
 @Inject
 class ImportPhotoUseCase(
@@ -25,8 +25,7 @@ class ImportPhotoUseCase(
     private val logger = logger()
 
     /**
-     * Import a photo from a platform-specific URI.
-     * This copies the photo to app storage and creates a database entry.
+     * Import a photo from a platform-specific URI. This copies the photo to app storage and creates a database entry.
      *
      * @param uri Platform-specific photo URI (content:// on Android, PHAsset ID on iOS)
      * @param photoData Raw photo bytes (must be provided)

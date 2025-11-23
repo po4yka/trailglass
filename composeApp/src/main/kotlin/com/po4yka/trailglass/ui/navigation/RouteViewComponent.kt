@@ -3,9 +3,7 @@ package com.po4yka.trailglass.ui.navigation
 import com.arkivanov.decompose.ComponentContext
 import com.po4yka.trailglass.feature.route.RouteViewController
 
-/**
- * Component for the Route View screen.
- */
+/** Component for the Route View screen. */
 interface RouteViewComponent {
     val tripId: String
     val routeViewController: RouteViewController
@@ -14,9 +12,7 @@ interface RouteViewComponent {
     val onBack: () -> Unit
 }
 
-/**
- * Default implementation of RouteViewComponent.
- */
+/** Default implementation of RouteViewComponent. */
 class DefaultRouteViewComponent(
     componentContext: ComponentContext,
     override val tripId: String,

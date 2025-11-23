@@ -7,24 +7,28 @@ This module provides persistent storage for TrailGlass using SQLDelight with cro
 ### Database Layer (`data/db/`)
 
 **SQLDelight Schema** (`sqldelight/com/po4yka/trailglass/db/`)
+
 - `LocationSamples.sq`: Raw location points storage with indices
 - `PlaceVisits.sq`: Place visits and sample linkage
 - `GeocodingCache.sq`: Persistent geocoding cache
 
 **Database Wrapper**
+
 - `Database.kt`: Main database access class
 - `DatabaseDriverFactory.kt`: Platform-specific driver factory (expect/actual)
-  - `DatabaseDriverFactory.android.kt`: Android SQLite driver
-  - `DatabaseDriverFactory.ios.kt`: iOS native driver
+    - `DatabaseDriverFactory.android.kt`: Android SQLite driver
+    - `DatabaseDriverFactory.ios.kt`: iOS native driver
 
 ### Repository Layer (`data/repository/`)
 
 **Interfaces**
+
 - `LocationRepository`: CRUD operations for location samples
 - `PlaceVisitRepository`: CRUD operations for place visits
 - `GeocodingCacheRepository`: Spatial cache queries
 
 **Implementations** (`data/repository/impl/`)
+
 - `LocationRepositoryImpl`: SQLDelight implementation
 - `PlaceVisitRepositoryImpl`: SQLDelight implementation with sample linkage
 - `GeocodingCacheRepositoryImpl`: Spatial queries with Haversine distance
@@ -47,6 +51,7 @@ cache.put(geocodedLocation)
 ```
 
 **Spatial Indexing:**
+
 - Bounding box queries for efficiency
 - Haversine distance calculation for accuracy
 - Configurable proximity threshold (default 100m)
@@ -71,6 +76,7 @@ val unprocessed = repository.getUnprocessedSamples(userId, limit = 1000)
 ```
 
 **Features:**
+
 - Soft delete support
 - Time-based queries with indices
 - Trip assignment tracking
@@ -92,6 +98,7 @@ repository.linkSamples(visitId, sampleIds)
 ```
 
 **Features:**
+
 - Many-to-many sample linkage
 - Geocoded address storage
 - Time range queries
@@ -182,21 +189,22 @@ recentVisits.forEach { visit ->
 
 ### location_samples
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | TEXT | Primary key |
-| timestamp | INTEGER | Unix timestamp in milliseconds |
-| latitude | REAL | Latitude coordinate |
-| longitude | REAL | Longitude coordinate |
-| accuracy | REAL | Accuracy in meters |
-| speed | REAL | Speed in m/s (nullable) |
-| bearing | REAL | Bearing in degrees (nullable) |
-| source | TEXT | GPS/NETWORK/VISIT/SIGNIFICANT_CHANGE |
-| trip_id | TEXT | Associated trip (nullable) |
-| user_id | TEXT | User identifier |
-| deleted_at | INTEGER | Soft delete timestamp (nullable) |
+| Column     | Type    | Description                          |
+|------------|---------|--------------------------------------|
+| id         | TEXT    | Primary key                          |
+| timestamp  | INTEGER | Unix timestamp in milliseconds       |
+| latitude   | REAL    | Latitude coordinate                  |
+| longitude  | REAL    | Longitude coordinate                 |
+| accuracy   | REAL    | Accuracy in meters                   |
+| speed      | REAL    | Speed in m/s (nullable)              |
+| bearing    | REAL    | Bearing in degrees (nullable)        |
+| source     | TEXT    | GPS/NETWORK/VISIT/SIGNIFICANT_CHANGE |
+| trip_id    | TEXT    | Associated trip (nullable)           |
+| user_id    | TEXT    | User identifier                      |
+| deleted_at | INTEGER | Soft delete timestamp (nullable)     |
 
 **Indices:**
+
 - `timestamp` - For time-based queries
 - `user_id, trip_id` - For trip queries
 - `user_id, timestamp DESC` - For recent samples
@@ -204,70 +212,75 @@ recentVisits.forEach { visit ->
 
 ### place_visits
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | TEXT | Primary key |
-| start_time | INTEGER | Visit start timestamp |
-| end_time | INTEGER | Visit end timestamp |
-| center_latitude | REAL | Center point latitude |
-| center_longitude | REAL | Center point longitude |
-| approximate_address | TEXT | Full address (nullable) |
-| poi_name | TEXT | Point of interest name (nullable) |
-| city | TEXT | City name (nullable) |
-| country_code | TEXT | ISO country code (nullable) |
-| user_id | TEXT | User identifier |
-| deleted_at | INTEGER | Soft delete timestamp (nullable) |
+| Column              | Type    | Description                       |
+|---------------------|---------|-----------------------------------|
+| id                  | TEXT    | Primary key                       |
+| start_time          | INTEGER | Visit start timestamp             |
+| end_time            | INTEGER | Visit end timestamp               |
+| center_latitude     | REAL    | Center point latitude             |
+| center_longitude    | REAL    | Center point longitude            |
+| approximate_address | TEXT    | Full address (nullable)           |
+| poi_name            | TEXT    | Point of interest name (nullable) |
+| city                | TEXT    | City name (nullable)              |
+| country_code        | TEXT    | ISO country code (nullable)       |
+| user_id             | TEXT    | User identifier                   |
+| deleted_at          | INTEGER | Soft delete timestamp (nullable)  |
 
 **Indices:**
+
 - `start_time, end_time` - For time range queries
 - `user_id` - For user queries
 - `user_id, start_time DESC` - For recent visits
 
 ### place_visit_samples (junction table)
 
-| Column | Type | Description |
-|--------|------|-------------|
-| place_visit_id | TEXT | Foreign key to place_visits |
+| Column             | Type | Description                     |
+|--------------------|------|---------------------------------|
+| place_visit_id     | TEXT | Foreign key to place_visits     |
 | location_sample_id | TEXT | Foreign key to location_samples |
 
 **Primary Key:** `(place_visit_id, location_sample_id)`
 
 ### geocoding_cache
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | TEXT | Primary key (lat,lon) |
-| latitude | REAL | Latitude coordinate |
-| longitude | REAL | Longitude coordinate |
-| formatted_address | TEXT | Full formatted address |
-| city | TEXT | City name |
-| state | TEXT | State/province |
-| country_code | TEXT | ISO country code |
-| country_name | TEXT | Country full name |
-| postal_code | TEXT | Postal/ZIP code |
-| poi_name | TEXT | POI name |
-| street | TEXT | Street name |
-| street_number | TEXT | Street number |
-| cached_at | INTEGER | Cache timestamp |
-| expires_at | INTEGER | Expiration timestamp |
+| Column            | Type    | Description            |
+|-------------------|---------|------------------------|
+| id                | TEXT    | Primary key (lat,lon)  |
+| latitude          | REAL    | Latitude coordinate    |
+| longitude         | REAL    | Longitude coordinate   |
+| formatted_address | TEXT    | Full formatted address |
+| city              | TEXT    | City name              |
+| state             | TEXT    | State/province         |
+| country_code      | TEXT    | ISO country code       |
+| country_name      | TEXT    | Country full name      |
+| postal_code       | TEXT    | Postal/ZIP code        |
+| poi_name          | TEXT    | POI name               |
+| street            | TEXT    | Street name            |
+| street_number     | TEXT    | Street number          |
+| cached_at         | INTEGER | Cache timestamp        |
+| expires_at        | INTEGER | Expiration timestamp   |
 
 **Indices:**
+
 - `latitude, longitude` - For spatial queries
 - `expires_at` - For cleanup queries
 
 ## Performance Considerations
 
 **Indexing Strategy:**
+
 - All time-based queries use indexed columns
 - User-scoped queries use composite indices
 - Spatial queries use bounding box + Haversine
 
 **Batch Operations:**
+
 - Process up to 1000 samples at a time
 - Use transactions for multi-record inserts
 - Bulk sample linking via junction table
 
 **Cache Management:**
+
 - Automatic expiration (30-day default)
 - Spatial proximity matching (100m default)
 - Periodic cleanup of expired entries
@@ -275,6 +288,7 @@ recentVisits.forEach { visit ->
 ## Future Enhancements
 
 Planned improvements:
+
 - [ ] Database migrations support
 - [ ] Backup and restore functionality
 - [ ] Query result caching (Flow-based)

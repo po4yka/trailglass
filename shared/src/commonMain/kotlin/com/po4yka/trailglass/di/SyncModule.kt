@@ -30,10 +30,7 @@ import me.tatarka.inject.annotations.Provides
  * - Syncable repositories
  */
 interface SyncModule {
-    /**
-     * Provides API configuration.
-     * Can be overridden for different environments (dev, staging, prod).
-     */
+    /** Provides API configuration. Can be overridden for different environments (dev, staging, prod). */
     @Provides
     fun provideApiConfig(): ApiConfig =
         ApiConfig(
@@ -42,31 +39,22 @@ interface SyncModule {
             enableLogging = true // Should be false in production
         )
 
-    /**
-     * Provides secure token storage.
-     * Platform-specific implementation.
-     */
+    /** Provides secure token storage. Platform-specific implementation. */
     @AppScope
     @Provides
     fun provideSecureTokenStorage(impl: SecureTokenStorage): SecureTokenStorage = impl
 
-    /**
-     * Provides token provider for authentication.
-     */
+    /** Provides token provider for authentication. */
     @AppScope
     @Provides
     fun provideTokenProvider(secureStorage: SecureTokenStorage): TokenProvider = TokenStorageProvider(secureStorage)
 
-    /**
-     * Provides platform device information provider.
-     */
+    /** Provides platform device information provider. */
     @AppScope
     @Provides
     fun provideDeviceInfoProvider(impl: PlatformDeviceInfoProvider): DeviceInfoProvider = impl
 
-    /**
-     * Provides the main API client.
-     */
+    /** Provides the main API client. */
     @AppScope
     @Provides
     fun provideApiClient(
@@ -75,17 +63,12 @@ interface SyncModule {
         deviceInfoProvider: DeviceInfoProvider
     ): TrailGlassApiClient = TrailGlassApiClient(config, tokenProvider, deviceInfoProvider)
 
-    /**
-     * Provides sync state repository.
-     * Platform-specific implementation.
-     */
+    /** Provides sync state repository. Platform-specific implementation. */
     @AppScope
     @Provides
     fun provideSyncStateRepository(impl: SyncStateRepositoryImpl): SyncStateRepository = impl
 
-    /**
-     * Provides sync coordinator.
-     */
+    /** Provides sync coordinator. */
     @AppScope
     @Provides
     fun provideSyncCoordinator(
@@ -93,34 +76,26 @@ interface SyncModule {
         syncStateRepository: SyncStateRepository
     ): SyncCoordinator = SyncCoordinator(apiClient, syncStateRepository)
 
-    /**
-     * Provides default conflict resolver.
-     */
+    /** Provides default conflict resolver. */
     @AppScope
     @Provides
     fun provideConflictResolver(): ConflictResolver<SyncableEntity> = DefaultConflictResolver()
 
-    /**
-     * Provides sync metadata repository.
-     */
+    /** Provides sync metadata repository. */
     @AppScope
     @Provides
     fun provideSyncMetadataRepository(
         impl: com.po4yka.trailglass.data.sync.SyncMetadataRepositoryImpl
     ): com.po4yka.trailglass.data.sync.SyncMetadataRepository = impl
 
-    /**
-     * Provides conflict repository for manual resolution.
-     */
+    /** Provides conflict repository for manual resolution. */
     @AppScope
     @Provides
     fun provideConflictRepository(
         impl: com.po4yka.trailglass.data.sync.ConflictRepositoryImpl
     ): com.po4yka.trailglass.data.sync.ConflictRepository = impl
 
-    /**
-     * Provides centralized sync manager.
-     */
+    /** Provides centralized sync manager. */
     @AppScope
     @Provides
     fun provideSyncManager(
@@ -152,9 +127,7 @@ interface SyncModule {
             userId = userId
         )
 
-    /**
-     * Provides JSON serializer for encryption.
-     */
+    /** Provides JSON serializer for encryption. */
     @AppScope
     @Provides
     fun provideJson(): Json =
@@ -164,9 +137,7 @@ interface SyncModule {
             encodeDefaults = true
         }
 
-    /**
-     * Provides sync data encryption for E2E encryption.
-     */
+    /** Provides sync data encryption for E2E encryption. */
     @AppScope
     @Provides
     fun provideSyncDataEncryption(

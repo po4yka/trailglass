@@ -4,21 +4,21 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Detects trip boundaries by identifying when the user travels
- * far from their home location.
- */
+/** Detects trip boundaries by identifying when the user travels far from their home location. */
 class TripBoundaryDetector(
     private val tripDistanceThresholdMeters: Double = 100_000.0, // 100km from home
     private val minTripDurationHours: Int = 4
 ) {
     private val logger = logger()
 
-    /**
-     * A potential trip segment.
-     */
+    /** A potential trip segment. */
     data class TripSegment(
         val startTime: Instant,
         val endTime: Instant,
@@ -163,9 +163,7 @@ class TripBoundaryDetector(
         return trips
     }
 
-    /**
-     * Calculate Haversine distance between two coordinates.
-     */
+    /** Calculate Haversine distance between two coordinates. */
     private fun haversineDistance(
         lat1: Double,
         lon1: Double,

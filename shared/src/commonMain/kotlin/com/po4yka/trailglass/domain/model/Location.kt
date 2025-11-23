@@ -3,9 +3,7 @@ package com.po4yka.trailglass.domain.model
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
-/**
- * Represents a geographic location with optional altitude and accuracy.
- */
+/** Represents a geographic location with optional altitude and accuracy. */
 @Serializable
 data class Location(
     val coordinate: Coordinate,

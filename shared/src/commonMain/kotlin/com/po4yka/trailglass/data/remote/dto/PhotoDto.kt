@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * EXIF data DTO.
- */
+/** EXIF data DTO. */
 @Serializable
 data class ExifDataDto(
     val cameraModel: String? = null,
@@ -14,9 +12,7 @@ data class ExifDataDto(
     val shutterSpeed: String? = null
 )
 
-/**
- * Photo metadata DTO.
- */
+/** Photo metadata DTO. */
 @Serializable
 data class PhotoMetadataDto(
     val id: String,
@@ -35,9 +31,7 @@ data class PhotoMetadataDto(
     val deviceId: String? = null
 )
 
-/**
- * Photo upload metadata (for multipart upload).
- */
+/** Photo upload metadata (for multipart upload). */
 @Serializable
 data class PhotoUploadMetadata(
     val id: String,
@@ -49,9 +43,7 @@ data class PhotoUploadMetadata(
     val exifData: ExifDataDto? = null
 )
 
-/**
- * Photo upload response.
- */
+/** Photo upload response. */
 @Serializable
 data class PhotoUploadResponse(
     val id: String,

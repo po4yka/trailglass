@@ -2,10 +2,7 @@ package com.po4yka.trailglass.location.geocoding
 
 import com.po4yka.trailglass.domain.model.GeocodedLocation
 
-/**
- * Platform-specific reverse geocoder interface.
- * Converts coordinates to human-readable addresses.
- */
+/** Platform-specific reverse geocoder interface. Converts coordinates to human-readable addresses. */
 interface ReverseGeocoder {
     /**
      * Reverse geocode a coordinate to get address information.
@@ -20,8 +17,5 @@ interface ReverseGeocoder {
     ): GeocodedLocation?
 }
 
-/**
- * Factory function to create platform-specific ReverseGeocoder.
- * This is implemented using expect/actual pattern.
- */
+/** Factory function to create platform-specific ReverseGeocoder. This is implemented using expect/actual pattern. */
 expect fun createReverseGeocoder(): ReverseGeocoder

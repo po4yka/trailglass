@@ -3,27 +3,17 @@ package com.po4yka.trailglass.data.storage
 import com.po4yka.trailglass.domain.model.AppSettings
 import kotlinx.coroutines.flow.Flow
 
-/**
- * Platform-specific settings storage.
- */
+/** Platform-specific settings storage. */
 expect class SettingsStorage {
-    /**
-     * Get settings as a Flow.
-     */
+    /** Get settings as a Flow. */
     fun getSettingsFlow(): Flow<AppSettings>
 
-    /**
-     * Get current settings value.
-     */
+    /** Get current settings value. */
     suspend fun getSettings(): AppSettings
 
-    /**
-     * Save settings.
-     */
+    /** Save settings. */
     suspend fun saveSettings(settings: AppSettings)
 
-    /**
-     * Clear all settings.
-     */
+    /** Clear all settings. */
     suspend fun clearSettings()
 }

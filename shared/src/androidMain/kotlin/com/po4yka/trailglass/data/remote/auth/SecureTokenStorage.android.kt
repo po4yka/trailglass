@@ -10,9 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Android implementation using EncryptedSharedPreferences.
- */
+/** Android implementation using EncryptedSharedPreferences. */
 @Suppress("DEPRECATION")
 @Inject
 actual class SecureTokenStorage(

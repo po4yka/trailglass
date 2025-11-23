@@ -1,11 +1,13 @@
 package com.po4yka.trailglass.data.remote
 
-import com.po4yka.trailglass.data.remote.dto.*
+import com.po4yka.trailglass.data.remote.dto.DeltaSyncRequest
+import com.po4yka.trailglass.data.remote.dto.DeltaSyncResponse
+import com.po4yka.trailglass.data.remote.dto.LoginResponse
+import com.po4yka.trailglass.data.remote.dto.SyncConflictDto
 
 /**
- * Mock implementation for testing sync operations.
- * Note: This doesn't extend TrailGlassApiClient since it's a final class.
- * Instead, this provides a standalone mock for testing sync logic.
+ * Mock implementation for testing sync operations. Note: This doesn't extend TrailGlassApiClient since it's a final
+ * class. Instead, this provides a standalone mock for testing sync logic.
  */
 class MockTrailGlassApiClient {
     var shouldFailSync = false

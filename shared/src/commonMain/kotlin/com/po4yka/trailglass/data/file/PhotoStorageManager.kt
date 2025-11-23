@@ -6,8 +6,8 @@ import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Manages photo storage operations, coordinating between file storage and database.
- * This class ensures photos are properly saved to disk and database entries are created.
+ * Manages photo storage operations, coordinating between file storage and database. This class ensures photos are
+ * properly saved to disk and database entries are created.
  */
 @Inject
 class PhotoStorageManager(

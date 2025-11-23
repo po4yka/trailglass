@@ -1,22 +1,55 @@
 package com.po4yka.trailglass.data.security
 
-import kotlinx.cinterop.*
+import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.alloc
+import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.ptr
+import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.value
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject
-import platform.CoreFoundation.*
-import platform.Foundation.*
-import platform.Security.*
+import platform.CoreFoundation.CFDictionaryCreateMutable
+import platform.CoreFoundation.CFDictionarySetValue
+import platform.CoreFoundation.CFMutableDictionaryRef
+import platform.CoreFoundation.CFRelease
+import platform.CoreFoundation.CFTypeRefVar
+import platform.CoreFoundation.kCFBooleanFalse
+import platform.CoreFoundation.kCFBooleanTrue
+import platform.Foundation.CFBridgingRetain
+import platform.Foundation.NSData
+import platform.Foundation.NSString
+import platform.Foundation.base64EncodedStringWithOptions
+import platform.Foundation.create
+import platform.Security.SecItemAdd
+import platform.Security.SecItemCopyMatching
+import platform.Security.SecItemDelete
+import platform.Security.SecItemUpdate
+import platform.Security.errSecDuplicateItem
+import platform.Security.errSecItemNotFound
+import platform.Security.errSecSuccess
+import platform.Security.kSecAttrAccessible
+import platform.Security.kSecAttrAccessibleAfterFirstUnlock
+import platform.Security.kSecAttrAccount
+import platform.Security.kSecAttrService
+import platform.Security.kSecClass
+import platform.Security.kSecClassGenericPassword
+import platform.Security.kSecMatchLimit
+import platform.Security.kSecMatchLimitOne
+import platform.Security.kSecReturnAttributes
+import platform.Security.kSecReturnData
+import platform.Security.kSecValueData
 import platform.posix.memcpy
 import kotlin.random.Random
 
 /**
  * iOS implementation of EncryptionService using iOS Keychain for key storage.
  *
- * This implementation uses Keychain for secure key storage and management.
- * Actual encryption/decryption using AES-256-GCM requires bridging to Swift/Objective-C
- * as CommonCrypto/CryptoKit APIs are not available in Kotlin/Native bindings.
+ * This implementation uses Keychain for secure key storage and management. Actual encryption/decryption using
+ * AES-256-GCM requires bridging to Swift/Objective-C as CommonCrypto/CryptoKit APIs are not available in Kotlin/Native
+ * bindings.
  *
  * For production use:
  * - Implement encryption/decryption in Swift using CryptoKit

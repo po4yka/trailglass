@@ -9,47 +9,30 @@ import com.arkivanov.decompose.value.Value
 import com.po4yka.trailglass.di.AppComponent
 import kotlinx.serialization.Serializable
 
-/**
- * Top-level root component that manages navigation between authentication flow
- * and the main application.
- */
+/** Top-level root component that manages navigation between authentication flow and the main application. */
 interface AppRootComponent {
-    /**
-     * Child stack for top-level navigation.
-     */
+    /** Child stack for top-level navigation. */
     val childStack: Value<ChildStack<*, Child>>
 
-    /**
-     * Navigate to authentication flow.
-     */
+    /** Navigate to authentication flow. */
     fun navigateToAuth()
 
-    /**
-     * Navigate to main app (after successful authentication).
-     */
+    /** Navigate to main app (after successful authentication). */
     fun navigateToMain()
 
-    /**
-     * Sealed class representing top-level navigation configurations.
-     */
+    /** Sealed class representing top-level navigation configurations. */
     @Serializable
     sealed interface Config {
-        /**
-         * Authentication flow (Login, Register, ForgotPassword).
-         */
+        /** Authentication flow (Login, Register, ForgotPassword). */
         @Serializable
         data object Auth : Config
 
-        /**
-         * Main application (Stats, Timeline, Map, Settings).
-         */
+        /** Main application (Stats, Timeline, Map, Settings). */
         @Serializable
         data object Main : Config
     }
 
-    /**
-     * Sealed class representing child components.
-     */
+    /** Sealed class representing child components. */
     sealed class Child {
         data class Auth(
             val component: AuthRootComponent
@@ -61,9 +44,7 @@ interface AppRootComponent {
     }
 }
 
-/**
- * Default implementation of AppRootComponent.
- */
+/** Default implementation of AppRootComponent. */
 class DefaultAppRootComponent(
     componentContext: ComponentContext,
     private val appComponent: AppComponent

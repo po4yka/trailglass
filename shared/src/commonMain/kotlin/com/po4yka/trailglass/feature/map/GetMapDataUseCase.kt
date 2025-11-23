@@ -2,14 +2,17 @@ package com.po4yka.trailglass.feature.map
 
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
-import com.po4yka.trailglass.domain.model.*
+import com.po4yka.trailglass.domain.model.Coordinate
+import com.po4yka.trailglass.domain.model.MapDisplayData
+import com.po4yka.trailglass.domain.model.MapMarker
+import com.po4yka.trailglass.domain.model.MapRegion
+import com.po4yka.trailglass.domain.model.MapRoute
+import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for getting map data (markers and routes) for display.
- */
+/** Use case for getting map data (markers and routes) for display. */
 @Inject
 class GetMapDataUseCase(
     private val placeVisitRepository: PlaceVisitRepository,
@@ -82,9 +85,7 @@ class GetMapDataUseCase(
         return mapData
     }
 
-    /**
-     * Get color for transport type (ARGB format).
-     */
+    /** Get color for transport type (ARGB format). */
     private fun getTransportColor(transportType: TransportType): Int =
         when (transportType) {
             TransportType.WALK -> 0xFF4CAF50.toInt() // Green
@@ -96,9 +97,7 @@ class GetMapDataUseCase(
             TransportType.UNKNOWN -> 0xFF9E9E9E.toInt() // Gray
         }
 
-    /**
-     * Calculate bounding region that contains all markers and routes.
-     */
+    /** Calculate bounding region that contains all markers and routes. */
     private fun calculateBoundingRegion(
         markers: List<MapMarker>,
         routes: List<MapRoute>

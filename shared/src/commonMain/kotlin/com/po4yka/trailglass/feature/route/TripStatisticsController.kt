@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for Trip Statistics screen.
- * Manages statistics data and display state.
+ * Controller for Trip Statistics screen. Manages statistics data and display state.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -31,9 +30,7 @@ class TripStatisticsController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * State for Trip Statistics screen.
-     */
+    /** State for Trip Statistics screen. */
     data class StatisticsState(
         val tripRoute: TripRoute? = null,
         val isLoading: Boolean = false,
@@ -45,9 +42,7 @@ class TripStatisticsController(
     private val _state = MutableStateFlow(StatisticsState())
     val state: StateFlow<StatisticsState> = _state.asStateFlow()
 
-    /**
-     * Load trip statistics.
-     */
+    /** Load trip statistics. */
     fun loadStatistics(tripId: String) {
         controllerScope.launch {
             logger.info { "Loading statistics for trip $tripId" }
@@ -73,9 +68,7 @@ class TripStatisticsController(
         }
     }
 
-    /**
-     * Toggle transport breakdown visibility.
-     */
+    /** Toggle transport breakdown visibility. */
     fun toggleTransportBreakdown() {
         _state.value =
             _state.value.copy(
@@ -83,16 +76,14 @@ class TripStatisticsController(
             )
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.value = _state.value.copy(error = null)
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

@@ -2,9 +2,7 @@ package com.po4yka.trailglass.data.remote.dto
 
 import kotlinx.serialization.Serializable
 
-/**
- * Trip data transfer object.
- */
+/** Trip data transfer object. */
 @Serializable
 data class TripDto(
     val id: String,
@@ -24,9 +22,7 @@ data class TripDto(
     val createdBy: String? = null
 )
 
-/**
- * Create trip request.
- */
+/** Create trip request. */
 @Serializable
 data class CreateTripRequest(
     val id: String,
@@ -36,9 +32,7 @@ data class CreateTripRequest(
     val notes: String? = null
 )
 
-/**
- * Update trip request.
- */
+/** Update trip request. */
 @Serializable
 data class UpdateTripRequest(
     val name: String? = null,
@@ -48,9 +42,7 @@ data class UpdateTripRequest(
     val expectedVersion: Long
 )
 
-/**
- * Trip response (for create/update).
- */
+/** Trip response (for create/update). */
 @Serializable
 data class TripResponse(
     val id: String,
@@ -58,9 +50,7 @@ data class TripResponse(
     val syncTimestamp: String
 )
 
-/**
- * Trips query response.
- */
+/** Trips query response. */
 @Serializable
 data class TripsResponse(
     val trips: List<TripDto>,

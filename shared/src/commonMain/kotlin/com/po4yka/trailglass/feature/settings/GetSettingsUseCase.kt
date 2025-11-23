@@ -5,20 +5,14 @@ import com.po4yka.trailglass.domain.model.AppSettings
 import kotlinx.coroutines.flow.Flow
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for getting app settings.
- */
+/** Use case for getting app settings. */
 @Inject
 class GetSettingsUseCase(
     private val settingsRepository: SettingsRepository
 ) {
-    /**
-     * Get settings as a Flow.
-     */
+    /** Get settings as a Flow. */
     fun execute(): Flow<AppSettings> = settingsRepository.getSettings()
 
-    /**
-     * Get current settings value.
-     */
+    /** Get current settings value. */
     suspend fun getCurrentSettings(): AppSettings = settingsRepository.getCurrentSettings()
 }

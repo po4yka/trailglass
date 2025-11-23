@@ -17,9 +17,8 @@ import kotlinx.datetime.Instant
 import java.util.UUID
 
 /**
- * Android implementation of PhotoPicker using MediaStore.
- * Note: This class handles metadata extraction but requires Activity-based
- * photo selection to be handled by the UI layer.
+ * Android implementation of PhotoPicker using MediaStore. Note: This class handles metadata extraction but requires
+ * Activity-based photo selection to be handled by the UI layer.
  */
 class AndroidPhotoPicker(
     private val context: Context,
@@ -59,8 +58,7 @@ class AndroidPhotoPicker(
     }
 
     /**
-     * Extract photo metadata from a URI.
-     * This is called after the user has selected a photo via Activity Result API.
+     * Extract photo metadata from a URI. This is called after the user has selected a photo via Activity Result API.
      */
     suspend fun extractPhotoFromUri(uri: Uri): Photo? =
         withContext(Dispatchers.IO) {
@@ -92,9 +90,7 @@ class AndroidPhotoPicker(
             }
         }
 
-    /**
-     * Extract multiple photos from URIs.
-     */
+    /** Extract multiple photos from URIs. */
     suspend fun extractPhotosFromUris(uris: List<Uri>): List<Photo> =
         withContext(Dispatchers.IO) {
             logger.debug { "Extracting ${uris.size} photos from URIs" }
@@ -105,9 +101,8 @@ class AndroidPhotoPicker(
         }
 
     /**
-     * Extract metadata from a content URI using MediaStore.
-     * Note: Location data should be extracted from EXIF using AndroidPhotoMetadataExtractor
-     * as MediaStore location fields are deprecated since API 29.
+     * Extract metadata from a content URI using MediaStore. Note: Location data should be extracted from EXIF using
+     * AndroidPhotoMetadataExtractor as MediaStore location fields are deprecated since API 29.
      */
     private fun extractMetadataFromUri(uri: Uri): PhotoMetadata? {
         val projection =
@@ -157,9 +152,7 @@ class AndroidPhotoPicker(
     }
 
     companion object {
-        /**
-         * Get required permissions for photo access based on Android version.
-         */
+        /** Get required permissions for photo access based on Android version. */
         fun getRequiredPermissions(): List<String> =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 listOf(Manifest.permission.READ_MEDIA_IMAGES)

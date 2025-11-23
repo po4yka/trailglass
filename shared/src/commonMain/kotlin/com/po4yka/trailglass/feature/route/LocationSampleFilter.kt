@@ -3,12 +3,14 @@ package com.po4yka.trailglass.feature.route
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
-/**
- * Filters and validates location samples for route construction.
- * Removes noisy, inaccurate, or duplicate samples.
- */
+/** Filters and validates location samples for route construction. Removes noisy, inaccurate, or duplicate samples. */
 class LocationSampleFilter(
     private val maxAccuracyMeters: Double = 100.0,
     private val minTimeBetweenSamplesSeconds: Long = 5,
@@ -44,9 +46,7 @@ class LocationSampleFilter(
         return filtered
     }
 
-    /**
-     * Remove samples with poor GPS accuracy.
-     */
+    /** Remove samples with poor GPS accuracy. */
     private fun filterByAccuracy(samples: List<LocationSample>): List<LocationSample> {
         val filtered =
             samples.filter { sample ->
@@ -61,10 +61,7 @@ class LocationSampleFilter(
         return filtered
     }
 
-    /**
-     * Remove duplicate or very close consecutive samples.
-     * Keeps only samples that are sufficiently spaced in time.
-     */
+    /** Remove duplicate or very close consecutive samples. Keeps only samples that are sufficiently spaced in time. */
     private fun filterDuplicates(samples: List<LocationSample>): List<LocationSample> {
         if (samples.isEmpty()) return emptyList()
 
@@ -100,8 +97,8 @@ class LocationSampleFilter(
     }
 
     /**
-     * Remove samples with unrealistic speed (likely GPS errors).
-     * Calculates speed between consecutive points and removes outliers.
+     * Remove samples with unrealistic speed (likely GPS errors). Calculates speed between consecutive points and
+     * removes outliers.
      */
     private fun filterBySpeed(samples: List<LocationSample>): List<LocationSample> {
         if (samples.size < 2) return samples
@@ -148,8 +145,8 @@ class LocationSampleFilter(
     }
 
     /**
-     * Remove clusters of static points (user standing still).
-     * These should already be captured in PlaceVisits, so we can thin them out.
+     * Remove clusters of static points (user standing still). These should already be captured in PlaceVisits, so we
+     * can thin them out.
      */
     private fun filterStaticPoints(samples: List<LocationSample>): List<LocationSample> {
         if (samples.size < 3) return samples
@@ -200,8 +197,8 @@ class LocationSampleFilter(
     }
 
     /**
-     * Prefer GPS samples over network samples when both are available.
-     * This is a secondary filter that can be applied if desired.
+     * Prefer GPS samples over network samples when both are available. This is a secondary filter that can be applied
+     * if desired.
      */
     fun preferGpsSamples(samples: List<LocationSample>): List<LocationSample> {
         // Group samples by approximate time and location
@@ -228,9 +225,7 @@ class LocationSampleFilter(
         return preferred
     }
 
-    /**
-     * Calculate Haversine distance between two coordinates.
-     */
+    /** Calculate Haversine distance between two coordinates. */
     private fun haversineDistance(
         lat1: Double,
         lon1: Double,

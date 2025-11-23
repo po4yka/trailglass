@@ -5,9 +5,7 @@ import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Get photos attached to a specific visit for timeline integration.
- */
+/** Get photos attached to a specific visit for timeline integration. */
 @Inject
 class GetPhotosForVisitUseCase(
     private val photoRepository: PhotoRepository

@@ -13,9 +13,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
-/**
- * SQLDelight-based persistent implementation of SyncMetadataRepository.
- */
+/** SQLDelight-based persistent implementation of SyncMetadataRepository. */
 @Inject
 class SyncMetadataRepositoryImpl(
     private val database: Database

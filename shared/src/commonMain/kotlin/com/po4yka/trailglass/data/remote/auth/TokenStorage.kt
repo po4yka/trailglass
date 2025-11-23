@@ -6,18 +6,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Clock
 
-/**
- * Token data class.
- */
+/** Token data class. */
 data class AuthTokens(
     val accessToken: String,
     val refreshToken: String,
     val expiresAt: Long // Timestamp in milliseconds
 )
 
-/**
- * Expect/actual for platform-specific secure token storage.
- */
+/** Expect/actual for platform-specific secure token storage. */
 expect class SecureTokenStorage {
     suspend fun saveTokens(tokens: AuthTokens)
 
@@ -26,9 +22,7 @@ expect class SecureTokenStorage {
     suspend fun clearTokens()
 }
 
-/**
- * Token provider implementation using secure storage.
- */
+/** Token provider implementation using secure storage. */
 class TokenStorageProvider(
     private val secureStorage: SecureTokenStorage
 ) : TokenProvider {

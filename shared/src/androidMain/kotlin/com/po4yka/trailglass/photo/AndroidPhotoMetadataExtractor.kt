@@ -10,11 +10,10 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
+import java.util.TimeZone
 
-/**
- * Android implementation of photo metadata extractor using EXIF.
- */
+/** Android implementation of photo metadata extractor using EXIF. */
 @Inject
 class AndroidPhotoMetadataExtractor(
     private val context: Context
@@ -128,10 +127,7 @@ class AndroidPhotoMetadataExtractor(
         )
     }
 
-    /**
-     * Parse EXIF date time string to Instant.
-     * Format: "YYYY:MM:DD HH:MM:SS"
-     */
+    /** Parse EXIF date time string to Instant. Format: "YYYY:MM:DD HH:MM:SS" */
     private fun parseExifDateTime(dateTimeStr: String): Instant? =
         try {
             val format = SimpleDateFormat("yyyy:MM:dd HH:mm:ss", Locale.US)
@@ -143,9 +139,7 @@ class AndroidPhotoMetadataExtractor(
             null
         }
 
-    /**
-     * Format exposure time as shutter speed (e.g., "1/250").
-     */
+    /** Format exposure time as shutter speed (e.g., "1/250"). */
     private fun formatShutterSpeed(exposureTime: String): String =
         try {
             val value = exposureTime.toDouble()

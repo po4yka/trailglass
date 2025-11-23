@@ -9,9 +9,7 @@ import com.po4yka.trailglass.util.UuidGenerator
 import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Automatically associates photos with place visits based on location and time.
- */
+/** Automatically associates photos with place visits based on location and time. */
 @Inject
 class AutoAssociatePhotosUseCase(
     private val photoRepository: PhotoRepository,

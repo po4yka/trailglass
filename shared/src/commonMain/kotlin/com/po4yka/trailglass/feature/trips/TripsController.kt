@@ -15,8 +15,7 @@ import me.tatarka.inject.annotations.Inject
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
 
 /**
- * Controller for trips list view.
- * Handles loading and managing user's trips.
+ * Controller for trips list view. Handles loading and managing user's trips.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -37,9 +36,7 @@ class TripsController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Sort option for trips list.
-     */
+    /** Sort option for trips list. */
     enum class SortOption {
         DATE_DESC, // Most recent first (default)
         DATE_ASC, // Oldest first
@@ -48,9 +45,7 @@ class TripsController(
         DISTANCE_DESC // Farthest trips first
     }
 
-    /**
-     * Filter option for trips list.
-     */
+    /** Filter option for trips list. */
     data class FilterOptions(
         val showOngoing: Boolean = true,
         val showCompleted: Boolean = true,
@@ -60,9 +55,7 @@ class TripsController(
             get() = !showOngoing || !showCompleted || searchQuery.isNotEmpty()
     }
 
-    /**
-     * Trips UI state.
-     */
+    /** Trips UI state. */
     data class TripsState(
         val trips: List<Trip> = emptyList(),
         val ongoingTrips: List<Trip> = emptyList(),
@@ -73,9 +66,7 @@ class TripsController(
         val filterOptions: FilterOptions = FilterOptions(),
         val showCreateDialog: Boolean = false
     ) {
-        /**
-         * Get filtered and sorted trips based on current options.
-         */
+        /** Get filtered and sorted trips based on current options. */
         val filteredTrips: List<Trip>
             get() {
                 var result = trips
@@ -116,9 +107,7 @@ class TripsController(
     private val _state = MutableStateFlow(TripsState())
     val state: StateFlow<TripsState> = _state.asStateFlow()
 
-    /**
-     * Load all trips for the current user.
-     */
+    /** Load all trips for the current user. */
     fun loadTrips() {
         logger.debug { "Loading trips for user $userId" }
 
@@ -142,6 +131,7 @@ class TripsController(
 
                     logger.info { "Loaded ${trips.size} trips (${ongoing.size} ongoing, ${completed.size} completed)" }
                 }
+
                 is TrailGlassResult.Error -> {
                     val error = result.error.userMessage
                     logger.error { "Failed to load trips: $error" }
@@ -156,57 +146,43 @@ class TripsController(
         }
     }
 
-    /**
-     * Refresh trips list.
-     */
+    /** Refresh trips list. */
     fun refresh() {
         logger.debug { "Refreshing trips" }
         loadTrips()
     }
 
-    /**
-     * Update sort option.
-     */
+    /** Update sort option. */
     fun setSortOption(option: SortOption) {
         logger.debug { "Setting sort option to $option" }
         _state.update { it.copy(sortOption = option) }
     }
 
-    /**
-     * Update filter options.
-     */
+    /** Update filter options. */
     fun setFilterOptions(options: FilterOptions) {
         logger.debug { "Updating filter options: $options" }
         _state.update { it.copy(filterOptions = options) }
     }
 
-    /**
-     * Update search query.
-     */
+    /** Update search query. */
     fun setSearchQuery(query: String) {
         _state.update {
             it.copy(filterOptions = it.filterOptions.copy(searchQuery = query))
         }
     }
 
-    /**
-     * Show create trip dialog.
-     */
+    /** Show create trip dialog. */
     fun showCreateDialog() {
         logger.info { "Showing create trip dialog" }
         _state.update { it.copy(showCreateDialog = true) }
     }
 
-    /**
-     * Hide create trip dialog.
-     */
+    /** Hide create trip dialog. */
     fun dismissCreateDialog() {
         _state.update { it.copy(showCreateDialog = false) }
     }
 
-    /**
-     * Create a new trip.
-     */
+    /** Create a new trip. */
     fun createTrip(trip: Trip) {
         logger.debug { "Creating new trip: ${trip.displayName}" }
 
@@ -231,6 +207,7 @@ class TripsController(
                     // Reload trips to include the new one
                     loadTrips()
                 }
+
                 is TrailGlassResult.Error -> {
                     val error = result.error.userMessage
                     logger.error { "Failed to create trip: $error" }
@@ -269,6 +246,7 @@ class TripsController(
                     // Reload trips to reflect the update
                     loadTrips()
                 }
+
                 is TrailGlassResult.Error -> {
                     val error = result.error.userMessage
                     logger.error { "Failed to update trip: $error" }
@@ -283,9 +261,7 @@ class TripsController(
         }
     }
 
-    /**
-     * Delete a trip.
-     */
+    /** Delete a trip. */
     fun deleteTrip(
         tripId: String,
         onSuccess: () -> Unit = {}
@@ -305,6 +281,7 @@ class TripsController(
                     // Notify caller of successful deletion
                     onSuccess()
                 }
+
                 is TrailGlassResult.Error -> {
                     val error = result.error.userMessage
                     logger.error { "Failed to delete trip: $error" }
@@ -319,16 +296,14 @@ class TripsController(
         }
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

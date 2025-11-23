@@ -1,29 +1,31 @@
 package com.po4yka.trailglass.domain.algorithm
 
 import com.po4yka.trailglass.domain.model.Coordinate
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.ln
+import kotlin.math.sin
+import kotlin.math.tan
 
 // Extension functions for degrees/radians conversion
 private fun Double.toRadians(): Double = this * PI / 180.0
 
 private fun Double.toDegrees(): Double = this * 180.0 / PI
 
-/**
- * Algorithm for calculating bearing (direction) between two geographic coordinates.
- */
+/** Algorithm for calculating bearing (direction) between two geographic coordinates. */
 interface BearingAlgorithm {
     /**
-     * Calculate bearing from one coordinate to another in degrees (0-360).
-     * 0° = North, 90° = East, 180° = South, 270° = West
+     * Calculate bearing from one coordinate to another in degrees (0-360). 0° = North, 90° = East, 180° = South, 270° =
+     * West
      */
     fun calculate(
         from: Coordinate,
         to: Coordinate
     ): Double
 
-    /**
-     * Calculate bearing between two lat/lon pairs in degrees (0-360).
-     */
+    /** Calculate bearing between two lat/lon pairs in degrees (0-360). */
     fun calculate(
         lat1: Double,
         lon1: Double,
@@ -32,33 +34,30 @@ interface BearingAlgorithm {
     ): Double
 }
 
-/**
- * Available bearing calculation algorithms.
- */
+/** Available bearing calculation algorithms. */
 enum class BearingAlgorithmType {
     /**
-     * Initial bearing (forward azimuth) - direction at start point.
-     * Most commonly used, represents compass heading at departure.
+     * Initial bearing (forward azimuth) - direction at start point. Most commonly used, represents compass heading at
+     * departure.
      */
     INITIAL,
 
     /**
-     * Final bearing (reverse azimuth) - direction at end point.
-     * Useful for arrival headings, can differ significantly from initial bearing.
+     * Final bearing (reverse azimuth) - direction at end point. Useful for arrival headings, can differ significantly
+     * from initial bearing.
      */
     FINAL,
 
     /**
-     * Rhumb line (constant bearing) - maintains same compass heading.
-     * Not the shortest path but simpler navigation.
+     * Rhumb line (constant bearing) - maintains same compass heading. Not the shortest path but simpler navigation.
      * Spirals toward poles on long distances.
      */
     RHUMB_LINE
 }
 
 /**
- * Initial bearing calculation - direction at the start point along great circle.
- * Most commonly used for navigation and visualization.
+ * Initial bearing calculation - direction at the start point along great circle. Most commonly used for navigation and
+ * visualization.
  */
 class InitialBearing : BearingAlgorithm {
     override fun calculate(
@@ -87,8 +86,7 @@ class InitialBearing : BearingAlgorithm {
 }
 
 /**
- * Final bearing calculation - direction at the end point along great circle.
- * Useful for determining arrival heading.
+ * Final bearing calculation - direction at the end point along great circle. Useful for determining arrival heading.
  */
 class FinalBearing : BearingAlgorithm {
     override fun calculate(
@@ -109,9 +107,8 @@ class FinalBearing : BearingAlgorithm {
 }
 
 /**
- * Rhumb line bearing - constant compass bearing throughout the journey.
- * Follows a line of constant bearing (loxodrome), not the shortest path.
- * Easier for navigation but longer distance than great circle.
+ * Rhumb line bearing - constant compass bearing throughout the journey. Follows a line of constant bearing (loxodrome),
+ * not the shortest path. Easier for navigation but longer distance than great circle.
  */
 class RhumbLineBearing : BearingAlgorithm {
     override fun calculate(
@@ -146,9 +143,7 @@ class RhumbLineBearing : BearingAlgorithm {
     }
 }
 
-/**
- * Factory for creating bearing algorithm instances.
- */
+/** Factory for creating bearing algorithm instances. */
 object BearingAlgorithmFactory {
     fun create(type: BearingAlgorithmType): BearingAlgorithm =
         when (type) {

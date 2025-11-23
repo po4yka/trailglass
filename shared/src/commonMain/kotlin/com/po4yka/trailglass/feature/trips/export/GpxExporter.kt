@@ -4,10 +4,7 @@ import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.Trip
 
-/**
- * Exports trip data to GPX (GPS Exchange Format) format.
- * GPX is an XML-based format for GPS data exchange.
- */
+/** Exports trip data to GPX (GPS Exchange Format) format. GPX is an XML-based format for GPS data exchange. */
 class GpxExporter {
     /**
      * Export a trip to GPX format.
@@ -76,9 +73,7 @@ class GpxExporter {
             appendLine("</gpx>")
         }
 
-    /**
-     * Escape special XML characters.
-     */
+    /** Escape special XML characters. */
     private fun escapeXml(text: String): String =
         text
             .replace("&", "&amp;")

@@ -1,28 +1,30 @@
 package com.po4yka.trailglass.domain.algorithm
 
 import com.po4yka.trailglass.domain.model.Coordinate
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.atan
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
+import kotlin.math.tan
 
 // Extension functions for degrees/radians conversion
 private fun Double.toRadians(): Double = this * PI / 180.0
 
 private fun Double.toDegrees(): Double = this * 180.0 / PI
 
-/**
- * Algorithm for calculating distance between two geographic coordinates.
- */
+/** Algorithm for calculating distance between two geographic coordinates. */
 interface DistanceAlgorithm {
-    /**
-     * Calculate distance between two coordinates in meters.
-     */
+    /** Calculate distance between two coordinates in meters. */
     fun calculate(
         from: Coordinate,
         to: Coordinate
     ): Double
 
-    /**
-     * Calculate distance between two lat/lon pairs in meters.
-     */
+    /** Calculate distance between two lat/lon pairs in meters. */
     fun calculate(
         lat1: Double,
         lon1: Double,
@@ -31,33 +33,30 @@ interface DistanceAlgorithm {
     ): Double
 }
 
-/**
- * Available distance calculation algorithms.
- */
+/** Available distance calculation algorithms. */
 enum class DistanceAlgorithmType {
     /**
-     * Haversine formula - accurate for most purposes, assumes spherical Earth.
-     * Fast and accurate to within 0.5% for most distances.
+     * Haversine formula - accurate for most purposes, assumes spherical Earth. Fast and accurate to within 0.5% for
+     * most distances.
      */
     HAVERSINE,
 
     /**
-     * Vincenty formula - most accurate, accounts for Earth's ellipsoidal shape.
-     * Slower but accurate to within 0.5mm for any distance.
+     * Vincenty formula - most accurate, accounts for Earth's ellipsoidal shape. Slower but accurate to within 0.5mm for
+     * any distance.
      */
     VINCENTY,
 
     /**
-     * Simple Euclidean approximation - fastest but least accurate.
-     * Only suitable for very short distances (<1km).
-     * Error increases significantly with distance and latitude.
+     * Simple Euclidean approximation - fastest but least accurate. Only suitable for very short distances (<1km). Error
+     * increases significantly with distance and latitude.
      */
     SIMPLE
 }
 
 /**
- * Haversine distance calculation - accurate to ~0.5% for most distances.
- * Assumes Earth is a perfect sphere with radius 6371km.
+ * Haversine distance calculation - accurate to ~0.5% for most distances. Assumes Earth is a perfect sphere with radius
+ * 6371km.
  */
 class HaversineDistance : DistanceAlgorithm {
     companion object {
@@ -90,8 +89,8 @@ class HaversineDistance : DistanceAlgorithm {
 }
 
 /**
- * Vincenty distance calculation - most accurate, accounts for ellipsoidal Earth.
- * Accurate to within 0.5mm using WGS-84 ellipsoid parameters.
+ * Vincenty distance calculation - most accurate, accounts for ellipsoidal Earth. Accurate to within 0.5mm using WGS-84
+ * ellipsoid parameters.
  */
 class VincentyDistance : DistanceAlgorithm {
     companion object {
@@ -167,8 +166,8 @@ class VincentyDistance : DistanceAlgorithm {
             lambda = L + (1 - C) * FLATTENING * sinAlpha * (
                 sigma + C * sinSigma * (
                     cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM.pow(2))
+                    )
                 )
-            )
         } while (abs(lambda - lambdaP) > CONVERGENCE_THRESHOLD && --iterLimit > 0)
 
         if (iterLimit == 0) {
@@ -184,17 +183,16 @@ class VincentyDistance : DistanceAlgorithm {
                 cos2SigmaM + B / 4 * (
                     cosSigma * (-1 + 2 * cos2SigmaM.pow(2)) -
                         B / 6 * cos2SigmaM * (-3 + 4 * sinSigma.pow(2)) * (-3 + 4 * cos2SigmaM.pow(2))
+                    )
                 )
-            )
 
         return SEMI_MINOR_AXIS * A * (sigma - deltaSigma)
     }
 }
 
 /**
- * Simple Euclidean distance approximation.
- * Fast but only accurate for very short distances (<1km).
- * Error increases with distance and latitude.
+ * Simple Euclidean distance approximation. Fast but only accurate for very short distances (<1km). Error increases with
+ * distance and latitude.
  */
 class SimpleDistance : DistanceAlgorithm {
     companion object {
@@ -222,9 +220,7 @@ class SimpleDistance : DistanceAlgorithm {
     }
 }
 
-/**
- * Factory for creating distance algorithm instances.
- */
+/** Factory for creating distance algorithm instances. */
 object DistanceAlgorithmFactory {
     fun create(type: DistanceAlgorithmType): DistanceAlgorithm =
         when (type) {

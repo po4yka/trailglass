@@ -4,9 +4,7 @@ import com.po4yka.trailglass.data.file.PhotoStorageManager
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-/**
- * Use case for loading photo data from storage.
- */
+/** Use case for loading photo data from storage. */
 @Inject
 class LoadPhotoUseCase(
     private val photoStorageManager: PhotoStorageManager

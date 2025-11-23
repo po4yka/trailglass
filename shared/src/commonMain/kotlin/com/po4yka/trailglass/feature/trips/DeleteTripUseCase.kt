@@ -5,9 +5,7 @@ import com.po4yka.trailglass.domain.error.TrailGlassError
 import me.tatarka.inject.annotations.Inject
 import com.po4yka.trailglass.domain.error.Result as TrailGlassResult
 
-/**
- * Use case for deleting a trip.
- */
+/** Use case for deleting a trip. */
 @Inject
 class DeleteTripUseCase(
     private val tripRepository: TripRepository

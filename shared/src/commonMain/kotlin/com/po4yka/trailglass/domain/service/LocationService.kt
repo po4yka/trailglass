@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 /**
  * Service for tracking user location.
  *
- * This is a platform-specific service that provides real-time location updates.
- * Platform implementations should use native location APIs:
+ * This is a platform-specific service that provides real-time location updates. Platform implementations should use
+ * native location APIs:
  * - Android: FusedLocationProviderClient
  * - iOS: CoreLocation
  */
@@ -15,8 +15,7 @@ interface LocationService {
     /**
      * Flow of location updates.
      *
-     * Emits new coordinates as the user's location changes.
-     * The flow is hot and will continue emitting until cancelled.
+     * Emits new coordinates as the user's location changes. The flow is hot and will continue emitting until cancelled.
      */
     val locationUpdates: Flow<Coordinate>
 
@@ -38,9 +37,7 @@ interface LocationService {
         fastestIntervalMs: Long = 2000
     )
 
-    /**
-     * Stop tracking location updates.
-     */
+    /** Stop tracking location updates. */
     suspend fun stopTracking()
 
     /**

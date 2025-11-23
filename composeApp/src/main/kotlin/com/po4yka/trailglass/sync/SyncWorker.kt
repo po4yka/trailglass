@@ -2,15 +2,23 @@ package com.po4yka.trailglass.sync
 
 import android.content.Context
 import android.util.Log
-import androidx.work.*
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkRequest
+import androidx.work.WorkerParameters
 import com.po4yka.trailglass.TrailGlassApplication
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-/**
- * WorkManager worker for background synchronization.
- */
+/** WorkManager worker for background synchronization. */
 class SyncWorker(
     context: Context,
     params: WorkerParameters
@@ -72,15 +80,11 @@ class SyncWorker(
     }
 }
 
-/**
- * Utility class for scheduling background sync.
- */
+/** Utility class for scheduling background sync. */
 object SyncScheduler {
     private const val TAG = "SyncScheduler"
 
-    /**
-     * Schedule periodic background sync.
-     */
+    /** Schedule periodic background sync. */
     fun schedulePeriodicSync(
         context: Context,
         intervalMinutes: Long = 60
@@ -114,9 +118,7 @@ object SyncScheduler {
         )
     }
 
-    /**
-     * Trigger immediate one-time sync.
-     */
+    /** Trigger immediate one-time sync. */
     fun triggerImmediateSync(context: Context) {
         Log.i(TAG, "Triggering immediate sync")
 
@@ -136,16 +138,13 @@ object SyncScheduler {
         WorkManager.getInstance(context).enqueue(syncRequest)
     }
 
-    /**
-     * Cancel all scheduled sync work.
-     */
+    /** Cancel all scheduled sync work. */
     fun cancelAllSync(context: Context) {
         Log.i(TAG, "Cancelling all scheduled sync work")
         WorkManager.getInstance(context).cancelUniqueWork(SyncWorker.WORK_NAME)
     }
 
-    /**
-     * Check sync work status.
-     */
-    fun getSyncWorkInfo(context: Context) = WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WORK_NAME)
+    /** Check sync work status. */
+    fun getSyncWorkInfo(context: Context) =
+        WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WORK_NAME)
 }

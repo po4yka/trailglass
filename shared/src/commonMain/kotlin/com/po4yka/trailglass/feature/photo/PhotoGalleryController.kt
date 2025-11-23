@@ -11,12 +11,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DatePeriod
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Controller for photo gallery view.
- * Handles loading and displaying photos grouped by date.
+ * Controller for photo gallery view. Handles loading and displaying photos grouped by date.
  *
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
@@ -35,9 +38,7 @@ class PhotoGalleryController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
-    /**
-     * Photo gallery UI state.
-     */
+    /** Photo gallery UI state. */
     data class GalleryState(
         val photoGroups: List<PhotoGroup> = emptyList(),
         val isLoading: Boolean = false,
@@ -48,9 +49,7 @@ class PhotoGalleryController(
     private val _state = MutableStateFlow(GalleryState())
     val state: StateFlow<GalleryState> = _state.asStateFlow()
 
-    /**
-     * Load photo gallery for recent time period (last 30 days).
-     */
+    /** Load photo gallery for recent time period (last 30 days). */
     fun loadGallery() {
         logger.debug { "Loading photo gallery" }
 
@@ -62,7 +61,7 @@ class PhotoGalleryController(
                 val now = Clock.System.now()
                 val timeZone = TimeZone.currentSystemDefault()
                 val endDate = now.toLocalDateTime(timeZone).date
-                val startDate = endDate.minus(30, kotlinx.datetime.DateTimeUnit.DAY)
+                val startDate = endDate.minus(DatePeriod(days = 30))
 
                 val photoGroups =
                     getPhotoGalleryUseCase.execute(
@@ -91,9 +90,7 @@ class PhotoGalleryController(
         }
     }
 
-    /**
-     * Load all photos (no time limit).
-     */
+    /** Load all photos (no time limit). */
     fun loadAllPhotos() {
         logger.debug { "Loading all photos" }
 
@@ -142,39 +139,31 @@ class PhotoGalleryController(
         }
     }
 
-    /**
-     * Show import dialog.
-     */
+    /** Show import dialog. */
     fun importPhotos() {
         logger.info { "User requested to import photos" }
         _state.update { it.copy(showImportDialog = true) }
     }
 
-    /**
-     * Hide import dialog.
-     */
+    /** Hide import dialog. */
     fun dismissImportDialog() {
         _state.update { it.copy(showImportDialog = false) }
     }
 
-    /**
-     * Refresh gallery.
-     */
+    /** Refresh gallery. */
     fun refresh() {
         logger.debug { "Refreshing gallery" }
         loadGallery()
     }
 
-    /**
-     * Clear error state.
-     */
+    /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */

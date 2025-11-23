@@ -5,20 +5,26 @@ import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.logging.logger
 import com.po4yka.trailglass.util.UuidGenerator
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 /**
  * Android equivalent of iOS CLVisit monitoring.
  *
- * Detects when the user arrives at and departs from significant locations
- * by analyzing location sample patterns. Creates VISIT-type location samples
- * to match iOS's native visit monitoring functionality.
+ * Detects when the user arrives at and departs from significant locations by analyzing location sample patterns.
+ * Creates VISIT-type location samples to match iOS's native visit monitoring functionality.
  *
  * iOS Equivalent: CLLocationManager.startMonitoringVisits()
  *
@@ -47,10 +53,7 @@ class AndroidVisitDetector(
     private val maxStationaryDistance = 100.0 // meters
     private val checkInterval = 60.seconds
 
-    /**
-     * Start monitoring for visits.
-     * Analyzes recent location samples to detect stationary periods.
-     */
+    /** Start monitoring for visits. Analyzes recent location samples to detect stationary periods. */
     fun startMonitoring() {
         if (monitoringJob?.isActive == true) {
             logger.debug { "Visit monitoring already active" }
@@ -72,9 +75,7 @@ class AndroidVisitDetector(
             }
     }
 
-    /**
-     * Stop monitoring for visits.
-     */
+    /** Stop monitoring for visits. */
     fun stopMonitoring() {
         logger.info { "Stopping Android visit detection" }
         monitoringJob?.cancel()
@@ -89,9 +90,7 @@ class AndroidVisitDetector(
         currentVisit = null
     }
 
-    /**
-     * Check recent location samples for visit patterns.
-     */
+    /** Check recent location samples for visit patterns. */
     private suspend fun checkForVisits() {
         // Get recent location samples (last 30 minutes)
         val lookbackTime = Clock.System.now() - 30.minutes
@@ -120,10 +119,12 @@ class AndroidVisitDetector(
                 // Start of a new visit
                 startVisit(sorted.first())
             }
+
             isStationary && currentVisit != null -> {
                 // Visit is ongoing, update it
                 updateVisit(sorted.last())
             }
+
             !isStationary && currentVisit != null -> {
                 // Visit has ended
                 endVisit(currentVisit!!, sorted.last().timestamp)
@@ -132,9 +133,7 @@ class AndroidVisitDetector(
         }
     }
 
-    /**
-     * Determine if user is stationary based on recent samples.
-     */
+    /** Determine if user is stationary based on recent samples. */
     private fun isUserStationary(samples: List<LocationSample>): Boolean {
         if (samples.size < 2) return false
 
@@ -160,9 +159,7 @@ class AndroidVisitDetector(
         }
     }
 
-    /**
-     * Start tracking a new visit.
-     */
+    /** Start tracking a new visit. */
     private fun startVisit(arrivalSample: LocationSample) {
         val visit =
             OngoingVisit(
@@ -180,9 +177,7 @@ class AndroidVisitDetector(
         }
     }
 
-    /**
-     * Update an ongoing visit with new location data.
-     */
+    /** Update an ongoing visit with new location data. */
     private fun updateVisit(latestSample: LocationSample) {
         val visit = currentVisit ?: return
 
@@ -196,10 +191,7 @@ class AndroidVisitDetector(
         logger.trace { "Visit ongoing at (${latestSample.latitude}, ${latestSample.longitude})" }
     }
 
-    /**
-     * End a visit and create a VISIT-type location sample.
-     * This creates parity with iOS CLVisit events.
-     */
+    /** End a visit and create a VISIT-type location sample. This creates parity with iOS CLVisit events. */
     private suspend fun endVisit(
         visit: OngoingVisit,
         departureTime: Instant
@@ -240,9 +232,7 @@ class AndroidVisitDetector(
         }
     }
 
-    /**
-     * Calculate distance between two coordinates using Haversine formula.
-     */
+    /** Calculate distance between two coordinates using Haversine formula. */
     private fun calculateDistance(
         lat1: Double,
         lon1: Double,
@@ -264,9 +254,7 @@ class AndroidVisitDetector(
         return earthRadiusMeters * c
     }
 
-    /**
-     * Represents an ongoing visit being tracked.
-     */
+    /** Represents an ongoing visit being tracked. */
     private data class OngoingVisit(
         val arrivalTime: Instant,
         val latitude: Double,

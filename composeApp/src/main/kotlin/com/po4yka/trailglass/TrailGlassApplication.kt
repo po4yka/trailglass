@@ -12,14 +12,10 @@ import kotlinx.coroutines.launch
 /**
  * TrailGlass Application class.
  *
- * Initializes the dependency injection component and provides
- * application-wide dependencies.
+ * Initializes the dependency injection component and provides application-wide dependencies.
  */
 class TrailGlassApplication : Application() {
-    /**
-     * Application-level DI component.
-     * Provides all application dependencies (repositories, controllers, etc.)
-     */
+    /** Application-level DI component. Provides all application dependencies (repositories, controllers, etc.) */
     val appComponent: AppComponent by lazy {
         createAndroidAppComponent(applicationContext)
     }
@@ -46,9 +42,7 @@ class TrailGlassApplication : Application() {
         stopNetworkMonitoring()
     }
 
-    /**
-     * Initialize SyncCoordinator on app startup.
-     */
+    /** Initialize SyncCoordinator on app startup. */
     private fun initializeSyncCoordinator() {
         applicationScope.launch {
             try {
@@ -63,9 +57,7 @@ class TrailGlassApplication : Application() {
         }
     }
 
-    /**
-     * Schedule periodic background sync using WorkManager.
-     */
+    /** Schedule periodic background sync using WorkManager. */
     private fun scheduleBackgroundSync() {
         try {
             SyncScheduler.schedulePeriodicSync(
@@ -79,9 +71,7 @@ class TrailGlassApplication : Application() {
         }
     }
 
-    /**
-     * Start network connectivity monitoring.
-     */
+    /** Start network connectivity monitoring. */
     private fun startNetworkMonitoring() {
         try {
             appComponent.networkConnectivityMonitor.startMonitoring()
@@ -92,9 +82,7 @@ class TrailGlassApplication : Application() {
         }
     }
 
-    /**
-     * Stop network connectivity monitoring.
-     */
+    /** Stop network connectivity monitoring. */
     private fun stopNetworkMonitoring() {
         try {
             appComponent.networkConnectivityMonitor.stopMonitoring()
@@ -105,9 +93,7 @@ class TrailGlassApplication : Application() {
         }
     }
 
-    /**
-     * Trigger immediate sync (can be called from UI).
-     */
+    /** Trigger immediate sync (can be called from UI). */
     fun triggerImmediateSync() {
         SyncScheduler.triggerImmediateSync(applicationContext)
     }

@@ -4,9 +4,7 @@ import android.content.Context
 import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.repository.LocationRepository
 
-/**
- * Android implementation of LocationTrackerFactory.
- */
+/** Android implementation of LocationTrackerFactory. */
 actual class LocationTrackerFactory(
     private val context: Context
 ) {

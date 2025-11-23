@@ -4,11 +4,16 @@ import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.asin
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
- * Detects the user's home location based on place visit patterns.
- * Home is typically where the user spends most nights and weekends.
+ * Detects the user's home location based on place visit patterns. Home is typically where the user spends most nights
+ * and weekends.
  */
 class HomeLocationDetector(
     private val homeRadiusMeters: Double = 500.0,
@@ -16,9 +21,7 @@ class HomeLocationDetector(
 ) {
     private val logger = logger()
 
-    /**
-     * Home location candidate with scoring.
-     */
+    /** Home location candidate with scoring. */
     data class HomeCandidate(
         val location: Coordinate,
         val nightsSpent: Int,
@@ -69,10 +72,7 @@ class HomeLocationDetector(
         return null
     }
 
-    /**
-     * Cluster visits by spatial proximity.
-     * Visits within homeRadiusMeters are grouped together.
-     */
+    /** Cluster visits by spatial proximity. Visits within homeRadiusMeters are grouped together. */
     private fun clusterVisitsByProximity(visits: List<PlaceVisit>): List<List<PlaceVisit>> {
         val clusters = mutableListOf<MutableList<PlaceVisit>>()
         val visited = mutableSetOf<String>()
@@ -108,9 +108,7 @@ class HomeLocationDetector(
         return clusters
     }
 
-    /**
-     * Score a cluster of visits as a potential home location.
-     */
+    /** Score a cluster of visits as a potential home location. */
     private fun scoreHomeCandidate(cluster: List<PlaceVisit>): HomeCandidate {
         // Calculate centroid
         val avgLat = cluster.map { it.centerLatitude }.average()
@@ -143,9 +141,7 @@ class HomeLocationDetector(
         )
     }
 
-    /**
-     * Calculate Haversine distance between two coordinates.
-     */
+    /** Calculate Haversine distance between two coordinates. */
     private fun haversineDistance(
         lat1: Double,
         lon1: Double,

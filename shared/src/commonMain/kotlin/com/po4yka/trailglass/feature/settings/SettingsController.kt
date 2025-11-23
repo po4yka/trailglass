@@ -164,6 +164,7 @@ class SettingsController(
                     is com.po4yka.trailglass.domain.error.Result.Success -> {
                         _state.value = _state.value.copy(isLoading = false)
                     }
+
                     is com.po4yka.trailglass.domain.error.Result.Error -> {
                         _state.value =
                             _state.value.copy(
@@ -205,8 +206,8 @@ class SettingsController(
     }
 
     /**
-     * Cleanup method to release resources and prevent memory leaks.
-     * MUST be called when this controller is no longer needed.
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
      *
      * Cancels all running coroutines including flow collectors.
      */
@@ -217,9 +218,7 @@ class SettingsController(
     }
 }
 
-/**
- * State for settings screen.
- */
+/** State for settings screen. */
 data class SettingsState(
     val settings: AppSettings? = null,
     val isLoading: Boolean = true,

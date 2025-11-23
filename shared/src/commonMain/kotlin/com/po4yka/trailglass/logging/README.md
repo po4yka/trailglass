@@ -5,6 +5,7 @@ TrailGlass uses [kotlin-logging](https://github.com/oshai/kotlin-logging) for st
 ## Overview
 
 Kotlin-logging provides:
+
 - ✅ **Multiplatform support**: Works on Android, iOS, JVM, and Native
 - ✅ **Lazy evaluation**: Log messages are only computed if the log level is enabled
 - ✅ **Structured logging**: Lambda-based message creation
@@ -28,10 +29,12 @@ SLF4J      NSLog/os_log
 ### Dependencies
 
 **Version Catalog (`gradle/libs.versions.toml`)**:
+
 - `kotlin-logging = "7.0.0"` - Multiplatform logging library
 - `slf4j = "2.0.16"` - Android backend
 
 **Shared Module**:
+
 - `implementation(libs.kotlin.logging)` - Common logging API
 - Android: `implementation(libs.slf4j.android)` - SLF4J backend for Android
 - iOS: Uses NSLog/os_log natively (no additional dependencies)
@@ -69,6 +72,7 @@ fun process() {
 ### Log Levels
 
 From most to least verbose:
+
 1. `TRACE` - Very detailed diagnostic information
 2. `DEBUG` - Detailed information for debugging
 3. `INFO` - Informational messages (important events)
@@ -78,11 +82,13 @@ From most to least verbose:
 ### Lazy Evaluation
 
 **Good** - Message only computed if DEBUG is enabled:
+
 ```kotlin
 logger.debug { "User ${user.id} processed ${items.size} items" }
 ```
 
 **Bad** - String concatenation always happens:
+
 ```kotlin
 logger.debug("User " + user.id + " processed " + items.size + " items")
 ```
@@ -104,9 +110,11 @@ try {
 **Backend**: SLF4J-Android (logs to Android Logcat)
 
 **Log Tags**: Automatically derived from class name
+
 - `LocationRepositoryImpl` → Tag: `com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl`
 
 **Filtering in Logcat**:
+
 ```bash
 # Filter by package
 adb logcat | grep "com.po4yka.trailglass"
@@ -129,6 +137,7 @@ SLF4J-Android uses Android's log levels. No additional configuration needed.
 **Log Output**: Visible in Xcode Console
 
 **Filtering in Xcode**:
+
 - Use the filter field in the console
 - Search for class names or log messages
 - Filter by subsystem (if configured)
@@ -140,6 +149,7 @@ SLF4J-Android uses Android's log levels. No additional configuration needed.
 ### What to Log
 
 **✅ DO Log:**
+
 - Important state changes
 - External API calls (geocoding, network)
 - Database operations (with counts, not full data)
@@ -148,6 +158,7 @@ SLF4J-Android uses Android's log levels. No additional configuration needed.
 - Performance-critical operations
 
 **❌ DON'T Log:**
+
 - Sensitive user data (coordinates at TRACE level only)
 - Passwords, tokens, API keys
 - Full database records
@@ -156,12 +167,14 @@ SLF4J-Android uses Android's log levels. No additional configuration needed.
 ### Log Level Guidelines
 
 **TRACE**: Fine-grained diagnostic
+
 ```kotlin
 logger.trace { "Looking up cache for ($lat, $lon)" }
 logger.trace { "Successfully inserted sample ${sample.id}" }
 ```
 
 **DEBUG**: Detailed debugging information
+
 ```kotlin
 logger.debug { "Inserting location sample: ${sample.id} at ($lat, $lon)" }
 logger.debug { "Found ${samples.size} location samples" }
@@ -169,6 +182,7 @@ logger.debug { "Cache HIT for coordinates" }
 ```
 
 **INFO**: Important business events
+
 ```kotlin
 logger.info { "Processing ${samples.size} location samples" }
 logger.info { "Detected ${visits.size} place visits" }
@@ -176,6 +190,7 @@ logger.info { "Geocoded place visit: ${city} (${countryCode})" }
 ```
 
 **WARN**: Potential issues
+
 ```kotlin
 logger.warn { "Failed to geocode place visit at ($lat, $lon)" }
 logger.warn { "Android Geocoder is not present on device" }
@@ -183,6 +198,7 @@ logger.warn { "Cache cleanup took ${duration}ms" }
 ```
 
 **ERROR**: Failures and exceptions
+
 ```kotlin
 logger.error(e) { "Failed to insert location sample ${id}" }
 logger.error(e) { "Database operation failed" }
@@ -294,6 +310,7 @@ class GeocodingCacheRepositoryImpl(...) {
 ### Performance Impact
 
 kotlin-logging has minimal overhead:
+
 - Lambda evaluation is skipped if log level disabled
 - No string concatenation unless needed
 - Platform backends are optimized
@@ -303,12 +320,14 @@ kotlin-logging has minimal overhead:
 ### From println/System.out
 
 **Before**:
+
 ```kotlin
 println("Processing ${items.size} items")
 System.out.println("Error: $message")
 ```
 
 **After**:
+
 ```kotlin
 private val logger = logger()
 
@@ -319,12 +338,14 @@ logger.error { "Error: $message" }
 ### From Android Log
 
 **Before**:
+
 ```kotlin
 Log.d(TAG, "Debug message")
 Log.e(TAG, "Error message", exception)
 ```
 
 **After**:
+
 ```kotlin
 private val logger = logger()
 
@@ -335,6 +356,7 @@ logger.error(exception) { "Error message" }
 ## Future Enhancements
 
 Planned improvements:
+
 - [ ] Structured logging with JSON format
 - [ ] Log file rotation for offline debugging
 - [ ] Remote logging for production monitoring
@@ -350,5 +372,6 @@ Planned improvements:
 ---
 
 **See Also**:
+
 - [data/README.md](../data/README.md) - Database layer with logging examples
 - [location/README.md](../location/README.md) - Location services with logging

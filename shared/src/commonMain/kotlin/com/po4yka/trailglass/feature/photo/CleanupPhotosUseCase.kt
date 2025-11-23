@@ -6,8 +6,8 @@ import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
 /**
- * Use case for cleaning up orphaned photo files.
- * Orphaned photos are files that exist in storage but have no corresponding database entry.
+ * Use case for cleaning up orphaned photo files. Orphaned photos are files that exist in storage but have no
+ * corresponding database entry.
  */
 @Inject
 class CleanupPhotosUseCase(
