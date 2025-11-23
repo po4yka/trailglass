@@ -117,6 +117,9 @@ dependencies {
     // DateTime (for kotlinx.datetime types from shared module)
     implementation(libs.kotlinx.datetime)
 
+    // Logging
+    implementation(libs.kotlin.logging)
+
     implementation(projects.shared)
 
     testImplementation(libs.junit)
