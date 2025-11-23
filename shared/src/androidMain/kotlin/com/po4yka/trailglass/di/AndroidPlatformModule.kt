@@ -13,8 +13,12 @@ import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.security.EncryptionService
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.permission.PermissionManager
+import com.po4yka.trailglass.domain.service.AndroidCrashReportingService
 import com.po4yka.trailglass.domain.service.AndroidLocationService
+import com.po4yka.trailglass.domain.service.AndroidPushNotificationService
+import com.po4yka.trailglass.domain.service.CrashReportingService
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.domain.service.PushNotificationService
 import com.po4yka.trailglass.photo.AndroidPhotoMetadataExtractor
 import com.po4yka.trailglass.photo.PhotoMetadataExtractor
 import kotlinx.coroutines.CoroutineScope
@@ -95,4 +99,12 @@ class AndroidPlatformModule(
     /** Provides Android-specific photo directory provider. */
     @Provides
     override fun photoDirectoryProvider(): PhotoDirectoryProvider = AndroidPhotoDirectoryProvider(context)
+
+    /** Provides Android-specific push notification service. */
+    @Provides
+    override fun pushNotificationService(): PushNotificationService = AndroidPushNotificationService(context)
+
+    /** Provides Android-specific crash reporting service. */
+    @Provides
+    override fun crashReportingService(): CrashReportingService = AndroidCrashReportingService()
 }

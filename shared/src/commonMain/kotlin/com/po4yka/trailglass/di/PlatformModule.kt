@@ -51,4 +51,10 @@ interface PlatformModule {
 
     /** Platform-specific photo directory provider. */
     fun photoDirectoryProvider(): com.po4yka.trailglass.data.file.PhotoDirectoryProvider
+
+    /** Platform-specific push notification service. */
+    fun pushNotificationService(): com.po4yka.trailglass.domain.service.PushNotificationService
+
+    /** Platform-specific crash reporting service. */
+    fun crashReportingService(): com.po4yka.trailglass.domain.service.CrashReportingService
 }

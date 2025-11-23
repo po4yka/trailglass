@@ -123,16 +123,20 @@ fun ActivityHeatmap(
             )
 
             Row(
-                modifier = Modifier
-                    .weight(1f)
-                    .height(12.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 (0..4).forEach { index ->
                     val intensity = index / 4f
-                    Canvas(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()) {
+                    Canvas(
+                        modifier =
+                            Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
+                    ) {
                         val color = blendColors(lowColor, highColor, intensity)
                         drawRoundRect(
                             color = color,

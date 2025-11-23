@@ -72,6 +72,15 @@
             android:exported="false"
             android:foregroundServiceType="location" />
 
+        <!-- Firebase Cloud Messaging service -->
+        <service
+            android:name=".service.TrailGlassFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <!-- FileProvider for sharing files (GPX, KML exports, photos, etc.) -->
         <provider
             android:name="androidx.core.content.FileProvider"

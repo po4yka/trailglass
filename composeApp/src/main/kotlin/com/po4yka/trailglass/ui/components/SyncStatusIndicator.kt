@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.data.sync.SyncProgress
-import com.po4yka.trailglass.data.sync.SyncStatusUiModel
+import com.po4yka.trailglass.data.sync.SyncUiState.SyncStatusUiModel
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone

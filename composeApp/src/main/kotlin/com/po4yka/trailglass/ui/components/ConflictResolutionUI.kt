@@ -34,8 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.po4yka.trailglass.data.sync.ConflictResolutionChoice
-import com.po4yka.trailglass.data.sync.ConflictUiModel
+import com.po4yka.trailglass.data.sync.SyncUiState.ConflictResolutionChoice
+import com.po4yka.trailglass.data.sync.SyncUiState.ConflictUiModel
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

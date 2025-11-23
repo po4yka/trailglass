@@ -115,10 +115,10 @@ class PhotoClusterer(
 
             val candidateLat =
                 candidate.metadata?.exifLatitude ?: candidate.photo.latitude
-                ?: return@filter false
+                    ?: return@filter false
             val candidateLon =
                 candidate.metadata?.exifLongitude ?: candidate.photo.longitude
-                ?: return@filter false
+                    ?: return@filter false
             val candidateTime = candidate.photo.timestamp
 
             // Check distance

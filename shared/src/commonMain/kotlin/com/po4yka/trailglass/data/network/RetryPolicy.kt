@@ -69,7 +69,7 @@ data class RetryPolicy(
             (
                 initialDelay.inWholeMilliseconds *
                     multiplier.pow(attempt.toDouble())
-                ).toLong().milliseconds
+            ).toLong().milliseconds
         return min(exponentialDelay.inWholeMilliseconds, maxDelay.inWholeMilliseconds).milliseconds
     }
 

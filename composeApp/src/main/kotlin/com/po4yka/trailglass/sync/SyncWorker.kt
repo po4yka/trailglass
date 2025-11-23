@@ -145,6 +145,5 @@ object SyncScheduler {
     }
 
     /** Check sync work status. */
-    fun getSyncWorkInfo(context: Context) =
-        WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WORK_NAME)
+    fun getSyncWorkInfo(context: Context) = WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WORK_NAME)
 }

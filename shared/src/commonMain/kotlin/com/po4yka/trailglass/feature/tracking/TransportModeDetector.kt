@@ -71,7 +71,7 @@ class TransportModeDetector {
                 (
                     curr.timestamp.toEpochMilliseconds() -
                         prev.timestamp.toEpochMilliseconds()
-                    ) / 1000.0
+                ) / 1000.0
 
             if (timeDiffSeconds > 0) {
                 val speedKmh = (distance / timeDiffSeconds) * 3.6 // m/s to km/h

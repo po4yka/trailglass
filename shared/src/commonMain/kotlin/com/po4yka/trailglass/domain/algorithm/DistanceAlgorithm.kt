@@ -166,8 +166,8 @@ class VincentyDistance : DistanceAlgorithm {
             lambda = L + (1 - C) * FLATTENING * sinAlpha * (
                 sigma + C * sinSigma * (
                     cos2SigmaM + C * cosSigma * (-1 + 2 * cos2SigmaM.pow(2))
-                    )
                 )
+            )
         } while (abs(lambda - lambdaP) > CONVERGENCE_THRESHOLD && --iterLimit > 0)
 
         if (iterLimit == 0) {
@@ -183,8 +183,8 @@ class VincentyDistance : DistanceAlgorithm {
                 cos2SigmaM + B / 4 * (
                     cosSigma * (-1 + 2 * cos2SigmaM.pow(2)) -
                         B / 6 * cos2SigmaM * (-3 + 4 * sinSigma.pow(2)) * (-3 + 4 * cos2SigmaM.pow(2))
-                    )
                 )
+            )
 
         return SEMI_MINOR_AXIS * A * (sigma - deltaSigma)
     }

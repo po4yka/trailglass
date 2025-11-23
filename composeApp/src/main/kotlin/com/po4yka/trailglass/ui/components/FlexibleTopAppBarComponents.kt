@@ -1,0 +1,298 @@
+package com.po4yka.trailglass.ui.components
+
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.ui.theme.MotionConfig
+import com.po4yka.trailglass.ui.theme.emphasized
+import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * Medium Flexible Top App Bar for Trailglass detail screens.
+ *
+ * A more compact variant than LargeFlexibleTopAppBar, suitable for place details and secondary screens. Collapses from
+ * medium to small size.
+ *
+ * Features:
+ * - Collapses from medium to compact size on scroll
+ * - Icon + title layout
+ * - Simpler design than large variant
+ * - Spring-based animations
+ * - Silent Waters colors
+ *
+ * Usage example:
+ * ```kotlin
+ * val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+ * MediumFlexibleTopAppBar(
+ *     title = { Text("Favorite Cafe") },
+ *     subtitle = { Text("23 visits • Last visit yesterday") },
+ *     navigationIcon = {
+ *         IconButton(onClick = onBack) {
+ *             Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+ *         }
+ *     },
+ *     leadingIcon = {
+ *         Icon(
+ *             Icons.Default.Restaurant,
+ *             contentDescription = null,
+ *             modifier = Modifier.size(40.dp)
+ *         )
+ *     },
+ *     scrollBehavior = scrollBehavior
+ * )
+ * ```
+ *
+ * @param title The main title text
+ * @param modifier Modifier for the top app bar
+ * @param subtitle Optional subtitle/metadata
+ * @param navigationIcon Navigation icon (back button)
+ * @param actions Action buttons
+ * @param leadingIcon Optional icon displayed before the title (e.g., place category icon)
+ * @param titleHorizontalAlignment Horizontal alignment of title and subtitle
+ * @param collapsedHeight Height when collapsed
+ * @param expandedHeight Height when expanded (default: 128.dp)
+ * @param windowInsets Window insets
+ * @param colors Color configuration
+ * @param scrollBehavior Scroll behavior for animations
+ */
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun MediumFlexibleTopAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: (@Composable () -> Unit)? = null,
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
+    leadingIcon: @Composable (() -> Unit)? = null,
+    titleHorizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    collapsedHeight: Dp = TopAppBarDefaults.MediumAppBarCollapsedHeight,
+    expandedHeight: Dp = 128.dp,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) {
+    // Calculate collapse progress
+    val collapseProgress = scrollBehavior?.state?.collapsedFraction ?: 0f
+
+    // Animate with expressive spring
+    val animatedProgress by animateFloatAsState(
+        targetValue = collapseProgress,
+        animationSpec = MotionConfig.expressiveSpring(),
+        label = "mediumAppBarCollapse"
+    )
+
+    // Subtitle alpha
+    val subtitleAlpha = 1f - min(1f, animatedProgress * 2f)
+
+    // Icon alpha (fades out on collapse)
+    val iconAlpha = 1f - animatedProgress
+
+    // Calculate current height
+    val currentHeight =
+        if (scrollBehavior != null) {
+            expandedHeight - collapsedHeight
+            val offset = scrollBehavior.state.heightOffset
+            max(collapsedHeight.value, expandedHeight.value + offset)
+        } else {
+            expandedHeight.value
+        }
+
+    androidx.compose.material3.Surface(
+        modifier = modifier.height(currentHeight.dp),
+        color = colors.containerColor
+    ) {
+        Box(
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(windowInsets)
+        ) {
+            // Top controls
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(collapsedHeight)
+                        .padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Navigation icon
+                Box(modifier = Modifier.size(48.dp)) {
+                    navigationIcon()
+                }
+
+                // Title in collapsed state
+                Box(
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .alpha(animatedProgress)
+                            .padding(horizontal = 8.dp)
+                ) {
+                    ProvideTextStyle(
+                        value = MaterialTheme.typography.titleLarge
+                    ) {
+                        title()
+                    }
+                }
+
+                // Actions
+                Row(
+                    modifier = Modifier.padding(end = 4.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    actions()
+                }
+            }
+
+            // Expanded content
+            Row(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomStart)
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Leading icon (fades out on collapse)
+                if (leadingIcon != null) {
+                    Box(
+                        modifier = Modifier.alpha(iconAlpha)
+                    ) {
+                        leadingIcon()
+                    }
+                }
+
+                // Title and subtitle column
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment =
+                        when (titleHorizontalAlignment) {
+                            Alignment.Start -> Alignment.Start
+                            Alignment.CenterHorizontally -> Alignment.CenterHorizontally
+                            Alignment.End -> Alignment.End
+                            else -> Alignment.Start
+                        }
+                ) {
+                    // Medium title (visible when expanded)
+                    Box(
+                        modifier =
+                            Modifier
+                                .alpha(1f - animatedProgress)
+                    ) {
+                        ProvideTextStyle(
+                            value = MaterialTheme.typography.emphasized.headlineMediumEmphasized
+                        ) {
+                            title()
+                        }
+                    }
+
+                    // Subtitle
+                    if (subtitle != null) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Box(
+                            modifier = Modifier.alpha(subtitleAlpha)
+                        ) {
+                            ProvideTextStyle(
+                                value =
+                                    MaterialTheme.typography.bodyMedium.copy(
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                            ) {
+                                subtitle()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Compact Flexible Top App Bar for Trailglass list screens.
+ *
+ * A simple, non-collapsing app bar for list and overview screens. Maintains consistent height and provides standard
+ * navigation + actions layout.
+ *
+ * Usage example:
+ * ```kotlin
+ * CompactFlexibleTopAppBar(
+ *     title = { Text("My Trips") },
+ *     navigationIcon = {
+ *         IconButton(onClick = onMenuClick) {
+ *             Icon(Icons.Default.Menu, contentDescription = "Menu")
+ *         }
+ *     },
+ *     actions = {
+ *         IconButton(onClick = onSearch) {
+ *             Icon(Icons.Default.Search, contentDescription = "Search")
+ *         }
+ *     }
+ * )
+ * ```
+ *
+ * @param title The title text
+ * @param modifier Modifier for the app bar
+ * @param navigationIcon Navigation icon (menu or back button)
+ * @param actions Action buttons
+ * @param windowInsets Window insets
+ * @param colors Color configuration
+ * @param scrollBehavior Optional scroll behavior (typically null for compact variant)
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CompactFlexibleTopAppBar(
+    title: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    navigationIcon: @Composable () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    scrollBehavior: TopAppBarScrollBehavior? = null
+) {
+    TopAppBar(
+        title = {
+            ProvideTextStyle(
+                value = MaterialTheme.typography.titleLarge
+            ) {
+                title()
+            }
+        },
+        modifier = modifier,
+        navigationIcon = navigationIcon,
+        actions = actions,
+        windowInsets = windowInsets,
+        colors = colors,
+        scrollBehavior = scrollBehavior
+    )
+}

@@ -218,9 +218,10 @@ fun WavyLinearProgressIndicator(
 
     LinearProgressIndicator(
         progress = { animatedProgress },
-        modifier = modifier
-            .fillMaxWidth()
-            .height(6.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .height(6.dp),
         color = color,
         trackColor = trackColor
     )

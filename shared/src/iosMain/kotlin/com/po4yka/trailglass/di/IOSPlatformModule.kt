@@ -11,8 +11,12 @@ import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
 import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.permission.PermissionManager
+import com.po4yka.trailglass.domain.service.CrashReportingService
+import com.po4yka.trailglass.domain.service.IosCrashReportingService
 import com.po4yka.trailglass.domain.service.IosLocationService
+import com.po4yka.trailglass.domain.service.IosPushNotificationService
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.domain.service.PushNotificationService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -86,4 +90,12 @@ class IOSPlatformModule : PlatformModule {
     /** Provides iOS-specific photo directory provider. */
     @Provides
     override fun photoDirectoryProvider(): PhotoDirectoryProvider = IOSPhotoDirectoryProvider()
+
+    /** Provides iOS-specific push notification service. */
+    @Provides
+    override fun pushNotificationService(): PushNotificationService = IosPushNotificationService()
+
+    /** Provides iOS-specific crash reporting service. */
+    @Provides
+    override fun crashReportingService(): CrashReportingService = IosCrashReportingService()
 }

@@ -3,67 +3,37 @@ package com.po4yka.trailglass.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.ExpandLess
-import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.GroupWork
-import androidx.compose.material.icons.filled.Layers
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Whatshot
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.TileOverlay
-import com.google.android.gms.maps.model.TileOverlayOptions
 import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapEffect
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.MapsComposeExperimentalApi
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.heatmaps.HeatmapTileProvider
 import com.po4yka.trailglass.domain.model.EnhancedMapDisplayData
 import com.po4yka.trailglass.domain.model.EnhancedMapMarker
 import com.po4yka.trailglass.domain.model.HeatmapData
 import com.po4yka.trailglass.domain.model.MapRoute
-import com.po4yka.trailglass.domain.model.MapVisualizationMode
 import com.po4yka.trailglass.domain.model.MarkerCluster
-import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.map.EnhancedMapController
-import com.po4yka.trailglass.feature.map.MarkerIconProvider
 
 /** Enhanced Google Maps view with clustering, heatmap, and custom markers. */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnhancedMapView(
     controller: EnhancedMapController,
@@ -111,7 +81,7 @@ fun EnhancedMapView(
             )
 
             // Visualization mode selector
-            VisualizationModeSelector(
+            MapVisualizationSelector(
                 currentMode = state.visualizationMode,
                 onModeChange = { mode ->
                     controller.setVisualizationMode(mode)
@@ -123,7 +93,7 @@ fun EnhancedMapView(
             )
 
             // Control panel for clustering and heatmap
-            EnhancedMapControls(
+            MapOptionsPanel(
                 clusteringEnabled = state.clusteringEnabled,
                 heatmapEnabled = state.heatmapEnabled,
                 onToggleClustering = { controller.toggleClustering() },
@@ -215,265 +185,6 @@ private fun EnhancedGoogleMapContent(
 }
 
 @Composable
-private fun RenderEnhancedMarker(
-    marker: EnhancedMapMarker,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val icon = MarkerIconProvider.getIcon(marker.category, marker.isFavorite)
-
-    Marker(
-        state =
-            MarkerState(
-                position = LatLng(marker.coordinate.latitude, marker.coordinate.longitude)
-            ),
-        title = marker.title,
-        snippet = marker.snippet,
-        icon = getMarkerBitmapDescriptor(icon.color, isSelected),
-        onClick = {
-            onClick()
-            true
-        }
-    )
-}
-
-@Composable
-private fun RenderCluster(
-    cluster: MarkerCluster,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val clusterColor = MarkerIconProvider.getClusterColor(cluster.count)
-
-    Marker(
-        state =
-            MarkerState(
-                position = LatLng(cluster.coordinate.latitude, cluster.coordinate.longitude)
-            ),
-        title = "${cluster.count} places",
-        snippet = "Tap to expand",
-        icon = getClusterBitmapDescriptor(cluster.count, clusterColor, isSelected),
-        onClick = {
-            onClick()
-            true
-        }
-    )
-}
-
-@Composable
-private fun RenderRoute(
-    route: MapRoute,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val points =
-        route.coordinates.map { coord ->
-            LatLng(coord.latitude, coord.longitude)
-        }
-
-    val routeColor = MarkerIconProvider.getRouteColor(route.transportType.name)
-
-    Polyline(
-        points = points,
-        color =
-            if (isSelected) {
-                Color(routeColor).copy(alpha = 1f)
-            } else {
-                Color(routeColor).copy(alpha = 0.7f)
-            },
-        width =
-            if (isSelected) {
-                getRouteWidth(route.transportType) * 1.5f
-            } else {
-                getRouteWidth(route.transportType)
-            },
-        clickable = true,
-        onClick = {
-            onClick()
-        }
-    )
-}
-
-@OptIn(MapsComposeExperimentalApi::class)
-@Composable
-private fun RenderHeatmap(heatmapData: HeatmapData) {
-    // Convert heatmap points to WeightedLatLng
-    val heatmapPoints =
-        remember(heatmapData) {
-            heatmapData.points.map { point ->
-                com.google.maps.android.heatmaps.WeightedLatLng(
-                    LatLng(point.coordinate.latitude, point.coordinate.longitude),
-                    point.intensity.toDouble()
-                )
-            }
-        }
-
-    // Track the current overlay reference to enable proper cleanup
-    var currentOverlay by remember { mutableStateOf<TileOverlay?>(null) }
-
-    // Use DisposableEffect for proper lifecycle management
-    // This ensures cleanup when the composable leaves composition or when heatmapPoints change
-    DisposableEffect(heatmapPoints) {
-        onDispose {
-            // Remove the overlay when the effect is disposed or keys change
-            currentOverlay?.remove()
-            currentOverlay = null
-        }
-    }
-
-    // Render heatmap using MapEffect
-    MapEffect(heatmapPoints) { map ->
-        // Remove previous overlay before adding a new one
-        currentOverlay?.remove()
-
-        // Create heatmap tile provider with custom gradient colors
-        val heatmapProvider =
-            HeatmapTileProvider
-                .Builder()
-                .weightedData(heatmapPoints)
-                .radius(50) // Radius of influence for each point in pixels
-                .opacity(0.6) // Transparency of heatmap layer
-                .build()
-
-        // Add tile overlay to the map and store the reference
-        currentOverlay =
-            map.addTileOverlay(
-                TileOverlayOptions().tileProvider(heatmapProvider)
-            )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun VisualizationModeSelector(
-    currentMode: MapVisualizationMode,
-    onModeChange: (MapVisualizationMode) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.small,
-        tonalElevation = 2.dp
-    ) {
-        Column {
-            FilterChip(
-                selected = true,
-                onClick = { expanded = !expanded },
-                label = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = getModeIcon(currentMode),
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Text(getModeLabel(currentMode))
-                        Icon(
-                            imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                },
-                modifier = Modifier.padding(8.dp)
-            )
-
-            if (expanded) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    MapVisualizationMode.entries.forEach { mode ->
-                        if (mode != currentMode) {
-                            FilterChip(
-                                selected = false,
-                                onClick = {
-                                    onModeChange(mode)
-                                    expanded = false
-                                },
-                                label = {
-                                    Row(
-                                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Icon(
-                                            imageVector = getModeIcon(mode),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Text(getModeLabel(mode))
-                                    }
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EnhancedMapControls(
-    clusteringEnabled: Boolean,
-    heatmapEnabled: Boolean,
-    onToggleClustering: () -> Unit,
-    onToggleHeatmap: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.small,
-        tonalElevation = 2.dp
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            // Clustering toggle
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.GroupWork,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text("Cluster", style = MaterialTheme.typography.bodySmall)
-                Switch(
-                    checked = clusteringEnabled,
-                    onCheckedChange = { onToggleClustering() },
-                    modifier = Modifier.height(24.dp)
-                )
-            }
-
-            // Heatmap toggle
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Whatshot,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Text("Heatmap", style = MaterialTheme.typography.bodySmall)
-                Switch(
-                    checked = heatmapEnabled,
-                    onCheckedChange = { onToggleHeatmap() },
-                    modifier = Modifier.height(24.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun EnhancedMapErrorView(
     error: String,
     onRetry: () -> Unit,
@@ -500,91 +211,5 @@ private fun EnhancedMapErrorView(
         Button(onClick = onRetry) {
             Text("Dismiss")
         }
-    }
-}
-
-/**
- * Get marker bitmap descriptor with custom color and styling.
- *
- * Uses custom-generated bitmaps with proper marker shape and selection highlighting.
- */
-private fun getMarkerBitmapDescriptor(
-    color: Int,
-    isSelected: Boolean
-): BitmapDescriptor =
-    MapMarkerBitmapGenerator.getCachedMarkerBitmap(
-        color = color,
-        isSelected = isSelected
-    )
-
-/**
- * Get cluster bitmap descriptor with count badge.
- *
- * Generates custom circular cluster markers with count text overlay.
- */
-private fun getClusterBitmapDescriptor(
-    count: Int,
-    color: Int,
-    isSelected: Boolean
-): BitmapDescriptor =
-    MapMarkerBitmapGenerator.getCachedClusterBitmap(
-        count = count,
-        color = color,
-        isSelected = isSelected
-    )
-
-/** Get route width based on transport type. */
-private fun getRouteWidth(transportType: TransportType): Float =
-    when (transportType) {
-        TransportType.WALK -> 8f
-        TransportType.BIKE -> 10f
-        TransportType.CAR -> 12f
-        TransportType.TRAIN -> 14f
-        TransportType.PLANE -> 16f
-        TransportType.BOAT -> 12f
-        TransportType.UNKNOWN -> 8f
-    }
-
-/** Get icon for visualization mode. */
-private fun getModeIcon(mode: MapVisualizationMode) =
-    when (mode) {
-        MapVisualizationMode.MARKERS -> Icons.Default.Place
-        MapVisualizationMode.CLUSTERS -> Icons.Default.GroupWork
-        MapVisualizationMode.HEATMAP -> Icons.Default.Whatshot
-        MapVisualizationMode.HYBRID -> Icons.Default.Layers
-    }
-
-/** Get label for visualization mode. */
-private fun getModeLabel(mode: MapVisualizationMode) =
-    when (mode) {
-        MapVisualizationMode.MARKERS -> "Markers"
-        MapVisualizationMode.CLUSTERS -> "Clusters"
-        MapVisualizationMode.HEATMAP -> "Heatmap"
-        MapVisualizationMode.HYBRID -> "Hybrid"
-    }
-
-/**
- * Calculate appropriate zoom level based on region deltas. Uses the larger delta (latitude or longitude) to determine
- * zoom.
- */
-private fun calculateZoomLevel(
-    latitudeDelta: Double,
-    longitudeDelta: Double
-): Float {
-    val maxDelta = maxOf(latitudeDelta, longitudeDelta)
-    return when {
-        maxDelta >= 40.0 -> 3f
-        maxDelta >= 20.0 -> 4f
-        maxDelta >= 10.0 -> 5f
-        maxDelta >= 5.0 -> 6f
-        maxDelta >= 2.0 -> 7f
-        maxDelta >= 1.0 -> 8f
-        maxDelta >= 0.5 -> 9f
-        maxDelta >= 0.25 -> 10f
-        maxDelta >= 0.1 -> 11f
-        maxDelta >= 0.05 -> 12f
-        maxDelta >= 0.025 -> 13f
-        maxDelta >= 0.01 -> 14f
-        else -> 15f
     }
 }

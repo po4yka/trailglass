@@ -36,8 +36,7 @@ interface LocationModule {
     /** Provides PlaceVisitProcessor. */
     @AppScope
     @Provides
-    fun providePlaceVisitProcessor(reverseGeocoder: CachedReverseGeocoder): PlaceVisitProcessor =
-        PlaceVisitProcessor(reverseGeocoder)
+    fun providePlaceVisitProcessor(reverseGeocoder: CachedReverseGeocoder): PlaceVisitProcessor = PlaceVisitProcessor(reverseGeocoder)
 
     /** Provides RouteSegmentBuilder. */
     @AppScope

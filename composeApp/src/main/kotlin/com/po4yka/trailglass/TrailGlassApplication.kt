@@ -1,6 +1,8 @@
 package com.po4yka.trailglass
 
 import android.app.Application
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.po4yka.trailglass.crash.CrashHandler
 import com.po4yka.trailglass.di.AppComponent
 import com.po4yka.trailglass.di.createAndroidAppComponent
 import com.po4yka.trailglass.sync.SyncScheduler
@@ -27,6 +29,12 @@ class TrailGlassApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        // Initialize Firebase Crashlytics
+        initializeCrashlytics()
+
+        // Install custom crash handler
+        installCrashHandler()
 
         // Start network connectivity monitoring
         startNetworkMonitoring()
@@ -89,6 +97,35 @@ class TrailGlassApplication : Application() {
             logger.info { "Network connectivity monitoring stopped" }
         } catch (e: Exception) {
             logger.error(e) { "Failed to stop network monitoring: ${e.message}" }
+        }
+    }
+
+    /** Initialize Firebase Crashlytics. */
+    private fun initializeCrashlytics() {
+        try {
+            // Enable Crashlytics collection based on user preference
+            // For now, enable by default. Later, tie this to user settings.
+            val crashlytics = FirebaseCrashlytics.getInstance()
+            crashlytics.setCrashlyticsCollectionEnabled(true)
+
+            // Set custom keys for better crash analysis
+            crashlytics.setCustomKey("app_version", BuildConfig.VERSION_NAME)
+            crashlytics.setCustomKey("debug_mode", BuildConfig.DEBUG)
+
+            logger.info { "Firebase Crashlytics initialized successfully" }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to initialize Firebase Crashlytics: ${e.message}" }
+        }
+    }
+
+    /** Install custom crash handler for uncaught exceptions. */
+    private fun installCrashHandler() {
+        try {
+            val crashHandler = CrashHandler(appComponent.crashReportingService)
+            crashHandler.install()
+            logger.info { "Custom crash handler installed successfully" }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to install crash handler: ${e.message}" }
         }
     }
 

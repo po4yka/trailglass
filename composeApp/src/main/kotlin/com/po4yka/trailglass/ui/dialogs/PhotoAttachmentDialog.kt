@@ -13,7 +13,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -135,10 +134,14 @@ fun PhotoAttachmentHandler(
                                     is com.po4yka.trailglass.feature.photo.ImportPhotoUseCase.ImportResult.Success -> {
                                         val photoId = importResult.photo.id
 
-                                        when (val result = attachPhotoUseCase.execute(
-                                            photoId,
-                                            placeVisitId,
-                                            caption.ifBlank { null })) {
+                                        when (
+                                            val result =
+                                                attachPhotoUseCase.execute(
+                                                    photoId,
+                                                    placeVisitId,
+                                                    caption.ifBlank { null }
+                                                )
+                                        ) {
                                             is AttachPhotoToVisitUseCase.Result.Success -> {
                                                 onPhotoAttached()
                                                 showCaptionDialog = false

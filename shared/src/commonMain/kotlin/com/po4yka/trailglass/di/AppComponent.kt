@@ -49,7 +49,8 @@ abstract class AppComponent(
     LocationModule,
     SyncModule,
     PermissionModule,
-    AuthModule {
+    AuthModule,
+    NotificationModule {
     /**
      * Provides a CoroutineScope for application-level background work. Platform-specific implementation should provide
      * this.
@@ -76,6 +77,15 @@ abstract class AppComponent(
 
     // Location service (from PlatformModule)
     abstract val locationService: com.po4yka.trailglass.domain.service.LocationService
+
+    // Push notification service (from PlatformModule)
+    abstract val pushNotificationService: com.po4yka.trailglass.domain.service.PushNotificationService
+
+    // Push notification repository (from NotificationModule)
+    abstract val pushNotificationRepository: com.po4yka.trailglass.data.repository.PushNotificationRepository
+
+    // Crash reporting service (from PlatformModule)
+    abstract val crashReportingService: com.po4yka.trailglass.domain.service.CrashReportingService
 
     // Network connectivity monitor (from PlatformModule)
     abstract val networkConnectivityMonitor: com.po4yka.trailglass.data.network.NetworkConnectivityMonitor

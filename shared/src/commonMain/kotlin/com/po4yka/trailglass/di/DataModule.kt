@@ -59,8 +59,7 @@ interface DataModule {
     /** Provides GeocodingCacheRepository implementation. */
     @AppScope
     @Provides
-    fun provideGeocodingCacheRepository(database: Database): GeocodingCacheRepository =
-        GeocodingCacheRepositoryImpl(database)
+    fun provideGeocodingCacheRepository(database: Database): GeocodingCacheRepository = GeocodingCacheRepositoryImpl(database)
 
     /** Provides FrequentPlaceRepository implementation. */
     @AppScope
@@ -75,8 +74,7 @@ interface DataModule {
     /** Provides AlgorithmProvider for dynamic algorithm selection. */
     @AppScope
     @Provides
-    fun provideAlgorithmProvider(settingsRepository: SettingsRepository): AlgorithmProvider =
-        AlgorithmProvider(settingsRepository)
+    fun provideAlgorithmProvider(settingsRepository: SettingsRepository): AlgorithmProvider = AlgorithmProvider(settingsRepository)
 
     /** Provides FileOperations for cross-platform file I/O. */
     @AppScope

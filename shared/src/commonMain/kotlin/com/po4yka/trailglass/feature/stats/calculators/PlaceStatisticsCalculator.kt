@@ -29,7 +29,7 @@ class PlaceStatisticsCalculator {
         val placeGroups =
             visits.groupBy { visit ->
                 visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-                ?: "${visit.centerLatitude},${visit.centerLongitude}"
+                    ?: "${visit.centerLatitude},${visit.centerLongitude}"
             }
 
         val totalPlaces = placeGroups.size
@@ -122,7 +122,7 @@ class PlaceStatisticsCalculator {
         val placeGroups =
             visits.groupBy { visit ->
                 visit.frequentPlaceId ?: visit.userLabel ?: visit.poiName
-                ?: "${visit.centerLatitude},${visit.centerLongitude}"
+                    ?: "${visit.centerLatitude},${visit.centerLongitude}"
             }
 
         return placeGroups
