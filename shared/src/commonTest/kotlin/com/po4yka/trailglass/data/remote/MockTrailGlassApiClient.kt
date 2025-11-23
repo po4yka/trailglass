@@ -1,8 +1,12 @@
 package com.po4yka.trailglass.data.remote
 
+import com.po4yka.trailglass.data.remote.dto.AcceptedEntities
+import com.po4yka.trailglass.data.remote.dto.DeletedIds
 import com.po4yka.trailglass.data.remote.dto.DeltaSyncRequest
 import com.po4yka.trailglass.data.remote.dto.DeltaSyncResponse
 import com.po4yka.trailglass.data.remote.dto.LoginResponse
+import com.po4yka.trailglass.data.remote.dto.RejectedEntities
+import com.po4yka.trailglass.data.remote.dto.RemoteChanges
 import com.po4yka.trailglass.data.remote.dto.SyncConflictDto
 
 /**

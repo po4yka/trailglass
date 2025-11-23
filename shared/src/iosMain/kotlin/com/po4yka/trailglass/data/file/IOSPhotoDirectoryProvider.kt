@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.file
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
@@ -10,6 +11,7 @@ import platform.Foundation.NSUserDomainMask
  * iOS implementation of PhotoDirectoryProvider. Uses NSDocumentDirectory for photos and NSCachesDirectory for temporary
  * files.
  */
+@OptIn(ExperimentalForeignApi::class)
 class IOSPhotoDirectoryProvider : PhotoDirectoryProvider {
     override fun getPhotosDirectory(): String {
         val documentsPath = getDocumentsDirectory()
