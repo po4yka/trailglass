@@ -57,9 +57,9 @@ struct GlassEffectsShowcase: View {
                     .foregroundColor(.white)
                     .frame(height: 60)
                     .frame(maxWidth: .infinity)
-                    .glassBackground(material: .regular, tint: .coastalPath, cornerRadius: 12)
-                    .interactive(tint: .lightBlue)
-                    .glassShadow(elevation: 2)
+                    .glassEffectTinted(.coastalPath, opacity: 0.8)
+                    .cornerRadius(12)
+                    .shadow(radius: 2)
             }
 
             Divider().padding(.vertical, 8)
@@ -74,7 +74,8 @@ struct GlassEffectsShowcase: View {
                     .font(.caption)
                     .foregroundColor(.primary)
                     .padding(12)
-                    .glassBackground(material: .regular, cornerRadius: 8)
+                    .glassEffectTinted(.coastalPath, opacity: 0.8)
+.cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .strokeBorder(
@@ -91,7 +92,8 @@ struct GlassEffectsShowcase: View {
                     .font(.caption)
                     .foregroundColor(.primary)
                     .padding(12)
-                    .glassBackground(material: .regular, cornerRadius: 8)
+                    .glassEffectTinted(.coastalPath, opacity: 0.8)
+.cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 8)
                             .strokeBorder(
@@ -202,7 +204,7 @@ struct CardsShowcase: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
-            VisitGlassCard(visit: samplePlaceVisit())
+            // VisitGlassCard(visit: samplePlaceVisit()) // Commented out - requires proper Kotlin types
 
             Divider().padding(.vertical, 8)
 
@@ -211,7 +213,7 @@ struct CardsShowcase: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
 
-            RouteGlassCard(route: sampleRouteSegment())
+            // RouteGlassCard(route: sampleRouteSegment()) // Commented out - requires proper Kotlin types
 
             Divider().padding(.vertical, 8)
 
@@ -350,7 +352,8 @@ struct ChartsShowcase: View {
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
                 .padding()
-                .glassBackground(material: .ultraThin, tint: .lightCyan, cornerRadius: 8)
+                .glassEffectTinted(.coastalPath, opacity: 0.6)
+                .cornerRadius(8)
         }
     }
 }
@@ -445,10 +448,12 @@ struct NavigationShowcase: View {
                         variant: .large,
                         scrollOffset: 0,
                         title: { Text("Large Title") },
-                        subtitle: { Text("With subtitle") }
+                        subtitle: { Text("With subtitle") },
+                        backgroundContent: { EmptyView() }
                     )
                     .frame(height: 180)
-                    .glassBackground(material: .regular, cornerRadius: 12)
+                    .glassEffectTinted(.coastalPath, opacity: 0.8)
+                    .cornerRadius(12)
                 }
 
                 // Medium
@@ -461,10 +466,12 @@ struct NavigationShowcase: View {
                         variant: .medium,
                         scrollOffset: 0,
                         title: { Text("Medium Title") },
-                        subtitle: { Text("With subtitle") }
+                        subtitle: { Text("With subtitle") },
+                        backgroundContent: { EmptyView() }
                     )
                     .frame(height: 128)
-                    .glassBackground(material: .regular, cornerRadius: 12)
+                    .glassEffectTinted(.coastalPath, opacity: 0.8)
+                    .cornerRadius(12)
                 }
 
                 // Compact
@@ -479,7 +486,8 @@ struct NavigationShowcase: View {
                         title: { Text("Compact Title") }
                     )
                     .frame(height: 64)
-                    .glassBackground(material: .regular, cornerRadius: 12)
+                    .glassEffectTinted(.coastalPath, opacity: 0.8)
+                    .cornerRadius(12)
                 }
             }
 
@@ -530,11 +538,12 @@ struct FiltersSelectorsShowcase: View {
                 .foregroundColor(.secondary)
 
             CategoryBadgeRow(
-                categories: [.home, .work, .food, .shopping, .fitness, .entertainment],
+                categories: [.home, .work],
                 selectedCategory: selectedCategory,
                 badgeSize: .medium
             ) { category in
-                selectedCategory = selectedCategory == category.name ? nil : category.name
+                let categoryName = categoryName(category)
+                selectedCategory = selectedCategory == categoryName ? nil : categoryName
             }
 
             Divider().padding(.vertical, 8)
@@ -556,7 +565,8 @@ struct FiltersSelectorsShowcase: View {
                                 .font(.caption)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
-                                .glassBackground(material: .ultraThin, tint: .coolSteel, cornerRadius: 8)
+                                .glassEffectTinted(.coolSteel, opacity: 0.6)
+                                .cornerRadius(8)
                         }
                     }
                 }

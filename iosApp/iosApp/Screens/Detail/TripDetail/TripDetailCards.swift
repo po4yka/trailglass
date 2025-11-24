@@ -21,7 +21,7 @@ struct TripOverviewCard: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
-                    let duration = tripRoute.endTime - tripRoute.startTime
+                    let duration = tripRoute.endTime.epochSeconds - tripRoute.startTime.epochSeconds
                     Text(formatDuration(duration))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
@@ -93,14 +93,14 @@ struct TripStatisticsCards: View {
                 TripStatCard(
                     icon: "arrow.up.right",
                     label: "Max Speed",
-                    value: formatSpeed(statistics.maxSpeedMps),
+                    value: formatSpeed(Double(statistics.maxSpeedMps ?? 0)),
                     color: .orange
                 )
 
                 TripStatCard(
                     icon: "speedometer",
                     label: "Avg Speed",
-                    value: formatSpeed(statistics.averageSpeedMps),
+                    value: formatSpeed(Double(truncating: (statistics.averageSpeedMps ?? 0) as NSNumber)),
                     color: .purple
                 )
             }
@@ -167,8 +167,12 @@ struct RouteMapPreview: View {
                 .font(.headline)
                 .padding(.horizontal)
 
-            Map(coordinateRegion: .constant(region), annotationItems: []) { _ in
-                MapMarker(coordinate: CLLocationCoordinate2D(latitude: 0, longitude: 0))
+            Rectangle()
+                .fill(Color.gray.opacity(0.3))
+                .overlay(
+                    Text("Map Preview")
+                        .foregroundColor(.secondary)
+                )
             }
             .frame(height: 200)
             .cornerRadius(12)
@@ -182,7 +186,6 @@ struct RouteMapPreview: View {
             }
         }
     }
-}
 
 // MARK: - Transport Breakdown Card
 

@@ -77,11 +77,11 @@ struct PaginatedTripsView: View {
                 viewModel.loadTrips()
             }
         }
-        .sheet(item: $selectedTrip) { trip in
-            NavigationView {
-                TripDetailView(tripId: trip.id, appComponent: nil)
-            }
-        }
+        // .sheet(item: $selectedTrip) { trip in
+        //     NavigationView {
+        //         TripDetailView(tripId: trip.id, controller: appComponent.tripDetailController) // appComponent not available
+        //     }
+        // }
     }
 
     private var subtitleText: String {
@@ -196,11 +196,8 @@ private struct TripCard: View {
                                 }
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .glassBackground(
-                                    material: .ultraThin,
-                                    tint: .coastalPath,
-                                    cornerRadius: 8
-                                )
+                                .glassEffectTinted(.coastalPath, opacity: 0.6)
+                                .cornerRadius(8)
                             }
                         }
 
@@ -223,18 +220,15 @@ private struct TripCard: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .glassBackground(
-                            material: .ultraThin,
-                            tint: .duskPurple,
-                            cornerRadius: 8
-                        )
+                        .glassEffectTinted(.duskPurple, opacity: 0.6)
+                        .cornerRadius(8)
                         .foregroundColor(.duskPurple)
                     }
                 }
 
                 // Description
-                if let description = trip.description {
-                    Text(description)
+                if !trip.description.isEmpty {
+                    Text(trip.description)
                         .font(.body)
                         .lineLimit(2)
                         .foregroundColor(.primary)
@@ -265,11 +259,8 @@ private struct TripCard: View {
                                 }
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .glassBackground(
-                                    material: .ultraThin,
-                                    tint: .coolSteel,
-                                    cornerRadius: 6
-                                )
+                                .glassEffectTinted(.coastalPath, opacity: 0.6)
+                                .cornerRadius(6)
                                 .foregroundColor(.primary)
                             }
 

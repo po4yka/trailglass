@@ -174,41 +174,13 @@ struct ShapeSemanticDemo: View {
 
 // MARK: - Sample Data Functions
 
-func samplePlaceVisit() -> PlaceVisit {
-    PlaceVisit(
-        id: 1,
-        latitude: 37.7749,
-        longitude: -122.4194,
-        arrivalTime: Date().addingTimeInterval(-7200),
-        departureTime: Date().addingTimeInterval(-3600),
-        category: .home,
-        poiName: "Golden Gate Park",
-        approximateAddress: "Golden Gate Park, San Francisco",
-        city: "San Francisco",
-        country: "USA",
-        userLabel: nil,
-        userNotes: "Beautiful afternoon walk through the park",
-        isFavorite: true,
-        tripId: nil,
-        photoCount: 3
-    )
-}
+// func samplePlaceVisit() -> PlaceVisit {
+//     PlaceVisit(...)
+// } // Commented out - requires proper Kotlin types
 
-func sampleRouteSegment() -> RouteSegment {
-    RouteSegment(
-        id: 1,
-        startTime: Date().addingTimeInterval(-1800),
-        endTime: Date().addingTimeInterval(-900),
-        transportType: .bike,
-        distanceMeters: 5280,
-        confidence: 0.85,
-        startLatitude: 37.7749,
-        startLongitude: -122.4194,
-        endLatitude: 37.7849,
-        endLongitude: -122.4094,
-        tripId: nil
-    )
-}
+// func sampleRouteSegment() -> RouteSegment {
+//     RouteSegment(...)
+// } // Commented out - requires proper Kotlin types
 
 func samplePieData() -> [PieData] {
     [

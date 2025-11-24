@@ -227,8 +227,8 @@ struct SyncStatusView_Previews: PreviewProvider {
                     pendingCount: 5,
                     conflictCount: 2,
                     lastError: nil,
-                    networkState: NetworkState.CONNECTED,
-                    networkType: NetworkType.WIFI,
+                    networkState: NetworkState.Connected(),
+                    networkType: NetworkType.wifi,
                     isNetworkMetered: false
                 ),
                 onSync: {},

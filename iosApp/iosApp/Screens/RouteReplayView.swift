@@ -232,10 +232,8 @@ struct RouteReplayMapView: View {
     )
 
     var body: some View {
-        Map(coordinateRegion: .constant(region), annotationItems: [vehicleMarker]) { marker in
-            MapAnnotation(coordinate: marker.coordinate) {
-                VehicleMarker(bearing: vehicleState.bearing)
-            }
+        Map(coordinateRegion: .constant(region))
+        .onAppear {
         }
         .onAppear {
             updateRegion()

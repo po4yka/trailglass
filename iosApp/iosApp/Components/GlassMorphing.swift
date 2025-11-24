@@ -216,7 +216,7 @@ struct GlassMorphingView: View {
                 startShape: currentShape,
                 endShape: targetShape
             )
-            .strokeBorder(
+            .stroke(
                 Color.white.opacity(colorScheme == .dark ? 0.3 : 0.5),
                 lineWidth: 1.5
             )

@@ -39,7 +39,8 @@ struct GlassCard<Content: View>: View {
     var body: some View {
         content()
             .padding(16)
-            .glassBackground(
+            .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                 material: variant.material,
                 tint: variant.tint,
                 cornerRadius: 12
@@ -122,7 +123,8 @@ struct VisitGlassCard: View {
                                 .foregroundColor(.primary)
                         }
                         .padding(8)
-                        .glassBackground(
+                        .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                             material: .ultraThin,
                             tint: .lightBlue,
                             cornerRadius: 6
@@ -335,7 +337,8 @@ private struct MetadataChip: View {
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
-        .glassBackground(
+        .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
             material: .ultraThin,
             tint: .coolSteel,
             cornerRadius: 4

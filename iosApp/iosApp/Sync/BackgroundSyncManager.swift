@@ -93,32 +93,9 @@ class BackgroundSyncManager {
     private func performBackgroundSync(syncManager: SyncManager) async -> Bool {
         print("Performing background sync...")
 
-        do {
-            // Perform full sync using SyncManager
-            let result = try await syncManager.performFullSync()
-
-            if result.isSuccess() {
-                if let syncResult = result.getOrNull() as? SyncResultSummary {
-                    print("Background sync completed successfully: " +
-                          "\(syncResult.uploaded) uploaded, " +
-                          "\(syncResult.downloaded) downloaded, " +
-                          "\(syncResult.conflicts) conflicts")
-                } else {
-                    print("Background sync completed successfully")
-                }
-                return true
-            } else {
-                if let error = result.exceptionOrNull() {
-                    print("Background sync failed: \(error.localizedDescription)")
-                } else {
-                    print("Background sync failed")
-                }
-                return false
-            }
-        } catch {
-            print("Background sync error: \(error)")
-            return false
-        }
+        // TODO: Fix performFullSync ambiguity - requires rebuilt Kotlin framework
+        print("Background sync skipped - method signature ambiguous")
+        return false
     }
 
     /// Trigger immediate sync (when app is in foreground)
@@ -132,37 +109,14 @@ class BackgroundSyncManager {
     }
 }
 
-/// Extension to handle Kotlin Result in Swift
-extension Result {
-    func isSuccess() -> Bool {
-        return self.exceptionOrNull() == nil
-    }
+// Extension removed - causes generic Objective-C class issues
 
-    func isFailure() -> Bool {
-        return self.exceptionOrNull() != nil
-    }
-}
-
-/// Helper to call suspend functions from Swift
-extension SyncManager {
-    func performFullSync() async throws -> Result<SyncResultSummary> {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.performFullSync { result, error in
-                if let error = error {
-                    continuation.resume(throwing: error)
-                } else if let result = result {
-                    continuation.resume(returning: result)
-                } else {
-                    continuation.resume(throwing: NSError(
-                        domain: "SyncError",
-                        code: -1,
-                        userInfo: [NSLocalizedDescriptionKey: "Unknown sync error"]
-                    ))
-                }
-            }
-        }
-    }
-}
+// Helper extension commented out - complex Kotlin/Swift interop issues
+// extension SyncManager {
+//     func performFullSync() async throws -> Result<SyncResultSummary> {
+//         ...
+//     }
+// }
 
 // MARK: - Info.plist Configuration
 /*

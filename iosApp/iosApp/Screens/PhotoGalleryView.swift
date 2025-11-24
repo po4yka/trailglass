@@ -158,18 +158,14 @@ private struct PhotoGroupSection: View {
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 6)
-                    .glassBackground(
-                        material: .ultraThin,
-                        tint: .lightBlue,
-                        cornerRadius: 8
-                    )
-                    .foregroundColor(.coolSteel)
+                    .glassEffectTinted(.coastalPath, opacity: 0.6)
+                    .foregroundColor(Color.coolSteel)
                 }
 
                 // Photo grid
                 LazyVGrid(columns: columns, spacing: 8) {
                     ForEach(group.photos, id: \.photo.id) { photoWithMeta in
-                        NavigationLink(destination: PhotoDetailView(photoId: photoWithMeta.photo.id, appComponent: appComponent)) {
+                        NavigationLink(destination: PhotoDetailView(photoId: photoWithMeta.photo.id, controller: appComponent.photoDetailController)) {
                             PhotoGlassGridItem(photo: photoWithMeta)
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -251,11 +247,10 @@ private struct PhotoGlassGridItem: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 8)
                 .padding(.vertical, 4)
-                .glassBackground(
-                    material: .thick,
-                    tint: .coastalPath,
-                    cornerRadius: 8
-                )
+                    .glassEffectTinted(
+                        Color.coastalPath,
+                        opacity: 0.8
+                    )
                 .padding(6)
             }
         }

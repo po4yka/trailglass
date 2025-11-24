@@ -38,9 +38,9 @@ public typealias KotlinDuration = Int64
 
 // Simple cancellable wrapper for Flow subscriptions
 public class KotlinJob {
-    private var task: Task<Void, Never>?
+    private var task: Task<Void, Error>?
 
-    init(task: Task<Void, Never>?) {
+    init(task: Task<Void, Error>?) {
         self.task = task
     }
 
@@ -97,7 +97,7 @@ extension TimelineFilter {
     ) {
         self.init(
             transportTypes: Set(transportTypes),
-            placeCategories: Set(placeCategories) as! Set<PlaceCategory>,
+            placeCategories: Set(placeCategories) as! Set<Shared.PlaceCategory>,
             countries: [],
             cities: [],
             searchQuery: nil,

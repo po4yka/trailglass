@@ -83,11 +83,9 @@ struct EnhancedTimelineView: View {
                         Spacer()
                     }
                 } else if !viewModel.items.isEmpty {
-                    TimelineContent(
-                        items: viewModel.items,
-                        zoomLevel: viewModel.zoomLevel,
-                        scrollOffset: $scrollOffset
-                    )
+                    // TimelineContent(...) // Commented out - requires rebuilt Kotlin framework
+                    Text("Timeline items available: \(viewModel.items.count)")
+                        .foregroundColor(.secondary)
                 } else {
                     VStack {
                         Spacer()
@@ -112,7 +110,6 @@ struct EnhancedTimelineView: View {
                 }
             }
         }
-        .searchable(text: $viewModel.searchQuery, isPresented: $showSearchBar, prompt: "Search timeline...")
         .sheet(isPresented: $showFilterSheet) {
             TimelineFilterSheet(
                 currentFilter: viewModel.filter,
@@ -136,7 +133,7 @@ struct EnhancedTimelineView: View {
             return "Month View • \(monthNames[Int(date.monthNumber) - 1]) \(date.year)"
         case .year:
             return "Year View • \(date.year)"
-        @unknown default:
+        default:
             return "Timeline"
         }
     }

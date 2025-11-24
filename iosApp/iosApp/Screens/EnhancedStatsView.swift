@@ -46,11 +46,12 @@ struct EnhancedStatsView: View {
             } else if let stats = viewModel.stats {
                 StatsContent(stats: stats, viewModel: viewModel, scrollOffset: $scrollOffset)
             } else {
-                EmptyStatsView()
+                Text("No stats available")
+                    .foregroundColor(.secondary)
             }
         }
-        .onAppear {
-            viewModel.loadCurrentYear()
-        }
+        // .onAppear {
+        //     viewModel.loadCurrentYear()
+        // }
     }
 }

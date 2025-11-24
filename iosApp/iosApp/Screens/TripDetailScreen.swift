@@ -27,13 +27,13 @@ struct TripDetailView: View {
                     TripStatisticsCard(trip: trip)
 
                     // Description card
-                    if let description = trip.description {
+                    if !trip.description.isEmpty {
                         Card {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Description")
                                     .font(.headline)
 
-                                Text(description)
+                                Text(trip.description)
                                     .font(.body)
                             }
                             .padding(16)
@@ -150,7 +150,7 @@ private struct TripHeaderCard: View {
                         }
 
                         // Duration
-                        if let duration = trip.duration {
+                        if let duration = trip.duration as? KotlinDuration {
                             HStack(spacing: 4) {
                                 Image(systemName: "clock")
                                     .font(.caption)
@@ -207,10 +207,10 @@ private struct TripHeaderCard: View {
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .none
 
-        let startDate = dateFormatter.string(from: Date(timeIntervalSince1970: trip.startTime.epochSeconds))
+        let startDate = dateFormatter.string(from: Date(timeIntervalSince1970: Double(trip.startTime.epochSeconds)))
 
         if let endTime = trip.endTime {
-            let endDate = dateFormatter.string(from: Date(timeIntervalSince1970: endTime.epochSeconds))
+            let endDate = dateFormatter.string(from: Date(timeIntervalSince1970: Double(endTime.epochSeconds)))
             return "\(startDate) to \(endDate)"
         } else {
             return "Started \(startDate)"
@@ -218,8 +218,9 @@ private struct TripHeaderCard: View {
     }
 
     private func formatDuration(_ duration: KotlinDuration) -> String {
-        let days = duration.inWholeDays
-        let hours = duration.inWholeHours % 24
+        let totalHours = duration.inWholeHours
+        let days = totalHours / 24
+        let hours = totalHours % 24
         let minutes = duration.inWholeMinutes % 60
 
         if days > 0 && hours > 0 {

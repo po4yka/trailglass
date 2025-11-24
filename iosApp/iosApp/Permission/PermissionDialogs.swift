@@ -375,7 +375,7 @@ struct PermissionDialogs_Previews: PreviewProvider {
 
         let mockState = PermissionRequestState(
             permissionType: .locationFine,
-            state: .notDetermined,
+            state: Shared.PermissionState.NotDetermined(),
             rationale: mockRationale,
             shouldShowRationale: true,
             canRequest: true

@@ -16,6 +16,18 @@ enum ShimmerStyle {
         case .strong: return 0.22
         }
     }
+
+    var angle: Angle {
+        .degrees(0) // No rotation by default
+    }
+
+    var duration: Double {
+        switch self {
+        case .light: return 2.0
+        case .medium: return 1.5
+        case .strong: return 1.0
+        }
+    }
 }
 
 struct DarkModeConfig {
@@ -339,7 +351,7 @@ private struct ShimmerView: View {
     var body: some View {
         Rectangle()
             .fill(DarkModeConfig.adaptiveShimmerGradient(for: colorScheme, style: style))
-            .frame(width: style.width)
+            .frame(width: width)
             .rotationEffect(style.angle)
             .offset(x: offset)
             .onAppear {

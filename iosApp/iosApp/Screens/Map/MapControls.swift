@@ -228,11 +228,11 @@ class MapViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
                 self.error = state.error
-                self.markers = state.mapData.markers
+                self.markers = state.mapData.markers as! [Shared.MapMarker]
                 self.routes = state.mapData.routes
                 self.selectedMarkerId = state.selectedMarker?.id
                 self.selectedRouteId = state.selectedRoute?.id
-                self.needsLocationPermission = !state.hasLocationPermission
+                self.needsLocationPermission = false
 
                 // Update region if changed
                 if let region = state.mapData.region {

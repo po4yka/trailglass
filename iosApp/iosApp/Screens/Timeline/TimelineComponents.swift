@@ -23,7 +23,8 @@ struct ZoomLevelSelector: View {
             }
         }
         .padding(8)
-        .glassBackground(material: .ultraThin, tint: .lightCyan, cornerRadius: 8)
+        .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(material: .ultraThin, tint: .lightCyan, cornerRadius: 8)
     }
 }
 

@@ -30,11 +30,8 @@ struct TripGlassCard: View {
                                 }
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .glassBackground(
-                                    material: .ultraThin,
-                                    tint: .coastalPath,
-                                    cornerRadius: 8
-                                )
+                                .glassEffectTinted(.coastalPath, opacity: 0.6)
+                                .cornerRadius(8)
                             }
                         }
 
@@ -57,11 +54,8 @@ struct TripGlassCard: View {
                         }
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .glassBackground(
-                            material: .ultraThin,
-                            tint: .duskPurple,
-                            cornerRadius: 8
-                        )
+                        .glassEffectTinted(.duskPurple, opacity: 0.6)
+                        .cornerRadius(8)
                         .foregroundColor(.duskPurple)
                     }
                 }
@@ -99,7 +93,8 @@ struct TripGlassCard: View {
                                 }
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .glassBackground(
+                                .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                                     material: .ultraThin,
                                     tint: .coolSteel,
                                     cornerRadius: 6

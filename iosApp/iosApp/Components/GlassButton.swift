@@ -75,7 +75,8 @@ struct GlassButton: View {
                     }
                 }
             )
-            .glassBackground(
+            .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                 material: variant.material,
                 tint: isSelected ? tint : nil,
                 cornerRadius: 8
@@ -176,7 +177,8 @@ struct GlassFilterChip: View {
                     }
                 }
             )
-            .glassBackground(
+            .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                 material: isSelected ? .thick : .thin,
                 tint: isSelected ? tint : nil,
                 cornerRadius: 16
@@ -242,7 +244,8 @@ struct GlassIconButton: View {
                 .font(.system(size: size * 0.5, weight: .medium))
                 .foregroundColor(tint)
                 .frame(width: size, height: size)
-                .glassBackground(
+                .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                     material: .regular,
                     tint: tint.opacity(0.1),
                     cornerRadius: size / 2

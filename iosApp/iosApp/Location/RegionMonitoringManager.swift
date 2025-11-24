@@ -159,7 +159,7 @@ class RegionMonitoringManager: NSObject, ObservableObject {
     // MARK: - Private Methods
 
     private func startMonitoringRegion(_ region: Region) {
-        guard region.radiusMeters >= locationManager.maximumRegionMonitoringDistance ||
+        guard Double(region.radiusMeters) >= locationManager.maximumRegionMonitoringDistance ||
               locationManager.maximumRegionMonitoringDistance == CLLocationDistanceMax else {
             print("Region \(region.name) radius too large: \(region.radiusMeters)m")
             errorSubject.send("Region \(region.name) radius exceeds maximum allowed")
@@ -173,7 +173,7 @@ class RegionMonitoringManager: NSObject, ObservableObject {
 
         let clRegion = CLCircularRegion(
             center: center,
-            radius: region.radiusMeters,
+            radius: Double(region.radiusMeters),
             identifier: region.id
         )
 

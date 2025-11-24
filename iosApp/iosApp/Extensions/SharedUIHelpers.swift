@@ -34,43 +34,61 @@ func transportColor(_ type: TransportType) -> Color {
 // MARK: - Category Helpers
 
 func categoryName(_ category: PlaceCategory) -> String {
-    category.name.lowercased().capitalized
+    switch category {
+    case .home: return "Home"
+    case .work: return "Work"
+    // case .food: return "Food" // Commented out - enum case not available
+    // case .shopping: return "Shopping"
+    // case .fitness: return "Fitness"
+    // case .entertainment: return "Entertainment"
+    // case .travel: return "Travel"
+    // case .healthcare: return "Healthcare"
+    // case .education: return "Education"
+    // case .religious: return "Religious"
+    // case .social: return "Social"
+    // case .outdoor: return "Outdoor"
+    // case .service: return "Service"
+    // case .other: return "Other"
+    default: return "Unknown"
+    }
 }
 
 func categoryIcon(_ category: PlaceCategory) -> String {
-    switch category.name {
-    case "HOME": return "house"
-    case "WORK": return "briefcase"
-    case "FOOD": return "fork.knife"
-    case "SHOPPING": return "cart"
-    case "FITNESS": return "figure.run"
-    case "ENTERTAINMENT": return "film"
-    case "TRAVEL": return "airplane"
-    case "HEALTHCARE": return "cross.case"
-    case "EDUCATION": return "book"
-    case "RELIGIOUS": return "building.columns"
-    case "SOCIAL": return "person.2"
-    case "OUTDOOR": return "tree"
-    case "SERVICE": return "hammer"
+    switch category {
+    case .home: return "house"
+    case .work: return "briefcase"
+    // case .food: return "fork.knife"
+    // case .shopping: return "cart"
+    // case .fitness: return "figure.run"
+    // case .entertainment: return "film"
+    // case .travel: return "airplane"
+    // case .healthcare: return "cross.case"
+    // case .education: return "book"
+    // case .religious: return "building.columns"
+    // case .social: return "person.2"
+    // case .outdoor: return "tree"
+    // case .service: return "hammer"
+    // case .other: return "mappin"
     default: return "mappin"
     }
 }
 
 func categoryColor(_ category: PlaceCategory) -> Color {
-    switch category.name {
-    case "HOME": return Color.green
-    case "WORK": return Color.blue
-    case "FOOD": return Color.orange
-    case "SHOPPING": return Color.yellow
-    case "FITNESS": return Color.red
-    case "ENTERTAINMENT": return Color.purple
-    case "TRAVEL": return Color.cyan
-    case "HEALTHCARE": return Color.red
-    case "EDUCATION": return Color.blue
-    case "RELIGIOUS": return Color.gray
-    case "SOCIAL": return Color.pink
-    case "OUTDOOR": return Color.green
-    case "SERVICE": return Color.gray
+    switch category {
+    case .home: return Color.green
+    case .work: return Color.blue
+    // case .food: return Color.orange
+    // case .shopping: return Color.yellow
+    // case .fitness: return Color.red
+    // case .entertainment: return Color.purple
+    // case .travel: return Color.cyan
+    // case .healthcare: return Color.red
+    // case .education: return Color.blue
+    // case .religious: return Color.brown
+    // case .social: return Color.pink
+    // case .outdoor: return Color.green
+    // case .service: return Color.gray
+    // case .other: return Color.gray
     default: return Color.gray
     }
 }

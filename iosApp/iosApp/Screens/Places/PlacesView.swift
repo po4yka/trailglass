@@ -67,7 +67,7 @@ struct PlacesView: View {
                     }
                 }
             }
-            .searchable(text: $viewModel.searchQuery, isPresented: $showSearchBar, prompt: "Search places...")
+            .searchable(text: $viewModel.searchQuery, prompt: "Search places...")
             .sheet(isPresented: $showFilterSheet) {
                 PlacesFilterSheet(
                     currentFilters: viewModel.filters,

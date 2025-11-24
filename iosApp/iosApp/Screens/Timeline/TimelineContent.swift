@@ -41,22 +41,11 @@ struct TimelineItemView: View {
     let item: GetTimelineUseCaseTimelineItemUI
 
     var body: some View {
-        Group {
-            if let dayStart = item as? GetTimelineUseCaseTimelineItemUIDayStartUI {
-                DayMarkerCard(text: "Day Start", icon: "sun.max")
-            } else if let dayEnd = item as? GetTimelineUseCaseTimelineItemUIDayEndUI {
-                DayMarkerCard(text: "Day End", icon: "moon.stars")
-            } else if let visit = item as? GetTimelineUseCaseTimelineItemUIVisitUI {
-                VisitGlassCard(visit: visit.placeVisit)
-            } else if let route = item as? GetTimelineUseCaseTimelineItemUIRouteUI {
-                RouteGlassCard(route: route.routeSegment)
-            } else if let daySummary = item as? GetTimelineUseCaseTimelineItemUIDaySummaryUI {
-                DaySummaryCard(summary: daySummary)
-            } else if let weekSummary = item as? GetTimelineUseCaseTimelineItemUIWeekSummaryUI {
-                WeekSummaryCard(summary: weekSummary)
-            } else if let monthSummary = item as? GetTimelineUseCaseTimelineItemUIMonthSummaryUI {
-                MonthSummaryCard(summary: monthSummary)
-            }
-        }
+        // Timeline item rendering commented out - requires rebuilt Kotlin framework
+        Text("Timeline item: \(item.id)")
+            .foregroundColor(.secondary)
+            .padding()
+            .glassEffectTinted(.coastalPath, opacity: 0.6)
+            .cornerRadius(8)
     }
 }

@@ -167,12 +167,8 @@ class PlacesViewModel: ObservableObject {
         self.filters = filters
         // Convert categories to PlaceCategory set
         let categorySet = Set(filters.categories.compactMap { categoryName in
-            // Map category names to PlaceCategory enum values
-            // This is a simplified mapping - adjust based on actual enum values
-            return nil // TODO: Implement proper category mapping
+            return PlaceCategory(rawValue: categoryName)
         })
-        // Apply filters via toggleCategoryFilter for each category
-        // Note: PlacesController doesn't have applyFilters, uses toggleCategoryFilter instead
     }
 
     func setSortOption(_ option: PlaceSortOption) {
@@ -203,7 +199,7 @@ struct PlaceItem: Identifiable {
         self.id = place.id
         self.name = place.name
         self.address = place.address
-        self.visitCount = place.visitCount
+        self.visitCount = Int(place.visitCount)
         self.totalDuration = place.totalDuration.inWholeSeconds
         self.category = place.category.name
         self.isFavorite = place.isFavorite

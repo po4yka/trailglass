@@ -45,7 +45,7 @@ class AuthStateManager: ObservableObject {
 
     func observe(authController: AuthController) {
         // Set initial state
-        isAuthenticated = authController.isAuthenticated
+        isAuthenticated = (authController.state.value as? AuthController.AuthStateAuthenticated) != nil
 
         // Observe state changes
         stateObserver = authController.state.subscribe { [weak self] (state: AuthState?) in

@@ -1,5 +1,30 @@
 import SwiftUI
 
+// MARK: - Wavy Shape
+
+struct WavyShape: Shape {
+    var phase: CGFloat
+    var frequency: CGFloat
+    var amplitude: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let width = rect.width
+        let height = rect.height
+        let midY = rect.midY
+
+        path.move(to: CGPoint(x: 0, y: midY))
+
+        for x in stride(from: 0, to: width, by: 1) {
+            let relativeX = x / width
+            let y = midY + sin(relativeX * frequency * .pi * 2 + phase) * amplitude
+            path.addLine(to: CGPoint(x: x, y: y))
+        }
+
+        return path
+    }
+}
+
 // MARK: - Loading Indicator Variants
 // Glass-themed loading animations with Silent Waters colors
 
@@ -132,7 +157,8 @@ private struct PulsingGlass: View {
                 )
                 .frame(width: size * scale1, height: size * scale1)
                 .opacity(opacity1)
-                .glassBackground(
+                .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                     material: .ultraThin,
                     tint: color,
                     cornerRadius: size
@@ -153,7 +179,8 @@ private struct PulsingGlass: View {
                 )
                 .frame(width: size * 0.7 * scale2, height: size * 0.7 * scale2)
                 .opacity(opacity2)
-                .glassBackground(
+                .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                     material: .thin,
                     tint: color,
                     cornerRadius: size
@@ -174,7 +201,8 @@ private struct PulsingGlass: View {
                 )
                 .frame(width: size * 0.4 * scale3, height: size * 0.4 * scale3)
                 .opacity(opacity3)
-                .glassBackground(
+                .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                     material: .regular,
                     tint: color,
                     cornerRadius: size
@@ -266,7 +294,8 @@ private struct MorphingShapes: View {
                 }
             }
             .frame(width: size, height: size)
-            .glassBackground(
+            .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                 material: .regular,
                 tint: color,
                 cornerRadius: size * 0.1
@@ -305,7 +334,8 @@ private struct LinearProgress: View {
                 RoundedRectangle(cornerRadius: 4)
                     .fill(color.opacity(0.2))
                     .frame(width: width, height: 8)
-                    .glassBackground(
+                    .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                         material: .ultraThin,
                         tint: color,
                         cornerRadius: 4
@@ -325,7 +355,8 @@ private struct LinearProgress: View {
                         )
                     )
                     .frame(width: width * 0.4, height: 8)
-                    .glassBackground(
+                    .glassEffectTinted(.coastalPath, opacity: 0.6)
+.cornerRadius(
                         material: .regular,
                         tint: color,
                         cornerRadius: 4

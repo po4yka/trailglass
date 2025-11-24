@@ -91,8 +91,10 @@ struct RegionDetailView: View {
 
     private var mapPreview: some View {
         GlassEffectGroup(spacing: 0, padding: 0) {
-            Map(coordinateRegion: $mapRegion, annotationItems: [MapAnnotation(coordinate: mapRegion.center)]) { item in
-                MapAnnotation(coordinate: item.coordinate) {
+            ZStack {
+                Map(coordinateRegion: $mapRegion)
+                // Overlay the annotation on top of the map
+                GeometryReader { geometry in
                     ZStack {
                         Circle()
                             .fill(Color.coastalPath.opacity(0.3))
@@ -106,6 +108,7 @@ struct RegionDetailView: View {
                             .foregroundColor(.coastalPath)
                             .font(.title)
                     }
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
                 }
             }
             .frame(height: 200)
@@ -217,13 +220,13 @@ struct RegionDetailView: View {
 
                 Slider(
                     value: $radiusMeters,
-                    in: Region.companion.MIN_RADIUS_METERS...5000.0,
+                    in: Double(Region.companion.MIN_RADIUS_METERS)...5000.0,
                     step: 50
                 )
                 .accentColor(.coastalPath)
 
                 HStack {
-                    Text("\(Int(Region.companion.MIN_RADIUS_METERS))m")
+                    Text("\(Region.companion.MIN_RADIUS_METERS)m")
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()

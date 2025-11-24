@@ -131,7 +131,7 @@ private struct MainFAB: View {
                     isTracking && !isExpanded ? Color.coastalPath : Color.adaptivePrimary,
                     opacity: 0.8
                 )
-                .glassShadow(elevation: 4)
+                .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
                 .rotationEffect(.degrees(isExpanded ? 45 : 0))
         }
         .buttonStyle(PlainButtonStyle())
@@ -160,7 +160,7 @@ private struct FABMenuItem: View {
                     Color.adaptiveSurface,
                     opacity: 0.7
                 )
-                .glassShadow(elevation: 2)
+                .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
 
             // Small FAB
             Button {
@@ -170,12 +170,11 @@ private struct FABMenuItem: View {
                     .font(.system(size: 20, weight: .medium))
                     .foregroundColor(.white)
                     .frame(width: 40, height: 40)
-                    .glassBackground(
-                        material: .thick,
-                        tint: tint,
-                        cornerRadius: 20
+                    .glassEffectTinted(
+                        Color.coastalPath,
+                        opacity: 0.8
                     )
-                    .glassShadow(elevation: 2)
+                    .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
             }
             .buttonStyle(PressableButtonStyle())
         }

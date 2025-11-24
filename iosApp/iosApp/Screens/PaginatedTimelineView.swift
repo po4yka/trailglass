@@ -81,13 +81,13 @@ struct PaginatedTimelineView: View {
                 viewModel.loadInitialData()
             }
         }
-        .sheet(item: $selectedVisit) { visit in
-            PlaceDetailView(
-                place: nil,
-                onToggleFavorite: {},
-                onDismiss: { selectedVisit = nil }
-            )
-        }
+        // .sheet(item: $selectedVisit) { visit in
+        //     PlaceDetailView(
+        //         place: nil, // TODO: Create proper FrequentPlace
+        //         onToggleFavorite: {},
+        //         onDismiss: { selectedVisit = nil }
+        //     )
+        // }
     }
 
     private var subtitleText: String {
@@ -181,14 +181,13 @@ private struct VisitCard: View {
         GlassCard(variant: .visit) {
             HStack(spacing: 12) {
                 // Category icon
-                Image(systemName: categoryIcon(visit.category))
+                Image(systemName: categoryIcon(visit.category as? PlaceCategory ?? .home))
                     .font(.title2)
-                    .foregroundColor(categoryColor(visit.category))
+                    .foregroundColor(categoryColor(visit.category as? PlaceCategory ?? .home))
                     .frame(width: 44, height: 44)
-                    .glassBackground(
-                        material: .ultraThin,
-                        tint: categoryColor(visit.category),
-                        cornerRadius: 10
+                    .glassEffectTinted(
+                        categoryColor(visit.category as? PlaceCategory ?? .home),
+                        opacity: 0.8
                     )
 
                 VStack(alignment: .leading, spacing: 6) {
@@ -242,12 +241,11 @@ private struct VisitCard: View {
                     .fontWeight(.medium)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .glassBackground(
-                        material: .ultraThin,
-                        tint: categoryColor(visit.category),
-                        cornerRadius: 6
+                    .glassEffectTinted(
+                        categoryColor(visit.category as? PlaceCategory ?? .home),
+                        opacity: 0.8
                     )
-                    .foregroundColor(categoryColor(visit.category))
+                    .foregroundColor(categoryColor(visit.category as? PlaceCategory ?? .home))
             }
         }
     }

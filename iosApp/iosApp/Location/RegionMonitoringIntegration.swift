@@ -167,7 +167,7 @@ struct RegionManagementView: View {
                     Section(header: Text("Last Event")) {
                         HStack {
                             Image(systemName: lastEvent.iconName)
-                                .foregroundColor(lastEvent.color)
+                                .foregroundColor(lastEvent.eventColor)
                             VStack(alignment: .leading) {
                                 Text(lastEvent.displayText)
                                     .font(.headline)
@@ -224,11 +224,9 @@ struct RegionRow: View {
                 }
             }
 
-            if let description = region.description {
-                Text(description)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
+            Text(region.description)
+                .font(.caption)
+                .foregroundColor(.secondary)
 
             HStack {
                 Label(region.radiusDisplayText, systemImage: "circle")
@@ -302,7 +300,7 @@ struct AddRegionView: View {
                 Section(header: Text("Radius")) {
                     Slider(
                         value: $radius,
-                        in: Region.companion.MIN_RADIUS_METERS...5000.0,
+                        in: Double(Region.companion.MIN_RADIUS_METERS)...5000.0,
                         step: 50
                     )
                     Text("\(Int(radius)) meters")

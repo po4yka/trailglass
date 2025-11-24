@@ -36,7 +36,8 @@ struct PeriodSelector: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .glassBackground(material: .ultraThin, tint: .lightCyan, cornerRadius: 8)
+        .glassEffectTinted(.coastalPath, opacity: 0.6)
+        .cornerRadius(8)
     }
 }
 
@@ -76,24 +77,23 @@ class EnhancedStatsViewModel: ObservableObject {
         observeState()
     }
 
-    func loadCurrentYear() {
-        let calendar = Calendar.current
-        let year = calendar.component(.year, from: Date())
-        controller.loadPeriod(period: GetStatsUseCasePeriodYear(year: Int32(year)))
-    }
+    // func loadCurrentYear() {
+    //     // TODO: Fix Kotlin period types
+    // }
 
     func loadPeriod(_ period: StatsPeriod) {
         selectedPeriod = period
         let calendar = Calendar.current
         let year = calendar.component(.year, from: Date())
 
-        switch period {
-        case .year:
-            controller.loadPeriod(period: GetStatsUseCasePeriodYear(year: Int32(year)))
-        case .month:
-            let month = calendar.component(.month, from: Date())
-            controller.loadPeriod(period: GetStatsUseCasePeriodMonth(year: Int32(year), month: Int32(month)))
-        }
+        // TODO: Fix Kotlin period loading
+        // switch period {
+        // case .year:
+        //     controller.loadPeriod(period: GetStatsUseCasePeriodYear(year: Int32(year)))
+        // case .month:
+        //     let month = calendar.component(.month, from: Date())
+        //     controller.loadPeriod(period: GetStatsUseCasePeriodMonth(year: Int32(year), month: Int32(month)))
+        // }
     }
 
     func refresh() {

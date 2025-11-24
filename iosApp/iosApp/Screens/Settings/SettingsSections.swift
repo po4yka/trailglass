@@ -252,7 +252,7 @@ struct AccountSettingsSection: View {
                 .foregroundColor(.secondary)
         }
 
-        if account.email != null {
+        if account.email != nil {
             Toggle("Auto Sync", isOn: .constant(account.autoSync))
                 .disabled(true)
 

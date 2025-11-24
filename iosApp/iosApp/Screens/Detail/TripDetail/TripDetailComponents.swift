@@ -27,7 +27,7 @@ struct TripDetailContent: View {
 
                 // Transport breakdown
                 if !tripRoute.statistics.distanceByTransport.isEmpty {
-                    TransportBreakdownCard(distribution: tripRoute.statistics.distanceByTransport)
+                    TransportBreakdownCard(distribution: tripRoute.statistics.distanceByTransport as! [TransportType : Double])
                 }
 
                 // Places visited

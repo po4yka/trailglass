@@ -31,17 +31,12 @@ enum MapAnnotationItem: Identifiable {
         }
     }
 
-    @ViewBuilder
-    var annotationView: some MapAnnotationProtocol {
+    var annotationView: some View {
         switch self {
         case .marker(let marker, let isSelected):
-            MapAnnotation(coordinate: coordinate) {
-                EnhancedMarkerView(marker: marker, isSelected: isSelected)
-            }
+            AnyView(EnhancedMarkerView(marker: marker, isSelected: isSelected))
         case .cluster(let cluster, let isSelected):
-            MapAnnotation(coordinate: coordinate) {
-                ClusterMarkerView(cluster: cluster, isSelected: isSelected)
-            }
+            AnyView(ClusterMarkerView(cluster: cluster, isSelected: isSelected))
         }
     }
 }
@@ -84,8 +79,7 @@ struct EnhancedMarkerView: View {
         case .home: return "house.fill"
         case .work: return "briefcase.fill"
         case .food: return "fork.knife"
-        case .transport: return "car.fill"
-        case .accommodation: return "bed.double.fill"
+        case .travel: return "car.fill"
         case .entertainment: return "theatermasks.fill"
         case .shopping: return "cart.fill"
         case .other: return "mappin.circle.fill"
@@ -98,8 +92,7 @@ struct EnhancedMarkerView: View {
         case .home: return .coolSteel
         case .work: return .blueSlate
         case .food: return .seaGlass
-        case .transport: return .coastalPath
-        case .accommodation: return .lightBlue
+        case .travel: return .coastalPath
         case .entertainment: return .mistyLavender
         case .shopping: return .weatheredBrass
         case .other: return .coolSteel

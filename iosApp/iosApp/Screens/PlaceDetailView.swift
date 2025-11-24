@@ -110,7 +110,7 @@ struct PlaceDetailView: View {
                     value: "\(place.visitCount)"
                 )
 
-                if place.totalDuration.toDouble(unit: .minutes) > 0 {
+                if Double(truncating: place.totalDuration as NSNumber) / 60.0 > 0 {
                     StatRow(
                         icon: "clock",
                         label: "Total Time",
@@ -118,7 +118,7 @@ struct PlaceDetailView: View {
                     )
                 }
 
-                if place.averageDuration.toDouble(unit: .minutes) > 0 {
+                if place.averageDuration.inWholeMinutes > 0 {
                     StatRow(
                         icon: "timer",
                         label: "Average Duration",
@@ -228,7 +228,7 @@ struct PlaceDetailView: View {
     }
 
     private func formatDuration(_ duration: KotlinDuration) -> String {
-        let minutes = Int(duration.toDouble(unit: .minutes))
+        let minutes = Int(duration) / 60
         let hours = minutes / 60
         let mins = minutes % 60
 
@@ -254,7 +254,7 @@ struct PlaceDetailView: View {
         return formatter.string(from: date)
     }
 
-    private func categoryIcon(for category: PlaceCategory) -> String {
+    private func categoryIcon(for category: Shared.PlaceCategory) -> String {
         switch category {
         case .home: return "house.fill"
         case .work: return "briefcase.fill"
@@ -273,7 +273,7 @@ struct PlaceDetailView: View {
         }
     }
 
-    private func categoryColor(for category: PlaceCategory) -> Color {
+    private func categoryColor(for category: Shared.PlaceCategory) -> Color {
         switch category {
         case .home: return .blue
         case .work: return .purple

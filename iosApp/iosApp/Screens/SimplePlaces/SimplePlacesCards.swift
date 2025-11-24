@@ -13,11 +13,8 @@ struct PlaceGlassCard: View {
                     .foregroundColor(place.categoryColor)
                     .font(.title2)
                     .frame(width: 44, height: 44)
-                    .glassBackground(
-                        material: .ultraThin,
-                        tint: place.categoryColor,
-                        cornerRadius: 10
-                    )
+                    .glassEffectTinted(place.categoryColor, opacity: 0.6)
+                    .cornerRadius(10)
 
                 VStack(alignment: .leading, spacing: 6) {
                     // Name and favorite
@@ -74,11 +71,8 @@ struct PlaceGlassCard: View {
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
-                .glassBackground(
-                    material: .ultraThin,
-                    tint: place.significanceColor,
-                    cornerRadius: 8
-                )
+                .glassEffectTinted(place.significanceColor, opacity: 0.6)
+                .cornerRadius(8)
                 .foregroundColor(place.significanceColor)
             }
         }

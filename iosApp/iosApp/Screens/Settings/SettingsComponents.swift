@@ -202,7 +202,7 @@ func accuracyName(_ accuracy: TrackingAccuracy) -> String {
     case .high: return "High"
     case .balanced: return "Balanced"
     case .low: return "Low"
-    @unknown default: return "Unknown"
+    default: return "Unknown"
     }
 }
 
@@ -211,7 +211,7 @@ func intervalName(_ interval: UpdateInterval) -> String {
     case .frequent: return "Frequent (30s)"
     case .normal: return "Normal (2min)"
     case .batterySaver: return "Battery Saver (10min)"
-    @unknown default: return "Unknown"
+    default: return "Unknown"
     }
 }
 
@@ -219,7 +219,7 @@ func distanceUnitName(_ unit: DistanceUnit) -> String {
     switch unit {
     case .metric: return "Metric (km)"
     case .imperial: return "Imperial (mi)"
-    @unknown default: return "Unknown"
+    default: return "Unknown"
     }
 }
 
@@ -227,7 +227,7 @@ func tempUnitName(_ unit: TemperatureUnit) -> String {
     switch unit {
     case .celsius: return "Celsius"
     case .fahrenheit: return "Fahrenheit"
-    @unknown default: return "Unknown"
+    default: return "Unknown"
     }
 }
 
@@ -235,7 +235,7 @@ func timeFormatName(_ format: TimeFormat) -> String {
     switch format {
     case .twelveHour: return "12-hour"
     case .twentyFourHour: return "24-hour"
-    @unknown default: return "Unknown"
+    default: return "Unknown"
     }
 }
 
@@ -244,7 +244,7 @@ func themeName(_ theme: AppTheme) -> String {
     case .light: return "Light"
     case .dark: return "Dark"
     case .system: return "System"
-    @unknown default: return "Unknown"
+    default: return "Unknown"
     }
 }
 

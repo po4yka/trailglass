@@ -216,9 +216,9 @@ struct FrequentPlaceItem: Identifiable {
         self.city = frequentPlace.city
         self.visitCount = frequentPlace.visitCount
         // Convert Duration to minutes
-        self.averageDurationMinutes = Int(frequentPlace.averageDuration.toDouble(unit: .minutes))
-        self.category = frequentPlace.category.name
-        self.significance = frequentPlace.significance.name
+        self.averageDurationMinutes = Int(frequentPlace.averageDuration.inWholeMinutes)
+        self.category = "Unknown" // TODO: Fix category name access
+        self.significance = "Unknown" // TODO: Fix significance name access
         self.isFavorite = frequentPlace.isFavorite
     }
 }

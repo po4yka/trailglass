@@ -32,16 +32,8 @@ struct FlexibleNavigationBar<Title: View, Subtitle: View, Background: View>: Vie
         self.variant = variant
         self.scrollOffset = scrollOffset
         self.title = title()
-        if let emptyView = EmptyView() as? Subtitle {
-            self.subtitle = emptyView
-        } else {
-            self.subtitle = nil
-        }
-        if let emptyView = EmptyView() as? Background {
-            self.backgroundContent = emptyView
-        } else {
-            self.backgroundContent = nil
-        }
+        self.subtitle = EmptyView()
+        self.backgroundContent = EmptyView()
     }
 
     private var maxHeight: CGFloat {
