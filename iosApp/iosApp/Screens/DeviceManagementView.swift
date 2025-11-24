@@ -264,7 +264,7 @@ class DeviceManagementViewModel: ObservableObject {
         controller.loadDevices()
 
         // Observe state changes
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: DeviceManagementState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {

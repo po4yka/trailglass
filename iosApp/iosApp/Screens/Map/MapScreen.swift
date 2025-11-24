@@ -78,15 +78,22 @@ struct MapScreen: View {
             )
         }
         .sheet(isPresented: $showLocationPermissionDialog) {
-            PermissionDialogs.locationPermissionSheet(
-                onRequestPermission: {
+            // TODO: Implement location permission sheet
+            // For now, use a simple permission request view
+            VStack {
+                Text("Location Permission Required")
+                    .font(.headline)
+                    .padding()
+                Button("Request Permission") {
                     viewModel.requestLocationPermission()
                     showLocationPermissionDialog = false
-                },
-                onCancel: {
+                }
+                .padding()
+                Button("Cancel") {
                     showLocationPermissionDialog = false
                 }
-            )
+                .padding()
+            }
         }
         .onAppear {
             viewModel.refreshData()

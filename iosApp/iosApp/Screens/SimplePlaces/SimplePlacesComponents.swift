@@ -103,7 +103,7 @@ class SimplePlacesViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: PlacesState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {

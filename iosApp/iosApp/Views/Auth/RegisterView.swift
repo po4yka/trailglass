@@ -274,7 +274,7 @@ class RegisterViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: AuthState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {

@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * SwiftUI trip detail screen matching Android TripDetailScreen.

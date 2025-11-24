@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 // MARK: - Glass Card Variants
 // Reusable glass cards for timeline, stats, and content display
@@ -282,7 +283,7 @@ struct SummaryGlassCard: View {
                 // Stats
                 HStack(spacing: 16) {
                     ForEach(stats.indices, id: \.self) { index in
-                        SummaryStatItem(
+                        GlassSummaryStatItem(
                             icon: stats[index].icon,
                             label: stats[index].label,
                             value: stats[index].value
@@ -297,7 +298,7 @@ struct SummaryGlassCard: View {
 
 // MARK: - Summary Stat Item
 
-private struct SummaryStatItem: View {
+private struct GlassSummaryStatItem: View {
     let icon: String
     let label: String
     let value: String
@@ -343,59 +344,8 @@ private struct MetadataChip: View {
     }
 }
 
-// MARK: - Helper Functions
 
-private func categoryIcon(_ category: PlaceCategory) -> String {
-    switch category.name {
-    case "HOME": return "house"
-    case "WORK": return "briefcase"
-    case "FOOD": return "fork.knife"
-    case "SHOPPING": return "cart"
-    case "FITNESS": return "figure.run"
-    case "ENTERTAINMENT": return "film"
-    case "TRAVEL": return "airplane"
-    case "HEALTHCARE": return "cross.case"
-    case "EDUCATION": return "book"
-    case "RELIGIOUS": return "building.columns"
-    case "SOCIAL": return "person.2"
-    case "OUTDOOR": return "tree"
-    case "SERVICE": return "hammer"
-    default: return "mappin"
-    }
-}
-
-private func categoryName(_ category: PlaceCategory) -> String {
-    category.name.lowercased().capitalized
-}
-
-private func transportIcon(_ type: TransportType) -> String {
-    switch type.name {
-    case "WALK": return "figure.walk"
-    case "BIKE": return "bicycle"
-    case "CAR": return "car"
-    case "TRAIN": return "tram"
-    case "PLANE": return "airplane"
-    case "BOAT": return "ferry"
-    default: return "questionmark.circle"
-    }
-}
-
-private func transportName(_ type: TransportType) -> String {
-    type.name.lowercased().capitalized
-}
-
-private func formatDuration(_ duration: KotlinDuration) -> String {
-    let hours = duration.inWholeHours
-    let minutes = duration.inWholeMinutes % 60
-
-    if hours > 0 && minutes > 0 {
-        return "\(hours)h \(minutes)m"
-    } else if hours > 0 {
-        return "\(hours)h"
-    } else {
-        return "\(minutes)m"
-    }
-}
+// formatDuration is defined in SharedUIHelpers.swift
 
 // MARK: - Previews (Disabled - require proper Kotlin types)
 

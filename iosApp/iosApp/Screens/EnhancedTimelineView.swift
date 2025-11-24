@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * SwiftUI timeline screen matching Android EnhancedTimelineScreen.

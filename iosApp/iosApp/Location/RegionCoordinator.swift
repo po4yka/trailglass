@@ -1,5 +1,6 @@
 import Foundation
 import CoreLocation
+import SwiftUI
 import Shared
 import Combine
 
@@ -311,7 +312,7 @@ struct RegionEventInfo {
         return type == .enter ? "arrow.down.circle.fill" : "arrow.up.circle.fill"
     }
 
-    var color: Color {
+    var eventColor: Color {
         return type == .enter ? .green : .orange
     }
 }

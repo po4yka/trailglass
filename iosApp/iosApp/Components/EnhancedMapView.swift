@@ -158,7 +158,7 @@ class EnhancedMapViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: MapState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
@@ -172,7 +172,7 @@ class EnhancedMapViewModel: ObservableObject {
         }
     }
 
-    private func updateAnnotations(from state: EnhancedMapControllerEnhancedMapState) {
+    private func updateAnnotations(from state: EnhancedMapController.EnhancedMapState) {
         var annotations: [MapAnnotationItem] = []
 
         // Add markers

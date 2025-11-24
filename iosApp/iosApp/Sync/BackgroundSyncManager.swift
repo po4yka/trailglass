@@ -98,7 +98,7 @@ class BackgroundSyncManager {
             let result = try await syncManager.performFullSync()
 
             if result.isSuccess() {
-                if let syncResult = result.getOrNull() as? SyncResult {
+                if let syncResult = result.getOrNull() as? SyncResultSummary {
                     print("Background sync completed successfully: " +
                           "\(syncResult.uploaded) uploaded, " +
                           "\(syncResult.downloaded) downloaded, " +
@@ -133,7 +133,7 @@ class BackgroundSyncManager {
 }
 
 /// Extension to handle Kotlin Result in Swift
-extension KotlinResult {
+extension Result {
     func isSuccess() -> Bool {
         return self.exceptionOrNull() == nil
     }
@@ -145,7 +145,7 @@ extension KotlinResult {
 
 /// Helper to call suspend functions from Swift
 extension SyncManager {
-    func performFullSync() async throws -> KotlinResult<SyncResult> {
+    func performFullSync() async throws -> Result<SyncResultSummary> {
         return try await withCheckedThrowingContinuation { continuation in
             self.performFullSync { result, error in
                 if let error = error {

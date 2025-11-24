@@ -23,7 +23,7 @@ struct DiagnosticsView: View {
                     LazyVStack(spacing: 16) {
                         LocationStatusCard(status: viewModel.state.locationStatus)
                         DatabaseStatusCard(status: viewModel.state.databaseStatus)
-                        SyncStatusCard(status: viewModel.state.syncStatus)
+                        DiagnosticsSyncStatusCard(status: viewModel.state.syncStatus)
                         SystemStatusCard(status: viewModel.state.systemStatus)
                         PermissionsStatusCard(status: viewModel.state.permissionsStatus)
                     }
@@ -94,7 +94,7 @@ struct DatabaseStatusCard: View {
     }
 }
 
-struct SyncStatusCard: View {
+struct DiagnosticsSyncStatusCard: View {
     let status: SyncStatus
 
     var body: some View {

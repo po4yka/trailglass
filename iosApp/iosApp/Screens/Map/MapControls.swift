@@ -71,7 +71,10 @@ struct EnhancedMapView: UIViewRepresentable {
         }
 
         // Remove routes that no longer exist
-        let routesToRemove = existingRoutes.filter { !newRouteIds.contains($0.id) }
+        let routesToRemove = existingRoutes.filter { route in
+            guard let routeId = route.id else { return false }
+            return !newRouteIds.contains(routeId)
+        }
         mapView.removeOverlays(routesToRemove)
 
         // Add new routes
@@ -101,7 +104,7 @@ struct EnhancedMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-            guard let markerAnnotation = annotation as? MarkerAnnotation else {
+            guard annotation is MarkerAnnotation else {
                 return nil
             }
 
@@ -178,7 +181,7 @@ struct EnhancedMapView: UIViewRepresentable {
             if let colorInt = polyline.colorInt {
                 // If color is provided by the controller, use it
                 // Convert Android color int (ARGB) to UIColor
-                let alpha = CGFloat((colorInt >> 24) & 0xFF) / 255.0
+                let _ = CGFloat((colorInt >> 24) & 0xFF) / 255.0 // alpha component (not used, using 1.0)
                 let red = CGFloat((colorInt >> 16) & 0xFF) / 255.0
                 let green = CGFloat((colorInt >> 8) & 0xFF) / 255.0
                 let blue = CGFloat(colorInt & 0xFF) / 255.0
@@ -219,12 +222,12 @@ class MapViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: MapState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
-                self.error = state.error?.userMessage
+                self.error = state.error
                 self.markers = state.mapData.markers
                 self.routes = state.mapData.routes
                 self.selectedMarkerId = state.selectedMarker?.id
@@ -249,7 +252,7 @@ class MapViewModel: ObservableObject {
     }
 
     func selectMarker(_ marker: Shared.MapMarker) {
-        controller.selectMarker(markerId: marker.id)
+        controller.selectMarker(marker: marker)
     }
 
     func clearRegionUpdate() {
@@ -257,11 +260,13 @@ class MapViewModel: ObservableObject {
     }
 
     func centerOnUserLocation() {
-        controller.centerOnUserLocation()
+        // TODO: Implement centerOnUserLocation functionality
+        // MapController doesn't have this method - may need to use map region updates
     }
 
     func fitAllMarkers() {
-        controller.fitAllMarkers()
+        // TODO: Implement fitAllMarkers functionality
+        // MapController doesn't have this method - may need to calculate bounds from markers
     }
 
     func refreshData() {

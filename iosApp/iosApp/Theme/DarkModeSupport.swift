@@ -4,6 +4,20 @@ import SwiftUI
 // Helper utilities for adapting Liquid Glass components to dark mode
 // Ensures consistent visual quality across light and dark appearances
 
+enum ShimmerStyle {
+    case light
+    case medium
+    case strong
+
+    var opacity: Double {
+        switch self {
+        case .light: return 0.1
+        case .medium: return 0.15
+        case .strong: return 0.22
+        }
+    }
+}
+
 struct DarkModeConfig {
     // MARK: - Glass Material Opacity
 

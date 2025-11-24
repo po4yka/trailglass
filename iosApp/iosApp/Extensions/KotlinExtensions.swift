@@ -1,58 +1,77 @@
 import Shared
 
-public typealias KotlinJob = Kotlinx_coroutines_coreJob
+// MARK: - Shared typealiases for Swift ergonomics
 
-// MARK: - KotlinDuration Extensions
+public typealias ConflictUiModel = SyncUiState.ConflictUiModel
+public typealias ConflictResolutionChoice = SyncUiState.ConflictResolutionChoice
+public typealias SyncStatusUiModel = SyncUiState.SyncStatusUiModel
+public typealias EnhancedMapState = EnhancedMapController.EnhancedMapState
+public typealias DayOfWeek = Kotlinx_datetimeDayOfWeek
+public typealias LocalDate = Kotlinx_datetimeLocalDate
+public typealias Instant = Kotlinx_datetimeInstant
+public typealias KotlinInstant = Kotlinx_datetimeInstant
+// TimelineZoomLevel is already correctly named in Shared module, no alias needed
+public typealias GetTimelineUseCaseTimelineItemUI = GetTimelineForDayUseCase.TimelineItemUI
+public typealias GetTimelineUseCaseTimelineItemUIDaySummaryUI = GetTimelineUseCase.TimelineItemUIDaySummaryUI
+public typealias GetTimelineUseCaseTimelineItemUIWeekSummaryUI = GetTimelineUseCase.TimelineItemUIWeekSummaryUI
+public typealias GetTimelineUseCaseTimelineItemUIMonthSummaryUI = GetTimelineUseCase.TimelineItemUIMonthSummaryUI
+public typealias TripsControllerSortOption = TripsController.SortOption
+public typealias TripStatistics = TripStatisticsCalculator.TripStatistics
+public typealias RouteData = TripRoute
+public typealias KotlinResult<T: AnyObject> = Result<T>
+public typealias AuthState = AuthController.AuthState
+public typealias RegionsState = RegionsController.RegionsState
+public typealias RouteViewState = RouteViewController.RouteViewState
+public typealias MapState = EnhancedMapController.EnhancedMapState
+public typealias TripsState = TripsController.TripsState
+public typealias ConflictResolutionState = ConflictResolutionController.ConflictResolutionState
+public typealias DeviceManagementState = DeviceManagementController.DeviceManagementState
+public typealias PlacesState = PlacesController.PlacesState
+public typealias PhotoGalleryState = PhotoGalleryController.GalleryState
+public typealias TrackingUIState = LocationTrackingController.LocationTrackingUIState
+public typealias TripStatsState = TripStatisticsController.StatisticsState
+public typealias RouteReplayState = RouteReplayController.ReplayState
+public typealias EnhancedTimelineState = EnhancedTimelineController.EnhancedTimelineState
 
-extension KotlinDuration {
-    var inWholeHours: Int64 {
-        return self.inWholeMilliseconds / (1000 * 60 * 60)
+// Kotlin Duration is not exported; represent as seconds.
+public typealias KotlinDuration = Int64
+
+// Simple cancellable wrapper for Flow subscriptions
+public class KotlinJob {
+    private var task: Task<Void, Never>?
+
+    init(task: Task<Void, Never>?) {
+        self.task = task
     }
 
-    var inWholeMinutes: Int64 {
-        return self.inWholeMilliseconds / (1000 * 60)
-    }
-
-    var hours: Int {
-        Int(inWholeHours)
-    }
-
-    var minutes: Int {
-        Int(inWholeMinutes)
+    public func cancel(cause: Error? = nil) {
+        task?.cancel()
+        task = nil
     }
 }
 
 // MARK: - Kotlinx_coroutines_coreStateFlow Extensions
 
 extension Kotlinx_coroutines_coreStateFlow {
-    func subscribe<T>(onValue: @escaping (T?) -> Void) -> Kotlinx_coroutines_coreJob {
-        let scope = KotlinCoroutineScope()
-        return scope.launch { [weak self] in
-            self?.collect(collector: FlowCollector<T> { value in
-                onValue(value as? T)
-            }, completionHandler: { _ in })
+    func subscribe<T>(onValue: @escaping (T?) -> Void) -> KotlinJob {
+        let task = Task {
+            self.collect(
+                collector: FlowCollector<T> { value in
+                    onValue(value as? T)
+                },
+                completionHandler: { _ in }
+            )
         }
+        return KotlinJob(task: task)
     }
 }
 
-// MARK: - Kotlin Coroutine Helpers
+// MARK: - KotlinDuration helpers (represented as seconds)
 
-/// Simple Kotlin coroutine scope for iOS
-class KotlinCoroutineScope {
-    private let scope = Kotlinx_coroutines_coreCoroutineScopeKt.CoroutineScope(
-        context: Kotlinx_coroutines_coreDispatchers.shared.Main
-    )
-
-    func launch(block: @escaping () -> Void) -> Kotlinx_coroutines_coreJob {
-        return Kotlinx_coroutines_coreLaunchKt.launch(
-            scope: scope,
-            context: Kotlinx_coroutines_coreDispatchers.shared.Main,
-            start: Kotlinx_coroutines_coreCoroutineStart.default_,
-            block: { _ in
-                block()
-            }
-        )
-    }
+public extension KotlinDuration {
+    var inWholeSeconds: Int64 { self }
+    var inWholeMinutes: Int64 { self / 60 }
+    var inWholeHours: Int64 { self / 3600 }
 }
 
 /// Flow collector helper

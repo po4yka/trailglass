@@ -4,6 +4,36 @@ import SwiftUI
 // iOS 26 Liquid Glass design system with translucent materials,
 // real-time lensing, and Silent Waters color integration
 
+// MARK: - Glass Material
+
+enum GlassMaterial {
+    case ultraThin
+    case thin
+    case regular
+    case thick
+    case clear
+
+    var opacity: Double {
+        switch self {
+        case .ultraThin: return 0.25
+        case .thin: return 0.3
+        case .regular: return 0.45
+        case .thick: return 0.6
+        case .clear: return 0.35
+        }
+    }
+
+    var blurRadius: CGFloat {
+        switch self {
+        case .ultraThin: return 8
+        case .thin: return 12
+        case .regular: return 16
+        case .thick: return 24
+        case .clear: return 12
+        }
+    }
+}
+
 // MARK: - Glass Variant
 
 enum GlassVariant {
@@ -82,7 +112,7 @@ struct GlassEffect: ViewModifier {
     func body(content: Content) -> some View {
         content
             .background(
-                GlassMaterial(
+                GlassMaterialBackground(
                     blurRadius: blurRadius,
                     tintColor: tintColor,
                     opacity: backgroundOpacity
@@ -93,7 +123,7 @@ struct GlassEffect: ViewModifier {
 
 // MARK: - Glass Material Background
 
-private struct GlassMaterial: View {
+private struct GlassMaterialBackground: View {
     let blurRadius: CGFloat
     let tintColor: Color
     let opacity: Double

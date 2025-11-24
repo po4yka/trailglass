@@ -354,7 +354,7 @@ class PhotoGalleryViewModel: ObservableObject {
 
     private func observeState() {
         // Observe Kotlin StateFlow
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: PhotoGalleryState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {

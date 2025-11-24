@@ -165,36 +165,3 @@ struct FloatingTabBarContainer<Content: View>: View {
         }
     }
 }
-
-/// Preference key for tracking scroll offset
-struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
-/// ViewModifier to track scroll position
-struct ScrollOffsetModifier: ViewModifier {
-    @Binding var offset: CGFloat
-
-    func body(content: Content) -> some View {
-        content
-            .overlay(
-                GeometryReader { geometry in
-                    Color.clear.preference(
-                        key: ScrollOffsetPreferenceKey.self,
-                        value: geometry.frame(in: .named("scroll")).minY
-                    )
-                }
-            )
-    }
-}
-
-extension View {
-    /// Adds scroll offset tracking to a view
-    func trackScrollOffset(_ offset: Binding<CGFloat>) -> some View {
-        modifier(ScrollOffsetModifier(offset: offset))
-    }
-}

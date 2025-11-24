@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * Timeline content with items.

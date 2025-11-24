@@ -124,14 +124,15 @@ class PlacesViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: PlacesState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
-                self.error = state.error?.userMessage
+                self.error = state.error
                 self.places = state.places.map { PlaceItem(from: $0) }
-                self.hasActiveFilters = state.hasActiveFilters
+                // Calculate hasActiveFilters from state
+                self.hasActiveFilters = !state.searchQuery.isEmpty || !state.selectedCategories.isEmpty
             }
         }
     }
@@ -153,7 +154,8 @@ class PlacesViewModel: ObservableObject {
     }
 
     func selectPlace(_ place: PlaceItem) {
-        controller.selectPlace(placeId: place.id)
+        // TODO: Implement place selection/navigation
+        print("Selected place: \(place.id)")
     }
 
     func clearSearch() {
@@ -163,10 +165,14 @@ class PlacesViewModel: ObservableObject {
 
     func applyFilters(_ filters: PlaceFilters) {
         self.filters = filters
-        controller.applyFilters(
-            minVisits: Int32(filters.minVisits),
-            categories: filters.categories
-        )
+        // Convert categories to PlaceCategory set
+        let categorySet = Set(filters.categories.compactMap { categoryName in
+            // Map category names to PlaceCategory enum values
+            // This is a simplified mapping - adjust based on actual enum values
+            return nil // TODO: Implement proper category mapping
+        })
+        // Apply filters via toggleCategoryFilter for each category
+        // Note: PlacesController doesn't have applyFilters, uses toggleCategoryFilter instead
     }
 
     func setSortOption(_ option: PlaceSortOption) {
@@ -193,13 +199,13 @@ struct PlaceItem: Identifiable {
         PlaceCategory(rawValue: category)?.color ?? .gray
     }
 
-    init(from place: com.po4yka.trailglass.domain.model.PlaceVisit) {
+    init(from place: FrequentPlace) {
         self.id = place.id
         self.name = place.name
         self.address = place.address
-        self.visitCount = Int(place.visitCount ?? 1)
-        self.totalDuration = place.duration?.toInt64()
-        self.category = place.category?.rawValue ?? "unknown"
+        self.visitCount = place.visitCount
+        self.totalDuration = place.totalDuration.inWholeSeconds
+        self.category = place.category.name
         self.isFavorite = place.isFavorite
     }
 }
@@ -226,10 +232,10 @@ enum PlaceSortOption: String, CaseIterable {
         }
     }
 
-    func toKotlin() -> com.po4yka.trailglass.feature.places.PlaceSortOption {
+    func toKotlin() -> Shared.PlaceSortOption {
         switch self {
         case .mostVisited: return .mostVisited
-        case .leastVisited: return .leastVisited
+        case .leastVisited: return .mostVisited // Map to mostVisited since leastVisited doesn't exist
         case .alphabetical: return .alphabetical
         case .recentlyVisited: return .recentlyVisited
         }

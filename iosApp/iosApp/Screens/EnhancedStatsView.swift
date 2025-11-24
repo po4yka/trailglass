@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * SwiftUI statistics screen matching Android EnhancedStatsScreen.

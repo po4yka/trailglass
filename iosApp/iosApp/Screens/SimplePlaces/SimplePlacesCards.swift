@@ -97,7 +97,7 @@ struct PlaceGlassCard: View {
 }
 
 /// Empty state view with glass styling
-struct EmptyPlacesView: View {
+struct SimpleEmptyPlacesView: View {
     var body: some View {
         VStack(spacing: 24) {
             Image(systemName: "mappin.slash")

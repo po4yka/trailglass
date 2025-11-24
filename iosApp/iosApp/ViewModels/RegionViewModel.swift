@@ -43,7 +43,7 @@ class RegionViewModel: ObservableObject {
     // MARK: - State Observation
 
     private func observeState() {
-        stateObserver = regionsController.state.subscribe { [weak self] state in
+        stateObserver = regionsController.state.subscribe { [weak self] (state: RegionsState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
@@ -244,10 +244,10 @@ extension Region {
      */
     var radiusDisplayText: String {
         if radiusMeters >= 1000 {
-            let km = radiusMeters / 1000.0
+            let km = Double(radiusMeters) / 1000.0
             return String(format: "%.1f km", km)
         } else {
-            return String(format: "%.0f m", radiusMeters)
+            return String(format: "%.0f m", Double(radiusMeters))
         }
     }
 

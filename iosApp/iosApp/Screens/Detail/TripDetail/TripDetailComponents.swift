@@ -5,33 +5,35 @@ import Shared
 
 /// Trip detail content layout
 struct TripDetailContent: View {
-    let stats: TripStatistics
-    let route: RouteData?
+    let tripRoute: TripRoute?
+    let tripName: String?
     let onShare: () -> Void
     let onExport: (String) -> Void
     let onDelete: () -> Void
 
     var body: some View {
         LazyVStack(spacing: 16) {
-            // Trip overview card
-            TripOverviewCard(stats: stats)
+            if let tripRoute = tripRoute {
+                // Trip overview card
+                TripOverviewCard(tripRoute: tripRoute, tripName: tripName)
 
-            // Statistics cards
-            TripStatisticsCards(stats: stats)
+                // Statistics cards
+                TripStatisticsCards(statistics: tripRoute.statistics)
 
-            // Map preview (if route available)
-            if let route = route, !route.coordinates.isEmpty {
-                RouteMapPreview(route: route)
-            }
+                // Map preview (if route available)
+                if !tripRoute.fullPath.isEmpty {
+                    RouteMapPreview(route: tripRoute)
+                }
 
-            // Transport breakdown
-            if let transportDist = stats.transportDistribution, !transportDist.isEmpty {
-                TransportBreakdownCard(distribution: transportDist)
-            }
+                // Transport breakdown
+                if !tripRoute.statistics.distanceByTransport.isEmpty {
+                    TransportBreakdownCard(distribution: tripRoute.statistics.distanceByTransport)
+                }
 
-            // Places visited
-            if !stats.placesVisited.isEmpty {
-                PlacesVisitedCard(places: stats.placesVisited)
+                // Places visited
+                if !tripRoute.visits.isEmpty {
+                    PlacesVisitedCard(places: tripRoute.visits.map { $0.displayName })
+                }
             }
         }
         .padding()
@@ -61,8 +63,7 @@ class TripDetailViewModel: ObservableObject {
     private var statsObserver: KotlinJob?
     private var routeObserver: KotlinJob?
 
-    @Published var tripStats: TripStatistics?
-    @Published var routeData: RouteData?
+    @Published var tripRoute: TripRoute?
     @Published var isLoading = true
     @Published var errorMessage: String?
     @Published var showDeleteAlert = false
@@ -85,16 +86,16 @@ class TripDetailViewModel: ObservableObject {
         errorMessage = nil
 
         // Load trip statistics
-        statsController.loadTripStatistics(tripId: tripId)
+        statsController.loadStatistics(tripId: tripId)
 
         // Observe stats state
-        statsObserver = statsController.state.subscribe { [weak self] state in
+        statsObserver = statsController.state.subscribe { [weak self] (state: TripStatsState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
-                self.errorMessage = state.error?.userMessage
-                self.tripStats = state.statistics
+                self.errorMessage = state.error
+                self.tripRoute = state.tripRoute
             }
         }
 
@@ -102,11 +103,11 @@ class TripDetailViewModel: ObservableObject {
         routeController.loadRoute(tripId: tripId)
 
         // Observe route state
-        routeObserver = routeController.state.subscribe { [weak self] state in
+        routeObserver = routeController.state.subscribe { [weak self] (state: RouteViewState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
-                self.routeData = state.routeData
+                // Route data is already loaded from stats controller
                 self.isExporting = state.isExporting
 
                 // Handle export result
@@ -129,18 +130,21 @@ class TripDetailViewModel: ObservableObject {
     }
 
     func exportTrip(format: String) {
-        guard let tripName = tripStats?.tripName else {
-            errorMessage = "Cannot export: trip name not available"
+        guard let tripRoute = tripRoute else {
+            errorMessage = "Cannot export: route data not available"
             return
         }
 
+        // Use trip ID as name if name not available
+        let tripName = tripRoute.tripId
+
         // Convert format string to ExportFormat enum
-        let exportFormat: ExportFormat
+        let exportFormat: Shared.ExportFormat
         switch format.lowercased() {
         case "gpx":
-            exportFormat = ExportFormat.gpx
+            exportFormat = Shared.ExportFormat.gpx
         case "kml":
-            exportFormat = ExportFormat.kml
+            exportFormat = Shared.ExportFormat.kml
         default:
             errorMessage = "Unsupported export format: \(format)"
             return

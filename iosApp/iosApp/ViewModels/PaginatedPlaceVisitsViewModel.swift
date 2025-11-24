@@ -130,9 +130,9 @@ struct PlaceVisitItem: Identifiable {
     var isFavorite: Bool { visit.isFavorite }
 
     var durationText: String {
-        let duration = visit.duration
-        let hours = duration.inWholeHours
-        let minutes = duration.inWholeMinutes % 60
+        let totalMinutes = Int(visit.duration / 60)
+        let hours = totalMinutes / 60
+        let minutes = totalMinutes % 60
 
         if hours > 0 {
             return "\(hours)h \(minutes)m"

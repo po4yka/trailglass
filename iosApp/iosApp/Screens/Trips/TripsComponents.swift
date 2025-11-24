@@ -83,7 +83,7 @@ class TripsViewModel: ObservableObject {
     @Published var completedTrips: [Trip] = []
     @Published var isLoading = false
     @Published var error: String?
-    @Published var sortOption: Shared.TripsControllerSortOption = .dateDesc
+    @Published var sortOption: TripsController.SortOption = .dateDesc
     @Published var filterShowOngoing = true
     @Published var filterShowCompleted = true
     @Published var searchQuery = ""
@@ -94,7 +94,7 @@ class TripsViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] state in
+        stateObserver = controller.state.subscribe { [weak self] (state: TripsState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
@@ -120,7 +120,7 @@ class TripsViewModel: ObservableObject {
         controller.refresh()
     }
 
-    func setSortOption(_ option: Shared.TripsControllerSortOption) {
+    func setSortOption(_ option: TripsController.SortOption) {
         controller.setSortOption(option: option)
     }
 

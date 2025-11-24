@@ -6,40 +6,28 @@ import MapKit
 
 /// Trip overview card showing basic info
 struct TripOverviewCard: View {
-    let stats: TripStatistics
+    let tripRoute: TripRoute
+    let tripName: String?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(stats.tripName)
+                    Text(tripName ?? tripRoute.tripId)
                         .font(.title2)
                         .fontWeight(.bold)
 
-                    Text(formatDateRange(stats.startTime, stats.endTime))
+                    Text(formatDateRange(tripRoute.startTime, tripRoute.endTime))
                         .font(.subheadline)
                         .foregroundColor(.secondary)
 
-                    if let duration = stats.duration {
-                        Text(formatDuration(duration))
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
+                    let duration = tripRoute.endTime - tripRoute.startTime
+                    Text(formatDuration(duration))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
                 }
 
                 Spacer()
-
-                // Status badge
-                if let isActive = stats.isActive, isActive {
-                    Text("Active")
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.green)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                }
             }
         }
         .padding()
@@ -48,7 +36,7 @@ struct TripOverviewCard: View {
         .cornerRadius(12)
     }
 
-    private func formatDateRange(_ start: Kotlinx_datetimeInstant, _ end: Kotlinx_datetimeInstant?) -> String {
+    private func formatDateRange(_ start: Kotlinx_datetimeInstant, _ end: Kotlinx_datetimeInstant) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
@@ -56,13 +44,9 @@ struct TripOverviewCard: View {
         let startDate = Date(timeIntervalSince1970: TimeInterval(start.epochSeconds))
         let startStr = formatter.string(from: startDate)
 
-        if let end = end {
-            let endDate = Date(timeIntervalSince1970: TimeInterval(end.epochSeconds))
-            let endStr = formatter.string(from: endDate)
-            return "\(startStr) - \(endStr)"
-        } else {
-            return "Started \(startStr)"
-        }
+        let endDate = Date(timeIntervalSince1970: TimeInterval(end.epochSeconds))
+        let endStr = formatter.string(from: endDate)
+        return "\(startStr) - \(endStr)"
     }
 
     private func formatDuration(_ duration: KotlinDuration) -> String {
@@ -85,38 +69,38 @@ struct TripOverviewCard: View {
 
 /// Trip statistics cards grid
 struct TripStatisticsCards: View {
-    let stats: TripStatistics
+    let statistics: RouteStatistics
 
     var body: some View {
         VStack(spacing: 12) {
             HStack(spacing: 12) {
-                StatCard(
+                TripStatCard(
                     icon: "figure.walk",
                     label: "Distance",
-                    value: formatDistance(stats.totalDistance),
+                    value: formatDistance(statistics.totalDistanceMeters),
                     color: .blue
                 )
 
-                StatCard(
+                TripStatCard(
                     icon: "mappin.and.ellipse",
                     label: "Places",
-                    value: "\(stats.placesVisited.count)",
+                    value: "\(statistics.numberOfLocations)",
                     color: .green
                 )
             }
 
             HStack(spacing: 12) {
-                StatCard(
+                TripStatCard(
                     icon: "arrow.up.right",
                     label: "Max Speed",
-                    value: formatSpeed(stats.maxSpeed),
+                    value: formatSpeed(statistics.maxSpeedMps),
                     color: .orange
                 )
 
-                StatCard(
+                TripStatCard(
                     icon: "speedometer",
                     label: "Avg Speed",
-                    value: formatSpeed(stats.averageSpeed),
+                    value: formatSpeed(statistics.averageSpeedMps),
                     color: .purple
                 )
             }
@@ -139,7 +123,7 @@ struct TripStatisticsCards: View {
 }
 
 /// Individual stat card
-struct StatCard: View {
+struct TripStatCard: View {
     let icon: String
     let label: String
     let value: String
@@ -170,7 +154,7 @@ struct StatCard: View {
 
 /// Route map preview
 struct RouteMapPreview: View {
-    let route: RouteData
+    let route: TripRoute
 
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
@@ -189,7 +173,7 @@ struct RouteMapPreview: View {
             .frame(height: 200)
             .cornerRadius(12)
             .onAppear {
-                if let first = route.coordinates.first {
+                if let first = route.fullPath.first {
                     region.center = CLLocationCoordinate2D(
                         latitude: first.latitude,
                         longitude: first.longitude
@@ -204,21 +188,21 @@ struct RouteMapPreview: View {
 
 /// Transport breakdown card
 struct TransportBreakdownCard: View {
-    let distribution: [String: Double]
+    let distribution: [TransportType: Double]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Transport Types")
                 .font(.headline)
 
-            ForEach(Array(distribution.keys.sorted()), id: \.self) { key in
-                if let distance = distribution[key] {
+            ForEach(Array(distribution.keys), id: \.self) { transportType in
+                if let distance = distribution[transportType] {
                     HStack {
-                        Image(systemName: transportIcon(key))
+                        Image(systemName: transportIcon(transportType.name))
                             .foregroundColor(.blue)
                             .frame(width: 24)
 
-                        Text(key.capitalized)
+                        Text(transportType.name.lowercased().capitalized)
                             .font(.body)
 
                         Spacer()
