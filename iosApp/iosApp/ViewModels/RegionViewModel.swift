@@ -26,7 +26,7 @@ class RegionViewModel: ObservableObject {
 
     private let regionsController: RegionsController
     private var cancellables = Set<AnyCancellable>()
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     // MARK: - Initialization
 

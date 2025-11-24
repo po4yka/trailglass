@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * Utility components and helpers for the statistics screen.
@@ -54,71 +55,8 @@ struct SectionHeader: View {
     }
 }
 
-/**
- * Info row for key-value pairs.
- */
-struct InfoRow: View {
-    let label: String
-    let value: String
+// ErrorView and InfoRow moved to SharedComponents.swift
 
-    var body: some View {
-        HStack {
-            Text(label)
-                .foregroundColor(.secondary)
-
-            Spacer()
-
-            Text(value)
-                .fontWeight(.semibold)
-        }
-    }
-}
-
-/**
- * Empty stats view.
- */
-struct EmptyStatsView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "chart.bar")
-                .font(.system(size: 64))
-                .foregroundColor(.secondary)
-
-            Text("No statistics available")
-                .font(.title2)
-                .foregroundColor(.secondary)
-
-            Text("Start tracking to see your travel statistics")
-                .font(.body)
-                .foregroundColor(.secondary)
-        }
-    }
-}
-
-/**
- * Error view with retry.
- */
-struct ErrorView: View {
-    let error: String
-    let onRetry: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 64))
-                .foregroundColor(.adaptiveWarning)
-
-            Text(error)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-
-            Button("Retry", action: onRetry)
-                .buttonStyle(.borderedProminent)
-        }
-        .padding()
-    }
-}
 
 // MARK: - ViewModel
 
@@ -175,75 +113,5 @@ enum StatsPeriod {
 
 // MARK: - Helper Functions
 
-func transportTypeName(_ type: TransportType) -> String {
-    type.name.lowercased().capitalized
-}
+// Helpers moved to SharedUIHelpers.swift
 
-func transportColor(_ type: TransportType) -> Color {
-    switch type.name {
-    case "WALK": return Color.adaptiveSuccess
-    case "BIKE": return Color.adaptivePrimary
-    case "CAR": return Color.adaptiveWarning
-    case "TRAIN": return Color.eveningCategory
-    case "PLANE": return Color.morningCategory
-    case "BOAT": return Color.waterCategory
-    default: return Color.neutralCategory
-    }
-}
-
-func categoryName(_ category: PlaceCategory) -> String {
-    category.name.lowercased().capitalized
-}
-
-func categoryColor(_ category: PlaceCategory) -> Color {
-    switch category.name {
-    case "HOME": return Color.adaptiveSuccess
-    case "WORK": return Color.adaptivePrimary
-    case "FOOD": return Color.morningCategory
-    case "SHOPPING": return Color.adaptiveWarning
-    case "FITNESS": return Color.eveningCategory
-    case "ENTERTAINMENT": return Color.morningCategory
-    case "TRAVEL": return Color.waterCategory
-    case "HEALTHCARE": return Color.adaptiveWarning
-    case "EDUCATION": return Color.adaptivePrimary
-    case "RELIGIOUS": return Color.neutralCategory
-    case "SOCIAL": return Color.morningCategory
-    case "OUTDOOR": return Color.adaptiveSuccess
-    case "SERVICE": return Color.neutralCategory
-    default: return Color.neutralCategory
-    }
-}
-
-func dayOfWeekName(_ day: DayOfWeek) -> String {
-    switch day.name {
-    case "MONDAY": return "Mon"
-    case "TUESDAY": return "Tue"
-    case "WEDNESDAY": return "Wed"
-    case "THURSDAY": return "Thu"
-    case "FRIDAY": return "Fri"
-    case "SATURDAY": return "Sat"
-    case "SUNDAY": return "Sun"
-    default: return day.name
-    }
-}
-
-func timeRangeForHour(_ hour: Int32) -> String {
-    switch hour {
-    case 0..<6: return "Night (12AM-6AM)"
-    case 6..<12: return "Morning (6AM-12PM)"
-    case 12..<18: return "Afternoon (12PM-6PM)"
-    default: return "Evening (6PM-12AM)"
-    }
-}
-
-// MARK: - Duration Extension
-
-extension KotlinDuration {
-    var hours: Int {
-        Int(inWholeHours)
-    }
-
-    var minutes: Int {
-        Int(inWholeMinutes)
-    }
-}

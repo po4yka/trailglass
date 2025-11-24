@@ -52,7 +52,7 @@ struct SimplePlacesView: View {
                 } else if viewModel.places.isEmpty && !viewModel.searchQuery.isEmpty {
                     NoSearchResultsView(query: viewModel.searchQuery)
                 } else {
-                    PlacesList(
+                    SimplePlacesList(
                         places: viewModel.places,
                         onPlaceTap: { place in
                             viewModel.selectedPlace = place

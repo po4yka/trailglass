@@ -58,8 +58,8 @@ class TripDetailViewModel: ObservableObject {
     private let routeController: RouteViewController
     private let tripsController: TripsController
 
-    private var statsObserver: Kotlinx_coroutines_coreJob?
-    private var routeObserver: Kotlinx_coroutines_coreJob?
+    private var statsObserver: KotlinJob?
+    private var routeObserver: KotlinJob?
 
     @Published var tripStats: TripStatistics?
     @Published var routeData: RouteData?
@@ -161,25 +161,5 @@ class TripDetailViewModel: ObservableObject {
     deinit {
         statsObserver?.cancel(cause: nil)
         routeObserver?.cancel(cause: nil)
-    }
-}
-
-// MARK: - Share Sheet
-
-/// SwiftUI wrapper for UIActivityViewController (share sheet)
-struct ShareSheet: UIViewControllerRepresentable {
-    let activityItems: [Any]
-    let applicationActivities: [UIActivity]? = nil
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        let controller = UIActivityViewController(
-            activityItems: activityItems,
-            applicationActivities: applicationActivities
-        )
-        return controller
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {
-        // No updates needed
     }
 }

@@ -50,7 +50,11 @@ struct PaginatedTripsView: View {
                         viewModel.loadTrips()
                     }
                 } else if viewModel.trips.isEmpty {
-                    EmptyTripsView()
+                    EmptyStateView(
+                        icon: "suitcase",
+                        title: "No Trips Yet",
+                        message: "Start tracking your adventures"
+                    )
                 } else {
                     TripsList(
                         trips: viewModel.trips,
@@ -316,74 +320,8 @@ private struct LoadingView: View {
     }
 }
 
-/// Error view
-private struct ErrorView: View {
-    let error: String
-    let onRetry: () -> Void
+// Shared components moved to SharedComponents.swift
 
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.driftwood)
-
-            VStack(spacing: 8) {
-                Text("Error Loading Trips")
-                    .font(.headline)
-                    .foregroundColor(.primary)
-
-                Text(error)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-            }
-
-            GlassButton(
-                title: "Retry",
-                icon: "arrow.clockwise",
-                variant: .filled,
-                tint: .coastalPath,
-                action: onRetry
-            )
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-/// Empty trips view
-private struct EmptyTripsView: View {
-    var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "suitcase")
-                .font(.system(size: 64))
-                .foregroundColor(.coolSteel)
-
-            VStack(spacing: 8) {
-                Text("No Trips Yet")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-
-                Text("Start tracking your adventures")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-/// Scroll offset preference key
-private struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
 
 extension Trip: @retroactive Identifiable {
     public var id: String { self.id }

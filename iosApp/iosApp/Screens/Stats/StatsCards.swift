@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * Individual stat card components for the statistics screen.
@@ -92,7 +93,7 @@ struct DistanceStatsCard: View {
             InfoRow(label: "Total Time", value: "\(hours)h \(minutes)m")
 
             if let mostUsed = stats.distanceStats.mostUsedTransportType {
-                InfoRow(label: "Most Used", value: transportTypeName(mostUsed))
+                InfoRow(label: "Most Used", value: transportName(mostUsed))
             }
         }
         .padding(16)
@@ -116,7 +117,7 @@ struct TransportDistributionCard: View {
 
             let barData = stats.distanceStats.byTransportType.map { type, meters in
                 BarData(
-                    label: String(transportTypeName(type).prefix(4)),
+                    label: String(transportName(type).prefix(4)),
                     value: Float(meters / 1000),
                     formattedValue: "\(Int(meters / 1000))km",
                     color: transportColor(type)

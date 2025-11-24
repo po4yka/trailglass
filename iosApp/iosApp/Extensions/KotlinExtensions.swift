@@ -1,5 +1,6 @@
-import Foundation
 import Shared
+
+public typealias KotlinJob = Kotlinx_coroutines_coreJob
 
 // MARK: - KotlinDuration Extensions
 
@@ -10,6 +11,14 @@ extension KotlinDuration {
 
     var inWholeMinutes: Int64 {
         return self.inWholeMilliseconds / (1000 * 60)
+    }
+
+    var hours: Int {
+        Int(inWholeHours)
+    }
+
+    var minutes: Int {
+        Int(inWholeMinutes)
     }
 }
 
@@ -57,5 +66,27 @@ class FlowCollector<T>: Kotlinx_coroutines_coreFlowCollector {
     func emit(value: Any?, completionHandler: @escaping (Error?) -> Void) {
         callback(value)
         completionHandler(nil)
+    }
+}
+
+// MARK: - TimelineFilter Extensions
+
+extension TimelineFilter {
+    convenience init(
+        transportTypes: [TransportType] = [],
+        placeCategories: [PlaceCategory] = [],
+        showOnlyFavorites: Bool = false
+    ) {
+        self.init(
+            transportTypes: Set(transportTypes),
+            placeCategories: Set(placeCategories),
+            countries: [],
+            cities: [],
+            searchQuery: nil,
+            dateRange: nil,
+            minDuration: nil,
+            maxDuration: nil,
+            showOnlyFavorites: showOnlyFavorites
+        )
     }
 }

@@ -337,22 +337,11 @@ private struct PhotoErrorView: View {
 }
 
 /**
- * Scroll offset preference key.
- */
-private struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
-/**
  * ViewModel for PhotoGalleryView bridging Swift and Kotlin.
  */
 class PhotoGalleryViewModel: ObservableObject {
     private let controller: PhotoGalleryController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var photoGroups: [PhotoGroup] = []
     @Published var isLoading: Bool = false

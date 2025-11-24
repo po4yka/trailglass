@@ -239,7 +239,7 @@ struct DeviceCard: View {
 /// ViewModel for DeviceManagementView
 class DeviceManagementViewModel: ObservableObject {
     private let controller: DeviceManagementController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var currentState: ViewState = .loading
     @Published var devices: [DeviceDto] = []

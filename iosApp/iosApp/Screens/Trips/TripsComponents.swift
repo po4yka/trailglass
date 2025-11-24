@@ -1,21 +1,12 @@
 import SwiftUI
 import Shared
 
-/**
- * Scroll offset preference key.
- */
-struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
+// ScrollOffsetPreferenceKey moved to SharedComponents.swift
 
 /**
  * Empty trips view with glass styling.
  */
-struct EmptyTripsView: View {
+struct TripsEmptyView: View {
     let onCreateTrip: () -> Void
 
     var body: some View {
@@ -77,49 +68,14 @@ struct NoResultsView: View {
     }
 }
 
-/**
- * Error view with glass styling.
- */
-struct ErrorView: View {
-    let error: String
-    let onRetry: () -> Void
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.driftwood)
-
-            VStack(spacing: 8) {
-                Text("Error Loading Trips")
-                    .font(.headline)
-                    .foregroundColor(.primary)
-
-                Text(error)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-
-            GlassButton(
-                title: "Retry",
-                icon: "arrow.clockwise",
-                variant: .filled,
-                tint: .coastalPath,
-                action: onRetry
-            )
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
+// ErrorView moved to SharedComponents.swift
 
 /**
  * ViewModel for TripsView bridging Swift and Kotlin.
  */
 class TripsViewModel: ObservableObject {
     private let controller: TripsController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var trips: [Trip] = []
     @Published var filteredTrips: [Trip] = []
@@ -127,7 +83,7 @@ class TripsViewModel: ObservableObject {
     @Published var completedTrips: [Trip] = []
     @Published var isLoading = false
     @Published var error: String?
-    @Published var sortOption: TripsControllerSortOption = .dateDesc
+    @Published var sortOption: Shared.TripsControllerSortOption = .dateDesc
     @Published var filterShowOngoing = true
     @Published var filterShowCompleted = true
     @Published var searchQuery = ""
@@ -164,7 +120,7 @@ class TripsViewModel: ObservableObject {
         controller.refresh()
     }
 
-    func setSortOption(_ option: TripsControllerSortOption) {
+    func setSortOption(_ option: Shared.TripsControllerSortOption) {
         controller.setSortOption(option: option)
     }
 

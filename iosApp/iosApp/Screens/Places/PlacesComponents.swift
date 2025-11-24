@@ -103,7 +103,7 @@ struct PlacesSortSheet: View {
 /// Places view model
 class PlacesViewModel: ObservableObject {
     private let controller: PlacesController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var places: [PlaceItem] = []
     @Published var isLoading: Bool = false

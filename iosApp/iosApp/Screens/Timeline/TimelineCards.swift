@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * Day marker card.
@@ -160,7 +161,7 @@ struct DaySummaryCard: View {
 
     var body: some View {
         SummaryGlassCard(
-            title: formatDate(summary.date),
+            title: formatLocalDate(summary.date),
             subtitle: nil,
             icon: "calendar",
             stats: [
@@ -181,7 +182,7 @@ struct WeekSummaryCard: View {
     var body: some View {
         SummaryGlassCard(
             title: "Week Summary",
-            subtitle: "\(formatDate(summary.weekStart)) - \(formatDate(summary.weekEnd))",
+            subtitle: "\(formatLocalDate(summary.weekStart)) - \(formatLocalDate(summary.weekEnd))",
             icon: "calendar.badge.clock",
             stats: [
                 (icon: "mappin.and.ellipse", label: "Places", value: "\(summary.totalVisits)"),

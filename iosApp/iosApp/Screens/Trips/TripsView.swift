@@ -51,7 +51,7 @@ struct TripsView: View {
                     ErrorView(error: error, onRetry: { viewModel.loadTrips() })
                 } else if viewModel.filteredTrips.isEmpty {
                     if viewModel.trips.isEmpty {
-                        EmptyTripsView(onCreateTrip: { viewModel.showCreateDialog() })
+                        TripsEmptyView(onCreateTrip: { viewModel.showCreateDialog() })
                     } else {
                         NoResultsView(message: "No trips match your filters")
                     }

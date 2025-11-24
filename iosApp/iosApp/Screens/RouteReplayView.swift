@@ -304,7 +304,7 @@ struct VehicleMarker: View {
 class RouteReplayViewModel: ObservableObject {
     private let tripId: String
     private let controller: RouteReplayController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var currentState: ViewState = .loading
     @Published var isPlaying = false

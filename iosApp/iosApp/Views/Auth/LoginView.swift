@@ -168,7 +168,7 @@ struct LoginView: View {
 /// ViewModel for LoginView bridging Swift and Kotlin
 class LoginViewModel: ObservableObject {
     private let controller: AuthController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var email: String = ""
     @Published var password: String = ""

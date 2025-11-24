@@ -103,35 +103,5 @@ struct EmptyPlacesView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
-}
 
-/// Error view
-struct ErrorView: View {
-    let error: String
-    let onRetry: () -> Void
-
-    var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 64))
-                .foregroundColor(.red)
-
-            Text("Error")
-                .font(.title2)
-                .fontWeight(.semibold)
-
-            Text(error)
-                .font(.body)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
-
-            Button(action: onRetry) {
-                Text("Retry")
-                    .fontWeight(.semibold)
-            }
-            .buttonStyle(.borderedProminent)
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
 }

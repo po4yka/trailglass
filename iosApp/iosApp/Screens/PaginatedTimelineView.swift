@@ -51,7 +51,11 @@ struct PaginatedTimelineView: View {
                         viewModel.loadInitialData()
                     }
                 } else if viewModel.visits.isEmpty {
-                    EmptyTimelineView()
+                    EmptyStateView(
+                        icon: "clock",
+                        title: "No Timeline Data",
+                        message: "Enable location tracking to see your timeline"
+                    )
                 } else {
                     VisitsList(
                         visits: viewModel.visits,
@@ -177,13 +181,13 @@ private struct VisitCard: View {
         GlassCard(variant: .visit) {
             HStack(spacing: 12) {
                 // Category icon
-                Image(systemName: categoryIcon)
+                Image(systemName: categoryIcon(visit.category))
                     .font(.title2)
-                    .foregroundColor(categoryColor)
+                    .foregroundColor(categoryColor(visit.category))
                     .frame(width: 44, height: 44)
                     .glassBackground(
                         material: .ultraThin,
-                        tint: categoryColor,
+                        tint: categoryColor(visit.category),
                         cornerRadius: 10
                     )
 
@@ -240,35 +244,11 @@ private struct VisitCard: View {
                     .padding(.vertical, 4)
                     .glassBackground(
                         material: .ultraThin,
-                        tint: categoryColor,
+                        tint: categoryColor(visit.category),
                         cornerRadius: 6
                     )
-                    .foregroundColor(categoryColor)
+                    .foregroundColor(categoryColor(visit.category))
             }
-        }
-    }
-
-    private var categoryIcon: String {
-        switch visit.category.name {
-        case "HOME": return "house.fill"
-        case "WORK": return "briefcase.fill"
-        case "FOOD": return "fork.knife"
-        case "SHOPPING": return "cart.fill"
-        case "FITNESS": return "figure.run"
-        case "ENTERTAINMENT": return "theatermasks.fill"
-        default: return "mappin.circle.fill"
-        }
-    }
-
-    private var categoryColor: Color {
-        switch visit.category.name {
-        case "HOME": return .blue
-        case "WORK": return .purple
-        case "FOOD": return .orange
-        case "SHOPPING": return .green
-        case "FITNESS": return .red
-        case "ENTERTAINMENT": return .pink
-        default: return .gray
         }
     }
 
@@ -277,17 +257,6 @@ private struct VisitCard: View {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
         return formatter.string(from: date)
-    }
-
-    private func formatDuration(_ duration: KotlinDuration) -> String {
-        let hours = duration.inWholeHours
-        let minutes = duration.inWholeMinutes % 60
-
-        if hours > 0 {
-            return "\(hours)h \(minutes)m"
-        } else {
-            return "\(minutes)m"
-        }
     }
 }
 
@@ -307,76 +276,8 @@ private struct LoadingView: View {
     }
 }
 
-/// Error view
-private struct ErrorView: View {
-    let error: String
-    let onRetry: () -> Void
+// Shared components moved to SharedComponents.swift
 
-    var body: some View {
-        VStack(spacing: 20) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.driftwood)
-
-            VStack(spacing: 8) {
-                Text("Error Loading Timeline")
-                    .font(.headline)
-                    .foregroundColor(.primary)
-
-                Text(error)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-            }
-
-            GlassButton(
-                title: "Retry",
-                icon: "arrow.clockwise",
-                variant: .filled,
-                tint: .coastalPath,
-                action: onRetry
-            )
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-/// Empty timeline view
-private struct EmptyTimelineView: View {
-    var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "clock")
-                .font(.system(size: 64))
-                .foregroundColor(.coastalPath)
-
-            VStack(spacing: 8) {
-                Text("No Timeline Data")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-
-                Text("Enable location tracking to see your timeline")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
-            }
-        }
-        .padding(32)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-/// Scroll offset preference key
-private struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
 
 extension PlaceVisit: @retroactive Identifiable {
     public var id: String { self.id }

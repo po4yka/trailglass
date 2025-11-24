@@ -274,7 +274,7 @@ struct VersionCard: View {
 /// ViewModel for ConflictResolutionView
 class ConflictResolutionViewModel: ObservableObject {
     private let controller: ConflictResolutionController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var currentConflict: SyncConflictDto?
     @Published var currentIndex: Int = 0

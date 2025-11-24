@@ -41,7 +41,7 @@ struct AppRootView: View {
 class AuthStateManager: ObservableObject {
     @Published var isAuthenticated: Bool = false
 
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     func observe(authController: AuthController) {
         // Set initial state

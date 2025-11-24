@@ -230,7 +230,7 @@ struct RegisterView: View {
 /// ViewModel for RegisterView
 class RegisterViewModel: ObservableObject {
     private let controller: AuthController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var displayName: String = ""
     @Published var email: String = ""

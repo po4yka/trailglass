@@ -3,7 +3,7 @@ import Shared
 import Combine
 
 /// List of frequent places with glass styling
-struct PlacesList: View {
+struct SimplePlacesList: View {
     let places: [FrequentPlaceItem]
     let onPlaceTap: (FrequentPlaceItem) -> Void
     @Binding var scrollOffset: CGFloat
@@ -79,19 +79,10 @@ struct PlacesList: View {
     }
 }
 
-/// Scroll offset preference key
-struct ScrollOffsetPreferenceKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 /// Places view model
 class SimplePlacesViewModel: ObservableObject {
     private let controller: PlacesController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
     private var frequentPlaces: [FrequentPlace] = []
     private var searchDebouncer: Timer?
 

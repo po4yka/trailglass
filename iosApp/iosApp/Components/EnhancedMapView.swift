@@ -3,7 +3,7 @@ import MapKit
 import Shared
 
 /// Enhanced MapKit view with clustering, heatmap, and custom markers
-struct EnhancedMapView: View {
+struct SwiftUIEnhancedMapView: View {
     @ObservedObject var viewModel: EnhancedMapViewModel
 
     @State private var region = MKCoordinateRegion(
@@ -139,7 +139,7 @@ struct EnhancedMapView: View {
 /// View model for EnhancedMapView that bridges to shared EnhancedMapController
 class EnhancedMapViewModel: ObservableObject {
     private let controller: EnhancedMapController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var allAnnotations: [MapAnnotationItem] = []
     @Published var currentMode: MapVisualizationMode = .hybrid

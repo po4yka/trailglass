@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 /**
  * Main content layout for the statistics screen.

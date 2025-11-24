@@ -198,7 +198,7 @@ struct EnhancedMapView: UIViewRepresentable {
 /// Map view model
 class MapViewModel: ObservableObject {
     private let controller: MapController
-    private var stateObserver: Kotlinx_coroutines_coreJob?
+    private var stateObserver: KotlinJob?
 
     @Published var markers: [Shared.MapMarker] = []
     @Published var routes: [Shared.MapRoute] = []

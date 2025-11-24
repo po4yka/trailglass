@@ -262,25 +262,7 @@ private struct SettingChip: View {
     }
 }
 
-/**
- * Info row for key-value pairs.
- */
-private struct InfoRow: View {
-    let label: String
-    let value: String
-
-    var body: some View {
-        HStack {
-            Text(label)
-                .foregroundColor(.secondary)
-
-            Spacer()
-
-            Text(value)
-                .fontWeight(.medium)
-        }
-    }
-}
+// InfoRow moved to SharedComponents.swift
 
 /**
  * ViewModel for PhotoDetailView.
