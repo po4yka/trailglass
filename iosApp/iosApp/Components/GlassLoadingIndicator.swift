@@ -158,11 +158,7 @@ private struct PulsingGlass: View {
                 .frame(width: size * scale1, height: size * scale1)
                 .opacity(opacity1)
                 .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                    material: .ultraThin,
-                    tint: color,
-                    cornerRadius: size
-                )
+                .cornerRadius(size)
 
             // Middle ring
             Circle()
@@ -180,11 +176,7 @@ private struct PulsingGlass: View {
                 .frame(width: size * 0.7 * scale2, height: size * 0.7 * scale2)
                 .opacity(opacity2)
                 .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                    material: .thin,
-                    tint: color,
-                    cornerRadius: size
-                )
+.cornerRadius(size)
 
             // Inner ring
             Circle()
@@ -202,11 +194,7 @@ private struct PulsingGlass: View {
                 .frame(width: size * 0.4 * scale3, height: size * 0.4 * scale3)
                 .opacity(opacity3)
                 .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                    material: .regular,
-                    tint: color,
-                    cornerRadius: size
-                )
+.cornerRadius(size)
         }
         .onAppear {
             withAnimation(
@@ -295,11 +283,7 @@ private struct MorphingShapes: View {
             }
             .frame(width: size, height: size)
             .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                material: .regular,
-                tint: color,
-                cornerRadius: size * 0.1
-            )
+.cornerRadius(size * 0.1)
             .rotationEffect(.degrees(rotation))
         }
         .onAppear {
@@ -335,11 +319,7 @@ private struct LinearProgress: View {
                     .fill(color.opacity(0.2))
                     .frame(width: width, height: 8)
                     .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                        material: .ultraThin,
-                        tint: color,
-                        cornerRadius: 4
-                    )
+.cornerRadius(4)
 
                 // Progress indicator
                 RoundedRectangle(cornerRadius: 4)
@@ -356,12 +336,8 @@ private struct LinearProgress: View {
                     )
                     .frame(width: width * 0.4, height: 8)
                     .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                        material: .regular,
-                        tint: color,
-                        cornerRadius: 4
-                    )
-                    .shimmer(style: .prominent, isActive: true)
+.cornerRadius(4)
+                    // .shimmer(style: .prominent, isActive: true)
                     .offset(x: offset)
             }
             .frame(width: width)

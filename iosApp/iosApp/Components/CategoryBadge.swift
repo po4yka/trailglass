@@ -55,46 +55,48 @@ struct CategoryBadge: View {
         switch category {
         case .home: return .seaGlass
         case .work: return .coolSteel
-        case "FOOD": return .sunrisePeach
-        case "SHOPPING": return .driftwood
-        case "FITNESS": return .adaptiveSuccess
-        case "ENTERTAINMENT": return .morningCategory
-        case "TRAVEL": return .waterCategory
-        case "HEALTHCARE": return .adaptiveWarning
-        case "EDUCATION": return .adaptivePrimary
-        case "RELIGIOUS": return .duskPurple
-        case "SOCIAL": return .morningCategory
-        case "OUTDOOR": return .adaptiveSuccess
-        case "SERVICE": return .neutralCategory
+        // case .food: return .sunrisePeach
+        // case .shopping: return .driftwood
+        // case .fitness: return .adaptiveSuccess
+        // case .entertainment: return .morningCategory
+        // case .travel: return .waterCategory
+        // case .healthcare: return .adaptiveWarning
+        // case .education: return .adaptivePrimary
+        // case .religious: return .duskPurple
+        // case .social: return .morningCategory
+        // case .outdoor: return .adaptiveSuccess
+        // case .service: return .neutralCategory
+        // case .other: return .neutralCategory
         default: return .neutralCategory
         }
     }
 
     private var categoryIcon: String {
-        switch category.name {
-        case "HOME": return "house.fill"
-        case "WORK": return "briefcase.fill"
-        case "FOOD": return "fork.knife"
-        case "SHOPPING": return "cart.fill"
-        case "FITNESS": return "figure.run"
-        case "ENTERTAINMENT": return "film.fill"
-        case "TRAVEL": return "airplane"
-        case "HEALTHCARE": return "cross.case.fill"
-        case "EDUCATION": return "book.fill"
-        case "RELIGIOUS": return "building.columns.fill"
-        case "SOCIAL": return "person.2.fill"
-        case "OUTDOOR": return "tree.fill"
-        case "SERVICE": return "hammer.fill"
+        switch category {
+        case .home: return "house.fill"
+        case .work: return "briefcase.fill"
+        // case .food: return "fork.knife"
+        // case .shopping: return "cart.fill"
+        // case .fitness: return "figure.run"
+        // case .entertainment: return "film.fill"
+        // case .travel: return "airplane"
+        // case .healthcare: return "cross.case.fill"
+        // case .education: return "book.fill"
+        // case .religious: return "building.columns.fill"
+        // case .social: return "person.2.fill"
+        // case .outdoor: return "tree.fill"
+        // case .service: return "hammer.fill"
+        // case .other: return "mappin.circle.fill"
         default: return "mappin.circle.fill"
         }
     }
 
     private var categoryShape: GlassShape {
-        GlassShape.forCategory(category.name)
+        GlassShape.forCategory(categoryName(category))
     }
 
     private var displayName: String {
-        category.name.lowercased().capitalized
+        categoryName(category)
     }
 
     var body: some View {

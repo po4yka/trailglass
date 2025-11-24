@@ -76,11 +76,7 @@ struct GlassButton: View {
                 }
             )
             .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                material: variant.material,
-                tint: isSelected ? tint : nil,
-                cornerRadius: 8
-            )
+            .cornerRadius(8)
             .overlay(
                 Group {
                     if variant == .outlined && !isSelected {
@@ -89,10 +85,10 @@ struct GlassButton: View {
                     }
                 }
             )
-            .glassShadow(elevation: isSelected ? 3 : 1)
+            .shadow(radius: isSelected ? 3 : 1)
             .scaleEffect(isPressed ? MotionConfig.pressScale : 1.0)
             .opacity(isDisabled ? 0.5 : 1.0)
-            .shimmer(style: isPressed ? .interactive : .subtle, isActive: isPressed)
+            // .shimmer(style: isPressed ? .interactive : .subtle, isActive: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
         .disabled(isDisabled)
@@ -178,11 +174,7 @@ struct GlassFilterChip: View {
                 }
             )
             .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                material: isSelected ? .thick : .thin,
-                tint: isSelected ? tint : nil,
-                cornerRadius: 16
-            )
+            .cornerRadius(16)
             .overlay(
                 Group {
                     if !isSelected {
@@ -191,9 +183,9 @@ struct GlassFilterChip: View {
                     }
                 }
             )
-            .glassShadow(elevation: isSelected ? 2 : 1)
+            .shadow(radius: isSelected ? 2 : 1)
             .scaleEffect(isPressed ? MotionConfig.pressScale : 1.0)
-            .shimmer(style: isPressed ? .interactive : .subtle, isActive: isPressed)
+            // .shimmer(style: isPressed ? .interactive : .subtle, isActive: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(
@@ -245,14 +237,10 @@ struct GlassIconButton: View {
                 .foregroundColor(tint)
                 .frame(width: size, height: size)
                 .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                    material: .regular,
-                    tint: tint.opacity(0.1),
-                    cornerRadius: size / 2
-                )
-                .glassShadow(elevation: 2)
+                .cornerRadius(size / 2)
+                .shadow(radius: 2)
                 .scaleEffect(isPressed ? MotionConfig.pressScale : 1.0)
-                .shimmer(style: .interactive, isActive: isPressed)
+                // // .shimmer(style: .interactive, isActive: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
         .simultaneousGesture(

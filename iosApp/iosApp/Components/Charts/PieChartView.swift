@@ -142,10 +142,9 @@ private struct GlassPieSlice: View {
                     clockwise: false
                 )
 
-                path.addLine(to: CGPoint(
-                    x: center.x + innerRadius * cos(CGFloat(endAngle.radians)),
-                    y: center.y + innerRadius * sin(CGFloat(endAngle.radians))
-                ))
+                let endX = center.x + innerRadius * cos(CGFloat(endAngle.radians))
+                let endY = center.y + innerRadius * sin(CGFloat(endAngle.radians))
+                path.addLine(to: CGPoint(x: endX, y: endY))
 
                 path.addArc(
                     center: center,
@@ -196,7 +195,7 @@ private struct GlassPieSlice: View {
 
                     path.closeSubpath()
                 }
-                .strokeBorder(
+                .stroke(
                     Color.white.opacity(colorScheme == .dark ? 0.3 : 0.5),
                     lineWidth: 1
                 )
@@ -261,7 +260,7 @@ private struct GlassLegendItem: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .fill(isSelected ? .ultraThinMaterial : Color.clear)
+                    .fill(isSelected ? Color.blue.opacity(0.1) : Color.clear)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 8)

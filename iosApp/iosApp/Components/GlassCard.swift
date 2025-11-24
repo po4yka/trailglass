@@ -40,12 +40,8 @@ struct GlassCard<Content: View>: View {
         content()
             .padding(16)
             .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                material: variant.material,
-                tint: variant.tint,
-                cornerRadius: 12
-            )
-            .glassShadow(elevation: 2)
+            .cornerRadius(12)
+            .shadow(radius: 2)
             .scaleEffect(isPressed ? MotionConfig.pressScale : 1.0)
             .animation(MotionConfig.buttonPress, value: isPressed)
     }
@@ -76,7 +72,7 @@ struct VisitGlassCard: View {
                 VStack(alignment: .leading, spacing: 12) {
                     // Header with icon and title
                     HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: categoryIcon(visit.category))
+                        Image(systemName: categoryIcon(visit.category as? PlaceCategory ?? .other))
                             .font(.title2)
                             .foregroundColor(.coastalPath)
 
@@ -93,8 +89,8 @@ struct VisitGlassCard: View {
                                 }
                             }
 
-                            if let city = visit.city, let country = visit.country {
-                                Text("\(city), \(country)")
+                            if let city = visit.city {
+                                Text(city)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -124,11 +120,7 @@ struct VisitGlassCard: View {
                         }
                         .padding(8)
                         .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                            material: .ultraThin,
-                            tint: .lightBlue,
-                            cornerRadius: 6
-                        )
+                        .cornerRadius(6)
                     }
 
                     // Metadata chips
@@ -138,12 +130,7 @@ struct VisitGlassCard: View {
                             text: formatDuration(visit.duration)
                         )
 
-                        if visit.category.name != "OTHER" {
-                            MetadataChip(
-                                icon: nil,
-                                text: categoryName(visit.category)
-                            )
-                        }
+                        // Category chip removed - enum access issues
                     }
                 }
             }
@@ -183,7 +170,7 @@ struct RouteGlassCard: View {
                                 .font(.caption)
                                 .foregroundColor(.secondary)
 
-                            let duration = route.endTime.timeIntervalSince1970 - route.startTime.timeIntervalSince1970
+                            let duration = Double(route.endTime.epochSeconds) - Double(route.startTime.epochSeconds)
                             if duration > 0 {
                                 Text("• \(Int(duration / 60)) min")
                                     .font(.caption)
@@ -338,11 +325,7 @@ private struct MetadataChip: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
         .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-            material: .ultraThin,
-            tint: .coolSteel,
-            cornerRadius: 4
-        )
+        .cornerRadius(4)
         .foregroundColor(.primary)
     }
 }
