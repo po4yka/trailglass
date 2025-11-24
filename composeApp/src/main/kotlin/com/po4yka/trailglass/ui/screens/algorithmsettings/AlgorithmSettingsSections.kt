@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.algorithm.BearingAlgorithmType
 import com.po4yka.trailglass.domain.algorithm.DistanceAlgorithmType
 import com.po4yka.trailglass.domain.algorithm.InterpolationAlgorithmType
-import com.po4yka.trailglass.domain.model.Settings
+import com.po4yka.trailglass.domain.model.AppSettings
 
 /**
  * Introduction card explaining the algorithm settings screen.
@@ -71,7 +71,7 @@ internal fun SectionHeader(text: String) {
  */
 @Composable
 internal fun DistanceAlgorithmCard(
-    settings: Settings,
+    settings: AppSettings,
     onClick: () -> Unit
 ) {
     AlgorithmCard(
@@ -94,7 +94,7 @@ internal fun DistanceAlgorithmCard(
  */
 @Composable
 internal fun BearingAlgorithmCard(
-    settings: Settings,
+    settings: AppSettings,
     onClick: () -> Unit
 ) {
     AlgorithmCard(
@@ -122,7 +122,7 @@ internal fun BearingAlgorithmCard(
  */
 @Composable
 internal fun InterpolationAlgorithmCard(
-    settings: Settings,
+    settings: AppSettings,
     onClick: () -> Unit
 ) {
     AlgorithmCard(

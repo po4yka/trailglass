@@ -35,7 +35,7 @@ class GeofenceNotificationManager(
                 .setContentTitle("Entered ${region.name}")
                 .setContentText(region.description ?: "You have entered a tracked region")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setCategory(NotificationCompat.CATEGORY_LOCATION)
+                .setCategory(NotificationCompat.CATEGORY_LOCATION_SHARING)
                 .setAutoCancel(true)
                 .setContentIntent(createMapIntent(region))
                 .addAction(
@@ -58,7 +58,7 @@ class GeofenceNotificationManager(
                 .setContentTitle("Left ${region.name}")
                 .setContentText(region.description ?: "You have left a tracked region")
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setCategory(NotificationCompat.CATEGORY_LOCATION)
+                .setCategory(NotificationCompat.CATEGORY_LOCATION_SHARING)
                 .setAutoCancel(true)
                 .setContentIntent(createMapIntent(region))
                 .addAction(

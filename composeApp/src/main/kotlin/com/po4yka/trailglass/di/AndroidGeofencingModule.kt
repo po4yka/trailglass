@@ -49,6 +49,7 @@ class AndroidGeofencingModule(
             context = context,
             regionRepository = appComponent.regionRepository,
             geofencingClientWrapper = geofencingClientWrapper,
+            currentLocationProvider = appComponent.platformModule.currentLocationProvider(),
             scope = appComponent.applicationScope,
             userId = appComponent.userId
         )

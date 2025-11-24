@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Circle
+import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -59,6 +60,29 @@ fun RegionMapPicker(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Camera position state
+    val cameraPositionState =
+        rememberCameraPositionState {
+            position =
+                CameraPosition.fromLatLngZoom(
+                    LatLng(
+                        if (initialLatitude != 0.0) initialLatitude else 37.7749,
+                        if (initialLongitude != 0.0) initialLongitude else -122.4194
+                    ),
+                    15f
+                )
+        }
+
+    // Marker position (draggable)
+    var markerPosition by remember {
+        mutableStateOf(
+            LatLng(
+                if (initialLatitude != 0.0) initialLatitude else 37.7749,
+                if (initialLongitude != 0.0) initialLongitude else -122.4194
+            )
+        )
+    }
 
     // Location permission launcher
     val locationPermissionLauncher = rememberLauncherForActivityResult(
@@ -88,29 +112,6 @@ fun RegionMapPicker(
                 snackbarHostState.showSnackbar("Location permission required")
             }
         }
-    }
-
-    // Camera position state
-    val cameraPositionState =
-        rememberCameraPositionState {
-            position =
-                CameraPosition.fromLatLngZoom(
-                    LatLng(
-                        if (initialLatitude != 0.0) initialLatitude else 37.7749,
-                        if (initialLongitude != 0.0) initialLongitude else -122.4194
-                    ),
-                    15f
-                )
-        }
-
-    // Marker position (draggable)
-    var markerPosition by remember {
-        mutableStateOf(
-            LatLng(
-                if (initialLatitude != 0.0) initialLatitude else 37.7749,
-                if (initialLongitude != 0.0) initialLongitude else -122.4194
-            )
-        )
     }
 
     Scaffold(
@@ -159,13 +160,21 @@ fun RegionMapPicker(
                     )
             ) {
                 // Draggable marker
-                Marker(
-                    state = MarkerState(position = markerPosition),
-                    title = "Region Center",
-                    draggable = true,
-                    onDragEnd = { newPosition ->
-                        markerPosition = newPosition
+                val markerState = remember(markerPosition) {
+                    MarkerState(position = markerPosition)
+                }
+
+                // Update marker position when dragged
+                LaunchedEffect(markerState.position) {
+                    if (markerState.position != markerPosition && markerState.dragState == com.google.maps.android.compose.DragState.END) {
+                        markerPosition = markerState.position
                     }
+                }
+
+                Marker(
+                    state = markerState,
+                    title = "Region Center",
+                    draggable = true
                 )
 
                 // Circle overlay showing radius

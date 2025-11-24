@@ -396,7 +396,7 @@ private fun RegionCard(
                 // Radius
                 RegionStat(
                     icon = Icons.Default.LocationOn,
-                    label = "Radius: ${formatDistance(region.radiusMeters)}"
+                    label = "Radius: ${formatDistance(region.radiusMeters.toDouble())}"
                 )
 
                 // Enter count
@@ -407,7 +407,7 @@ private fun RegionCard(
             }
 
             // Last entered
-            region.lastEnteredAt?.let { lastEntered ->
+            region.lastEnterTime?.let { lastEntered ->
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Last entered ${formatRelativeTime(lastEntered)}",

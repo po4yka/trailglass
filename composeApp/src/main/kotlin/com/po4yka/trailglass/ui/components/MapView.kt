@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Dash
+import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
@@ -297,15 +299,13 @@ private fun GoogleMapContent(
         regions.forEach { region ->
             Circle(
                 center = LatLng(region.latitude, region.longitude),
-                radius = region.radiusMeters,
+                radius = region.radiusMeters.toDouble(),
                 strokeColor = MaterialTheme.colorScheme.tertiary,
                 strokeWidth = 3f,
                 strokePattern =
                     listOf(
-                        com.google.maps.android.compose
-                            .DashPattern(10f),
-                        com.google.maps.android.compose
-                            .GapPattern(10f)
+                        Dash(10f),
+                        Gap(10f)
                     ),
                 fillColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
                 clickable = true,
@@ -369,18 +369,6 @@ private fun MapErrorView(
         }
     }
 }
-
-/** Get route width based on transport type. */
-private fun getRouteWidth(transportType: TransportType): Float =
-    when (transportType) {
-        TransportType.WALK -> 8f
-        TransportType.BIKE -> 10f
-        TransportType.CAR -> 12f
-        TransportType.TRAIN -> 14f
-        TransportType.PLANE -> 16f
-        TransportType.BOAT -> 12f
-        TransportType.UNKNOWN -> 8f
-    }
 
 /** Convert domain CameraPosition to Google Maps CameraPosition. */
 private fun com.po4yka.trailglass.domain.model.CameraPosition.toGmsCameraPosition(): CameraPosition =

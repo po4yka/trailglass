@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -65,7 +66,7 @@ fun RegionDetailScreen(
     var description by remember { mutableStateOf("") }
     var latitude by remember { mutableDoubleStateOf(0.0) }
     var longitude by remember { mutableDoubleStateOf(0.0) }
-    var radiusMeters by remember { mutableDoubleStateOf(Region.DEFAULT_RADIUS_METERS) }
+    var radiusMeters by remember { mutableStateOf(Region.DEFAULT_RADIUS_METERS) }
     var notificationsEnabled by remember { mutableStateOf(true) }
 
     // Validation errors
@@ -244,7 +245,7 @@ fun RegionDetailScreen(
 
                 OutlinedButton(
                     onClick = {
-                        onNavigateToMapPicker(latitude, longitude, radiusMeters)
+                        onNavigateToMapPicker(latitude, longitude, radiusMeters.toDouble())
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -260,7 +261,7 @@ fun RegionDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Radius: ${radiusMeters.toInt()} meters",
+                    text = "Radius: $radiusMeters meters",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -271,7 +272,7 @@ fun RegionDetailScreen(
                 )
                 Slider(
                     value = radiusMeters.toFloat(),
-                    onValueChange = { radiusMeters = it.toDouble() },
+                    onValueChange = { radiusMeters = it.toInt() },
                     valueRange = Region.MIN_RADIUS_METERS.toFloat()..Region.MAX_RADIUS_METERS.toFloat(),
                     modifier = Modifier.fillMaxWidth()
                 )

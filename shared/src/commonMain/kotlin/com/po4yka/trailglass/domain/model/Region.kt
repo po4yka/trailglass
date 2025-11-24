@@ -100,3 +100,12 @@ enum class TransitionType {
     ENTER,
     EXIT
 }
+
+/**
+ * Type of region event (enter or exit).
+ * Used for geofencing and region monitoring.
+ */
+enum class RegionEventType {
+    ENTER,
+    EXIT
+}
