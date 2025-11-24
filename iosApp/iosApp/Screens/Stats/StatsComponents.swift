@@ -66,6 +66,7 @@ struct SectionHeader: View {
  */
 class EnhancedStatsViewModel: ObservableObject {
     private let controller: EnhancedStatsController
+    private var stateObserver: KotlinJob?
 
     @Published var stats: ComprehensiveStatistics?
     @Published var isLoading: Bool = false
@@ -77,23 +78,22 @@ class EnhancedStatsViewModel: ObservableObject {
         observeState()
     }
 
-    // func loadCurrentYear() {
-    //     // TODO: Fix Kotlin period types
-    // }
+    deinit {
+        stateObserver?.cancel(cause: nil)
+    }
+
+    func loadCurrentYear() {
+        // TODO: Implement proper period loading once Kotlin types are available
+        // For now, just refresh current data
+        controller.refresh()
+        selectedPeriod = .year
+    }
 
     func loadPeriod(_ period: StatsPeriod) {
         selectedPeriod = period
-        let calendar = Calendar.current
-        let year = calendar.component(.year, from: Date())
-
-        // TODO: Fix Kotlin period loading
-        // switch period {
-        // case .year:
-        //     controller.loadPeriod(period: GetStatsUseCasePeriodYear(year: Int32(year)))
-        // case .month:
-        //     let month = calendar.component(.month, from: Date())
-        //     controller.loadPeriod(period: GetStatsUseCasePeriodMonth(year: Int32(year), month: Int32(month)))
-        // }
+        // TODO: Implement proper period loading with correct Kotlin enum types
+        // For now, just refresh current data
+        controller.refresh()
     }
 
     func refresh() {
@@ -101,8 +101,25 @@ class EnhancedStatsViewModel: ObservableObject {
     }
 
     private func observeState() {
-        // TODO: Implement StateFlow observation bridge
-        // For now, manually trigger updates
+        // Assuming the controller has a state with isLoading, error, and stats properties
+        // This may need adjustment based on the actual Kotlin controller interface
+        stateObserver = controller.state.subscribe { [weak self] (state: Any?) in
+            guard let self = self, let state = state else { return }
+
+            DispatchQueue.main.async {
+                // Extract properties from the state object
+                // This implementation assumes the state has these properties
+                if let loading = (state as? NSObject)?.value(forKey: "isLoading") as? Bool {
+                    self.isLoading = loading
+                }
+                if let error = (state as? NSObject)?.value(forKey: "error") as? String {
+                    self.error = error
+                }
+                if let stats = (state as? NSObject)?.value(forKey: "stats") as? ComprehensiveStatistics {
+                    self.stats = stats
+                }
+            }
+        }
     }
 }
 

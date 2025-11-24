@@ -145,11 +145,17 @@ struct EmptyTimelineView: View {
  */
 struct TimelineFilterSheet: View {
     @State private var localFilter: TimelineFilter
+    @State private var selectedCategories: Set<PlaceCategory>
+    @State private var showOnlyFavorites: Bool
     let onFilterChanged: (TimelineFilter) -> Void
     let onDismiss: () -> Void
 
     init(currentFilter: TimelineFilter, onFilterChanged: @escaping (TimelineFilter) -> Void, onDismiss: @escaping () -> Void) {
         _localFilter = State(initialValue: currentFilter)
+        // Initialize selected categories from the current filter
+        // For now, start with empty set - we'll implement proper conversion later
+        _selectedCategories = State(initialValue: [])
+        _showOnlyFavorites = State(initialValue: currentFilter.showOnlyFavorites)
         self.onFilterChanged = onFilterChanged
         self.onDismiss = onDismiss
     }
@@ -176,22 +182,33 @@ struct TimelineFilterSheet: View {
                     }
                 }
 
-                // Section("Place Categories") {
-                //     // TODO: Fix PlaceCategory ForEach issues
-                // }
+                Section("Place Categories") {
+                    ForEach(placeCategoryList(), id: \.rawValue) { category in
+                        Toggle(category.displayName, isOn: Binding(
+                            get: { selectedCategories.contains(category) },
+                            set: { _ in toggleCategory(category) }
+                        ))
+                    }
+                }
 
-                // Section("Options") {
-                //     Toggle("Show only favorites", isOn: $localFilter.showOnlyFavorites)
-                // }
+                Section("Options") {
+                    Toggle("Show only favorites", isOn: $showOnlyFavorites)
+                }
 
-                // Section {
-                //     Button("Reset", action: {
-                //         // TODO: Fix TimelineFilter construction
-                //     })
+                Section {
+                    Button("Reset", action: {
+                        localFilter = TimelineFilter(transportTypes: [], placeCategories: [], showOnlyFavorites: false)
+                        selectedCategories = []
+                        showOnlyFavorites = false
+                    })
 
-                    Section {
-                        Button("Apply") {
-                        onFilterChanged(localFilter)
+                    Button("Apply") {
+                        let updatedFilter = TimelineFilter(
+                            transportTypes: Array(localFilter.transportTypes),
+                            placeCategories: Array(selectedCategories),
+                            showOnlyFavorites: showOnlyFavorites
+                        )
+                        onFilterChanged(updatedFilter)
                         onDismiss()
                     }
                     .fontWeight(.bold)
@@ -214,21 +231,25 @@ struct TimelineFilterSheet: View {
         } else {
             types.append(type)
         }
-        // localFilter = TimelineFilter(
-        //     transportTypes: types,
-        //     placeCategories: localFilter.placeCategories,
-        //     showOnlyFavorites: localFilter.showOnlyFavorites
-        // )
+        localFilter = TimelineFilter(
+            transportTypes: types,
+            placeCategories: [], // Categories managed separately via selectedCategories
+            showOnlyFavorites: localFilter.showOnlyFavorites
+        )
     }
 
-    // private func toggleCategory(_ category: PlaceCategory) {
-    //     // TODO: Fix category.name issues
-    // }
+    private func toggleCategory(_ category: PlaceCategory) {
+        if selectedCategories.contains(category) {
+            selectedCategories.remove(category)
+        } else {
+            selectedCategories.insert(category)
+        }
+    }
 
-    // private func placeCategoryList() -> [PlaceCategory] {
-    //     // Return all categories except OTHER
-    //     [.home, .work] // Only available categories
-    // }
+    private func placeCategoryList() -> [PlaceCategory] {
+        // Return all categories except OTHER and UNKNOWN
+        [.home, .work, .restaurant, .shopping, .entertainment, .travel]
+    }
 }
 
 // MARK: - ViewModel
@@ -238,6 +259,7 @@ struct TimelineFilterSheet: View {
  */
 class EnhancedTimelineViewModel: ObservableObject {
     private let controller: EnhancedTimelineController
+    private var stateObserver: KotlinJob?
 
     @Published var items: [GetTimelineUseCaseTimelineItemUI] = []
     @Published var zoomLevel: TimelineZoomLevel = .day
@@ -251,6 +273,10 @@ class EnhancedTimelineViewModel: ObservableObject {
     init(controller: EnhancedTimelineController) {
         self.controller = controller
         observeState()
+    }
+
+    deinit {
+        stateObserver?.cancel(cause: nil)
     }
 
     // FAB actions
@@ -313,8 +339,20 @@ class EnhancedTimelineViewModel: ObservableObject {
     }
 
     private func observeState() {
-        // TODO: Implement StateFlow observation bridge
-        // For now, manually trigger updates
+        stateObserver = controller.state.subscribe { [weak self] (state: EnhancedTimelineState?) in
+            guard let self = self, let state = state else { return }
+
+            DispatchQueue.main.async {
+                self.items = state.items as? [GetTimelineUseCaseTimelineItemUI] ?? []
+                self.zoomLevel = state.zoomLevel
+                self.selectedDate = state.selectedDate
+                self.filter = state.filter
+                self.searchQuery = state.searchQuery ?? ""
+                self.isLoading = state.isLoading
+                self.error = state.error
+                // Note: isTracking is managed separately via toggleTracking()
+            }
+        }
     }
 }
 

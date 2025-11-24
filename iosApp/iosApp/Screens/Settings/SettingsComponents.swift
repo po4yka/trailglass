@@ -149,6 +149,7 @@ struct EmptySettingsView: View {
  */
 class SettingsViewModel: ObservableObject {
     private let controller: SettingsController
+    private var stateObserver: KotlinJob?
 
     @Published var settings: AppSettings?
     @Published var isLoading: Bool = true
@@ -158,6 +159,10 @@ class SettingsViewModel: ObservableObject {
     init(controller: SettingsController) {
         self.controller = controller
         observeState()
+    }
+
+    deinit {
+        stateObserver?.cancel(cause: nil)
     }
 
     func updateTrackingPreferences(_ preferences: TrackingPreferences) {
@@ -190,8 +195,23 @@ class SettingsViewModel: ObservableObject {
     }
 
     private func observeState() {
-        // TODO: Implement StateFlow observation bridge
-        // For now, manually trigger updates
+        stateObserver = controller.state.subscribe { [weak self] (state: Any?) in
+            guard let self = self, let state = state else { return }
+
+            DispatchQueue.main.async {
+                // Extract properties from the state object
+                if let loading = (state as? NSObject)?.value(forKey: "isLoading") as? Bool {
+                    self.isLoading = loading
+                }
+                if let error = (state as? NSObject)?.value(forKey: "error") as? String {
+                    self.error = error
+                    self.showError = error != nil
+                }
+                if let settings = (state as? NSObject)?.value(forKey: "settings") as? AppSettings {
+                    self.settings = settings
+                }
+            }
+        }
     }
 }
 
