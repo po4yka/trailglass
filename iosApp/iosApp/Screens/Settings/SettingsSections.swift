@@ -281,6 +281,54 @@ struct AccountSettingsSection: View {
 }
 
 /**
+ * Developer section with navigation links to diagnostic tools.
+ */
+struct DeveloperSection: View {
+    let appComponent: AppComponent
+
+    var body: some View {
+        NavigationLink(destination: RegionsListView(viewModel: RegionViewModel(appComponent: appComponent))) {
+            HStack {
+                Image(systemName: "mappin.circle.fill")
+                    .frame(width: 24)
+                    .foregroundColor(.coastalPath)
+                Text("Places")
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+
+        NavigationLink(destination: LogViewerView()) {
+            HStack {
+                Image(systemName: "doc.text.fill")
+                    .frame(width: 24)
+                    .foregroundColor(.blueSlate)
+                Text("Logs")
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+
+        NavigationLink(destination: DiagnosticsView(controller: appComponent.diagnosticsController)) {
+            HStack {
+                Image(systemName: "stethoscope")
+                    .frame(width: 24)
+                    .foregroundColor(.coolSteel)
+                Text("Diagnostics")
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
+    }
+}
+
+/**
  * Data management section with glass buttons.
  */
 struct DataManagementSection: View {
@@ -372,6 +420,116 @@ struct DataManagementSection: View {
                 )
             }
         }
+    }
+}
+
+/**
+ * Tracking mode selection section.
+ * Provides simple interface for selecting battery-optimized tracking modes.
+ */
+struct TrackingModeSection: View {
+    let currentMode: TrackingMode
+    let onModeSelected: (TrackingMode) -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Tracking Mode")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+                .foregroundColor(.secondary)
+
+            VStack(spacing: 8) {
+                TrackingModeRow(
+                    mode: .idle,
+                    title: "Off",
+                    description: "No tracking, GPS off",
+                    batteryImpact: "No battery impact",
+                    isSelected: currentMode == .idle,
+                    onSelect: { onModeSelected(.idle) }
+                )
+
+                TrackingModeRow(
+                    mode: .significant,
+                    title: "Efficient",
+                    description: "Major movements only (WiFi/Cell changes)",
+                    batteryImpact: "Minimal (1-2% per day)",
+                    isSelected: currentMode == .significant,
+                    onSelect: { onModeSelected(.significant) }
+                )
+
+                TrackingModeRow(
+                    mode: .passive,
+                    title: "Balanced",
+                    description: "Periodic updates (5min/500m)",
+                    batteryImpact: "Low (3-5% per day)",
+                    isSelected: currentMode == .passive,
+                    onSelect: { onModeSelected(.passive) }
+                )
+
+                TrackingModeRow(
+                    mode: .active,
+                    title: "High",
+                    description: "Continuous tracking (30sec/10m)",
+                    batteryImpact: "Moderate (10-15% per day)",
+                    isSelected: currentMode == .active,
+                    onSelect: { onModeSelected(.active) }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Individual tracking mode row with selection radio button.
+ */
+struct TrackingModeRow: View {
+    let mode: TrackingMode
+    let title: String
+    let description: String
+    let batteryImpact: String
+    let isSelected: Bool
+    let onSelect: () -> Void
+
+    var body: some View {
+        Button(action: onSelect) {
+            HStack(spacing: 12) {
+                Image(systemName: isSelected ? "circle.fill" : "circle")
+                    .foregroundColor(isSelected ? .coastalPath : .secondary)
+                    .font(.system(size: 20))
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.body)
+                        .fontWeight(.medium)
+                        .foregroundColor(.primary)
+
+                    Text(description)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack(spacing: 4) {
+                        Image(systemName: "battery.100")
+                            .font(.caption2)
+                            .foregroundColor(.coastalPath)
+                        Text(batteryImpact)
+                            .font(.caption2)
+                            .foregroundColor(.coastalPath)
+                    }
+                }
+
+                Spacer()
+            }
+            .padding(12)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? Color.coastalPath.opacity(0.1) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(isSelected ? Color.coastalPath : Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

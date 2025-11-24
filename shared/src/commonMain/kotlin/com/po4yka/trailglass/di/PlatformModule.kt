@@ -7,6 +7,8 @@ import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.LocationService
+import com.po4yka.trailglass.feature.diagnostics.PlatformDiagnostics
+import com.po4yka.trailglass.location.CurrentLocationProvider
 import kotlinx.coroutines.CoroutineScope
 
 interface PlatformModule {
@@ -15,6 +17,9 @@ interface PlatformModule {
 
     /** Platform-specific location service. Provides real-time location tracking functionality. */
     fun locationService(): LocationService
+
+    /** Platform-specific current location provider. Provides lightweight location access. */
+    fun currentLocationProvider(): CurrentLocationProvider
 
     /** Application-level coroutine scope. Should be tied to application lifecycle. */
     fun applicationScope(): CoroutineScope
@@ -60,4 +65,7 @@ interface PlatformModule {
 
     /** Platform-specific performance monitoring service. */
     fun performanceMonitoringService(): com.po4yka.trailglass.domain.service.PerformanceMonitoringService
+
+    /** Platform-specific diagnostics provider. */
+    fun platformDiagnostics(): PlatformDiagnostics
 }

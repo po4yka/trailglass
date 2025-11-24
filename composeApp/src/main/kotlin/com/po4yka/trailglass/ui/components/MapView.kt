@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -45,13 +46,15 @@ import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.coroutines.launch
 
-/** Google Maps view with markers and routes. */
+/** Google Maps view with markers, routes, and optional region overlays. */
 @Composable
 fun MapView(
     controller: MapController,
     modifier: Modifier = Modifier,
     onMarkerClick: (MapMarker) -> Unit = {},
-    onRouteClick: (MapRoute) -> Unit = {}
+    onRouteClick: (MapRoute) -> Unit = {},
+    regions: List<com.po4yka.trailglass.domain.model.Region> = emptyList(),
+    onRegionClick: (String) -> Unit = {}
 ) {
     val state by controller.state.collectAsState()
 
@@ -72,6 +75,8 @@ fun MapView(
                 cameraMove = state.cameraMove,
                 eventSink = controller,
                 onMarkerClick = onMarkerClick,
+                regions = regions,
+                onRegionClick = onRegionClick,
                 modifier = Modifier.fillMaxSize()
             )
 
@@ -132,6 +137,8 @@ private fun GoogleMapContent(
     cameraMove: CameraMove?,
     eventSink: MapEventSink,
     onMarkerClick: (MapMarker) -> Unit,
+    regions: List<com.po4yka.trailglass.domain.model.Region> = emptyList(),
+    onRegionClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Initialize camera position state
@@ -283,6 +290,39 @@ private fun GoogleMapContent(
                     // Note: Polyline clicks aren't directly supported in Compose Maps
                     // Would need custom implementation
                 }
+            )
+        }
+
+        // Draw regions (circles with dotted borders)
+        regions.forEach { region ->
+            Circle(
+                center = LatLng(region.latitude, region.longitude),
+                radius = region.radiusMeters,
+                strokeColor = MaterialTheme.colorScheme.tertiary,
+                strokeWidth = 3f,
+                strokePattern =
+                    listOf(
+                        com.google.maps.android.compose
+                            .DashPattern(10f),
+                        com.google.maps.android.compose
+                            .GapPattern(10f)
+                    ),
+                fillColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
+                clickable = true,
+                onClick = {
+                    onRegionClick(region.id)
+                }
+            )
+
+            // Small marker at region center
+            Marker(
+                state =
+                    MarkerState(
+                        position = LatLng(region.latitude, region.longitude)
+                    ),
+                title = region.name,
+                snippet = "${region.enterCount} visits",
+                alpha = 0.7f
             )
         }
 

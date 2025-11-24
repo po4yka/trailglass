@@ -6,6 +6,12 @@ import kotlin.time.Duration.Companion.seconds
 
 /** Configuration for location tracking behavior. */
 data class TrackingConfiguration(
+    /** Minimum time interval between location updates in SIGNIFICANT mode. */
+    val significantInterval: Duration = 5.minutes,
+    /** Minimum distance between location updates in SIGNIFICANT mode (meters). */
+    val significantDistance: Double = 500.0,
+    /** Desired accuracy for location in SIGNIFICANT mode (meters). */
+    val significantAccuracy: Double = 500.0,
     /** Minimum time interval between location updates in PASSIVE mode. */
     val passiveInterval: Duration = 5.minutes,
     /** Minimum distance between location updates in PASSIVE mode (meters). */
@@ -36,6 +42,9 @@ object TrackingConfigurations {
     /** Battery-optimized configuration. Suitable for all-day background tracking. */
     val BATTERY_OPTIMIZED =
         TrackingConfiguration(
+            significantInterval = 5.minutes,
+            significantDistance = 500.0,
+            significantAccuracy = 500.0,
             passiveInterval = 10.minutes,
             passiveDistance = 1000.0,
             activeInterval = 1.minutes,
@@ -47,6 +56,9 @@ object TrackingConfigurations {
     /** Balanced configuration. Good compromise between accuracy and battery life. */
     val BALANCED =
         TrackingConfiguration(
+            significantInterval = 5.minutes,
+            significantDistance = 500.0,
+            significantAccuracy = 500.0,
             passiveInterval = 5.minutes,
             passiveDistance = 500.0,
             activeInterval = 30.seconds,
@@ -58,6 +70,9 @@ object TrackingConfigurations {
     /** High accuracy configuration. Best for active trip recording, higher battery usage. */
     val HIGH_ACCURACY =
         TrackingConfiguration(
+            significantInterval = 5.minutes,
+            significantDistance = 500.0,
+            significantAccuracy = 500.0,
             passiveInterval = 2.minutes,
             passiveDistance = 100.0,
             activeInterval = 10.seconds,

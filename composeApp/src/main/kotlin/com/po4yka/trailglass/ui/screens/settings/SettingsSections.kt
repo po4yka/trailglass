@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BatteryChargingFull
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.GpsFixed
@@ -21,11 +24,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.location.tracking.TrackingMode
 
@@ -75,8 +80,15 @@ internal fun TrackingStatusCard(
                     )
 
                     if (isTracking) {
+                        val modeDescription =
+                            when (mode) {
+                                TrackingMode.IDLE -> "Off"
+                                TrackingMode.SIGNIFICANT -> "Efficient"
+                                TrackingMode.PASSIVE -> "Balanced"
+                                TrackingMode.ACTIVE -> "High"
+                            }
                         Text(
-                            text = "Mode: ${mode.name} • $samplesRecorded samples today",
+                            text = "Mode: $modeDescription • $samplesRecorded samples today",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -221,6 +233,143 @@ internal fun PermissionsCard(
                         Text("Enable Background Tracking")
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+internal fun TrackingModeCard(
+    currentMode: TrackingMode,
+    isTracking: Boolean,
+    onModeSelected: (TrackingMode) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier =
+                Modifier
+                    .padding(16.dp)
+                    .selectableGroup()
+        ) {
+            Text(
+                text = "Tracking Mode",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+
+            TrackingModeOption(
+                mode = TrackingMode.IDLE,
+                title = "Off",
+                description = "No tracking, GPS off",
+                batteryImpact = "No battery impact",
+                selected = currentMode == TrackingMode.IDLE,
+                enabled = !isTracking,
+                onSelect = { onModeSelected(TrackingMode.IDLE) }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TrackingModeOption(
+                mode = TrackingMode.SIGNIFICANT,
+                title = "Efficient",
+                description = "Major movements only (WiFi/Cell changes)",
+                batteryImpact = "Minimal (1-2% per day)",
+                selected = currentMode == TrackingMode.SIGNIFICANT,
+                enabled = !isTracking,
+                onSelect = { onModeSelected(TrackingMode.SIGNIFICANT) }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TrackingModeOption(
+                mode = TrackingMode.PASSIVE,
+                title = "Balanced",
+                description = "Periodic updates (5min/500m)",
+                batteryImpact = "Low (3-5% per day)",
+                selected = currentMode == TrackingMode.PASSIVE,
+                enabled = !isTracking,
+                onSelect = { onModeSelected(TrackingMode.PASSIVE) }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            TrackingModeOption(
+                mode = TrackingMode.ACTIVE,
+                title = "High",
+                description = "Continuous tracking (30sec/10m)",
+                batteryImpact = "Moderate (10-15% per day)",
+                selected = currentMode == TrackingMode.ACTIVE,
+                enabled = !isTracking,
+                onSelect = { onModeSelected(TrackingMode.ACTIVE) }
+            )
+
+            if (isTracking) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Stop tracking to change mode",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrackingModeOption(
+    mode: TrackingMode,
+    title: String,
+    description: String,
+    batteryImpact: String,
+    selected: Boolean,
+    enabled: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .selectable(
+                    selected = selected,
+                    enabled = enabled,
+                    role = Role.RadioButton,
+                    onClick = onSelect
+                ).padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = null,
+            enabled = enabled
+        )
+
+        Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.BatteryChargingFull,
+                    contentDescription = null,
+                    modifier = Modifier.height(12.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = batteryImpact,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         }
     }

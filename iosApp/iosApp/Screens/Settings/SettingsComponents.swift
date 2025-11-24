@@ -91,6 +91,11 @@ struct SettingsContent: View {
                     )
                 }
 
+                // Developer Section
+                SettingsSectionCard(title: "Developer", icon: "wrench.and.screwdriver.fill", tint: .seaGlass) {
+                    DeveloperSection(appComponent: appComponent)
+                }
+
                 // About Section
                 SettingsSectionCard(title: "About", icon: "info.circle.fill", tint: .blueSlate) {
                     AboutSection()

@@ -36,11 +36,13 @@ import com.po4yka.trailglass.ui.dialogs.PhotoAttachmentInfoDialog
 import kotlinx.datetime.Clock
 import kotlin.time.Duration.Companion.days
 
-/** Map screen showing travels on a map. */
+/** Map screen showing travels on a map with optional region overlays. */
 @Composable
 fun MapScreen(
     controller: MapController,
     onNavigateToPlaceVisitDetail: (String) -> Unit = {},
+    onNavigateToRegionDetail: (String) -> Unit = {},
+    regions: List<com.po4yka.trailglass.domain.model.Region> = emptyList(),
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
@@ -67,6 +69,11 @@ fun MapScreen(
             onMarkerClick = { marker ->
                 // Navigate to visit detail
                 onNavigateToPlaceVisitDetail(marker.placeVisitId)
+            },
+            regions = regions,
+            onRegionClick = { regionId ->
+                // Navigate to region detail
+                onNavigateToRegionDetail(regionId)
             },
             modifier =
                 Modifier

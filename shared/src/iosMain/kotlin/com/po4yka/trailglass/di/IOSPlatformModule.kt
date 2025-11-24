@@ -19,6 +19,9 @@ import com.po4yka.trailglass.domain.service.IosPushNotificationService
 import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.PushNotificationService
+import com.po4yka.trailglass.feature.diagnostics.PlatformDiagnostics
+import com.po4yka.trailglass.location.CurrentLocationProvider
+import com.po4yka.trailglass.location.IOSCurrentLocationProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -45,6 +48,10 @@ class IOSPlatformModule : PlatformModule {
 
     @Provides
     override fun locationService(): LocationService = IosLocationService()
+
+    @Provides
+    @AppScope
+    override fun currentLocationProvider(): CurrentLocationProvider = IOSCurrentLocationProvider()
 
     @Provides
     override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -104,4 +111,8 @@ class IOSPlatformModule : PlatformModule {
     /** Provides iOS-specific performance monitoring service. */
     @Provides
     override fun performanceMonitoringService(): PerformanceMonitoringService = IosPerformanceMonitoringService()
+
+    /** Provides iOS-specific platform diagnostics. */
+    @Provides
+    override fun platformDiagnostics(): PlatformDiagnostics = PlatformDiagnostics()
 }

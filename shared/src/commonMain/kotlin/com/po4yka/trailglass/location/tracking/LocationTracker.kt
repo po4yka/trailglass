@@ -3,20 +3,41 @@ package com.po4yka.trailglass.location.tracking
 import com.po4yka.trailglass.domain.model.LocationSample
 import kotlinx.coroutines.flow.Flow
 
-/** Tracking mode for location updates. */
+/**
+ * Tracking mode for location updates.
+ *
+ * Battery impact estimates:
+ * - IDLE: No battery impact
+ * - SIGNIFICANT: Minimal battery impact (1-2% per day)
+ * - PASSIVE: Low battery impact (3-5% per day)
+ * - ACTIVE: Moderate battery impact (10-15% per day)
+ */
 enum class TrackingMode {
-    /** No location tracking. */
+    /** No location tracking. GPS off. */
     IDLE,
 
     /**
-     * Passive location tracking (significant location changes only). Best for battery efficiency, updates every ~500m
-     * or 5 minutes.
+     * Battery-efficient mode using WiFi/Cell changes.
+     * - Android: Network location only, 5min/500m minimum
+     * - iOS: System significant location changes (CLLocationManager.startMonitoringSignificantLocationChanges)
+     * - Battery impact: Minimal (1-2% per day)
+     * - Accuracy: 100-500m (network-based)
+     */
+    SIGNIFICANT,
+
+    /**
+     * Passive location tracking with GPS. Updates every ~500m or 5 minutes.
+     * Best for balanced battery usage and reasonable accuracy.
+     * - Battery impact: Low (3-5% per day)
+     * - Accuracy: 10-100m (GPS + network)
      */
     PASSIVE,
 
     /**
      * Active location tracking (continuous updates). Higher accuracy and frequency, but more battery usage. Typically
      * used during trips or when user explicitly enables tracking.
+     * - Battery impact: Moderate (10-15% per day)
+     * - Accuracy: 5-10m (High-accuracy GPS)
      */
     ACTIVE
 }

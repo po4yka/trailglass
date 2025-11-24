@@ -48,7 +48,9 @@ struct MainTabView: View {
                 case 5:
                     PhotoGalleryView(appComponent: appComponent)
                 case 6:
-                    EnhancedSettingsView(controller: appComponent.settingsController, appComponent: appComponent)
+                    NavigationStack {
+                        EnhancedSettingsView(controller: appComponent.settingsController, appComponent: appComponent)
+                    }
                 #if DEBUG
                 case 7:
                     ComponentShowcaseView()

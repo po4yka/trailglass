@@ -8,9 +8,9 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TrailGlass needs access to your location to show your position on the map and track your travels.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>TrailGlass needs access to your location to track your travels and show your position on the map.</string>
+	<string>TrailGlass needs access to your location to track your travels, show your position on the map, and notify you when entering or leaving places you've marked.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>TrailGlass needs access to your location in the background to automatically track your trips.</string>
+	<string>TrailGlass needs access to your location in the background to automatically track your trips and notify you when entering or leaving places you've marked.</string>
 
 	<!-- Background modes for location tracking and sync -->
 	<key>UIBackgroundModes</key>
@@ -38,7 +38,7 @@
 
 	<!-- Notification permission for trip updates and reminders -->
 	<key>NSUserNotificationsUsageDescription</key>
-	<string>TrailGlass sends notifications for trip updates, sync status, and travel insights.</string>
+	<string>TrailGlass sends notifications for trip updates, sync status, travel insights, and when you enter or leave places you've marked.</string>
 
 	<!-- Motion permission for activity recognition (walking, driving, etc.) -->
 	<key>NSMotionUsageDescription</key>

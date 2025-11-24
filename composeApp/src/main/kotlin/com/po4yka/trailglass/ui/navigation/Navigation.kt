@@ -32,21 +32,25 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
 import com.po4yka.trailglass.ui.dialogs.CreateTripDialog
-import com.po4yka.trailglass.ui.screens.algorithmsettings.AlgorithmSettingsScreen
 import com.po4yka.trailglass.ui.screens.DeviceManagementScreen
+import com.po4yka.trailglass.ui.screens.DiagnosticsScreen
 import com.po4yka.trailglass.ui.screens.EnhancedStatsScreen
 import com.po4yka.trailglass.ui.screens.EnhancedTimelineScreen
+import com.po4yka.trailglass.ui.screens.LogViewerScreen
 import com.po4yka.trailglass.ui.screens.MapScreen
 import com.po4yka.trailglass.ui.screens.PhotoDetailScreenWrapper
 import com.po4yka.trailglass.ui.screens.PhotosScreenWrapper
 import com.po4yka.trailglass.ui.screens.PlaceDetailScreen
 import com.po4yka.trailglass.ui.screens.PlaceVisitDetailScreen
 import com.po4yka.trailglass.ui.screens.PlacesScreen
+import com.po4yka.trailglass.ui.screens.RegionDetailScreen
+import com.po4yka.trailglass.ui.screens.RegionsScreen
 import com.po4yka.trailglass.ui.screens.RouteReplayScreen
 import com.po4yka.trailglass.ui.screens.RouteViewScreen
 import com.po4yka.trailglass.ui.screens.SettingsScreen
 import com.po4yka.trailglass.ui.screens.TripStatisticsScreen
 import com.po4yka.trailglass.ui.screens.TripsScreen
+import com.po4yka.trailglass.ui.screens.algorithmsettings.AlgorithmSettingsScreen
 
 /** Main navigation destinations. */
 sealed class Screen(
@@ -122,7 +126,11 @@ fun MainScaffold(
             is RootComponent.Child.PlaceVisitDetail,
             is RootComponent.Child.PlaceDetail,
             is RootComponent.Child.DeviceManagement,
-            is RootComponent.Child.AlgorithmSettings -> null // No bottom nav for detail screens
+            is RootComponent.Child.AlgorithmSettings,
+            is RootComponent.Child.Regions,
+            is RootComponent.Child.RegionDetail,
+            is RootComponent.Child.LogViewer,
+            is RootComponent.Child.Diagnostics -> null // No bottom nav for detail screens
         }
 
     // Show bottom nav and top bar only for main screens
@@ -211,6 +219,9 @@ fun MainScaffold(
                             onNavigateToPlaceVisitDetail = { placeVisitId ->
                                 rootComponent.navigateToScreen(RootComponent.Config.PlaceVisitDetail(placeVisitId))
                             },
+                            onNavigateToRegionDetail = { regionId ->
+                                rootComponent.navigateToScreen(RootComponent.Config.RegionDetail(regionId))
+                            },
                             modifier = Modifier
                         )
                     }
@@ -285,6 +296,12 @@ fun MainScaffold(
                             },
                             onNavigateToAlgorithmSettings = {
                                 rootComponent.navigateToScreen(RootComponent.Config.AlgorithmSettings)
+                            },
+                            onNavigateToLogs = {
+                                rootComponent.navigateToScreen(RootComponent.Config.LogViewer)
+                            },
+                            onNavigateToDiagnostics = {
+                                rootComponent.navigateToScreen(RootComponent.Config.Diagnostics)
                             },
                             modifier = Modifier
                         )
@@ -369,6 +386,42 @@ fun MainScaffold(
                             controller = instance.component.settingsController,
                             onBack = instance.component.onBack,
                             modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.Regions -> {
+                        RegionsScreen(
+                            controller = instance.component.regionsController,
+                            onNavigateToCreate = {
+                                rootComponent.navigateToScreen(RootComponent.Config.RegionDetail(null))
+                            },
+                            onNavigateToDetail = { regionId ->
+                                rootComponent.navigateToScreen(RootComponent.Config.RegionDetail(regionId))
+                            },
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.RegionDetail -> {
+                        RegionDetailScreen(
+                            controller = instance.component.regionsController,
+                            regionId = instance.component.regionId,
+                            onNavigateBack = instance.component.onBack,
+                            onNavigateToMapPicker = instance.component.onNavigateToMapPicker,
+                            modifier = Modifier
+                        )
+                    }
+
+                    is RootComponent.Child.LogViewer -> {
+                        LogViewerScreen(
+                            onBackPressed = instance.component.onBack
+                        )
+                    }
+
+                    is RootComponent.Child.Diagnostics -> {
+                        DiagnosticsScreen(
+                            controller = instance.component.diagnosticsController,
+                            onBackPressed = instance.component.onBack
                         )
                     }
                 }

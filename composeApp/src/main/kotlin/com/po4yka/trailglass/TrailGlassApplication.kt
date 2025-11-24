@@ -4,6 +4,7 @@ import android.app.Application
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
 import com.po4yka.trailglass.crash.CrashHandler
+import com.po4yka.trailglass.di.AndroidGeofencingModule
 import com.po4yka.trailglass.di.AppComponent
 import com.po4yka.trailglass.di.createAndroidAppComponent
 import com.po4yka.trailglass.sync.SyncScheduler
@@ -24,6 +25,11 @@ class TrailGlassApplication : Application() {
     /** Application-level DI component. Provides all application dependencies (repositories, controllers, etc.) */
     val appComponent: AppComponent by lazy {
         createAndroidAppComponent(applicationContext)
+    }
+
+    /** Android-specific geofencing module for region monitoring. */
+    val geofencingModule: AndroidGeofencingModule by lazy {
+        AndroidGeofencingModule(applicationContext, appComponent)
     }
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)

@@ -7,10 +7,13 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.po4yka.trailglass.R
+import com.po4yka.trailglass.location.GeofencingClientWrapper
+import com.po4yka.trailglass.location.RegionSyncObserver
 import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.location.tracking.TrackingMode
 import kotlinx.coroutines.CoroutineScope
@@ -20,10 +23,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
- * Foreground Service for continuous location tracking.
+ * Foreground Service for continuous location tracking and geofence monitoring.
  *
  * This service runs in the foreground with a persistent notification, allowing continuous location tracking even when
- * the app is in the background or the screen is off. It's suitable for active trip recording.
+ * the app is in the background or the screen is off. It's suitable for active trip recording and region monitoring.
  *
  * The service respects Android's battery optimization and doze mode by using a foreground service with a notification.
  */
@@ -89,11 +92,39 @@ class LocationTrackingService : Service() {
         null
     }
 
+    /**
+     * Geofencing components for region monitoring.
+     */
+    private lateinit var geofencingClientWrapper: GeofencingClientWrapper
+    private var regionSyncObserver: RegionSyncObserver? = null
+
     private var isTracking = false
+    private var lastLocation: Location? = null
 
     override fun onCreate() {
         super.onCreate()
         createNotificationChannel()
+        initializeGeofencing()
+    }
+
+    /**
+     * Initialize geofencing components.
+     */
+    private fun initializeGeofencing() {
+        geofencingClientWrapper = GeofencingClientWrapper(this)
+
+        // TODO: Initialize RegionSyncObserver with RegionRepository from DI
+        // Example:
+        // val application = application as TrailGlassApplication
+        // val regionRepository = application.appComponent.regionRepository
+        // val userId = getCurrentUserId()
+        // regionSyncObserver = RegionSyncObserver(
+        //     context = this,
+        //     regionRepository = regionRepository,
+        //     geofencingClientWrapper = geofencingClientWrapper,
+        //     scope = serviceScope,
+        //     userId = userId
+        // )
     }
 
     override fun onStartCommand(
@@ -136,8 +167,11 @@ class LocationTrackingService : Service() {
                 locationTracker?.startTracking(mode)
                 isTracking = true
 
+                // Start monitoring regions
+                regionSyncObserver?.startObserving(lastLocation)
+
                 // Update notification to show active tracking
-                updateNotification("Tracking your location...")
+                updateNotification("Tracking your location and regions...")
             } catch (e: Exception) {
                 // Handle error - permission denied, location service unavailable, etc.
                 android.util.Log.e("LocationTrackingService", "Failed to start tracking", e)
@@ -152,11 +186,34 @@ class LocationTrackingService : Service() {
         serviceScope.launch {
             // Stop tracking with LocationTracker from DI
             locationTracker?.stopTracking()
+
+            // Stop monitoring regions
+            regionSyncObserver?.stopObserving()
+
             isTracking = false
         }
 
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
+    }
+
+    /**
+     * Update location for region prioritization.
+     * Call this when a significant location change occurs.
+     */
+    private fun onLocationChanged(location: Location) {
+        val previousLocation = lastLocation
+        lastLocation = location
+
+        // Resync geofences if moved significantly
+        if (previousLocation != null && regionSyncObserver != null) {
+            val distance = previousLocation.distanceTo(location)
+            if (distance >= RegionSyncObserver.RESYNC_DISTANCE_METERS) {
+                serviceScope.launch {
+                    regionSyncObserver?.syncWithCurrentLocation(location)
+                }
+            }
+        }
     }
 
     private fun createNotificationChannel() {

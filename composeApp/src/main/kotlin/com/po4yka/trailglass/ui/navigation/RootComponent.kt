@@ -31,6 +31,10 @@ interface RootComponent {
      * - trailglass://app/timeline
      * - trailglass://app/map
      * - trailglass://app/settings
+     * - trailglass://app/regions
+     * - trailglass://app/regions/{regionId}
+     * - trailglass://app/logs
+     * - trailglass://app/diagnostics
      */
     fun handleDeepLink(path: String)
 
@@ -93,6 +97,20 @@ interface RootComponent {
 
         @Serializable
         data object AlgorithmSettings : Config
+
+        @Serializable
+        data object Regions : Config
+
+        @Serializable
+        data class RegionDetail(
+            val regionId: String? = null
+        ) : Config
+
+        @Serializable
+        data object LogViewer : Config
+
+        @Serializable
+        data object Diagnostics : Config
     }
 
     /** Sealed class representing the child components. */
@@ -156,6 +174,22 @@ interface RootComponent {
         data class AlgorithmSettings(
             val component: AlgorithmSettingsComponent
         ) : Child()
+
+        data class Regions(
+            val component: RegionsComponent
+        ) : Child()
+
+        data class RegionDetail(
+            val component: RegionDetailComponent
+        ) : Child()
+
+        data class LogViewer(
+            val component: LogViewerComponent
+        ) : Child()
+
+        data class Diagnostics(
+            val component: DiagnosticsComponent
+        ) : Child()
     }
 }
 
@@ -196,7 +230,11 @@ class DefaultRootComponent(
             is RootComponent.Config.PlaceVisitDetail,
             is RootComponent.Config.PlaceDetail,
             is RootComponent.Config.DeviceManagement,
-            is RootComponent.Config.AlgorithmSettings -> navigation.push(config)
+            is RootComponent.Config.AlgorithmSettings,
+            is RootComponent.Config.Regions,
+            is RootComponent.Config.RegionDetail,
+            is RootComponent.Config.LogViewer,
+            is RootComponent.Config.Diagnostics -> navigation.push(config)
         }
     }
 
@@ -209,10 +247,21 @@ class DefaultRootComponent(
 
     /**
      * Parse deep link path to navigation configuration. Supports paths like: /stats, /timeline, /map, /photos,
-     * /settings
+     * /settings, /regions, /regions/{regionId}, /logs, /diagnostics
      */
     private fun parseDeepLink(path: String): RootComponent.Config? {
         val cleanPath = path.trim('/').lowercase()
+
+        // Handle paths with parameters
+        if (cleanPath.startsWith("regions/")) {
+            val regionId = cleanPath.substringAfter("regions/")
+            return if (regionId.isNotBlank()) {
+                RootComponent.Config.RegionDetail(regionId)
+            } else {
+                RootComponent.Config.Regions
+            }
+        }
+
         return when (cleanPath) {
             "stats" -> RootComponent.Config.Stats
             "timeline" -> RootComponent.Config.Timeline
@@ -221,6 +270,9 @@ class DefaultRootComponent(
             "trips" -> RootComponent.Config.Trips
             "places" -> RootComponent.Config.Places
             "settings" -> RootComponent.Config.Settings
+            "regions" -> RootComponent.Config.Regions
+            "logs" -> RootComponent.Config.LogViewer
+            "diagnostics" -> RootComponent.Config.Diagnostics
             else -> null
         }
     }
@@ -381,6 +433,48 @@ class DefaultRootComponent(
                         DefaultAlgorithmSettingsComponent(
                             componentContext = componentContext,
                             settingsController = appComponent.settingsController,
+                            onBack = { navigation.pop() }
+                        )
+                )
+
+            is RootComponent.Config.Regions ->
+                RootComponent.Child.Regions(
+                    component =
+                        DefaultRegionsComponent(
+                            componentContext = componentContext,
+                            regionsController = appComponent.regionsController
+                        )
+                )
+
+            is RootComponent.Config.RegionDetail ->
+                RootComponent.Child.RegionDetail(
+                    component =
+                        DefaultRegionDetailComponent(
+                            componentContext = componentContext,
+                            regionsController = appComponent.regionsController,
+                            regionId = config.regionId,
+                            onBack = { navigation.pop() },
+                            onNavigateToMapPicker = { lat, lon, radius ->
+                                // TODO: Navigate to map picker when implemented
+                            }
+                        )
+                )
+
+            is RootComponent.Config.LogViewer ->
+                RootComponent.Child.LogViewer(
+                    component =
+                        DefaultLogViewerComponent(
+                            componentContext = componentContext,
+                            onBack = { navigation.pop() }
+                        )
+                )
+
+            is RootComponent.Config.Diagnostics ->
+                RootComponent.Child.Diagnostics(
+                    component =
+                        DefaultDiagnosticsComponent(
+                            componentContext = componentContext,
+                            diagnosticsController = appComponent.diagnosticsController,
                             onBack = { navigation.pop() }
                         )
                 )

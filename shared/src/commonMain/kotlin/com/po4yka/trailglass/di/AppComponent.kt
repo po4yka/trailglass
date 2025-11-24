@@ -4,16 +4,21 @@ import com.po4yka.trailglass.data.repository.GeocodingCacheRepository
 import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.data.repository.RegionRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.feature.auth.AuthController
 import com.po4yka.trailglass.feature.devices.DeviceManagementController
+import com.po4yka.trailglass.feature.diagnostics.DiagnosticsController
 import com.po4yka.trailglass.feature.export.ExportController
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.feature.photo.PhotoController
 import com.po4yka.trailglass.feature.photo.PhotoDetailController
 import com.po4yka.trailglass.feature.photo.PhotoGalleryController
 import com.po4yka.trailglass.feature.places.PlacesController
+import com.po4yka.trailglass.feature.region.RegionController
+import com.po4yka.trailglass.feature.region.RegionMonitoringCoordinator
+import com.po4yka.trailglass.feature.regions.RegionsController
 import com.po4yka.trailglass.feature.route.RouteReplayController
 import com.po4yka.trailglass.feature.route.RouteViewController
 import com.po4yka.trailglass.feature.route.TripStatisticsController
@@ -26,6 +31,7 @@ import com.po4yka.trailglass.feature.timeline.TimelineController
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
 import com.po4yka.trailglass.feature.trips.TripsController
 import com.po4yka.trailglass.location.LocationProcessor
+import com.po4yka.trailglass.logging.LogBuffer
 import me.tatarka.inject.annotations.Component
 
 /**
@@ -67,6 +73,7 @@ abstract class AppComponent(
     abstract val tripRepository: TripRepository
     abstract val photoRepository: PhotoRepository
     abstract val geocodingCacheRepository: GeocodingCacheRepository
+    abstract val regionRepository: RegionRepository
 
     // Services (from DataModule)
     abstract val algorithmProvider: com.po4yka.trailglass.domain.service.AlgorithmProvider
@@ -117,6 +124,9 @@ abstract class AppComponent(
     abstract val photoGalleryController: PhotoGalleryController
     abstract val photoDetailController: PhotoDetailController
     abstract val placesController: PlacesController
+    abstract val regionController: RegionController
+    abstract val regionsController: RegionsController
+    abstract val regionMonitoringCoordinator: RegionMonitoringCoordinator
     abstract val settingsController: SettingsController
     abstract val locationTrackingController: LocationTrackingController
     abstract val routeViewController: RouteViewController
@@ -126,6 +136,10 @@ abstract class AppComponent(
     abstract val deviceManagementController: DeviceManagementController
     abstract val conflictResolutionController: ConflictResolutionController
     abstract val exportController: ExportController
+    abstract val diagnosticsController: DiagnosticsController
+
+    // Log buffer (singleton)
+    abstract val logBuffer: LogBuffer
 
     companion object
 }

@@ -10,6 +10,7 @@ import com.po4yka.trailglass.data.repository.GeocodingCacheRepository
 import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.data.repository.PhotoRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.data.repository.RegionRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.repository.SettingsRepository
 import com.po4yka.trailglass.data.repository.SettingsRepositoryImpl
@@ -19,9 +20,11 @@ import com.po4yka.trailglass.data.repository.impl.GeocodingCacheRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.PhotoRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.PlaceVisitRepositoryImpl
+import com.po4yka.trailglass.data.repository.impl.RegionRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.RouteSegmentRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.TripRepositoryImpl
 import com.po4yka.trailglass.domain.service.AlgorithmProvider
+import com.po4yka.trailglass.logging.LogBuffer
 import me.tatarka.inject.annotations.Provides
 
 /** Data layer dependency injection module. Provides repositories and database dependencies. */
@@ -71,6 +74,11 @@ interface DataModule {
     @Provides
     fun provideSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository = impl
 
+    /** Provides RegionRepository implementation. */
+    @AppScope
+    @Provides
+    fun provideRegionRepository(impl: RegionRepositoryImpl): RegionRepository = impl
+
     /** Provides AlgorithmProvider for dynamic algorithm selection. */
     @AppScope
     @Provides
@@ -100,4 +108,9 @@ interface DataModule {
         photoFileManager: PhotoFileManager,
         photoRepository: PhotoRepository
     ): PhotoStorageManager = PhotoStorageManager(photoFileManager, photoRepository)
+
+    /** Provides LogBuffer singleton for in-memory log storage. */
+    @AppScope
+    @Provides
+    fun provideLogBuffer(): LogBuffer = LogBuffer
 }

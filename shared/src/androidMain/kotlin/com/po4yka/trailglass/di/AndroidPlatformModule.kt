@@ -21,6 +21,9 @@ import com.po4yka.trailglass.domain.service.CrashReportingService
 import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.PushNotificationService
+import com.po4yka.trailglass.feature.diagnostics.PlatformDiagnostics
+import com.po4yka.trailglass.location.AndroidCurrentLocationProvider
+import com.po4yka.trailglass.location.CurrentLocationProvider
 import com.po4yka.trailglass.photo.AndroidPhotoMetadataExtractor
 import com.po4yka.trailglass.photo.PhotoMetadataExtractor
 import kotlinx.coroutines.CoroutineScope
@@ -43,13 +46,23 @@ import me.tatarka.inject.annotations.Provides
  */
 @Inject
 class AndroidPlatformModule(
-    private val context: Context
+    @get:ApplicationContext private val context: Context
 ) : PlatformModule {
+    /** Provides application Context. */
+    @ApplicationContext
+    @AppScope
+    @Provides
+    fun provideContext(): Context = context
+
     @Provides
     override fun databaseDriverFactory(): DatabaseDriverFactory = AndroidDatabaseDriverFactory(context)
 
     @Provides
     override fun locationService(): LocationService = AndroidLocationService(context)
+
+    @Provides
+    @AppScope
+    override fun currentLocationProvider(): CurrentLocationProvider = AndroidCurrentLocationProvider(context)
 
     @Provides
     override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -113,4 +126,8 @@ class AndroidPlatformModule(
     /** Provides Android-specific performance monitoring service. */
     @Provides
     override fun performanceMonitoringService(): PerformanceMonitoringService = AndroidPerformanceMonitoringService()
+
+    /** Provides Android-specific platform diagnostics. */
+    @Provides
+    override fun platformDiagnostics(): PlatformDiagnostics = PlatformDiagnostics(context)
 }

@@ -151,36 +151,50 @@ class AndroidLocationTracker(
 
     /** Create a LocationRequest based on the tracking mode. */
     private fun createLocationRequest(mode: TrackingMode): LocationRequest {
-        val (interval, distance, priority) =
+        val (interval, distance, priority, waitForAccurate) =
             when (mode) {
+                TrackingMode.SIGNIFICANT ->
+                    Tuple4(
+                        configuration.significantInterval.inWholeMilliseconds,
+                        configuration.significantDistance.toFloat(),
+                        Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                        false // Don't wait for accurate location, use network only
+                    )
+
                 TrackingMode.PASSIVE ->
-                    Triple(
+                    Tuple4(
                         configuration.passiveInterval.inWholeMilliseconds,
                         configuration.passiveDistance.toFloat(),
-                        Priority.PRIORITY_BALANCED_POWER_ACCURACY
+                        Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+                        false
                     )
 
                 TrackingMode.ACTIVE ->
-                    Triple(
+                    Tuple4(
                         configuration.activeInterval.inWholeMilliseconds,
                         configuration.activeDistance.toFloat(),
-                        Priority.PRIORITY_HIGH_ACCURACY
+                        Priority.PRIORITY_HIGH_ACCURACY,
+                        true // Wait for accurate GPS location
                     )
 
                 TrackingMode.IDLE ->
-                    Triple(
+                    Tuple4(
                         Long.MAX_VALUE,
                         Float.MAX_VALUE,
-                        Priority.PRIORITY_PASSIVE
+                        Priority.PRIORITY_PASSIVE,
+                        false
                     )
             }
 
         return LocationRequest
             .Builder(priority, interval)
             .setMinUpdateDistanceMeters(distance)
-            .setWaitForAccurateLocation(mode == TrackingMode.ACTIVE)
+            .setWaitForAccurateLocation(waitForAccurate)
             .build()
     }
+
+    /** Helper data class for tracking mode configuration. */
+    private data class Tuple4<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
 
     /** Create a LocationCallback that processes location updates. */
     private fun createLocationCallback(): LocationCallback =

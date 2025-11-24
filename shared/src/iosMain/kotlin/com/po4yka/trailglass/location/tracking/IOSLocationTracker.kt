@@ -54,6 +54,13 @@ class IOSLocationTracker(
         configureLocationManager(mode)
 
         when (mode) {
+            TrackingMode.SIGNIFICANT -> {
+                // Use significant location changes only - extremely battery efficient
+                // iOS monitors WiFi/cell tower changes automatically
+                locationManager.startMonitoringSignificantLocationChanges()
+                logger.debug { "Started significant location changes monitoring (WiFi/Cell changes only)" }
+            }
+
             TrackingMode.PASSIVE -> {
                 // Use significant location changes for battery efficiency
                 locationManager.startMonitoringSignificantLocationChanges()
@@ -141,6 +148,16 @@ class IOSLocationTracker(
     /** Configure CLLocationManager based on tracking mode. */
     private fun configureLocationManager(mode: TrackingMode) {
         when (mode) {
+            TrackingMode.SIGNIFICANT -> {
+                // For significant location changes, minimal configuration needed
+                // iOS handles this automatically, monitoring WiFi/cell tower changes
+                locationManager.desiredAccuracy = kCLLocationAccuracyKilometer
+                locationManager.distanceFilter = configuration.significantDistance
+                locationManager.allowsBackgroundLocationUpdates = true
+                locationManager.pausesLocationUpdatesAutomatically = true
+                locationManager.activityType = CLActivityTypeOtherNavigation
+            }
+
             TrackingMode.PASSIVE -> {
                 locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
                 locationManager.distanceFilter = configuration.passiveDistance
