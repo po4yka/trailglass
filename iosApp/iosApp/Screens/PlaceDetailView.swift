@@ -354,14 +354,14 @@ struct StatRow: View {
                 significance: .frequent,
                 visitCount: 42,
                 totalDuration: KotlinDuration.Companion().parse(isoString: "PT24H30M"),
-                firstVisitTime: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_609_459_200, nanosecondsOfSecond: 0),
-                lastVisitTime: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_640_995_200, nanosecondsOfSecond: 0),
+                firstVisitTime: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_609_459_200, nanosecondAdjustment: 0),
+                lastVisitTime: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_640_995_200, nanosecondAdjustment: 0),
                 userLabel: nil,
                 userNotes: nil,
                 isFavorite: true,
                 userId: "user123",
-                createdAt: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_609_459_200, nanosecondsOfSecond: 0),
-                updatedAt: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_640_995_200, nanosecondsOfSecond: 0)
+                createdAt: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_609_459_200, nanosecondAdjustment: 0),
+                updatedAt: Kotlinx_datetimeInstant.Companion().fromEpochSeconds(epochSeconds: 1_640_995_200, nanosecondAdjustment: 0)
             ),
             onToggleFavorite: {},
             onDismiss: {}

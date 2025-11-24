@@ -233,13 +233,13 @@ struct RegionCard: View {
     }
 }
 
-extension Region: Identifiable {}
+extension Region: @retroactive Identifiable {}
 
 #Preview {
     NavigationView {
         RegionsListView(
             viewModel: RegionViewModel(
-                appComponent: CreateKt.createIOSAppComponent()
+                appComponent: InjectIOSAppComponent(platformModule: IOSPlatformModule())
             )
         )
     }

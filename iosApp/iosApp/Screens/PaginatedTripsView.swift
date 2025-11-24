@@ -385,6 +385,6 @@ private struct ScrollOffsetPreferenceKey: PreferenceKey {
     }
 }
 
-extension Trip: Identifiable {
+extension Trip: @retroactive Identifiable {
     public var id: String { self.id }
 }

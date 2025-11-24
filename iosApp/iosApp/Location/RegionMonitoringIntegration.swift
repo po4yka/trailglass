@@ -18,7 +18,7 @@ import Shared
  ```swift
  class AppDelegate: UIResponder, UIApplicationDelegate {
      lazy var appComponent: AppComponent = {
-         return CreateKt.createIOSAppComponent()
+         return InjectIOSAppComponent(platformModule: IOSPlatformModule())
      }()
 
      // Add these properties

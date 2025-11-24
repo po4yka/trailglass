@@ -435,7 +435,7 @@ struct MapAnnotation: Identifiable {
     NavigationView {
         RegionDetailView(
             viewModel: RegionViewModel(
-                appComponent: CreateKt.createIOSAppComponent()
+                appComponent: InjectIOSAppComponent(platformModule: IOSPlatformModule())
             ),
             region: nil,
             onSave: {}

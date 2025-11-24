@@ -5,7 +5,7 @@ import Shared
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // Application DI component
     lazy var appComponent: AppComponent = {
-        return CreateKt.createIOSAppComponent()
+        return InjectIOSAppComponent(platformModule: IOSPlatformModule())
     }()
 
     func application(

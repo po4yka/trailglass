@@ -200,8 +200,8 @@ class MapViewModel: ObservableObject {
     private let controller: MapController
     private var stateObserver: Kotlinx_coroutines_coreJob?
 
-    @Published var markers: [shared.MapMarker] = []
-    @Published var routes: [shared.MapRoute] = []
+    @Published var markers: [Shared.MapMarker] = []
+    @Published var routes: [Shared.MapRoute] = []
     @Published var selectedMarkerId: String?
     @Published var selectedRouteId: String?
     @Published var regionUpdate: MKCoordinateRegion?
@@ -248,7 +248,7 @@ class MapViewModel: ObservableObject {
         }
     }
 
-    func selectMarker(_ marker: shared.MapMarker) {
+    func selectMarker(_ marker: Shared.MapMarker) {
         controller.selectMarker(markerId: marker.id)
     }
 

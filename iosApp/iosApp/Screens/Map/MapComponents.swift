@@ -8,9 +8,9 @@ class MarkerAnnotation: NSObject, MKAnnotation {
     let coordinate: CLLocationCoordinate2D
     let title: String?
     let subtitle: String?
-    let marker: shared.MapMarker
+    let marker: Shared.MapMarker
 
-    init(marker: shared.MapMarker) {
+    init(marker: Shared.MapMarker) {
         self.id = marker.id
         self.coordinate = CLLocationCoordinate2D(
             latitude: marker.coordinate.latitude,
