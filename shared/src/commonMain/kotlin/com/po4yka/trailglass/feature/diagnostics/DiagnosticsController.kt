@@ -114,7 +114,7 @@ class DiagnosticsController(
                     currentState.copy(
                         locationStatus = currentState.locationStatus.copy(
                             trackingMode = trackingState.mode,
-                            lastLocationUpdate = trackingState.lastUpdate
+                            lastLocationUpdate = trackingState.lastLocation?.timestamp
                         )
                     )
                 }
@@ -139,14 +139,14 @@ class DiagnosticsController(
 
         // Observe network connectivity
         controllerScope.launch {
-            networkConnectivityMonitor.observeConnectivity().collect { isConnected ->
+            networkConnectivityMonitor.networkState.collect { networkState ->
                 _state.update { currentState ->
                     currentState.copy(
                         systemStatus = currentState.systemStatus.copy(
-                            networkConnectivity = if (isConnected) {
-                                NetworkConnectivity.WIFI
-                            } else {
-                                NetworkConnectivity.OFFLINE
+                            networkConnectivity = when (networkState) {
+                                is com.po4yka.trailglass.data.network.NetworkState.Connected -> NetworkConnectivity.WIFI
+                                is com.po4yka.trailglass.data.network.NetworkState.Disconnected -> NetworkConnectivity.OFFLINE
+                                is com.po4yka.trailglass.data.network.NetworkState.Limited -> NetworkConnectivity.MOBILE
                             }
                         )
                     )
@@ -190,19 +190,22 @@ class DiagnosticsController(
                 is Result.Error -> 0L
             }
 
-            val placeVisitsCount = when (val result = placeVisitRepository.getAllPlaceVisits("")) {
-                is Result.Success -> result.data.size.toLong()
-                is Result.Error -> 0L
+            val placeVisitsCount = try {
+                placeVisitRepository.getVisitsByUser("", Int.MAX_VALUE, 0).size.toLong()
+            } catch (e: Exception) {
+                0L
             }
 
-            val routeSegmentsCount = when (val result = routeSegmentRepository.getAllRouteSegments("")) {
-                is Result.Success -> result.data.size.toLong()
-                is Result.Error -> 0L
+            val routeSegmentsCount = try {
+                routeSegmentRepository.getRouteSegmentCount()
+            } catch (e: Exception) {
+                0L
             }
 
-            val tripsCount = when (val result = tripRepository.getAllTrips("")) {
-                is Result.Success -> result.data.size.toLong()
-                is Result.Error -> 0L
+            val tripsCount = try {
+                tripRepository.getTripCount("")
+            } catch (e: Exception) {
+                0L
             }
 
             val photosCount = photoRepository.getPhotoCount("")

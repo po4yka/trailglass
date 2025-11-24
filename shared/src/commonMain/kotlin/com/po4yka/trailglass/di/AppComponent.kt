@@ -50,7 +50,7 @@ import me.tatarka.inject.annotations.Component
 @AppScope
 @Component
 abstract class AppComponent(
-    @Component val platformModule: PlatformModule
+    @Component open val platformModule: PlatformModule
 ) : DataModule,
     LocationModule,
     SyncModule,

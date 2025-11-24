@@ -8,5 +8,5 @@ import me.tatarka.inject.annotations.Component
 @AppScope
 @Component
 abstract class AndroidAppComponent(
-    @Component val platformModule: PlatformModule
+    @Component override val platformModule: PlatformModule
 ) : AppComponent(platformModule), AndroidLocationModule

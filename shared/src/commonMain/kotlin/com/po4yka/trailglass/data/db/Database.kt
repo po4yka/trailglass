@@ -40,6 +40,9 @@ class Database(driverFactory: DatabaseDriverFactory) {
     /** Access to sync conflicts queries. */
     val syncConflictsQueries get() = database.syncConflictsQueries
 
+    /** Access to regions queries. */
+    val regionsQueries get() = database.regionsQueries
+
     /** Execute a transaction. */
     fun transaction(body: app.cash.sqldelight.TransactionWithoutReturn.() -> Unit) {
         database.transaction(body = body)

@@ -8,7 +8,9 @@ import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlinx.datetime.toLocalDateTime
 import me.tatarka.inject.annotations.Inject
 
@@ -26,35 +28,36 @@ class WidgetStateRepositoryImpl(
     private val logger = logger()
 
     override fun getTodayStats(): Flow<WidgetStats> =
-        combine(
-            locationRepository.getAllLocations(), // TODO: Filter by today
-            placeVisitRepository.getAllPlaceVisits() // TODO: Filter by today
-        ) { locations, placeVisits ->
+        kotlinx.coroutines.flow.flow {
             // Calculate today's stats
             val now = Clock.System.now()
             val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+            val startOfDay = today.atStartOfDayIn(TimeZone.currentSystemDefault())
 
-            // Filter locations for today
-            val todayLocations =
-                locations.filter {
-                    it.timestamp.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
-                }
+            // Get locations for today
+            val locations = when (val result = locationRepository.getSamples("", startOfDay, now)) {
+                is com.po4yka.trailglass.domain.error.Result.Success -> result.data
+                is com.po4yka.trailglass.domain.error.Result.Error -> emptyList()
+            }
 
-            // Filter place visits for today
-            val todayPlaces =
-                placeVisits.filter {
-                    it.arrivalTime.toLocalDateTime(TimeZone.currentSystemDefault()).date == today
-                }
+            // Get place visits for today
+            val placeVisits = try {
+                placeVisitRepository.getVisits("", startOfDay, now)
+            } catch (e: Exception) {
+                emptyList()
+            }
 
             // Calculate total distance (rough approximation)
-            val distanceKm = calculateDistance(todayLocations)
+            val distanceKm = calculateDistance(locations)
 
-            logger.debug { "Widget stats: distance=$distanceKm km, places=${todayPlaces.size}" }
+            logger.debug { "Widget stats: distance=$distanceKm km, places=${placeVisits.size}" }
 
-            WidgetStats(
-                distanceKm = distanceKm,
-                placesVisited = todayPlaces.size,
-                isTracking = false // TODO: Get actual tracking status
+            emit(
+                WidgetStats(
+                    distanceKm = distanceKm,
+                    placesVisited = placeVisits.size,
+                    isTracking = false // TODO: Get actual tracking status
+                )
             )
         }
 
@@ -62,17 +65,29 @@ class WidgetStateRepositoryImpl(
         // Get snapshot of current data
         val now = Clock.System.now()
         val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val startOfDay = today.atStartOfDayIn(TimeZone.currentSystemDefault())
 
-        // Get all locations and filter for today
-        val allLocations = locationRepository.getAllLocations()
-        // TODO: This is a Flow, need to collect or use a different approach
-        // For now, return mock data
+        // Get locations for today
+        val locations = when (val result = locationRepository.getSamples("", startOfDay, now)) {
+            is com.po4yka.trailglass.domain.error.Result.Success -> result.data
+            is com.po4yka.trailglass.domain.error.Result.Error -> emptyList()
+        }
 
-        logger.debug { "Getting widget stats snapshot for today: $today" }
+        // Get place visits for today
+        val placeVisits = try {
+            placeVisitRepository.getVisits("", startOfDay, now)
+        } catch (e: Exception) {
+            emptyList()
+        }
+
+        // Calculate total distance
+        val distanceKm = calculateDistance(locations)
+
+        logger.debug { "Getting widget stats snapshot for today: $today, distance=$distanceKm km, places=${placeVisits.size}" }
 
         return WidgetStats(
-            distanceKm = 0.0,
-            placesVisited = 0,
+            distanceKm = distanceKm,
+            placesVisited = placeVisits.size,
             isTracking = false
         )
     }

@@ -7,7 +7,6 @@ import android.os.BatteryManager
 import android.os.Build
 import android.os.PowerManager
 import androidx.core.content.ContextCompat
-import com.po4yka.trailglass.BuildConfig
 import java.io.File
 
 actual class PlatformDiagnostics(
