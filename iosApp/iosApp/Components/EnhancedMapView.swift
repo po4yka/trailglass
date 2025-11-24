@@ -189,11 +189,48 @@ class EnhancedMapViewModel: ObservableObject {
     }
 
     func setupInitialRegion(completion: @escaping (MKCoordinateRegion) -> Void) {
-        // TODO: Implement proper initial region setup
-        completion(MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-        ))
+        // Get the current state to calculate initial region from markers
+        if let state = controller.state.value as? EnhancedMapController.EnhancedMapState {
+            let markers = state.mapData.markers
+
+            if !markers.isEmpty {
+                // Calculate region that fits all markers
+                var minLat = Double.greatestFiniteMagnitude
+                var maxLat = -Double.greatestFiniteMagnitude
+                var minLon = Double.greatestFiniteMagnitude
+                var maxLon = -Double.greatestFiniteMagnitude
+
+                for marker in markers {
+                    minLat = min(minLat, marker.coordinate.latitude)
+                    maxLat = max(maxLat, marker.coordinate.latitude)
+                    minLon = min(minLon, marker.coordinate.longitude)
+                    maxLon = max(maxLon, marker.coordinate.longitude)
+                }
+
+                let centerLat = (minLat + maxLat) / 2
+                let centerLon = (minLon + maxLon) / 2
+                let latDelta = max((maxLat - minLat) * 1.2, 0.01) // Add 20% padding
+                let lonDelta = max((maxLon - minLon) * 1.2, 0.01)
+
+                let region = MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: centerLat, longitude: centerLon),
+                    span: MKCoordinateSpan(latitudeDelta: latDelta, longitudeDelta: lonDelta)
+                )
+                completion(region)
+            } else {
+                // No markers available, use world view
+                completion(MKCoordinateRegion(
+                    center: CLLocationCoordinate2D(latitude: 0, longitude: 0),
+                    span: MKCoordinateSpan(latitudeDelta: 180, longitudeDelta: 180)
+                ))
+            }
+        } else {
+            // State not available yet, use default region
+            completion(MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+            ))
+        }
     }
 
     func onRegionChanged(_ region: MKCoordinateRegion) {

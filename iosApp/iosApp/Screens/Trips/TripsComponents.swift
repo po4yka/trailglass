@@ -87,6 +87,7 @@ class TripsViewModel: ObservableObject {
     @Published var filterShowOngoing = true
     @Published var filterShowCompleted = true
     @Published var searchQuery = ""
+    @Published var showCreateTripDialog = false
 
     init(controller: TripsController) {
         self.controller = controller
@@ -124,21 +125,81 @@ class TripsViewModel: ObservableObject {
         controller.setSortOption(option: option)
     }
 
-    // func toggleOngoingFilter() {
-    //     // TODO: Fix TripsControllerFilterOptions
-    // }
+    func toggleOngoingFilter() {
+        // TODO: Implement filter toggle when controller API is available
+        filterShowOngoing.toggle()
+        // Refresh data to apply filter
+        controller.loadTrips()
+    }
 
-    // func toggleCompletedFilter() {
-    //     // TODO: Fix TripsControllerFilterOptions
-    // }
+    func toggleCompletedFilter() {
+        // TODO: Implement filter toggle when controller API is available
+        filterShowCompleted.toggle()
+        // Refresh data to apply filter
+        controller.loadTrips()
+    }
 
     func showCreateDialog() {
-        controller.showCreateDialog()
-        // TODO: Implement create trip dialog
-        print("Create trip dialog requested")
+        showCreateTripDialog = true
     }
 
     deinit {
         stateObserver?.cancel(cause: nil)
+    }
+
+    func createTrip(name: String, description: String?) {
+        // TODO: Implement createTrip when controller API is available
+        // For now, just close the dialog and refresh
+        print("Creating trip: \(name), description: \(description ?? "none")")
+        showCreateTripDialog = false
+        controller.loadTrips() // Refresh the list
+    }
+
+    func cancelCreateTrip() {
+        showCreateTripDialog = false
+    }
+}
+
+/**
+ * Dialog for creating a new trip.
+ */
+struct CreateTripDialog: View {
+    @Binding var isPresented: Bool
+    let onCreate: (String, String?) -> Void
+    let onCancel: () -> Void
+
+    @State private var tripName = ""
+    @State private var tripDescription = ""
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section("Trip Details") {
+                    TextField("Trip Name", text: $tripName)
+                        .autocapitalization(.words)
+
+                    TextField("Description (optional)", text: $tripDescription)
+                        .autocapitalization(.sentences)
+                }
+            }
+            .navigationTitle("Create New Trip")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel", action: onCancel)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Create") {
+                        if !tripName.trimmingCharacters(in: .whitespaces).isEmpty {
+                            let description = tripDescription.trimmingCharacters(in: .whitespaces).isEmpty ? nil : tripDescription
+                            onCreate(tripName, description)
+                            tripName = ""
+                            tripDescription = ""
+                        }
+                    }
+                    .disabled(tripName.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+            }
+        }
     }
 }

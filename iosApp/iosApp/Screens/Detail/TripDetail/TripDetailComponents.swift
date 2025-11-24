@@ -125,8 +125,39 @@ class TripDetailViewModel: ObservableObject {
     }
 
     func shareTrip() {
-        // TODO: Implement share functionality
-        print("Share trip: \(tripId)")
+        guard let tripRoute = tripRoute else {
+            errorMessage = "Cannot share: trip data not available"
+            return
+        }
+
+        // Create share text with trip information
+        let tripName = (tripRoute as? NSObject)?.value(forKey: "tripName") as? String ?? "My Trip"
+        let durationSeconds = tripRoute.endTime.epochSeconds - tripRoute.startTime.epochSeconds
+        let shareText = """
+        Check out my trip: \(tripName)
+
+        📅 Duration: \(formatDuration(Int64(durationSeconds)))
+        📍 Distance: \(formatDistance(tripRoute.statistics.totalDistanceMeters))
+        🗺️ Places visited: \((tripRoute as? NSObject)?.value(forKey: "placesCount") as? Int ?? 0)
+
+        Shared from TrailGlass
+        """
+
+        // For now, just print - in a real implementation, this would show a share sheet
+        // You would use UIActivityViewController to present the share options
+        print("Share content: \(shareText)")
+
+        // TODO: Present UIActivityViewController with the share text and optional image
+        // let activityVC = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+        // UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true)
+    }
+
+    private func formatDistance(_ meters: Double) -> String {
+        if meters < 1000 {
+            return String(format: "%.0f m", meters)
+        } else {
+            return String(format: "%.2f km", meters / 1000)
+        }
     }
 
     func exportTrip(format: String) {

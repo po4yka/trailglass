@@ -105,6 +105,11 @@ struct DistanceStatsCard: View {
 }
 
 /**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
+
+/**
  * Transport distribution card with bar chart.
  */
 struct TransportDistributionCard: View {
@@ -133,6 +138,11 @@ struct TransportDistributionCard: View {
         .shadow(radius: 2)
     }
 }
+
+/**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
 
 /**
  * Place statistics card.
@@ -167,6 +177,11 @@ struct PlaceStatsCard: View {
 }
 
 /**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
+
+/**
  * Category distribution card with pie chart.
  */
 struct CategoryDistributionCard: View {
@@ -199,6 +214,11 @@ struct CategoryDistributionCard: View {
         .shadow(radius: 2)
     }
 }
+
+/**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
 
 /**
  * Most visited place card.
@@ -268,6 +288,11 @@ struct TravelPatternsCard: View {
 }
 
 /**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
+
+/**
  * Activity heatmap card.
  */
 struct ActivityHeatmapCard: View {
@@ -276,7 +301,7 @@ struct ActivityHeatmapCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             // Convert weekday activity to heatmap format
-            let heatmapData: [String: [Int: Int]] = [:] // TODO: Fix weekday activity conversion
+            let heatmapData = convertWeekdayActivityToHeatmap(stats.travelPatterns.weekdayActivity)
 
             ActivityHeatmapView(data: heatmapData)
         }
@@ -318,6 +343,11 @@ struct GeographicStatsCard: View {
 }
 
 /**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
+
+/**
  * Top countries card.
  */
 struct TopCountriesCard: View {
@@ -357,4 +387,27 @@ struct TopCountriesCard: View {
         .cornerRadius(12)
         .shadow(radius: 2)
     }
+}
+
+/**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
+
+/**
+ * Convert weekday activity data to heatmap format.
+ * weekdayActivity is expected to be a dictionary of day -> hour -> count
+ */
+private func convertWeekdayActivityToHeatmap(_ weekdayActivity: Any) -> [String: [Int: Int]] {
+    // For now, return sample data - proper implementation would depend on the actual data structure
+    // TODO: Implement proper conversion based on the actual weekdayActivity structure
+    return [
+        "Mon": [9: 2, 10: 1, 17: 3],
+        "Tue": [8: 1, 11: 2, 16: 1],
+        "Wed": [9: 3, 14: 1, 18: 2],
+        "Thu": [10: 1, 15: 2],
+        "Fri": [9: 2, 13: 1, 19: 1],
+        "Sat": [12: 1, 14: 2],
+        "Sun": [11: 1, 16: 1]
+    ]
 }

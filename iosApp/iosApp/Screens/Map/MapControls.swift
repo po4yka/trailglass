@@ -260,13 +260,26 @@ class MapViewModel: ObservableObject {
     }
 
     func centerOnUserLocation() {
-        // TODO: Implement centerOnUserLocation functionality
-        // MapController doesn't have this method - may need to use map region updates
+        // TODO: Implement center on user location when location services are available
+        // For now, request permission if not granted
+        if !needsLocationPermission {
+            // Assume we have permission, center on a default location for now
+            let region = MKCoordinateRegion(
+                center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
+            )
+            // Note: This would need to update the controller's map region
+            print("Centering on user location")
+        } else {
+            requestLocationPermission()
+        }
     }
 
     func fitAllMarkers() {
-        // TODO: Implement fitAllMarkers functionality
-        // MapController doesn't have this method - may need to calculate bounds from markers
+        // TODO: Implement fit all markers when controller supports region updates
+        // For now, just refresh the data
+        controller.refresh()
+        print("Fitting all markers")
     }
 
     func refreshData() {

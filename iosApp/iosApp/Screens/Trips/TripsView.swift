@@ -88,6 +88,17 @@ struct TripsView: View {
         .onAppear {
             viewModel.loadTrips()
         }
+        .sheet(isPresented: $viewModel.showCreateTripDialog) {
+            CreateTripDialog(
+                isPresented: $viewModel.showCreateTripDialog,
+                onCreate: { name, description in
+                    viewModel.createTrip(name: name, description: description)
+                },
+                onCancel: {
+                    viewModel.cancelCreateTrip()
+                }
+            )
+        }
     }
 
     private var tripSubtitle: String {
