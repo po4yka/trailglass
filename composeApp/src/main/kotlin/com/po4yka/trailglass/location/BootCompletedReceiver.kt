@@ -68,22 +68,22 @@ class BootCompletedReceiver : BroadcastReceiver() {
 
     /**
      * Get RegionRepository from the application component.
-     * This is a placeholder - implement based on your DI setup.
      */
     private fun getRegionRepository(application: TrailGlassApplication): RegionRepository {
-        // TODO: Get from DI container
-        // Example: application.appComponent.regionRepository
-        throw NotImplementedError("RegionRepository DI integration needed")
+        return application.appComponent.regionRepository
     }
 
     /**
      * Get current user ID from the application.
-     * This is a placeholder - implement based on your auth system.
+     * Returns null if no user is logged in.
      */
     private fun getCurrentUserId(application: TrailGlassApplication): String? {
-        // TODO: Get from auth service
-        // Example: application.appComponent.authService.getCurrentUserId()
-        return null
+        return try {
+            application.appComponent.userId
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to get user ID: ${e.message}")
+            null
+        }
     }
 
     companion object {

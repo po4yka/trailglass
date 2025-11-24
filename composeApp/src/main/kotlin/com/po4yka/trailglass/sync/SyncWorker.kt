@@ -52,11 +52,21 @@ class SyncWorker(
                         Result.success()
                     },
                     onFailure = { error ->
-                        Log.e(TAG, "Background sync failed", error)
-                        if (runAttemptCount < MAX_RETRIES) {
-                            Result.retry()
+                        // Handle auth errors gracefully - these are expected when user isn't logged in
+                        val isAuthError = error.message?.contains("No access token available") == true ||
+                            error.message?.contains("Authentication failed") == true
+
+                        if (isAuthError) {
+                            Log.d(TAG, "Sync skipped: User not authenticated")
+                            // Return success to avoid retry spam - this is not a real failure
+                            Result.success()
                         } else {
-                            Result.failure()
+                            Log.e(TAG, "Background sync failed", error)
+                            if (runAttemptCount < MAX_RETRIES) {
+                                Result.retry()
+                            } else {
+                                Result.failure()
+                            }
                         }
                     }
                 )
