@@ -71,6 +71,12 @@ class PaginatedTripsViewModel: ObservableObject {
 /// UI-friendly wrapper for Trip with pagination support
 /// When TripRepository adds pagination, this will be extended
 struct TripItem: Identifiable {
+    private static let dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        return formatter
+    }()
     let trip: Trip
 
     var id: String { trip.id }
@@ -91,9 +97,7 @@ struct TripItem: Identifiable {
     }
 
     var dateRangeText: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
+        let formatter = TripItem.dateFormatter
 
         let start = formatter.string(from: startDate)
 

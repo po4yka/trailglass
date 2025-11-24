@@ -188,8 +188,8 @@ struct EnhancedTimelineView: View {
         case .week:
             return "Week View"
         case .month:
-            let monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-            return "Month View • \(monthNames[Int(date.monthNumber) - 1]) \(date.year)"
+            let formatter = DateFormatter()
+            return "Month View • \(formatter.shortMonthSymbols[Int(date.monthNumber) - 1]) \(date.year)"
         case .year:
             return "Year View • \(date.year)"
         default:

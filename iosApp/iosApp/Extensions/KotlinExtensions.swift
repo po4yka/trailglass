@@ -97,7 +97,7 @@ extension TimelineFilter {
     ) {
         self.init(
             transportTypes: Set(transportTypes),
-            placeCategories: Set(placeCategories) as! Set<Shared.PlaceCategory>,
+            placeCategories: Set(placeCategories),
             countries: [],
             cities: [],
             searchQuery: nil,

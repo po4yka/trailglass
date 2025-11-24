@@ -144,6 +144,11 @@ struct FilterChip: View {
 
 struct LogEntryRow: View {
     let entry: LogEntry
+    private let relativeFormatter: RelativeDateTimeFormatter = {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter
+    }()
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -193,20 +198,9 @@ struct LogEntryRow: View {
     }
 
     private func formatTimestamp(_ timestamp: Instant) -> String {
-        let now = timestamp // TODO: Use proper current time when API is available
-        let diff = now.minus(other: timestamp)
-
-        let seconds = diff.inWholeSeconds
-
-        if seconds < 60 {
-            return "\(seconds)s ago"
-        } else if seconds < 3600 {
-            return "\(seconds / 60)m ago"
-        } else if seconds < 86400 {
-            return "\(seconds / 3600)h ago"
-        } else {
-            return "\(seconds / 86400)d ago"
-        }
+        // Convert Instant to Date
+        let date = Date(timeIntervalSince1970: TimeInterval(timestamp.epochSeconds))
+        return relativeFormatter.localizedString(for: date, relativeTo: Date())
     }
 }
 

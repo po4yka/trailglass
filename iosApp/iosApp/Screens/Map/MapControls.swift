@@ -228,7 +228,7 @@ class MapViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.isLoading = state.isLoading
                 self.error = state.error
-                self.markers = state.mapData.markers as! [Shared.MapMarker]
+                self.markers = (state.mapData.markers as? [Shared.MapMarker]) ?? []
                 self.routes = state.mapData.routes
                 self.selectedMarkerId = state.selectedMarker?.id
                 self.selectedRouteId = state.selectedRoute?.id
