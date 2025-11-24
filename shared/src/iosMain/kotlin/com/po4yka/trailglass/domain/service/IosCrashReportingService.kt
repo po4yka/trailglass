@@ -10,9 +10,28 @@ private val logger = KotlinLogging.logger {}
  *
  * This service provides crash reporting and error tracking for the iOS platform.
  *
- * Note: Firebase iOS SDK integration requires CocoaPods configuration.
- * The actual Firebase setup must be done in the iosApp's AppDelegate.
- * See the iOS app code for Firebase initialization.
+ * **Implementation Note:**
+ * Firebase Crashlytics iOS SDK requires Swift/Objective-C interop as it's not directly
+ * accessible from Kotlin/Native. To complete the implementation:
+ *
+ * 1. Create a Swift helper class `FirebaseCrashlyticsHelper` in the iOS app:
+ *    ```swift
+ *    import FirebaseCrashlytics
+ *    @objc class FirebaseCrashlyticsHelper: NSObject {
+ *        @objc static func recordException(_ error: NSError) {
+ *            Crashlytics.crashlytics().record(error: error)
+ *        }
+ *        @objc static func log(_ message: String) {
+ *            Crashlytics.crashlytics().log(message)
+ *        }
+ *        // ... other methods
+ *    }
+ *    ```
+ *
+ * 2. Use cinterop or expect/actual pattern to call Swift from Kotlin
+ * 3. Or use @ObjCName annotations for direct interop
+ *
+ * For now, methods log warnings and are stubbed. They will work once Swift helpers are created.
  */
 @Inject
 class IosCrashReportingService : CrashReportingService {

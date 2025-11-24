@@ -15,7 +15,9 @@ import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.repository.SettingsRepository
 import com.po4yka.trailglass.data.repository.SettingsRepositoryImpl
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.data.repository.WidgetStateRepository
 import com.po4yka.trailglass.data.repository.impl.FrequentPlaceRepositoryImpl
+import com.po4yka.trailglass.data.repository.impl.WidgetStateRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.GeocodingCacheRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.PhotoRepositoryImpl
@@ -78,6 +80,11 @@ interface DataModule {
     @AppScope
     @Provides
     fun provideRegionRepository(impl: RegionRepositoryImpl): RegionRepository = impl
+
+    /** Provides WidgetStateRepository implementation. */
+    @AppScope
+    @Provides
+    fun provideWidgetStateRepository(impl: WidgetStateRepositoryImpl): WidgetStateRepository = impl
 
     /** Provides AlgorithmProvider for dynamic algorithm selection. */
     @AppScope

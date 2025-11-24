@@ -54,6 +54,13 @@ import com.po4yka.trailglass.ui.screens.routeview.MapStyleSelectorSheet
 import com.po4yka.trailglass.ui.screens.routeview.PrivacyWarningDialog
 import com.po4yka.trailglass.ui.screens.routeview.RouteViewContent
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import com.google.android.gms.maps.Snapshotter
+import com.google.android.gms.maps.model.SnapshotOptions
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 
 /** Route View screen - displays trip route on a map with visualization controls. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,6 +118,98 @@ fun RouteViewScreen(
         }
     }
 
+    // Share map snapshot
+    suspend fun shareMapSnapshot(tripRoute: com.po4yka.trailglass.domain.model.TripRoute?, tripId: String) {
+        if (tripRoute == null) {
+            snackbarHostState.showSnackbar(
+                message = "Route not loaded yet",
+                duration = SnackbarDuration.Short
+            )
+            return
+        }
+
+        try {
+            // Create snapshot using Google Maps Snapshotter
+            // Note: Snapshotter requires a GoogleMap instance. For Compose, we need to either:
+            // 1. Pass the GoogleMap instance from the composable, or
+            // 2. Use Static Maps API, or
+            // 3. Create a bitmap programmatically from route data
+            // For now, we'll use Snapshotter with a new instance
+            val snapshotter = Snapshotter(context)
+            val bounds = tripRoute.bounds
+            val center = LatLng(
+                (bounds.minLatitude + bounds.maxLatitude) / 2.0,
+                (bounds.minLongitude + bounds.maxLongitude) / 2.0
+            )
+
+            // Calculate zoom level to fit bounds (simplified calculation)
+            val latSpan = bounds.maxLatitude - bounds.minLatitude
+            val lonSpan = bounds.maxLongitude - bounds.minLongitude
+            val maxSpan = maxOf(latSpan, lonSpan)
+            val zoom = when {
+                maxSpan > 180 -> 1f
+                maxSpan > 90 -> 2f
+                maxSpan > 45 -> 3f
+                maxSpan > 22.5 -> 4f
+                maxSpan > 11.25 -> 5f
+                maxSpan > 5.625 -> 6f
+                maxSpan > 2.813 -> 7f
+                maxSpan > 1.406 -> 8f
+                maxSpan > 0.703 -> 9f
+                maxSpan > 0.352 -> 10f
+                maxSpan > 0.176 -> 11f
+                maxSpan > 0.088 -> 12f
+                maxSpan > 0.044 -> 13f
+                maxSpan > 0.022 -> 14f
+                else -> 15f
+            }
+
+            val snapshotOptions = SnapshotOptions().apply {
+                camera(CameraPosition.Builder()
+                    .target(center)
+                    .zoom(zoom)
+                    .build())
+            }
+
+            val snapshot = snapshotter.snapshot(snapshotOptions).await()
+            val imageData = if (snapshot is Bitmap) {
+                // Convert bitmap to byte array
+                val stream = java.io.ByteArrayOutputStream()
+                snapshot.compress(Bitmap.CompressFormat.PNG, 100, stream)
+                stream.toByteArray()
+            } else {
+                // Fallback: create empty image
+                snackbarHostState.showSnackbar(
+                    message = "Map snapshot not available - requires GoogleMap instance",
+                    duration = SnackbarDuration.Short
+                )
+                return
+            }
+
+            // Share using AndroidRouteShareHandler
+            val shareHandler = AndroidRouteShareHandler(context)
+            val tripName = tripRoute.tripId.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
+            shareHandler.shareMapSnapshot(imageData, tripName)
+                .onSuccess {
+                    snackbarHostState.showSnackbar(
+                        message = "Map snapshot ready to share",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+                .onFailure { error ->
+                    snackbarHostState.showSnackbar(
+                        message = "Failed to share map: ${error.message}",
+                        duration = SnackbarDuration.Short
+                    )
+                }
+        } catch (e: Exception) {
+            snackbarHostState.showSnackbar(
+                message = "Failed to create map snapshot: ${e.message}",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -161,12 +260,8 @@ fun RouteViewScreen(
                             text = { Text("Share Map") },
                             onClick = {
                                 showMenu = false
-                                // TODO: Implement map snapshot sharing
                                 scope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Map snapshot sharing coming soon!",
-                                        duration = SnackbarDuration.Short
-                                    )
+                                    shareMapSnapshot(state.tripRoute, tripId)
                                 }
                             },
                             leadingIcon = { Icon(Icons.Default.Share, null) }

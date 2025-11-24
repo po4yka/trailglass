@@ -8,11 +8,13 @@ import android.content.Intent
 import android.widget.RemoteViews
 import com.po4yka.trailglass.MainActivity
 import com.po4yka.trailglass.R
+import com.po4yka.trailglass.TrailGlassApplication
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val logger = KotlinLogging.logger {}
 
@@ -109,19 +111,40 @@ class TodayStatsWidget : AppWidgetProvider() {
         }
     }
 
-    private fun getWidgetData(context: Context): WidgetData {
-        // TODO: Get actual data from repository
-        // For now, return mock data
-        // In production, you would:
-        // 1. Get app component from application
-        // 2. Access repository to get today's stats
-        // 3. Return actual data
+    private suspend fun getWidgetData(context: Context): WidgetData {
+        return withContext(Dispatchers.IO) {
+            try {
+                val application = context.applicationContext as? TrailGlassApplication
+                if (application == null) {
+                    logger.warn { "Application is not TrailGlassApplication, returning default data" }
+                    return@withContext WidgetData(
+                        distanceKm = 0.0,
+                        placesCount = 0,
+                        isTracking = false
+                    )
+                }
 
-        return WidgetData(
-            distanceKm = 0.0,
-            placesCount = 0,
-            isTracking = false
-        )
+                // Get widget state repository from DI
+                val widgetStateRepository = application.appComponent.widgetStateRepository
+
+                // Get today's stats snapshot
+                val stats = widgetStateRepository.getTodayStatsSnapshot()
+
+                WidgetData(
+                    distanceKm = stats.distanceKm,
+                    placesCount = stats.placesVisited,
+                    isTracking = stats.isTracking
+                )
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to get widget data: ${e.message}" }
+                // Return default data on error
+                WidgetData(
+                    distanceKm = 0.0,
+                    placesCount = 0,
+                    isTracking = false
+                )
+            }
+        }
     }
 
     companion object {

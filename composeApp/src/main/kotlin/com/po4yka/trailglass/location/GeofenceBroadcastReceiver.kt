@@ -151,12 +151,9 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
     /**
      * Get RegionRepository from the application component.
-     * This is a placeholder - implement based on your DI setup.
      */
     private fun getRegionRepository(application: TrailGlassApplication): RegionRepository {
-        // TODO: Get from DI container
-        // Example: application.appComponent.regionRepository
-        throw NotImplementedError("RegionRepository DI integration needed")
+        return application.appComponent.regionRepository
     }
 
     companion object {

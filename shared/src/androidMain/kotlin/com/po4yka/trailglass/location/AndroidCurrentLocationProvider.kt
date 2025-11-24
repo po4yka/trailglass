@@ -20,10 +20,25 @@ import kotlin.coroutines.resume
 
 /**
  * Factory function to create Android CurrentLocationProvider.
+ *
+ * NOTE: This factory function is provided for compatibility, but using Dependency Injection (DI)
+ * is the preferred approach. Access CurrentLocationProvider via AppComponent in your application:
+ *
+ * ```kotlin
+ * val application = context.applicationContext as TrailGlassApplication
+ * val currentLocationProvider = application.appComponent.platformModule.currentLocationProvider()
+ * ```
+ *
+ * If you must use this factory, ensure you have a valid Android Context available.
+ * However, this is not recommended as it bypasses the DI system.
  */
 actual fun createCurrentLocationProvider(): CurrentLocationProvider {
-    // This will be resolved by DI
-    throw NotImplementedError("Use DI to create AndroidCurrentLocationProvider")
+    // This factory requires a Context, which is not available in this scope.
+    // Use DI instead: appComponent.platformModule.currentLocationProvider()
+    throw NotImplementedError(
+        "Use DI to create AndroidCurrentLocationProvider. " +
+            "Access via: appComponent.platformModule.currentLocationProvider()"
+    )
 }
 
 /**

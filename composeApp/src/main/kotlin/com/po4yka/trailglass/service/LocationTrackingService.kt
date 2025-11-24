@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.po4yka.trailglass.R
+import com.po4yka.trailglass.TrailGlassApplication
 import com.po4yka.trailglass.location.GeofencingClientWrapper
 import com.po4yka.trailglass.location.RegionSyncObserver
 import com.po4yka.trailglass.location.tracking.LocationTracker
@@ -113,18 +114,16 @@ class LocationTrackingService : Service() {
     private fun initializeGeofencing() {
         geofencingClientWrapper = GeofencingClientWrapper(this)
 
-        // TODO: Initialize RegionSyncObserver with RegionRepository from DI
-        // Example:
-        // val application = application as TrailGlassApplication
-        // val regionRepository = application.appComponent.regionRepository
-        // val userId = getCurrentUserId()
-        // regionSyncObserver = RegionSyncObserver(
-        //     context = this,
-        //     regionRepository = regionRepository,
-        //     geofencingClientWrapper = geofencingClientWrapper,
-        //     scope = serviceScope,
-        //     userId = userId
-        // )
+        // Initialize RegionSyncObserver from geofencing module
+        val application = applicationContext as? TrailGlassApplication
+        if (application != null) {
+            // Use the regionSyncObserver from geofencing module
+            // Note: We use the geofencingClientWrapper created here, but the module's observer
+            // uses its own instance. For consistency, we'll use the module's observer.
+            regionSyncObserver = application.geofencingModule.regionSyncObserver
+        } else {
+            android.util.Log.w("LocationTrackingService", "Application is not TrailGlassApplication, RegionSyncObserver not initialized")
+        }
     }
 
     override fun onStartCommand(

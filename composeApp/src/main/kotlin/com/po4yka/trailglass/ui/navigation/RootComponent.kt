@@ -111,6 +111,22 @@ interface RootComponent {
 
         @Serializable
         data object Diagnostics : Config
+
+        @Serializable
+        data object AddPhoto : Config
+
+        @Serializable
+        data object AddNote : Config
+
+        @Serializable
+        data object ManualCheckIn : Config
+
+        @Serializable
+        data class MapPicker(
+            val initialLat: Double? = null,
+            val initialLon: Double? = null,
+            val initialRadius: Double? = null
+        ) : Config
     }
 
     /** Sealed class representing the child components. */
@@ -190,6 +206,22 @@ interface RootComponent {
         data class Diagnostics(
             val component: DiagnosticsComponent
         ) : Child()
+
+        data class AddPhoto(
+            val component: AddPhotoComponent
+        ) : Child()
+
+        data class AddNote(
+            val component: AddNoteComponent
+        ) : Child()
+
+        data class ManualCheckIn(
+            val component: ManualCheckInComponent
+        ) : Child()
+
+        data class MapPicker(
+            val component: MapPickerComponent
+        ) : Child()
     }
 }
 
@@ -234,7 +266,11 @@ class DefaultRootComponent(
             is RootComponent.Config.Regions,
             is RootComponent.Config.RegionDetail,
             is RootComponent.Config.LogViewer,
-            is RootComponent.Config.Diagnostics -> navigation.push(config)
+            is RootComponent.Config.Diagnostics,
+            is RootComponent.Config.AddPhoto,
+            is RootComponent.Config.AddNote,
+            is RootComponent.Config.ManualCheckIn,
+            is RootComponent.Config.MapPicker -> navigation.push(config)
         }
     }
 
@@ -455,7 +491,13 @@ class DefaultRootComponent(
                             regionId = config.regionId,
                             onBack = { navigation.pop() },
                             onNavigateToMapPicker = { lat, lon, radius ->
-                                // TODO: Navigate to map picker when implemented
+                                navigateToScreen(
+                                    RootComponent.Config.MapPicker(
+                                        initialLat = lat,
+                                        initialLon = lon,
+                                        initialRadius = radius
+                                    )
+                                )
                             }
                         )
                 )
@@ -476,6 +518,51 @@ class DefaultRootComponent(
                             componentContext = componentContext,
                             diagnosticsController = appComponent.diagnosticsController,
                             onBack = { navigation.pop() }
+                        )
+                )
+
+            is RootComponent.Config.AddPhoto ->
+                RootComponent.Child.AddPhoto(
+                    component =
+                        DefaultAddPhotoComponent(
+                            componentContext = componentContext,
+                            photoController = appComponent.photoController,
+                            onBack = { navigation.pop() }
+                        )
+                )
+
+            is RootComponent.Config.AddNote ->
+                RootComponent.Child.AddNote(
+                    component =
+                        DefaultAddNoteComponent(
+                            componentContext = componentContext,
+                            onBack = { navigation.pop() }
+                        )
+                )
+
+            is RootComponent.Config.ManualCheckIn ->
+                RootComponent.Child.ManualCheckIn(
+                    component =
+                        DefaultManualCheckInComponent(
+                            componentContext = componentContext,
+                            placeVisitRepository = appComponent.placeVisitRepository,
+                            onBack = { navigation.pop() }
+                        )
+                )
+
+            is RootComponent.Config.MapPicker ->
+                RootComponent.Child.MapPicker(
+                    component =
+                        DefaultMapPickerComponent(
+                            componentContext = componentContext,
+                            initialLat = config.initialLat,
+                            initialLon = config.initialLon,
+                            initialRadius = config.initialRadius,
+                            onBack = { navigation.pop() },
+                            onLocationSelected = { lat, lon, radius ->
+                                // This will be handled by the component that navigated here
+                                navigation.pop()
+                            }
                         )
                 )
         }

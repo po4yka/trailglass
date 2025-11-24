@@ -4,9 +4,11 @@ import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.WidgetStateRepository
 import com.po4yka.trailglass.data.repository.WidgetStats
+import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -28,43 +30,54 @@ import me.tatarka.inject.annotations.Inject
 @Inject
 class WidgetStateRepositoryImpl(
     private val locationRepository: LocationRepository,
-    private val placeVisitRepository: PlaceVisitRepository
+    private val placeVisitRepository: PlaceVisitRepository,
+    private val locationTracker: LocationTracker
 ) : WidgetStateRepository {
     private val logger = logger()
 
-    override fun getTodayStats(): Flow<WidgetStats> =
-        kotlinx.coroutines.flow.flow {
-            // Calculate today's stats
-            val now = Clock.System.now()
-            val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
-            val startOfDay = today.atStartOfDayIn(TimeZone.currentSystemDefault())
+    override fun getTodayStats(): Flow<WidgetStats> {
+        // Combine location/visit data with tracking status
+        return combine(
+            kotlinx.coroutines.flow.flow {
+                // Calculate today's stats
+                val now = Clock.System.now()
+                val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+                val startOfDay = today.atStartOfDayIn(TimeZone.currentSystemDefault())
 
-            // Get locations for today
-            val locations = when (val result = locationRepository.getSamples("", startOfDay, now)) {
-                is com.po4yka.trailglass.domain.error.Result.Success -> result.data
-                is com.po4yka.trailglass.domain.error.Result.Error -> emptyList()
-            }
+                // Get locations for today
+                val locations = when (val result = locationRepository.getSamples("", startOfDay, now)) {
+                    is com.po4yka.trailglass.domain.error.Result.Success -> result.data
+                    is com.po4yka.trailglass.domain.error.Result.Error -> emptyList()
+                }
 
-            // Get place visits for today
-            val placeVisits = try {
-                placeVisitRepository.getVisits("", startOfDay, now)
-            } catch (e: Exception) {
-                emptyList()
-            }
+                // Get place visits for today
+                val placeVisits = try {
+                    placeVisitRepository.getVisits("", startOfDay, now)
+                } catch (e: Exception) {
+                    emptyList()
+                }
 
-            // Calculate total distance (rough approximation)
-            val distanceKm = calculateDistance(locations)
+                // Calculate total distance (rough approximation)
+                val distanceKm = calculateDistance(locations)
 
-            logger.debug { "Widget stats: distance=$distanceKm km, places=${placeVisits.size}" }
+                logger.debug { "Widget stats: distance=$distanceKm km, places=${placeVisits.size}" }
 
-            emit(
-                WidgetStats(
-                    distanceKm = distanceKm,
-                    placesVisited = placeVisits.size,
-                    isTracking = false // TODO: Get actual tracking status
+                emit(
+                    Pair(
+                        distanceKm,
+                        placeVisits.size
+                    )
                 )
+            },
+            locationTracker.trackingState.map { it.isTracking }
+        ) { (distanceAndPlaces, isTracking) ->
+            WidgetStats(
+                distanceKm = distanceAndPlaces.first,
+                placesVisited = distanceAndPlaces.second,
+                isTracking = isTracking
             )
         }
+    }
 
     override suspend fun getTodayStatsSnapshot(): WidgetStats {
         // Get snapshot of current data
@@ -88,18 +101,20 @@ class WidgetStateRepositoryImpl(
         // Calculate total distance
         val distanceKm = calculateDistance(locations)
 
-        logger.debug { "Getting widget stats snapshot for today: $today, distance=$distanceKm km, places=${placeVisits.size}" }
+        // Get current tracking status
+        val isTracking = locationTracker.getCurrentState().isTracking
+
+        logger.debug { "Getting widget stats snapshot for today: $today, distance=$distanceKm km, places=${placeVisits.size}, tracking=$isTracking" }
 
         return WidgetStats(
             distanceKm = distanceKm,
             placesVisited = placeVisits.size,
-            isTracking = false
+            isTracking = isTracking
         )
     }
 
     override suspend fun isTrackingActive(): Boolean {
-        // TODO: Get actual tracking status from tracking service
-        return false
+        return locationTracker.getCurrentState().isTracking
     }
 
     /**

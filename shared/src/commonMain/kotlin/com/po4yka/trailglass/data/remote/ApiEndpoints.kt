@@ -32,6 +32,16 @@ internal object ApiEndpoints {
 
     fun tripById(id: String) = "/trips/$id"
 
+    // Photos
+    const val PHOTOS = "/photos"
+    const val PHOTOS_UPLOAD = "/photos/upload"
+    const val PHOTOS_ATTACHMENTS = "/photos/attachments"
+
+    fun photoById(id: String) = "/photos/$id"
+    fun photoDownload(id: String) = "/photos/$id/download"
+    fun photoAttachmentsByPhoto(photoId: String) = "/photos/$photoId/attachments"
+    fun photoAttachmentsByVisit(visitId: String) = "/place-visits/$visitId/photos"
+
     // Settings
     const val SETTINGS = "/settings"
 

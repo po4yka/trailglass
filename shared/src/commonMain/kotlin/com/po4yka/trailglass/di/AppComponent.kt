@@ -7,6 +7,7 @@ import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.RegionRepository
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.data.repository.WidgetStateRepository
 import com.po4yka.trailglass.feature.auth.AuthController
 import com.po4yka.trailglass.feature.devices.DeviceManagementController
 import com.po4yka.trailglass.feature.diagnostics.DiagnosticsController
@@ -74,6 +75,7 @@ abstract class AppComponent(
     abstract val photoRepository: PhotoRepository
     abstract val geocodingCacheRepository: GeocodingCacheRepository
     abstract val regionRepository: RegionRepository
+    abstract val widgetStateRepository: WidgetStateRepository
 
     // Services (from DataModule)
     abstract val algorithmProvider: com.po4yka.trailglass.domain.service.AlgorithmProvider

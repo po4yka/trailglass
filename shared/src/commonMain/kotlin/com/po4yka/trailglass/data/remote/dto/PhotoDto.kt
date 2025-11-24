@@ -52,3 +52,35 @@ data class PhotoUploadResponse(
     val serverVersion: Long,
     val syncTimestamp: String
 )
+
+/** Photo attachment DTO. */
+@Serializable
+data class PhotoAttachmentDto(
+    val id: String,
+    val photoId: String,
+    val placeVisitId: String,
+    val attachedAt: String,
+    val caption: String? = null,
+    val syncAction: SyncAction? = null,
+    val localVersion: Long? = null,
+    val serverVersion: Long? = null,
+    val deviceId: String? = null
+)
+
+/** Photo attachments response. */
+@Serializable
+data class PhotoAttachmentsResponse(
+    val attachments: List<PhotoAttachmentDto>
+)
+
+/** Sync photo attachments request. */
+@Serializable
+data class SyncPhotoAttachmentsRequest(
+    val attachments: List<PhotoAttachmentDto>
+)
+
+/** Sync photo attachments response. */
+@Serializable
+data class SyncPhotoAttachmentsResponse(
+    val attachments: List<PhotoAttachmentDto>
+)

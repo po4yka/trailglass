@@ -1,7 +1,11 @@
 package com.po4yka.trailglass.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.Map
@@ -9,6 +13,8 @@ import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ViewTimeline
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -130,7 +136,11 @@ fun MainScaffold(
             is RootComponent.Child.Regions,
             is RootComponent.Child.RegionDetail,
             is RootComponent.Child.LogViewer,
-            is RootComponent.Child.Diagnostics -> null // No bottom nav for detail screens
+            is RootComponent.Child.Diagnostics,
+            is RootComponent.Child.AddPhoto,
+            is RootComponent.Child.AddNote,
+            is RootComponent.Child.ManualCheckIn,
+            is RootComponent.Child.MapPicker -> null // No bottom nav for detail screens
         }
 
     // Show bottom nav and top bar only for main screens
@@ -201,13 +211,13 @@ fun MainScaffold(
                             controller = instance.component.enhancedTimelineController,
                             trackingController = instance.component.locationTrackingController,
                             onAddPhoto = {
-                                // TODO: Navigate to add photo screen
+                                instance.component.navigateToScreen(RootComponent.Config.AddPhoto)
                             },
                             onAddNote = {
-                                // TODO: Navigate to add note screen
+                                instance.component.navigateToScreen(RootComponent.Config.AddNote)
                             },
                             onCheckIn = {
-                                // TODO: Navigate to manual check-in screen
+                                instance.component.navigateToScreen(RootComponent.Config.ManualCheckIn)
                             },
                             modifier = Modifier
                         )
@@ -423,6 +433,114 @@ fun MainScaffold(
                             controller = instance.component.diagnosticsController,
                             onBackPressed = instance.component.onBack
                         )
+                    }
+
+                    is RootComponent.Child.AddPhoto -> {
+                        // Placeholder screen - TODO: Implement AddPhotoScreen
+                        androidx.compose.material3.Scaffold(
+                            topBar = {
+                                androidx.compose.material3.TopAppBar(
+                                    title = { Text("Add Photo") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.Default.ArrowBack, "Back")
+                                        }
+                                    }
+                                )
+                            }
+                        ) { padding ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(padding),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("Add Photo Screen - Coming Soon")
+                            }
+                        }
+                    }
+
+                    is RootComponent.Child.AddNote -> {
+                        // Placeholder screen - TODO: Implement AddNoteScreen
+                        androidx.compose.material3.Scaffold(
+                            topBar = {
+                                androidx.compose.material3.TopAppBar(
+                                    title = { Text("Add Note") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.Default.ArrowBack, "Back")
+                                        }
+                                    }
+                                )
+                            }
+                        ) { padding ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(padding),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("Add Note Screen - Coming Soon")
+                            }
+                        }
+                    }
+
+                    is RootComponent.Child.ManualCheckIn -> {
+                        // Placeholder screen - TODO: Implement ManualCheckInScreen
+                        androidx.compose.material3.Scaffold(
+                            topBar = {
+                                androidx.compose.material3.TopAppBar(
+                                    title = { Text("Manual Check-In") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.Default.ArrowBack, "Back")
+                                        }
+                                    }
+                                )
+                            }
+                        ) { padding ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(padding),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text("Manual Check-In Screen - Coming Soon")
+                            }
+                        }
+                    }
+
+                    is RootComponent.Child.MapPicker -> {
+                        // Placeholder screen - TODO: Implement MapPickerScreen
+                        androidx.compose.material3.Scaffold(
+                            topBar = {
+                                androidx.compose.material3.TopAppBar(
+                                    title = { Text("Pick Location") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.Default.ArrowBack, "Back")
+                                        }
+                                    }
+                                )
+                            }
+                        ) { padding ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(padding),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text("Map Picker Screen - Coming Soon")
+                                    if (instance.component.initialLat != null && instance.component.initialLon != null) {
+                                        Text(
+                                            "Initial: ${instance.component.initialLat}, ${instance.component.initialLon}",
+                                            style = MaterialTheme.typography.bodySmall
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
