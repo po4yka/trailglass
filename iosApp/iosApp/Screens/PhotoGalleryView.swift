@@ -1,5 +1,6 @@
 import SwiftUI
 import Shared
+import PhotosUI
 
 /**
  * SwiftUI photo gallery screen with Liquid Glass components.
@@ -10,6 +11,8 @@ struct PhotoGalleryView: View {
     @StateObject private var viewModel: PhotoGalleryViewModel
     @State private var scrollOffset: CGFloat = 0
     @State private var showGridView = false
+    @State private var showPhotoPicker = false
+    @State private var selectedPhotos: [PhotosPickerItem] = []
 
     init(appComponent: AppComponent) {
         self.appComponent = appComponent
@@ -32,7 +35,7 @@ struct PhotoGalleryView: View {
                             }
                         },
                         NavigationAction(icon: "plus") {
-                            viewModel.importPhotos()
+                            showPhotoPicker = true
                         },
                         NavigationAction(icon: "arrow.clockwise") {
                             viewModel.refresh()
@@ -56,7 +59,7 @@ struct PhotoGalleryView: View {
                         showGridView: showGridView
                     )
                 } else {
-                    EmptyGalleryView(onImportClick: viewModel.importPhotos)
+                    EmptyGalleryView(onImportClick: { showPhotoPicker = true })
                 }
             }
         }
@@ -64,12 +67,42 @@ struct PhotoGalleryView: View {
         .onAppear {
             viewModel.loadGallery()
         }
+        .photosPicker(
+            isPresented: $showPhotoPicker,
+            selection: $selectedPhotos,
+            matching: .images
+        )
+        .onChange(of: selectedPhotos) { newPhotos in
+            handlePhotoSelection(newPhotos)
+        }
     }
 
     private var photoSubtitle: String {
         let count = viewModel.photoGroups.reduce(0) { $0 + $1.photoCount }
         return "\(count) photos"
     }
+
+    private func handlePhotoSelection(_ photos: [PhotosPickerItem]) {
+        // Process selected photos
+        Task {
+            for item in photos {
+                do {
+                    // Load photo data
+                    if let data = try await item.loadTransferable(type: Data.self) {
+                        // TODO: Create Photo object with metadata
+                        // TODO: Add to gallery via viewModel.controller
+                        print("Successfully loaded photo data: \(data.count) bytes")
+                    }
+
+                } catch {
+                    print("Failed to load photo: \(error)")
+                }
+            }
+        }
+        selectedPhotos = [] // Clear selection
+        showPhotoPicker = false
+    }
+
 }
 
 /**
@@ -364,11 +397,6 @@ class PhotoGalleryViewModel: ObservableObject {
         controller.loadGallery()
     }
 
-    func importPhotos() {
-        controller.importPhotos()
-        // TODO: Show platform-specific photo picker
-        print("Import photos requested")
-    }
 
     func refresh() {
         controller.refresh()

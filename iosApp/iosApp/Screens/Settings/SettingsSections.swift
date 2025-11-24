@@ -334,6 +334,8 @@ struct DeveloperSection: View {
 struct DataManagementSection: View {
     let data: DataManagement
     let onClearData: () -> Void
+    let onExportData: () -> Void
+    let onImportData: () -> Void
 
     var body: some View {
         VStack(spacing: 12) {
@@ -399,7 +401,7 @@ struct DataManagementSection: View {
                     variant: .outlined,
                     tint: .coolSteel
                 ) {
-                    // TODO: Export data
+                    onExportData()
                 }
 
                 GlassButton(
@@ -408,7 +410,7 @@ struct DataManagementSection: View {
                     variant: .outlined,
                     tint: .coolSteel
                 ) {
-                    // TODO: Import data
+                    onImportData()
                 }
 
                 GlassButton(

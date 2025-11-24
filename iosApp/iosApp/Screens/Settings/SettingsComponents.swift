@@ -39,6 +39,8 @@ struct SettingsContent: View {
     let viewModel: SettingsViewModel
     let appComponent: AppComponent
     let onClearData: () -> Void
+    let onExportData: () -> Void
+    let onImportData: () -> Void
 
     var body: some View {
         ScrollView {
@@ -87,7 +89,9 @@ struct SettingsContent: View {
                 SettingsSectionCard(title: "Data Management", icon: "externaldrive.fill", tint: .neutralCategory) {
                     DataManagementSection(
                         data: settings.dataManagement,
-                        onClearData: onClearData
+                        onClearData: onClearData,
+                        onExportData: onExportData,
+                        onImportData: onImportData
                     )
                 }
 
