@@ -2,6 +2,8 @@ package com.po4yka.trailglass.crash
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.staticCFunction
+import platform.Foundation.NSException
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import kotlin.native.concurrent.ThreadLocal
 
@@ -37,17 +39,20 @@ actual fun setDefaultExceptionHandler(handler: (Throwable) -> Unit) {
     IosExceptionHandler.customHandler = handler
 
     // Set up NSException handler for Objective-C/Swift exceptions
-    NSSetUncaughtExceptionHandler { exception ->
-        logger.error { "Uncaught NSException: ${exception?.reason}" }
+    NSSetUncaughtExceptionHandler(
+        staticCFunction { exception: NSException? ->
+            logger.error { "Uncaught NSException: ${exception?.reason}" }
 
-        // Convert NSException to Kotlin Throwable
-        val kotlinException =
-            Exception(
-                "NSException: ${exception?.reason ?: "Unknown"}\n" +
-                    "Name: ${exception?.name}\n" +
-                    "Callstack: ${exception?.callStackSymbols}"
-            )
+            // Convert NSException to Kotlin Throwable
+            val kotlinException =
+                Exception(
+                    "NSException: ${exception?.reason ?: "Unknown"}\n" +
+                        "Name: ${exception?.name}\n" +
+                        "Callstack: ${exception?.callStackSymbols}"
+                )
 
-        IosExceptionHandler.customHandler?.invoke(kotlinException)
-    }
+            IosExceptionHandler.customHandler?.invoke(kotlinException)
+            Unit
+        }
+    )
 }

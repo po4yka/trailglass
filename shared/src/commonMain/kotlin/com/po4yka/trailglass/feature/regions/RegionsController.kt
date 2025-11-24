@@ -19,6 +19,11 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -127,13 +132,13 @@ class RegionsController(
         lon2: Double
     ): Double {
         val earthRadiusKm = 6371.0
-        val dLat = Math.toRadians(lat2 - lat1)
-        val dLon = Math.toRadians(lon2 - lon1)
+        val dLat = (lat2 - lat1).toRadians()
+        val dLon = (lon2 - lon1).toRadians()
         val a =
-            kotlin.math.sin(dLat / 2) * kotlin.math.sin(dLat / 2) +
-                kotlin.math.cos(Math.toRadians(lat1)) * kotlin.math.cos(Math.toRadians(lat2)) *
-                kotlin.math.sin(dLon / 2) * kotlin.math.sin(dLon / 2)
-        val c = 2 * kotlin.math.atan2(kotlin.math.sqrt(a), kotlin.math.sqrt(1 - a))
+            sin(dLat / 2) * sin(dLat / 2) +
+                cos(lat1.toRadians()) * cos(lat2.toRadians()) *
+                sin(dLon / 2) * sin(dLon / 2)
+        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
         return earthRadiusKm * c * 1000 // Convert to meters
     }
 
@@ -436,4 +441,6 @@ class RegionsController(
         controllerScope.cancel()
         logger.debug { "RegionsController cleanup complete" }
     }
+
+    private fun Double.toRadians(): Double = this * PI / 180.0
 }

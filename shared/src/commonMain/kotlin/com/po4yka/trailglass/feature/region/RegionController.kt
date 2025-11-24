@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import me.tatarka.inject.annotations.Inject
 
 /**
@@ -242,6 +243,7 @@ class RegionController(
     }
 
     private fun generateRegionId(): String {
-        return "region_${System.currentTimeMillis()}_${(0..999).random()}"
+        val timestamp = Clock.System.now().toEpochMilliseconds()
+        return "region_${timestamp}_${(0..999).random()}"
     }
 }

@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
+import kotlin.math.pow
+import kotlin.math.round
 
 data class LocationStatus(
     val trackingMode: TrackingMode = TrackingMode.IDLE,
@@ -296,7 +298,12 @@ class DiagnosticsController(
             appendLine("=== LOCATION STATUS ===")
             appendLine("Tracking Mode: ${currentState.locationStatus.trackingMode}")
             appendLine("Last Update: ${currentState.locationStatus.lastLocationUpdate ?: "Never"}")
-            appendLine("Accuracy: ${currentState.locationStatus.locationAccuracy?.let { "%.2f m".format(it) } ?: "N/A"}")
+            appendLine(
+                "Accuracy: ${
+                    currentState.locationStatus.locationAccuracy?.let { "${it.formatDecimals(2)} m" }
+                        ?: "N/A"
+                }"
+            )
             appendLine("GPS Satellites: ${currentState.locationStatus.gpsSatellites ?: "N/A"}")
             appendLine("Location Permission: ${if (currentState.locationStatus.locationPermissionGranted) "Granted" else "Denied"}")
             appendLine("Background Permission: ${if (currentState.locationStatus.backgroundLocationPermissionGranted) "Granted" else "Denied"}")
@@ -309,7 +316,7 @@ class DiagnosticsController(
             appendLine("Trips: ${currentState.databaseStatus.tripsCount}")
             appendLine("Photos: ${currentState.databaseStatus.photosCount}")
             appendLine("Regions: ${currentState.databaseStatus.regionsCount}")
-            appendLine("Database Size: ${"%.2f".format(currentState.databaseStatus.databaseSizeMB)} MB")
+            appendLine("Database Size: ${currentState.databaseStatus.databaseSizeMB.formatDecimals(2)} MB")
             appendLine()
 
             appendLine("=== SYNC STATUS ===")
@@ -341,6 +348,17 @@ class DiagnosticsController(
     fun cleanup() {
         logger.info { "Cleaning up DiagnosticsController" }
         controllerScope.cancel()
+    }
+
+    private fun Double.formatDecimals(decimals: Int): String {
+        val factor = 10.0.pow(decimals)
+        val rounded = round(this * factor) / factor
+        val parts = rounded.toString().split(".")
+        if (decimals == 0) {
+            return parts[0]
+        }
+        val fractional = parts.getOrElse(1) { "" }.padEnd(decimals, '0').take(decimals)
+        return "${parts[0]}.$fractional"
     }
 }
 

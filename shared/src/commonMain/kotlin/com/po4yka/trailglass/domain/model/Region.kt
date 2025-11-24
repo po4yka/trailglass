@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.domain.model
 
 import kotlinx.datetime.Instant
+import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
 import kotlin.math.pow
@@ -53,10 +54,10 @@ data class Region(
     fun distanceFrom(lat: Double, lon: Double): Double {
         val earthRadiusMeters = 6371000.0
 
-        val lat1Rad = Math.toRadians(latitude)
-        val lat2Rad = Math.toRadians(lat)
-        val deltaLatRad = Math.toRadians(lat - latitude)
-        val deltaLonRad = Math.toRadians(lon - longitude)
+        val lat1Rad = latitude.toRadians()
+        val lat2Rad = lat.toRadians()
+        val deltaLatRad = (lat - latitude).toRadians()
+        val deltaLonRad = (lon - longitude).toRadians()
 
         val a = sin(deltaLatRad / 2).pow(2) +
             cos(lat1Rad) * cos(lat2Rad) *
@@ -66,6 +67,8 @@ data class Region(
 
         return earthRadiusMeters * c
     }
+
+    private fun Double.toRadians(): Double = this * PI / 180.0
 
     /**
      * Whether this region has been entered at least once.

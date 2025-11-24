@@ -8,6 +8,7 @@ import platform.Photos.PHPhotoLibrary
 import platform.UIKit.UIDevice
 import platform.UserNotifications.UNUserNotificationCenter
 import kotlinx.cinterop.ExperimentalForeignApi
+import platform.Foundation.isLowPowerModeEnabled
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedAlways
 import platform.CoreLocation.kCLAuthorizationStatusAuthorizedWhenInUse
 import platform.Photos.PHAuthorizationStatusAuthorized
@@ -43,7 +44,7 @@ class IOSPlatformDiagnostics : PlatformDiagnostics {
         }
 
         val processInfo = NSProcessInfo.processInfo
-        val lowPowerMode = processInfo.lowPowerModeEnabled
+        val lowPowerMode = processInfo.isLowPowerModeEnabled()
 
         return BatteryInfo(
             batteryLevel = batteryLevel,

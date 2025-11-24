@@ -11,6 +11,7 @@ import com.po4yka.trailglass.data.remote.DeviceInfoProvider
 
 import com.po4yka.trailglass.data.remote.auth.TokenStorage
 import com.po4yka.trailglass.data.sync.SyncStateRepository
+import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
 import com.po4yka.trailglass.domain.permission.IOSPermissionManager
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.CrashReportingService

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreLocation.*
 import platform.Foundation.NSDate
+import platform.Foundation.timeIntervalSince1970
 import platform.darwin.NSObject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -47,13 +48,13 @@ class IOSCurrentLocationProvider : CurrentLocationProvider {
         ) {
             logger.warn { "Location authorization not granted: $authStatus" }
             return Result.failure(
-                SecurityException("Location authorization not granted")
+                IllegalStateException("Location authorization not granted")
             )
         }
 
         // Try last known location first
         locationManager.location?.let { location ->
-            val timestamp = location.timestamp.timeIntervalSince1970.toLong() * 1000
+            val timestamp = (location.timestamp.timeIntervalSince1970 * 1000).toLong()
             if (isLocationFresh(timestamp)) {
                 logger.debug {
                     "Using cached location: (${location.coordinate.useContents { latitude }}, ${location.coordinate.useContents { longitude }})"
@@ -89,7 +90,7 @@ class IOSCurrentLocationProvider : CurrentLocationProvider {
             authStatus != kCLAuthorizationStatusAuthorizedAlways
         ) {
             logger.warn { "Location authorization not granted for observation" }
-            close(SecurityException("Location authorization not granted"))
+            close(IllegalStateException("Location authorization not granted"))
             return@callbackFlow
         }
 
