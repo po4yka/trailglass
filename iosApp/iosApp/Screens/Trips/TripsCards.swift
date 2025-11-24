@@ -29,7 +29,7 @@ struct TripGlassCard: View {
                                         .fontWeight(.medium)
                                 }
                                 .padding(.horizontal, 8)
-                                .padding(.vertical: 4)
+                                .padding(.vertical, 4)
                                 .glassBackground(
                                     material: .ultraThin,
                                     tint: .coastalPath,
