@@ -152,15 +152,96 @@ struct EnhancedSettingsView: View {
                     throw ImportError.incompatibleVersion
                 }
 
-                // Import data (simplified - in production, you'd want more robust error handling)
-                // Note: This is a basic implementation. Full import would require use cases or repository methods
-                print("Processing imported data with version: \(exportData.version)")
-                print("Trips: \(exportData.trips.count), Places: \(exportData.places.count), Regions: \(exportData.regions.count)")
+                // Import data using available repositories and use cases
+                var importedTrips = 0
+                var importedRegions = 0
+                var errorCount = 0
 
-                // TODO: Implement full import logic using repositories or use cases
-                // For now, just log the import
-                errorMessage = "Import functionality requires backend implementation"
+                // Import trips using TripRepository
+                for tripData in exportData.trips {
+                    do {
+                        let startTime = Kotlinx_datetimeInstant.Companion.shared.fromEpochSeconds(
+                            epochSeconds: Int64(tripData.startDate.timeIntervalSince1970),
+                            nanosecondAdjustment: 0
+                        )
+                        let endTime = tripData.endDate.map { date in
+                            Kotlinx_datetimeInstant.Companion.shared.fromEpochSeconds(
+                                epochSeconds: Int64(date.timeIntervalSince1970),
+                                nanosecondAdjustment: 0
+                            )
+                        }
+
+                        // Create trip object
+                        let newTrip = Trip(
+                            id: tripData.id,
+                            name: tripData.name,
+                            description: tripData.description,
+                            userId: appComponent.userId,
+                            startTime: startTime,
+                            endTime: endTime,
+                            isOngoing: endTime == nil,
+                            isAutoDetected: false,
+                            detectionConfidence: nil,
+                            coverPhotoUri: nil,
+                            tags: [],
+                            isPublic: false,
+                            primaryCountry: nil,
+                            countriesVisited: [],
+                            citiesVisited: [],
+                            totalDistanceMeters: 0.0,
+                            duration: nil
+                        )
+
+                        // Use repository to upsert trip (will insert or update if exists)
+                        try await appComponent.tripRepository.upsertTrip(trip: newTrip)
+                        importedTrips += 1
+                    } catch {
+                        print("Failed to import trip \(tripData.id): \(error)")
+                        errorCount += 1
+                    }
+                }
+
+                // Import regions using RegionRepository
+                for regionData in exportData.regions {
+                    do {
+                        let now = Kotlinx_datetimeInstant.Companion.shared.now()
+
+                        // Create region object (Region uses latitude/longitude directly, not center)
+                        let newRegion = Region(
+                            id: regionData.id,
+                            userId: appComponent.userId,
+                            name: regionData.name,
+                            description: nil,
+                            latitude: regionData.latitude,
+                            longitude: regionData.longitude,
+                            radiusMeters: Int32(regionData.radiusMeters),
+                            notificationsEnabled: true,
+                            createdAt: now,
+                            updatedAt: now,
+                            enterCount: 0,
+                            lastEnterTime: nil,
+                            lastExitTime: nil
+                        )
+
+                        // Use repository to insert region
+                        try await appComponent.regionRepository.insertRegion(region: newRegion)
+                        importedRegions += 1
+                    } catch {
+                        print("Failed to import region \(regionData.id): \(error)")
+                        errorCount += 1
+                    }
+                }
+
+                // Show success/error message
+                let totalImported = importedTrips + importedRegions
+                if errorCount == 0 {
+                    errorMessage = "Successfully imported \(totalImported) items (\(importedTrips) trips, \(importedRegions) regions)"
+                } else {
+                    errorMessage = "Imported \(totalImported) items (\(importedTrips) trips, \(importedRegions) regions), \(errorCount) failed"
+                }
                 showErrorAlert = true
+
+                print("Import complete: \(totalImported) imported (\(importedTrips) trips, \(importedRegions) regions), \(errorCount) errors")
 
             } catch {
                 errorMessage = "Failed to import data: \(error.localizedDescription)"

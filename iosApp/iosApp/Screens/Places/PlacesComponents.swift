@@ -112,6 +112,7 @@ class PlacesViewModel: ObservableObject {
     @Published var filters: PlaceFilters = PlaceFilters(minVisits: 1, categories: [])
     @Published var sortOption: PlaceSortOption = .mostVisited
     @Published var hasActiveFilters: Bool = false
+    @Published var selectedPlace: FrequentPlace?
 
     init(controller: PlacesController) {
         self.controller = controller
@@ -154,8 +155,27 @@ class PlacesViewModel: ObservableObject {
     }
 
     func selectPlace(_ place: PlaceItem) {
-        // TODO: Implement place selection/navigation
-        print("Selected place: \(place.id)")
+        // Find the FrequentPlace from the controller's state
+        Task {
+            // First try to find in current state
+            let currentState = controller.state.value
+            if let frequentPlace = currentState.allPlaces.first(where: { $0.id == place.id }) {
+                await MainActor.run {
+                    selectedPlace = frequentPlace
+                }
+            } else {
+                // If not found in state, fetch from controller
+                if let frequentPlace = await controller.getPlaceById(placeId: place.id) {
+                    await MainActor.run {
+                        selectedPlace = frequentPlace
+                    }
+                }
+            }
+        }
+    }
+
+    func toggleFavorite(placeId: String) {
+        controller.toggleFavorite(placeId: placeId)
     }
 
     func clearSearch() {

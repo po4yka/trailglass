@@ -92,6 +92,23 @@ struct PlacesView: View {
                     }
                 )
             }
+            .sheet(item: $viewModel.selectedPlace) { place in
+                NavigationView {
+                    PlaceDetailView(
+                        place: place,
+                        onToggleFavorite: {
+                            viewModel.toggleFavorite(placeId: place.id)
+                            // Update selected place after toggle
+                            if let updatedPlace = viewModel.controller.state.value.allPlaces.first(where: { $0.id == place.id }) {
+                                viewModel.selectedPlace = updatedPlace
+                            }
+                        },
+                        onDismiss: {
+                            viewModel.selectedPlace = nil
+                        }
+                    )
+                }
+            }
         }
     }
 }
