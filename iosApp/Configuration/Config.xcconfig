@@ -17,7 +17,7 @@ SWIFT_OPTIMIZATION_LEVEL = -Onone
 IPHONEOS_DEPLOYMENT_TARGET = 16.4
 
 // Linker Flags
-OTHER_LDFLAGS = $(inherited) -framework Shared
+OTHER_LDFLAGS = $(inherited) -framework Shared -lsqlite3
 
 // Enable Modules
 CLANG_ENABLE_MODULES = YES
