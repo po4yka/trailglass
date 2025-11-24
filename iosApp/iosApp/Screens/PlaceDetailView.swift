@@ -337,6 +337,8 @@ struct StatRow: View {
     }
 }
 
+// Preview disabled - requires proper Kotlin API
+/*
 #Preview {
     NavigationView {
         PlaceDetailView(
@@ -368,3 +370,4 @@ struct StatRow: View {
         )
     }
 }
+*/

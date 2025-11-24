@@ -219,9 +219,9 @@ private struct GlassSegmentButtonStyle: ButtonStyle {
 
 // MARK: - Glass Bottom Sheet
 
-struct GlassBottomSheet<Content: View>: ViewModifier {
+struct GlassBottomSheet<SheetContent: View>: ViewModifier {
     let isPresented: Bool
-    let content: Content
+    let sheetContent: SheetContent
     let detents: Set<PresentationDetent>
     let variant: GlassVariant
 
@@ -229,18 +229,18 @@ struct GlassBottomSheet<Content: View>: ViewModifier {
         isPresented: Bool,
         variant: GlassVariant = .regular,
         detents: Set<PresentationDetent> = [.medium, .large],
-        @ViewBuilder content: () -> Content
+        @ViewBuilder content: () -> SheetContent
     ) {
         self.isPresented = isPresented
         self.variant = variant
         self.detents = detents
-        self.content = content()
+        self.sheetContent = content()
     }
 
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: .constant(isPresented)) {
-                self.content
+                self.sheetContent
                     .glassEffect(variant: variant)
                     .presentationDetents(detents)
                     .presentationBackgroundInteraction(.enabled)

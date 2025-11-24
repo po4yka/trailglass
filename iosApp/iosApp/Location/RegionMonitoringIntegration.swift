@@ -281,7 +281,7 @@ struct AddRegionView: View {
     @State private var description: String = ""
     @State private var latitude: String = ""
     @State private var longitude: String = ""
-    @State private var radius: Double = Region.companion.DEFAULT_RADIUS_METERS
+    @State private var radius: Double = 100.0
     @State private var notificationsEnabled: Bool = true
 
     var body: some View {
@@ -302,7 +302,7 @@ struct AddRegionView: View {
                 Section(header: Text("Radius")) {
                     Slider(
                         value: $radius,
-                        in: Region.companion.MIN_RADIUS_METERS...Region.companion.MAX_RADIUS_METERS,
+                        in: Region.companion.MIN_RADIUS_METERS...5000.0,
                         step: 50
                     )
                     Text("\(Int(radius)) meters")

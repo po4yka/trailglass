@@ -84,13 +84,13 @@ class RegionViewModel: ObservableObject {
         description: String? = nil,
         latitude: Double,
         longitude: Double,
-        radiusMeters: Double = Region.companion.DEFAULT_RADIUS_METERS,
+        radiusMeters: Double = 100.0,
         notificationsEnabled: Bool = true
     ) {
         // Validate radius
         let validRadius = max(
-            Region.companion.MIN_RADIUS_METERS,
-            min(radiusMeters, Region.companion.MAX_RADIUS_METERS)
+            Double(Region.companion.MIN_RADIUS_METERS),
+            min(radiusMeters, 5000.0)
         )
 
         regionsController.createRegion(
@@ -98,7 +98,7 @@ class RegionViewModel: ObservableObject {
             description: description,
             latitude: latitude,
             longitude: longitude,
-            radiusMeters: validRadius,
+            radiusMeters: Int32(validRadius),
             notificationsEnabled: notificationsEnabled
         )
     }
@@ -154,7 +154,8 @@ class RegionViewModel: ObservableObject {
                 epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
             ),
             enterCount: updatedRegion.enterCount,
-            lastEnteredAt: updatedRegion.lastEnteredAt
+            lastEnterTime: updatedRegion.lastEnterTime,
+            lastExitTime: updatedRegion.lastExitTime
         )
 
         updateRegion(updatedRegion)
@@ -229,8 +230,13 @@ extension Region {
     }
 
     var lastEnteredDate: Date? {
-        guard let lastEntered = lastEnteredAt else { return nil }
+        guard let lastEntered = lastEnterTime else { return nil }
         return Date(timeIntervalSince1970: TimeInterval(lastEntered.epochSeconds))
+    }
+
+    var lastExitDate: Date? {
+        guard let lastExit = lastExitTime else { return nil }
+        return Date(timeIntervalSince1970: TimeInterval(lastExit.epochSeconds))
     }
 
     /**

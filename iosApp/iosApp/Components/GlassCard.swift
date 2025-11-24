@@ -397,8 +397,9 @@ private func formatDuration(_ duration: KotlinDuration) -> String {
     }
 }
 
-// MARK: - Previews
+// MARK: - Previews (Disabled - require proper Kotlin types)
 
+/*
 #Preview("Visit Card") {
     VStack(spacing: 16) {
         VisitGlassCard(
@@ -443,3 +444,4 @@ private func formatDuration(_ duration: KotlinDuration) -> String {
     .padding()
     .background(Color.backgroundLight)
 }
+*/

@@ -116,8 +116,9 @@ struct GlassButtonPressStyle: ButtonStyle {
     }
 }
 
-// MARK: - Preview
 
+// Preview disabled - requires correct MapMarker API
+/*
 #Preview {
     ZStack {
         Color.adaptiveBackground.ignoresSafeArea()
@@ -127,12 +128,10 @@ struct GlassButtonPressStyle: ButtonStyle {
             MarkerInfoCard(
                 marker: MapMarker(
                     id: "1",
-                    coordinate: LatLng(latitude: 37.7749, longitude: -122.4194),
+                    coordinate: Coordinate(latitude: 37.7749, longitude: -122.4194),
                     title: "Golden Gate Park",
                     snippet: "Visited 2 hours ago",
-                    color: nil,
-                    iconResourceName: nil,
-                    placeVisitId: nil
+                    placeVisitId: "visit-1"
                 ),
                 onDismiss: {},
                 onViewDetails: {},
@@ -141,3 +140,4 @@ struct GlassButtonPressStyle: ButtonStyle {
         }
     }
 }
+*/

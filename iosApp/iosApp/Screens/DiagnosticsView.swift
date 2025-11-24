@@ -289,6 +289,8 @@ class DiagnosticsViewModel: ObservableObject {
     }
 }
 
+// Preview disabled - requires proper DI setup
+/*
 #Preview {
     NavigationView {
         DiagnosticsView(controller: DiagnosticsController(
@@ -317,3 +319,4 @@ struct PreviewMocks {
     static let networkConnectivityMonitor = NetworkConnectivityMonitor()
     static let coroutineScope = CoroutineScope()
 }
+*/

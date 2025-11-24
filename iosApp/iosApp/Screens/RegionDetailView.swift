@@ -11,7 +11,7 @@ struct RegionDetailView: View {
     @State private var description: String = ""
     @State private var latitude: Double = 37.7749
     @State private var longitude: Double = -122.4194
-    @State private var radiusMeters: Double = Region.companion.DEFAULT_RADIUS_METERS
+    @State private var radiusMeters: Double = 100.0
     @State private var notificationsEnabled: Bool = true
     @State private var mapRegion: MKCoordinateRegion
     @State private var showingValidationError = false
@@ -29,7 +29,7 @@ struct RegionDetailView: View {
             _description = State(initialValue: region.description_ ?? "")
             _latitude = State(initialValue: region.latitude)
             _longitude = State(initialValue: region.longitude)
-            _radiusMeters = State(initialValue: region.radiusMeters)
+            _radiusMeters = State(initialValue: Double(region.radiusMeters))
             _notificationsEnabled = State(initialValue: region.notificationsEnabled)
             _mapRegion = State(initialValue: MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: region.latitude, longitude: region.longitude),
@@ -217,7 +217,7 @@ struct RegionDetailView: View {
 
                 Slider(
                     value: $radiusMeters,
-                    in: Region.companion.MIN_RADIUS_METERS...Region.companion.MAX_RADIUS_METERS,
+                    in: Region.companion.MIN_RADIUS_METERS...5000.0,
                     step: 50
                 )
                 .accentColor(.coastalPath)
@@ -227,7 +227,7 @@ struct RegionDetailView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("\(Int(Region.companion.MAX_RADIUS_METERS / 1000))km")
+                    Text("\(Int(5000.0 / 1000))km")
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -370,14 +370,15 @@ struct RegionDetailView: View {
                 description: description.isEmpty ? nil : description,
                 latitude: latitude,
                 longitude: longitude,
-                radiusMeters: radiusMeters,
+                radiusMeters: Int32(radiusMeters),
                 notificationsEnabled: notificationsEnabled,
                 createdAt: region.createdAt,
                 updatedAt: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
                     epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
                 ),
                 enterCount: region.enterCount,
-                lastEnteredAt: region.lastEnteredAt
+                lastEnterTime: region.lastEnterTime,
+                lastExitTime: region.lastExitTime
             )
             viewModel.updateRegion(updatedRegion)
         } else {

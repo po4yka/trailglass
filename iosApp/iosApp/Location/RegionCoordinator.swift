@@ -269,9 +269,10 @@ class RegionCoordinator: ObservableObject {
                     epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
                 ),
                 enterCount: updatedRegion.enterCount + 1,
-                lastEnteredAt: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
+                lastEnterTime: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
                     epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
-                )
+                ),
+                lastExitTime: nil
             )
 
             // Update in ViewModel

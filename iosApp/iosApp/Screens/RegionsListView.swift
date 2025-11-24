@@ -176,7 +176,7 @@ struct RegionCard: View {
                             Text("Last Visit")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            Text(region.lastEnteredAt != nil ? formatDate(region.lastEnteredDate!) : "Never")
+                            Text(region.lastEnterTime != nil ? formatDate(region.lastEnteredDate!) : "Never")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                                 .foregroundColor(.blueSlate)
