@@ -109,3 +109,18 @@ extension TimelineFilter {
     }
 }
 
+// MARK: - Data to Kotlin ByteArray Conversion
+
+extension Data {
+    /// Converts Swift Data to Kotlin ByteArray
+    func toKotlinByteArray() -> KotlinByteArray {
+        let kotlinData = KotlinByteArray(size: Int32(self.count))
+        self.withUnsafeBytes { bytes in
+            for (index, byte) in bytes.enumerated() {
+                kotlinData.set(index: Int32(index), value: Int8(bitPattern: byte))
+            }
+        }
+        return kotlinData
+    }
+}
+

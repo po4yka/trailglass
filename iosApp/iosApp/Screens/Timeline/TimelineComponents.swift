@@ -281,20 +281,34 @@ class EnhancedTimelineViewModel: ObservableObject {
 
     // FAB actions
     func toggleTracking() {
-        // TODO: Implement tracking toggle via controller
-        isTracking.toggle()
+        // Get LocationTrackingController from appComponent (would need to be passed in)
+        // For now, this is a placeholder - the actual implementation would require
+        // passing the controller or appComponent to the ViewModel
+        // TODO: Pass locationTrackingController to ViewModel and implement:
+        // if isTracking {
+        //     locationTrackingController.stopTracking()
+        // } else {
+        //     locationTrackingController.startTracking(mode: .balanced)
+        // }
+        print("Toggle tracking - requires LocationTrackingController")
     }
 
     func addPhoto() {
-        // TODO: Implement add photo action
+        // Navigate to photo picker or camera
+        // This would typically be handled by navigation/presentation
+        print("Add photo - requires navigation implementation")
     }
 
     func addNote() {
-        // TODO: Implement add note action
+        // Navigate to note editor
+        // This would typically be handled by navigation/presentation
+        print("Add note - requires navigation implementation")
     }
 
     func checkIn() {
-        // TODO: Implement check-in action
+        // Create manual place visit/check-in
+        // This would require PlaceVisitRepository or a use case
+        print("Check-in - requires PlaceVisitRepository or use case")
     }
 
     func loadTimeline() {

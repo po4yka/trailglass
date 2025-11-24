@@ -89,13 +89,22 @@ struct PhotoGalleryView: View {
                 do {
                     // Load photo data
                     if let data = try await item.loadTransferable(type: Data.self) {
-                        // TODO: Create Photo object with metadata
-                        // TODO: Add to gallery via viewModel.controller
-                        print("Successfully loaded photo data: \(data.count) bytes")
-                    }
+                        // Use item identifier as URI (PhotosPickerItem provides unique identifier)
+                        let uri = item.identifier ?? "photo_\(UUID().uuidString)"
 
+                        // Convert Swift Data to Kotlin ByteArray
+                        let kotlinData = data.toKotlinByteArray()
+
+                        // Import photo via controller
+                        viewModel.controller.importPhoto(
+                            uri: uri,
+                            photoData: kotlinData,
+                            timestamp: nil // Will extract from EXIF
+                        )
+                    }
                 } catch {
                     print("Failed to load photo: \(error)")
+                    // TODO: Show error alert to user
                 }
             }
         }

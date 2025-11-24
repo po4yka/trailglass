@@ -47,6 +47,11 @@ struct EnhancedSettingsView: View {
     let appComponent: AppComponent
     @StateObject private var viewModel: SettingsViewModel
     @State private var showClearDataAlert = false
+    @State private var showShareSheet = false
+    @State private var shareItems: [Any] = []
+    @State private var showDocumentPicker = false
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
 
     init(controller: SettingsController, appComponent: AppComponent) {
         self.appComponent = appComponent
@@ -54,66 +59,113 @@ struct EnhancedSettingsView: View {
     }
 
     private func exportData() {
-        // Create export data structure
-        let exportData = TrailglassExportData(
-            version: "1.0",
-            exportDate: Date(),
-            trips: [], // TODO: Get trips from controller
-            places: [], // TODO: Get places from controller
-            regions: [], // TODO: Get regions from controller
-            settings: [:] // TODO: Get settings from viewModel
-        )
+        Task {
+            do {
+                // Get data from repositories
+                let trips = try await appComponent.tripRepository.getTripsForUser(userId: appComponent.userId)
+                let placeVisits = try await appComponent.placeVisitRepository.getPlaceVisitsForUser(userId: appComponent.userId)
+                let regions = try await appComponent.regionRepository.getRegionsForUser(userId: appComponent.userId)
 
-        do {
-            // Convert to JSON
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            let jsonData = try encoder.encode(exportData)
-            let jsonString = String(data: jsonData, encoding: .utf8) ?? "{}"
+                // Convert to export format
+                let tripExports = trips.map { trip in
+                    TripExportData(
+                        id: trip.id,
+                        name: trip.name,
+                        description: trip.description,
+                        startDate: Date(timeIntervalSince1970: TimeInterval(trip.startTime.epochSeconds)),
+                        endDate: trip.endTime?.epochSeconds.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+                    )
+                }
 
-            // Create temporary file
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("trailglass_export.json")
-            try jsonString.write(to: tempURL, atomically: true, encoding: .utf8)
+                let placeExports = placeVisits.map { visit in
+                    PlaceExportData(
+                        id: visit.id,
+                        name: visit.name ?? "Unknown Place",
+                        latitude: visit.latitude,
+                        longitude: visit.longitude,
+                        category: visit.category?.name ?? "Unknown"
+                    )
+                }
 
-            // Present share sheet
-            presentShareSheet(for: tempURL)
+                let regionExports = regions.map { region in
+                    RegionExportData(
+                        id: region.id,
+                        name: region.name,
+                        latitude: region.center.latitude,
+                        longitude: region.center.longitude,
+                        radiusMeters: region.radiusMeters
+                    )
+                }
 
-        } catch {
-            print("Failed to export data: \(error)")
-            // TODO: Show error alert
+                // Get settings from viewModel
+                var settingsDict: [String: String] = [:]
+                if let settings = viewModel.settings {
+                    // Convert settings to dictionary (simplified)
+                    settingsDict["trackingEnabled"] = String(settings.trackingEnabled)
+                    settingsDict["syncEnabled"] = String(settings.syncEnabled)
+                }
+
+                // Create export data structure
+                let exportData = TrailglassExportData(
+                    version: "1.0",
+                    exportDate: Date(),
+                    trips: tripExports,
+                    places: placeExports,
+                    regions: regionExports,
+                    settings: settingsDict
+                )
+
+                // Convert to JSON
+                let encoder = JSONEncoder()
+                encoder.dateEncodingStrategy = .iso8601
+                let jsonData = try encoder.encode(exportData)
+
+                // Create temporary file
+                let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("trailglass_export_\(Date().timeIntervalSince1970).json")
+                try jsonData.write(to: tempURL)
+
+                // Present share sheet
+                shareItems = [tempURL]
+                showShareSheet = true
+
+            } catch {
+                errorMessage = "Failed to export data: \(error.localizedDescription)"
+                showErrorAlert = true
+            }
         }
     }
 
-    private func presentShareSheet(for fileURL: URL) {
-        // TODO: Present UIActivityViewController
-        print("Presenting share sheet for file: \(fileURL)")
-    }
-
     private func importData() {
-        // For now, show a placeholder alert
-        // TODO: Implement proper document picker with UIViewControllerRepresentable
-        print("Import data functionality - placeholder implementation")
-        // In a real implementation:
-        // let picker = UIDocumentPickerViewController(forOpeningContentTypes: [.json])
-        // picker.delegate = self
-        // present(picker, animated: true)
+        showDocumentPicker = true
     }
 
     private func processImportedData(_ jsonData: Data) {
-        do {
-            // Parse JSON
-            guard let jsonObject = try JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-                  let version = jsonObject["version"] as? String else {
-                throw ImportError.invalidFormat
+        Task {
+            do {
+                // Parse JSON
+                let decoder = JSONDecoder()
+                decoder.dateDecodingStrategy = .iso8601
+                let exportData = try decoder.decode(TrailglassExportData.self, from: jsonData)
+
+                // Validate version compatibility
+                guard exportData.version == "1.0" else {
+                    throw ImportError.incompatibleVersion
+                }
+
+                // Import data (simplified - in production, you'd want more robust error handling)
+                // Note: This is a basic implementation. Full import would require use cases or repository methods
+                print("Processing imported data with version: \(exportData.version)")
+                print("Trips: \(exportData.trips.count), Places: \(exportData.places.count), Regions: \(exportData.regions.count)")
+
+                // TODO: Implement full import logic using repositories or use cases
+                // For now, just log the import
+                errorMessage = "Import functionality requires backend implementation"
+                showErrorAlert = true
+
+            } catch {
+                errorMessage = "Failed to import data: \(error.localizedDescription)"
+                showErrorAlert = true
             }
-
-            // TODO: Validate version compatibility
-            // TODO: Import trips, places, regions, settings
-            print("Processing imported data with version: \(version)")
-
-        } catch {
-            print("Failed to import data: \(error)")
-            // TODO: Show error alert
         }
     }
 
@@ -169,6 +221,35 @@ struct EnhancedSettingsView: View {
 
             Are you sure you want to continue?
             """)
+        }
+        .alert("Error", isPresented: $showErrorAlert) {
+            Button("OK") {
+                showErrorAlert = false
+            }
+        } message: {
+            Text(errorMessage)
+        }
+        .sheet(isPresented: $showShareSheet) {
+            ShareSheet(items: shareItems)
+        }
+        .sheet(isPresented: $showDocumentPicker) {
+            DocumentPicker(contentTypes: [.json]) { url in
+                // Access the file and read its contents
+                guard url.startAccessingSecurityScopedResource() else {
+                    errorMessage = "Failed to access selected file"
+                    showErrorAlert = true
+                    return
+                }
+                defer { url.stopAccessingSecurityScopedResource() }
+
+                do {
+                    let jsonData = try Data(contentsOf: url)
+                    processImportedData(jsonData)
+                } catch {
+                    errorMessage = "Failed to read file: \(error.localizedDescription)"
+                    showErrorAlert = true
+                }
+            }
         }
     }
 }

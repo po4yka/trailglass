@@ -162,6 +162,59 @@ class PhotoGalleryController(
     }
 
     /**
+     * Import a photo from platform-specific data. This is called by platform code after photo is selected.
+     *
+     * @param uri Platform-specific photo URI
+     * @param photoData Raw photo bytes
+     * @param timestamp Optional photo timestamp (will extract from EXIF if not provided)
+     */
+    fun importPhoto(
+        uri: String,
+        photoData: ByteArray,
+        timestamp: kotlinx.datetime.Instant? = null
+    ) {
+        logger.info { "Importing photo from URI: $uri (${photoData.size} bytes)" }
+
+        _state.update { it.copy(isLoading = true, error = null) }
+
+        controllerScope.launch {
+            try {
+                val result = importPhotoUseCase.execute(
+                    uri = uri,
+                    photoData = photoData,
+                    userId = userId,
+                    timestamp = timestamp
+                )
+
+                when (result) {
+                    is ImportPhotoUseCase.ImportResult.Success -> {
+                        logger.info { "Successfully imported photo ${result.photo.id}" }
+                        // Refresh gallery to show new photo
+                        loadGallery()
+                    }
+                    is ImportPhotoUseCase.ImportResult.Error -> {
+                        logger.error { "Failed to import photo: ${result.message}" }
+                        _state.update {
+                            it.copy(
+                                error = result.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                logger.error(e) { "Exception while importing photo" }
+                _state.update {
+                    it.copy(
+                        error = e.message ?: "Unknown error",
+                        isLoading = false
+                    )
+                }
+            }
+        }
+    }
+
+    /**
      * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
      * needed.
      *
