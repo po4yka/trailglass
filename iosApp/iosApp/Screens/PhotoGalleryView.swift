@@ -13,6 +13,8 @@ struct PhotoGalleryView: View {
     @State private var showGridView = false
     @State private var showPhotoPicker = false
     @State private var selectedPhotos: [PhotosPickerItem] = []
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
 
     init(appComponent: AppComponent) {
         self.appComponent = appComponent
@@ -75,6 +77,13 @@ struct PhotoGalleryView: View {
         .onChange(of: selectedPhotos) { newPhotos in
             handlePhotoSelection(newPhotos)
         }
+        .alert("Error", isPresented: $showErrorAlert) {
+            Button("OK") {
+                showErrorAlert = false
+            }
+        } message: {
+            Text(errorMessage)
+        }
     }
 
     private var photoSubtitle: String {
@@ -104,7 +113,8 @@ struct PhotoGalleryView: View {
                     }
                 } catch {
                     print("Failed to load photo: \(error)")
-                    // TODO: Show error alert to user
+                    errorMessage = "Failed to import photo: \(error.localizedDescription)"
+                    showErrorAlert = true
                 }
             }
         }

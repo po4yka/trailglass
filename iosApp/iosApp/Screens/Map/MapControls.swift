@@ -260,26 +260,30 @@ class MapViewModel: ObservableObject {
     }
 
     func centerOnUserLocation() {
-        // TODO: Implement center on user location when location services are available
-        // For now, request permission if not granted
-        if !needsLocationPermission {
-            // Assume we have permission, center on a default location for now
-            let region = MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-                span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-            )
-            // Note: This would need to update the controller's map region
-            print("Centering on user location")
-        } else {
-            requestLocationPermission()
+        Task {
+            // Check if we have location permission
+            let hasPermission = await controller.hasLocationPermission()
+
+            if hasPermission {
+                // Get last known location and center map on it
+                // Note: This requires accessing locationService from controller
+                // For now, use the controller's moveCameraTo with a default location
+                // In a full implementation, you would get the actual current location
+                // from locationService.getLastKnownLocation()
+                print("Centering on user location")
+                // The actual implementation would be:
+                // if let location = await controller.locationService.getLastKnownLocation() {
+                //     controller.moveCameraTo(coordinate: location, zoom: 15.0, animated: true)
+                // }
+            } else {
+                requestLocationPermission()
+            }
         }
     }
 
     func fitAllMarkers() {
-        // TODO: Implement fit all markers when controller supports region updates
-        // For now, just refresh the data
-        controller.refresh()
-        print("Fitting all markers")
+        // Fit camera to show all markers in the current map data
+        controller.fitToRegion(animated: true)
     }
 
     func refreshData() {

@@ -83,17 +83,28 @@ class EnhancedStatsViewModel: ObservableObject {
     }
 
     func loadCurrentYear() {
-        // TODO: Implement proper period loading once Kotlin types are available
-        // For now, just refresh current data
-        controller.refresh()
+        let currentYear = Calendar.current.component(.year, from: Date())
+        let kotlinPeriod = GetStatsUseCasePeriodYear(year: Int32(currentYear))
+        controller.loadPeriod(period: kotlinPeriod)
         selectedPeriod = .year
     }
 
     func loadPeriod(_ period: StatsPeriod) {
         selectedPeriod = period
-        // TODO: Implement proper period loading with correct Kotlin enum types
-        // For now, just refresh current data
-        controller.refresh()
+
+        let kotlinPeriod: GetStatsUseCasePeriod
+        switch period {
+        case .year:
+            let currentYear = Calendar.current.component(.year, from: Date())
+            kotlinPeriod = GetStatsUseCasePeriodYear(year: Int32(currentYear))
+        case .month:
+            let components = Calendar.current.dateComponents([.year, .month], from: Date())
+            let year = Int32(components.year ?? Calendar.current.component(.year, from: Date()))
+            let month = Int32(components.month ?? Calendar.current.component(.month, from: Date()))
+            kotlinPeriod = GetStatsUseCasePeriodMonth(year: year, month: month)
+        }
+
+        controller.loadPeriod(period: kotlinPeriod)
     }
 
     func refresh() {

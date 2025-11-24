@@ -73,6 +73,8 @@ class TripDetailViewModel: ObservableObject {
     @Published var tripDeleted = false
     @Published var scrollOffset: CGFloat = 0
     @Published var showMenu = false
+    @Published var showShareSheet = false
+    @Published var shareItems: [Any] = []
 
     init(tripId: String, statsController: TripStatisticsController, routeController: RouteViewController, tripsController: TripsController) {
         self.tripId = tripId
@@ -143,13 +145,9 @@ class TripDetailViewModel: ObservableObject {
         Shared from TrailGlass
         """
 
-        // For now, just print - in a real implementation, this would show a share sheet
-        // You would use UIActivityViewController to present the share options
-        print("Share content: \(shareText)")
-
-        // TODO: Present UIActivityViewController with the share text and optional image
-        // let activityVC = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
-        // UIApplication.shared.windows.first?.rootViewController?.present(activityVC, animated: true)
+        // Present share sheet
+        shareItems = [shareText]
+        showShareSheet = true
     }
 
     private func formatDistance(_ meters: Double) -> String {
