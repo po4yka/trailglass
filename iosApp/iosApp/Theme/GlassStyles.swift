@@ -219,6 +219,7 @@ private struct GlassSegmentButtonStyle: ButtonStyle {
 
 // MARK: - Glass Bottom Sheet
 
+@available(iOS 16.4, *)
 struct GlassBottomSheet<SheetContent: View>: ViewModifier {
     let isPresented: Bool
     let sheetContent: SheetContent
@@ -237,13 +238,13 @@ struct GlassBottomSheet<SheetContent: View>: ViewModifier {
         self.sheetContent = content()
     }
 
+    @ViewBuilder
     func body(content: Content) -> some View {
         content
             .sheet(isPresented: .constant(isPresented)) {
                 self.sheetContent
                     .glassEffect(variant: variant)
                     .presentationDetents(detents)
-                    .presentationBackgroundInteraction(.enabled)
                     .presentationCornerRadius(24)
             }
     }

@@ -13,8 +13,8 @@ FRAMEWORK_SEARCH_PATHS = $(inherited) $(SRCROOT)/../shared/build/xcode-framework
 SWIFT_VERSION = 5.10
 SWIFT_OPTIMIZATION_LEVEL = -Onone
 
-// Deployment Target
-IPHONEOS_DEPLOYMENT_TARGET = 16.0
+// Deployment Target (16.4 required for presentationCornerRadius and presentationBackgroundInteraction)
+IPHONEOS_DEPLOYMENT_TARGET = 16.4
 
 // Linker Flags
 OTHER_LDFLAGS = $(inherited) -framework Shared
