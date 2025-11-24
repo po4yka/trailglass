@@ -10,7 +10,7 @@ package com.po4yka.trailglass.data.security
  * - Android: Uses Android Keystore with hardware-backed keys
  * - iOS: Uses iOS Keychain with Secure Enclave
  */
-expect class EncryptionService() {
+interface EncryptionService {
     /**
      * Encrypt data using AES-256-GCM.
      *

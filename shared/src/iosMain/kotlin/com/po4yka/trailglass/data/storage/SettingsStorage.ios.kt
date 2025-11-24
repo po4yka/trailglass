@@ -21,7 +21,7 @@ import kotlinx.datetime.Instant
 import platform.Foundation.NSUserDefaults
 
 /** iOS implementation of SettingsStorage using UserDefaults. */
-actual class SettingsStorage {
+class IOSSettingsStorage : SettingsStorage {
     private val logger = logger()
     private val userDefaults = NSUserDefaults.standardUserDefaults
 
@@ -67,11 +67,11 @@ actual class SettingsStorage {
         const val DATA_STORAGE_MB = "data_storage_mb"
     }
 
-    actual fun getSettingsFlow(): Flow<AppSettings> = _settingsFlow.asStateFlow()
+    override fun getSettingsFlow(): Flow<AppSettings> = _settingsFlow.asStateFlow()
 
-    actual suspend fun getSettings(): AppSettings = _settingsFlow.value
+    override suspend fun getSettings(): AppSettings = _settingsFlow.value
 
-    actual suspend fun saveSettings(settings: AppSettings) {
+    override suspend fun saveSettings(settings: AppSettings) {
         // Tracking
         userDefaults.setObject(settings.trackingPreferences.accuracy.name, Keys.TRACKING_ACCURACY)
         userDefaults.setObject(settings.trackingPreferences.updateInterval.name, Keys.TRACKING_UPDATE_INTERVAL)
@@ -120,7 +120,7 @@ actual class SettingsStorage {
         _settingsFlow.value = settings
     }
 
-    actual suspend fun clearSettings() {
+    override suspend fun clearSettings() {
         // Remove all settings keys
         listOf(
             Keys.TRACKING_ACCURACY,

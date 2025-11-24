@@ -3,7 +3,7 @@ package com.po4yka.trailglass.domain.permission
 import kotlinx.coroutines.flow.StateFlow
 
 /** Platform-agnostic permission manager. Handles permission checking, requesting, and providing rationales. */
-expect class PermissionManager {
+interface PermissionManager {
     /** Check the current state of a permission. */
     suspend fun checkPermission(permissionType: PermissionType): PermissionState
 

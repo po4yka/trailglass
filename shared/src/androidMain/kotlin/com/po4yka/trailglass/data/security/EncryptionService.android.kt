@@ -21,13 +21,13 @@ import javax.crypto.spec.SecretKeySpec
  * Uses AES-256-GCM with Android Keystore for hardware-backed key storage.
  */
 @Inject
-actual class EncryptionService actual constructor() {
+class AndroidEncryptionService : EncryptionService {
     private val keyStore: KeyStore =
         KeyStore.getInstance(ANDROID_KEYSTORE).apply {
             load(null)
         }
 
-    actual suspend fun encrypt(plaintext: String): Result<EncryptedData> =
+    override suspend fun encrypt(plaintext: String): Result<EncryptedData> =
         withContext(Dispatchers.IO) {
             runCatching {
                 val key = getOrCreateKey()
@@ -55,7 +55,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun decrypt(encryptedData: EncryptedData): Result<String> =
+    override suspend fun decrypt(encryptedData: EncryptedData): Result<String> =
         withContext(Dispatchers.IO) {
             runCatching {
                 val key = getOrCreateKey()
@@ -80,12 +80,12 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun hasEncryptionKey(): Boolean =
+    override suspend fun hasEncryptionKey(): Boolean =
         withContext(Dispatchers.IO) {
             keyStore.containsAlias(KEY_ALIAS)
         }
 
-    actual suspend fun generateKey(): Result<Unit> =
+    override suspend fun generateKey(): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
                 val keyGenerator =
@@ -113,7 +113,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun exportKey(password: String): Result<String> =
+    override suspend fun exportKey(password: String): Result<String> =
         withContext(Dispatchers.IO) {
             runCatching {
                 // Get the key from keystore
@@ -149,7 +149,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun importKey(
+    override suspend fun importKey(
         encryptedKeyBackup: String,
         password: String
     ): Result<Unit> =
@@ -191,7 +191,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun deleteKey(): Result<Unit> =
+    override suspend fun deleteKey(): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
                 if (keyStore.containsAlias(KEY_ALIAS)) {

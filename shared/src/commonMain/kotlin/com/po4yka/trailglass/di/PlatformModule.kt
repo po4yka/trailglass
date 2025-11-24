@@ -2,9 +2,9 @@ package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
-import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
-import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
-import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.data.remote.DeviceInfoProvider
+import com.po4yka.trailglass.data.remote.auth.TokenStorage
+import com.po4yka.trailglass.data.sync.SyncStateRepository
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.feature.diagnostics.PlatformDiagnostics
@@ -31,13 +31,13 @@ interface PlatformModule {
     fun deviceId(): String
 
     /** Platform-specific secure token storage. */
-    fun secureTokenStorage(): SecureTokenStorage
+    fun secureTokenStorage(): TokenStorage
 
     /** Platform-specific device info provider. */
-    fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider
+    fun platformDeviceInfoProvider(): DeviceInfoProvider
 
     /** Platform-specific sync state repository. */
-    fun syncStateRepositoryImpl(): SyncStateRepositoryImpl
+    fun syncStateRepository(): SyncStateRepository
 
     /** Platform-specific network connectivity monitor. */
     fun networkConnectivityMonitor(): NetworkConnectivityMonitor

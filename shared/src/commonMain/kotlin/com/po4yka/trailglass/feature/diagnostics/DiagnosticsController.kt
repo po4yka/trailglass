@@ -364,7 +364,7 @@ data class LocationInfo(
     val backgroundLocationPermissionGranted: Boolean
 )
 
-expect class PlatformDiagnostics {
+interface PlatformDiagnostics {
     suspend fun getSystemInfo(): SystemInfo
     suspend fun getBatteryInfo(): BatteryInfo
     suspend fun getPermissionsStatus(): PermissionsStatus

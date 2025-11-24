@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.domain.error
 
 import kotlinx.datetime.Instant
+import kotlinx.coroutines.CancellationException
 
 /**
  * Domain error hierarchy for TrailGlass.
@@ -353,6 +354,8 @@ sealed class Result<out T> {
 inline fun <T> resultOf(block: () -> T): Result<T> =
     try {
         Result.Success(block())
+    } catch (e: CancellationException) {
+        throw e
     } catch (e: Exception) {
         Result.Error(
             TrailGlassError.Unknown(

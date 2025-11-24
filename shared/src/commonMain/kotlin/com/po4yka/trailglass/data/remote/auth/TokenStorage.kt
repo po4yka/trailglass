@@ -13,8 +13,8 @@ data class AuthTokens(
     val expiresAt: Long // Timestamp in milliseconds
 )
 
-/** Expect/actual for platform-specific secure token storage. */
-expect class SecureTokenStorage {
+/** Contract for storing auth tokens in a secure manner. */
+interface TokenStorage {
     suspend fun saveTokens(tokens: AuthTokens)
 
     suspend fun getTokens(): AuthTokens?
@@ -22,15 +22,18 @@ expect class SecureTokenStorage {
     suspend fun clearTokens()
 }
 
+/** Expect/actual for platform-specific secure token storage. */
+
+
 /** Token provider implementation using secure storage. */
 class TokenStorageProvider(
-    private val secureStorage: SecureTokenStorage
+    private val tokenStorage: TokenStorage
 ) : TokenProvider {
     private val _authState = MutableStateFlow<AuthTokens?>(null)
     val authState: StateFlow<AuthTokens?> = _authState.asStateFlow()
 
     override suspend fun getAccessToken(): String? {
-        val tokens = _authState.value ?: secureStorage.getTokens()
+        val tokens = _authState.value ?: tokenStorage.getTokens()
         _authState.value = tokens
 
         // Check if token is expired
@@ -42,7 +45,7 @@ class TokenStorageProvider(
     }
 
     override suspend fun getRefreshToken(): String? {
-        val tokens = _authState.value ?: secureStorage.getTokens()
+        val tokens = _authState.value ?: tokenStorage.getTokens()
         _authState.value = tokens
         return tokens?.refreshToken
     }
@@ -54,12 +57,12 @@ class TokenStorageProvider(
     ) {
         val expiresAt = Clock.System.now().toEpochMilliseconds() + (expiresIn * 1000)
         val tokens = AuthTokens(accessToken, refreshToken, expiresAt)
-        secureStorage.saveTokens(tokens)
+        tokenStorage.saveTokens(tokens)
         _authState.value = tokens
     }
 
     override suspend fun clearTokens() {
-        secureStorage.clearTokens()
+        tokenStorage.clearTokens()
         _authState.value = null
     }
 

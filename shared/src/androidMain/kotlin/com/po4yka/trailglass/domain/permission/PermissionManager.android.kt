@@ -19,13 +19,13 @@ import me.tatarka.inject.annotations.Inject
  * ActivityCompat.
  */
 @Inject
-actual class PermissionManager(
+class AndroidPermissionManager(
     private val context: Context
-) {
+) : PermissionManager {
     private val permissionStates = mutableMapOf<PermissionType, MutableStateFlow<PermissionState>>()
 
     /** Check the current state of a permission. */
-    actual suspend fun checkPermission(permissionType: PermissionType): PermissionState {
+    override suspend fun checkPermission(permissionType: PermissionType): PermissionState {
         val androidPermission = getAndroidPermission(permissionType)
 
         return when {
@@ -66,7 +66,7 @@ actual class PermissionManager(
      * 4. Trigger permission request via Activity Result API
      * 5. Update permission state via updatePermissionState() after result
      */
-    actual suspend fun requestPermission(permissionType: PermissionType): PermissionResult {
+    override suspend fun requestPermission(permissionType: PermissionType): PermissionResult {
         val androidPermission =
             getAndroidPermission(permissionType)
                 ?: return PermissionResult.Error("Unknown permission type: $permissionType")
@@ -94,14 +94,14 @@ actual class PermissionManager(
     }
 
     /** Check if we should show a rationale before requesting. */
-    actual suspend fun shouldShowRationale(permissionType: PermissionType): Boolean {
+    override suspend fun shouldShowRationale(permissionType: PermissionType): Boolean {
         val androidPermission = getAndroidPermission(permissionType) ?: return false
 
         return shouldShowRequestPermissionRationale(androidPermission)
     }
 
     /** Open system settings for the app. */
-    actual suspend fun openAppSettings() {
+    override suspend fun openAppSettings() {
         val intent =
             Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.fromParts("package", context.packageName, null)
@@ -111,7 +111,7 @@ actual class PermissionManager(
     }
 
     /** Observable state for permission changes. */
-    actual fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
+    override fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
         permissionStates.getOrPut(permissionType) {
             MutableStateFlow(PermissionState.NotDetermined)
         }

@@ -16,8 +16,8 @@ import platform.UserNotifications.UNAuthorizationStatusAuthorized
 import platform.UserNotifications.UNAuthorizationStatusProvisional
 
 @OptIn(ExperimentalForeignApi::class)
-actual class PlatformDiagnostics {
-    actual suspend fun getSystemInfo(): SystemInfo {
+class IOSPlatformDiagnostics : PlatformDiagnostics {
+    override suspend fun getSystemInfo(): SystemInfo {
         val bundle = NSBundle.mainBundle
         val appVersion = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String ?: "Unknown"
         val buildNumber = bundle.objectForInfoDictionaryKey("CFBundleVersion") as? String ?: "Unknown"
@@ -32,7 +32,7 @@ actual class PlatformDiagnostics {
         )
     }
 
-    actual suspend fun getBatteryInfo(): BatteryInfo {
+    override suspend fun getBatteryInfo(): BatteryInfo {
         val device = UIDevice.currentDevice
         device.batteryMonitoringEnabled = true
 
@@ -52,7 +52,7 @@ actual class PlatformDiagnostics {
         )
     }
 
-    actual suspend fun getPermissionsStatus(): PermissionsStatus {
+    override suspend fun getPermissionsStatus(): PermissionsStatus {
         val locationManager = CLLocationManager()
         val authStatus = locationManager.authorizationStatus()
 
@@ -79,7 +79,7 @@ actual class PlatformDiagnostics {
         )
     }
 
-    actual suspend fun getLocationInfo(): LocationInfo {
+    override suspend fun getLocationInfo(): LocationInfo {
         val permissionsStatus = getPermissionsStatus()
 
         return LocationInfo(
@@ -90,7 +90,7 @@ actual class PlatformDiagnostics {
         )
     }
 
-    actual suspend fun getDatabaseSizeMB(): Double {
+    override suspend fun getDatabaseSizeMB(): Double {
         val fileManager = NSFileManager.defaultManager
         val documentsDir = fileManager.URLsForDirectory(
             directory = platform.Foundation.NSDocumentDirectory,

@@ -6,6 +6,7 @@ import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
+import com.po4yka.trailglass.data.remote.auth.TokenStorage
 import me.tatarka.inject.annotations.Inject
 import platform.CoreFoundation.CFDictionaryCreateMutable
 import platform.CoreFoundation.CFDictionaryCreateMutableCopy
@@ -41,14 +42,14 @@ private val logger = KotlinLogging.logger {}
 
 /** iOS implementation using Keychain Services. */
 @Inject
-actual class SecureTokenStorage {
-    actual suspend fun saveTokens(tokens: AuthTokens) {
+class IOSSecureTokenStorage : TokenStorage {
+    override suspend fun saveTokens(tokens: AuthTokens) {
         saveToKeychain(KEY_ACCESS_TOKEN, tokens.accessToken)
         saveToKeychain(KEY_REFRESH_TOKEN, tokens.refreshToken)
         saveToKeychain(KEY_EXPIRES_AT, tokens.expiresAt.toString())
     }
 
-    actual suspend fun getTokens(): AuthTokens? {
+    override suspend fun getTokens(): AuthTokens? {
         val accessToken = getFromKeychain(KEY_ACCESS_TOKEN)
         val refreshToken = getFromKeychain(KEY_REFRESH_TOKEN)
         val expiresAt = getFromKeychain(KEY_EXPIRES_AT)?.toLongOrNull()
@@ -60,7 +61,7 @@ actual class SecureTokenStorage {
         }
     }
 
-    actual suspend fun clearTokens() {
+    override suspend fun clearTokens() {
         deleteFromKeychain(KEY_ACCESS_TOKEN)
         deleteFromKeychain(KEY_REFRESH_TOKEN)
         deleteFromKeychain(KEY_EXPIRES_AT)

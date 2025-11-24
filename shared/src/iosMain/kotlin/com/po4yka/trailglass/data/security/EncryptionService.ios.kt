@@ -58,8 +58,8 @@ import kotlin.random.Random
  */
 @Inject
 @OptIn(ExperimentalForeignApi::class)
-actual class EncryptionService actual constructor() {
-    actual suspend fun encrypt(plaintext: String): Result<EncryptedData> =
+class IOSEncryptionService : EncryptionService {
+    override suspend fun encrypt(plaintext: String): Result<EncryptedData> =
         withContext(Dispatchers.IO) {
             runCatching {
                 // Ensure key exists
@@ -89,7 +89,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun decrypt(encryptedData: EncryptedData): Result<String> =
+    override suspend fun decrypt(encryptedData: EncryptedData): Result<String> =
         withContext(Dispatchers.IO) {
             runCatching {
                 // Ensure key exists
@@ -104,7 +104,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun hasEncryptionKey(): Boolean =
+    override suspend fun hasEncryptionKey(): Boolean =
         withContext(Dispatchers.Default) {
             memScoped {
                 val query = createKeychainQuery()
@@ -123,7 +123,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun generateKey(): Result<Unit> =
+    override suspend fun generateKey(): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
                 // Generate 256-bit (32 bytes) random key
@@ -166,7 +166,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun exportKey(password: String): Result<String> =
+    override suspend fun exportKey(password: String): Result<String> =
         withContext(Dispatchers.IO) {
             runCatching {
                 // Retrieve key from Keychain
@@ -191,7 +191,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun importKey(
+    override suspend fun importKey(
         encryptedKeyBackup: String,
         password: String
     ): Result<Unit> =
@@ -236,7 +236,7 @@ actual class EncryptionService actual constructor() {
             }
         }
 
-    actual suspend fun deleteKey(): Result<Unit> =
+    override suspend fun deleteKey(): Result<Unit> =
         withContext(Dispatchers.IO) {
             runCatching {
                 memScoped {

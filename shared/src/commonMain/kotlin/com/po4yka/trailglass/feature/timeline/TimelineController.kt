@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 import kotlinx.datetime.LocalDate
 import me.tatarka.inject.annotations.Inject
 
@@ -54,6 +55,8 @@ class TimelineController(
                 val items = getTimelineUseCase.execute(date, userId)
                 _state.update { it.copy(items = items, isLoading = false) }
                 logger.info { "Loaded ${items.size} timeline items for $date" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load timeline for $date" }
                 _state.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }

@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.feature.tracking
 
+import com.po4yka.trailglass.di.AppScope
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
 import com.po4yka.trailglass.feature.common.Lifecycle
@@ -24,6 +25,7 @@ import me.tatarka.inject.annotations.Inject
  * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
  */
 @Inject
+@AppScope
 class LocationTrackingController(
     private val locationTracker: LocationTracker,
     private val startTrackingUseCase: StartTrackingUseCase,

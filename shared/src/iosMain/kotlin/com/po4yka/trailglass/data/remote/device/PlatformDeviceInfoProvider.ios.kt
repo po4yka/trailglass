@@ -7,10 +7,12 @@ import platform.Foundation.NSUserDefaults
 import platform.UIKit.UIDevice
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kotlinx.cinterop.ExperimentalForeignApi
 
 /** iOS implementation of DeviceInfoProvider. */
 @Inject
-actual class PlatformDeviceInfoProvider : DeviceInfoProvider {
+@OptIn(ExperimentalForeignApi::class)
+class IOSPlatformDeviceInfoProvider : DeviceInfoProvider {
     private val cachedDeviceId: String by lazy {
         val userDefaults = NSUserDefaults.standardUserDefaults
         var id = userDefaults.stringForKey(KEY_DEVICE_ID)
@@ -25,15 +27,15 @@ actual class PlatformDeviceInfoProvider : DeviceInfoProvider {
         id!!
     }
 
-    actual override fun getDeviceId(): String = cachedDeviceId
+    override fun getDeviceId(): String = cachedDeviceId
 
-    actual override fun getDeviceName(): String = UIDevice.currentDevice.name
+    override fun getDeviceName(): String = UIDevice.currentDevice.name
 
-    actual override fun getPlatform(): String = "iOS"
+    override fun getPlatform(): String = "ios"
 
-    actual override fun getOsVersion(): String = UIDevice.currentDevice.systemVersion
+    override fun getOsVersion(): String = UIDevice.currentDevice.systemVersion
 
-    actual override fun getAppVersion(): String {
+    override fun getAppVersion(): String {
         val bundle = NSBundle.mainBundle
         val version = bundle.objectForInfoDictionaryKey("CFBundleShortVersionString") as? String
         return version ?: "1.0.0"

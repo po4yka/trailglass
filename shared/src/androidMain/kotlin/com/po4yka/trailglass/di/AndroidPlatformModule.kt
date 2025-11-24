@@ -8,10 +8,12 @@ import com.po4yka.trailglass.data.file.AndroidPhotoDirectoryProvider
 import com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 import com.po4yka.trailglass.data.network.AndroidNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
-import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
-import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
+import com.po4yka.trailglass.data.remote.DeviceInfoProvider
+
+import com.po4yka.trailglass.data.remote.auth.TokenStorage
 import com.po4yka.trailglass.data.security.EncryptionService
 import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.domain.permission.AndroidPermissionManager
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.AndroidCrashReportingService
 import com.po4yka.trailglass.domain.service.AndroidLocationService
@@ -21,6 +23,7 @@ import com.po4yka.trailglass.domain.service.CrashReportingService
 import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.PushNotificationService
+import com.po4yka.trailglass.feature.diagnostics.AndroidPlatformDiagnostics
 import com.po4yka.trailglass.feature.diagnostics.PlatformDiagnostics
 import com.po4yka.trailglass.location.AndroidCurrentLocationProvider
 import com.po4yka.trailglass.location.CurrentLocationProvider
@@ -31,7 +34,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import me.tatarka.inject.annotations.Inject
 import me.tatarka.inject.annotations.Provides
-
+import com.po4yka.trailglass.data.remote.auth.AndroidSecureTokenStorage
+import com.po4yka.trailglass.data.remote.device.AndroidPlatformDeviceInfoProvider
+import com.po4yka.trailglass.data.storage.AndroidSettingsStorage
+import com.po4yka.trailglass.data.security.AndroidEncryptionService
 /**
  * Android implementation of PlatformModule.
  *
@@ -65,6 +71,7 @@ class AndroidPlatformModule(
     override fun currentLocationProvider(): CurrentLocationProvider = AndroidCurrentLocationProvider(context)
 
     @Provides
+    @AppScope
     override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
@@ -77,17 +84,19 @@ class AndroidPlatformModule(
             android.provider.Settings.Secure.ANDROID_ID
         ) ?: "unknown_device"
 
+
+
     /** Provides Android-specific secure token storage. */
     @Provides
-    override fun secureTokenStorage(): SecureTokenStorage = SecureTokenStorage(context)
+    override fun secureTokenStorage(): TokenStorage = AndroidSecureTokenStorage(context)
 
     /** Provides Android-specific device info provider. */
     @Provides
-    override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider = PlatformDeviceInfoProvider(context)
+    override fun platformDeviceInfoProvider(): DeviceInfoProvider = AndroidPlatformDeviceInfoProvider(context)
 
     /** Provides Android-specific sync state repository. */
     @Provides
-    override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl = SyncStateRepositoryImpl(context)
+    override fun syncStateRepository(): SyncStateRepositoryImpl = SyncStateRepositoryImpl(context)
 
     /** Provides Android-specific network connectivity monitor. */
     @Provides
@@ -95,11 +104,11 @@ class AndroidPlatformModule(
 
     /** Provides Android-specific permission manager. */
     @Provides
-    override fun permissionManager(): PermissionManager = PermissionManager(context)
+    override fun permissionManager(): PermissionManager = AndroidPermissionManager(context)
 
     /** Provides Android-specific encryption service. */
     @Provides
-    override fun encryptionService(): EncryptionService = EncryptionService()
+    override fun encryptionService(): EncryptionService = AndroidEncryptionService()
 
     /** Provides Android-specific photo metadata extractor. */
     @Provides
@@ -109,7 +118,7 @@ class AndroidPlatformModule(
     @Provides
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
         com.po4yka.trailglass.data.storage
-            .SettingsStorage(context)
+            .AndroidSettingsStorage(context)
 
     /** Provides Android-specific photo directory provider. */
     @Provides
@@ -129,5 +138,5 @@ class AndroidPlatformModule(
 
     /** Provides Android-specific platform diagnostics. */
     @Provides
-    override fun platformDiagnostics(): PlatformDiagnostics = PlatformDiagnostics(context)
+    override fun platformDiagnostics(): PlatformDiagnostics = AndroidPlatformDiagnostics(context)
 }

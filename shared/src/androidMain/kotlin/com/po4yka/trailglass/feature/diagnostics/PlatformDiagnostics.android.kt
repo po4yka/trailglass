@@ -9,10 +9,10 @@ import android.os.PowerManager
 import androidx.core.content.ContextCompat
 import java.io.File
 
-actual class PlatformDiagnostics(
+class AndroidPlatformDiagnostics(
     private val context: Context
-) {
-    actual suspend fun getSystemInfo(): SystemInfo {
+) : PlatformDiagnostics {
+    override suspend fun getSystemInfo(): SystemInfo {
         val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
         return SystemInfo(
             appVersion = packageInfo.versionName ?: "Unknown",
@@ -27,7 +27,7 @@ actual class PlatformDiagnostics(
         )
     }
 
-    actual suspend fun getBatteryInfo(): BatteryInfo {
+    override suspend fun getBatteryInfo(): BatteryInfo {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as? BatteryManager
 
         val batteryLevel = batteryManager?.let {
@@ -55,7 +55,7 @@ actual class PlatformDiagnostics(
         )
     }
 
-    actual suspend fun getPermissionsStatus(): PermissionsStatus {
+    override suspend fun getPermissionsStatus(): PermissionsStatus {
         val locationPermissionGranted = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -99,7 +99,7 @@ actual class PlatformDiagnostics(
         )
     }
 
-    actual suspend fun getLocationInfo(): LocationInfo {
+    override suspend fun getLocationInfo(): LocationInfo {
         val permissionsStatus = getPermissionsStatus()
 
         return LocationInfo(
@@ -110,7 +110,7 @@ actual class PlatformDiagnostics(
         )
     }
 
-    actual suspend fun getDatabaseSizeMB(): Double {
+    override suspend fun getDatabaseSizeMB(): Double {
         val dbFile = context.getDatabasePath("trailglass.db")
         return if (dbFile?.exists() == true) {
             dbFile.length() / (1024.0 * 1024.0)

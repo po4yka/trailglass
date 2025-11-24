@@ -8,7 +8,7 @@ import java.util.UUID
 
 /** Android implementation of DeviceInfoProvider. */
 @Inject
-actual class PlatformDeviceInfoProvider(
+class AndroidPlatformDeviceInfoProvider(
     private val context: Context
 ) : DeviceInfoProvider {
     private val cachedDeviceId: String by lazy {
@@ -25,9 +25,9 @@ actual class PlatformDeviceInfoProvider(
         id
     }
 
-    actual override fun getDeviceId(): String = cachedDeviceId
+    override fun getDeviceId(): String = cachedDeviceId
 
-    actual override fun getDeviceName(): String {
+    override fun getDeviceName(): String {
         val manufacturer = Build.MANUFACTURER
         val model = Build.MODEL
         return if (model.startsWith(manufacturer)) {
@@ -37,11 +37,11 @@ actual class PlatformDeviceInfoProvider(
         }
     }
 
-    actual override fun getPlatform(): String = "Android"
+    override fun getPlatform(): String = "Android"
 
-    actual override fun getOsVersion(): String = Build.VERSION.RELEASE
+    override fun getOsVersion(): String = Build.VERSION.RELEASE
 
-    actual override fun getAppVersion(): String =
+    override fun getAppVersion(): String =
         try {
             val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
             packageInfo.versionName ?: "1.0.0"

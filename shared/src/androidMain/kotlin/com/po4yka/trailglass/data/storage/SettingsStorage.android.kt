@@ -33,9 +33,9 @@ import kotlinx.datetime.Instant
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 /** Android implementation of SettingsStorage using DataStore. */
-actual class SettingsStorage(
+class AndroidSettingsStorage(
     private val context: Context
-) {
+) : SettingsStorage {
     private val logger = logger()
 
     // Preference keys
@@ -77,7 +77,7 @@ actual class SettingsStorage(
         val DATA_STORAGE_MB = doublePreferencesKey("data_storage_mb")
     }
 
-    actual fun getSettingsFlow(): Flow<AppSettings> =
+    override fun getSettingsFlow(): Flow<AppSettings> =
         context.dataStore.data
             .catch { exception ->
                 logger.error(exception) { "Error reading settings" }
@@ -86,7 +86,7 @@ actual class SettingsStorage(
                 preferences.toAppSettings()
             }
 
-    actual suspend fun getSettings(): AppSettings =
+    override suspend fun getSettings(): AppSettings =
         context.dataStore.data
             .catch { exception ->
                 logger.error(exception) { "Error reading settings" }
@@ -94,7 +94,7 @@ actual class SettingsStorage(
             }.map { it.toAppSettings() }
             .first()
 
-    actual suspend fun saveSettings(settings: AppSettings) {
+    override suspend fun saveSettings(settings: AppSettings) {
         context.dataStore.edit { preferences ->
             // Tracking
             preferences[Keys.TRACKING_ACCURACY] = settings.trackingPreferences.accuracy.name
@@ -140,7 +140,7 @@ actual class SettingsStorage(
         }
     }
 
-    actual suspend fun clearSettings() {
+    override suspend fun clearSettings() {
         context.dataStore.edit { it.clear() }
     }
 

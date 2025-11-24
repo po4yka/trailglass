@@ -7,9 +7,11 @@ import com.po4yka.trailglass.data.file.IOSPhotoDirectoryProvider
 import com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 import com.po4yka.trailglass.data.network.IOSNetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
-import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
-import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
-import com.po4yka.trailglass.data.sync.SyncStateRepositoryImpl
+import com.po4yka.trailglass.data.remote.DeviceInfoProvider
+
+import com.po4yka.trailglass.data.remote.auth.TokenStorage
+import com.po4yka.trailglass.data.sync.SyncStateRepository
+import com.po4yka.trailglass.domain.permission.IOSPermissionManager
 import com.po4yka.trailglass.domain.permission.PermissionManager
 import com.po4yka.trailglass.domain.service.CrashReportingService
 import com.po4yka.trailglass.domain.service.IosCrashReportingService
@@ -19,6 +21,7 @@ import com.po4yka.trailglass.domain.service.IosPushNotificationService
 import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.domain.service.PerformanceMonitoringService
 import com.po4yka.trailglass.domain.service.PushNotificationService
+import com.po4yka.trailglass.feature.diagnostics.IOSPlatformDiagnostics
 import com.po4yka.trailglass.feature.diagnostics.PlatformDiagnostics
 import com.po4yka.trailglass.location.CurrentLocationProvider
 import com.po4yka.trailglass.location.IOSCurrentLocationProvider
@@ -28,6 +31,10 @@ import kotlinx.coroutines.SupervisorJob
 import me.tatarka.inject.annotations.Inject
 import me.tatarka.inject.annotations.Provides
 import platform.UIKit.UIDevice
+import com.po4yka.trailglass.data.remote.auth.IOSSecureTokenStorage
+import com.po4yka.trailglass.data.remote.device.IOSPlatformDeviceInfoProvider
+import com.po4yka.trailglass.data.storage.IOSSettingsStorage
+import com.po4yka.trailglass.data.security.IOSEncryptionService
 
 /**
  * iOS implementation of PlatformModule.
@@ -54,6 +61,7 @@ class IOSPlatformModule : PlatformModule {
     override fun currentLocationProvider(): CurrentLocationProvider = IOSCurrentLocationProvider()
 
     @Provides
+    @AppScope
     override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
@@ -64,13 +72,13 @@ class IOSPlatformModule : PlatformModule {
 
     /** Provides iOS-specific permission manager. */
     @Provides
-    override fun permissionManager(): PermissionManager = PermissionManager()
+    override fun permissionManager(): PermissionManager = IOSPermissionManager()
 
     /** Provides iOS-specific encryption service. */
     @Provides
     override fun encryptionService(): com.po4yka.trailglass.data.security.EncryptionService =
         com.po4yka.trailglass.data.security
-            .EncryptionService()
+            .IOSEncryptionService()
 
     /** Provides iOS-specific photo metadata extractor. */
     @Provides
@@ -82,16 +90,18 @@ class IOSPlatformModule : PlatformModule {
     @Provides
     override fun settingsStorage(): com.po4yka.trailglass.data.storage.SettingsStorage =
         com.po4yka.trailglass.data.storage
-            .SettingsStorage()
+            .IOSSettingsStorage()
+
+
 
     @Provides
-    override fun secureTokenStorage(): SecureTokenStorage = SecureTokenStorage()
+    override fun secureTokenStorage(): TokenStorage = IOSSecureTokenStorage()
 
     @Provides
-    override fun platformDeviceInfoProvider(): PlatformDeviceInfoProvider = PlatformDeviceInfoProvider()
+    override fun platformDeviceInfoProvider(): DeviceInfoProvider = IOSPlatformDeviceInfoProvider()
 
     @Provides
-    override fun syncStateRepositoryImpl(): SyncStateRepositoryImpl = SyncStateRepositoryImpl()
+    override fun syncStateRepository(): SyncStateRepository = SyncStateRepositoryImpl()
 
     @Provides
     override fun networkConnectivityMonitor(): NetworkConnectivityMonitor = IOSNetworkConnectivityMonitor()
@@ -114,5 +124,5 @@ class IOSPlatformModule : PlatformModule {
 
     /** Provides iOS-specific platform diagnostics. */
     @Provides
-    override fun platformDiagnostics(): PlatformDiagnostics = PlatformDiagnostics()
+    override fun platformDiagnostics(): PlatformDiagnostics = IOSPlatformDiagnostics()
 }

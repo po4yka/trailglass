@@ -9,13 +9,14 @@ import androidx.security.crypto.MasterKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import me.tatarka.inject.annotations.Inject
+import com.po4yka.trailglass.data.remote.auth.TokenStorage
 
 /** Android implementation using EncryptedSharedPreferences. */
 @Suppress("DEPRECATION")
 @Inject
-actual class SecureTokenStorage(
+class AndroidSecureTokenStorage(
     private val context: Context
-) {
+) : TokenStorage {
     private val masterKey =
         MasterKey
             .Builder(context)
@@ -32,7 +33,7 @@ actual class SecureTokenStorage(
         )
     }
 
-    actual suspend fun saveTokens(tokens: AuthTokens): Unit =
+    override suspend fun saveTokens(tokens: AuthTokens): Unit =
         withContext(Dispatchers.IO) {
             sharedPreferences.edit().apply {
                 putString(KEY_ACCESS_TOKEN, tokens.accessToken)
@@ -43,7 +44,7 @@ actual class SecureTokenStorage(
             Unit
         }
 
-    actual suspend fun getTokens(): AuthTokens? =
+    override suspend fun getTokens(): AuthTokens? =
         withContext(Dispatchers.IO) {
             val accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, null)
             val refreshToken = sharedPreferences.getString(KEY_REFRESH_TOKEN, null)
@@ -56,7 +57,7 @@ actual class SecureTokenStorage(
             }
         }
 
-    actual suspend fun clearTokens(): Unit =
+    override suspend fun clearTokens(): Unit =
         withContext(Dispatchers.IO) {
             sharedPreferences.edit().apply {
                 remove(KEY_ACCESS_TOKEN)

@@ -4,7 +4,7 @@ import com.po4yka.trailglass.domain.model.AppSettings
 import kotlinx.coroutines.flow.Flow
 
 /** Platform-specific settings storage. */
-expect class SettingsStorage {
+interface SettingsStorage {
     /** Get settings as a Flow. */
     fun getSettingsFlow(): Flow<AppSettings>
 

@@ -2,11 +2,11 @@ package com.po4yka.trailglass.di
 
 import com.po4yka.trailglass.data.remote.ApiConfig
 import com.po4yka.trailglass.data.remote.DeviceInfoProvider
+
 import com.po4yka.trailglass.data.remote.TokenProvider
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
-import com.po4yka.trailglass.data.remote.auth.SecureTokenStorage
+import com.po4yka.trailglass.data.remote.auth.TokenStorage
 import com.po4yka.trailglass.data.remote.auth.TokenStorageProvider
-import com.po4yka.trailglass.data.remote.device.PlatformDeviceInfoProvider
 import com.po4yka.trailglass.data.security.EncryptionService
 import com.po4yka.trailglass.data.security.SyncDataEncryption
 import com.po4yka.trailglass.data.sync.ConflictResolver
@@ -42,17 +42,17 @@ interface SyncModule {
     /** Provides secure token storage. Platform-specific implementation. */
     @AppScope
     @Provides
-    fun provideSecureTokenStorage(impl: SecureTokenStorage): SecureTokenStorage = impl
+    fun provideSecureTokenStorage(storage: TokenStorage): TokenStorage = storage
 
     /** Provides token provider for authentication. */
     @AppScope
     @Provides
-    fun provideTokenProvider(secureStorage: SecureTokenStorage): TokenProvider = TokenStorageProvider(secureStorage)
+    fun provideTokenProvider(tokenStorage: TokenStorage): TokenProvider = TokenStorageProvider(tokenStorage)
 
     /** Provides platform device information provider. */
     @AppScope
     @Provides
-    fun provideDeviceInfoProvider(impl: PlatformDeviceInfoProvider): DeviceInfoProvider = impl
+    fun provideDeviceInfoProvider(deviceInfoProvider: DeviceInfoProvider): DeviceInfoProvider = deviceInfoProvider
 
     /** Provides the main API client. */
     @AppScope
@@ -66,7 +66,7 @@ interface SyncModule {
     /** Provides sync state repository. Platform-specific implementation. */
     @AppScope
     @Provides
-    fun provideSyncStateRepository(impl: SyncStateRepositoryImpl): SyncStateRepository = impl
+    fun provideSyncStateRepository(repository: SyncStateRepository): SyncStateRepository = repository
 
     /** Provides sync coordinator. */
     @AppScope

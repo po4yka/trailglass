@@ -36,7 +36,7 @@ import kotlin.coroutines.resume
  */
 @Inject
 @OptIn(ExperimentalForeignApi::class)
-actual class PermissionManager {
+class IOSPermissionManager : PermissionManager {
     private val permissionStates = mutableMapOf<PermissionType, MutableStateFlow<PermissionState>>()
     private val locationManager = CLLocationManager()
 
@@ -117,7 +117,7 @@ actual class PermissionManager {
     }
 
     /** Check the current state of a permission. */
-    actual suspend fun checkPermission(permissionType: PermissionType): PermissionState {
+    override suspend fun checkPermission(permissionType: PermissionType): PermissionState {
         val state =
             when (permissionType) {
                 PermissionType.LOCATION_FINE,
@@ -147,7 +147,7 @@ actual class PermissionManager {
     }
 
     /** Request a permission from the user. */
-    actual suspend fun requestPermission(permissionType: PermissionType): PermissionResult =
+    override suspend fun requestPermission(permissionType: PermissionType): PermissionResult =
         when (permissionType) {
             PermissionType.LOCATION_FINE,
             PermissionType.LOCATION_COARSE -> {
@@ -175,13 +175,13 @@ actual class PermissionManager {
      * Check if we should show a rationale before requesting. On iOS, this is typically only relevant if permission was
      * previously denied.
      */
-    actual suspend fun shouldShowRationale(permissionType: PermissionType): Boolean {
+    override suspend fun shouldShowRationale(permissionType: PermissionType): Boolean {
         val state = checkPermission(permissionType)
         return state is PermissionState.Denied
     }
 
     /** Open system settings for the app. */
-    actual suspend fun openAppSettings() {
+    override suspend fun openAppSettings() {
         val settingsUrl = NSURL.URLWithString(UIApplicationOpenSettingsURLString)
         if (settingsUrl != null) {
             UIApplication.sharedApplication.openURL(settingsUrl)
@@ -189,7 +189,7 @@ actual class PermissionManager {
     }
 
     /** Observable state for permission changes. */
-    actual fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
+    override fun observePermission(permissionType: PermissionType): StateFlow<PermissionState> =
         permissionStates.getOrPut(permissionType) {
             MutableStateFlow(PermissionState.NotDetermined)
         }
