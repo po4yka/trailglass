@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Photo detail content layout
 struct PhotoDetailContent: View {

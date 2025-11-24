@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Device Management screen showing list of user's devices
 struct DeviceManagementView: View {

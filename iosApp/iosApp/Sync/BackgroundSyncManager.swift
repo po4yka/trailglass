@@ -1,6 +1,6 @@
 import Foundation
 import BackgroundTasks
-import shared
+import Shared
 
 /// Manages background synchronization for iOS using BackgroundTasks framework
 class BackgroundSyncManager {

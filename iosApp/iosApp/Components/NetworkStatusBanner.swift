@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Banner showing network connectivity status
 /// Appears at top of screen when offline or network is limited

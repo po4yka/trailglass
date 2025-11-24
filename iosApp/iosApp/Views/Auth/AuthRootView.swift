@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Root view for authentication flow managing navigation between auth screens
 struct AuthRootView: View {

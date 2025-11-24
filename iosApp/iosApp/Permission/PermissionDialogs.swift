@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// SwiftUI view showing permission rationale before requesting.
 struct PermissionRationaleView: View {

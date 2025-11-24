@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import shared
+import Shared
 
 /// Custom marker annotation
 class MarkerAnnotation: NSObject, MKAnnotation {

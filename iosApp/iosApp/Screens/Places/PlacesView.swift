@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Places screen showing all visited places, matching Android PlacesScreen
 struct PlacesView: View {

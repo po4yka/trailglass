@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 struct LogViewerView: View {
     @StateObject private var viewModel = LogViewerViewModel()

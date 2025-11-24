@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Login screen for user authentication matching Android LoginScreen
 struct LoginView: View {

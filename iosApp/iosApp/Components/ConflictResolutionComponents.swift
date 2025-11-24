@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Screen showing list of unresolved conflicts
 struct ConflictListView: View {

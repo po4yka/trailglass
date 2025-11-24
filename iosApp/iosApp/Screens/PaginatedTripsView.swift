@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Paginated trips view with pull-to-refresh
 /// Alternative to TripsView that uses direct repository access

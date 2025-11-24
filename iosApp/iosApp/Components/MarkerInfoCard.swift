@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 // MARK: - Marker Info Card
 // Glass marker info card with Liquid Glass styling for iOS

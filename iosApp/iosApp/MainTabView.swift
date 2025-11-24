@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Main tab navigation view for TrailGlass iOS app
 /// Uses floating tab bar with Liquid Glass design

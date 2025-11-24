@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 import MapKit
 
 /// Trip detail screen showing comprehensive trip information and statistics

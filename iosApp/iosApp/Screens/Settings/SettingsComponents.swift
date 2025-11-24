@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /**
  * Settings section card with glass styling.

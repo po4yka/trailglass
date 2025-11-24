@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Compact sync status indicator for toolbar
 struct SyncStatusIndicator: View {

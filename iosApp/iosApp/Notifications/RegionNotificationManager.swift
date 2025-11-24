@@ -1,6 +1,6 @@
 import Foundation
 import UserNotifications
-import shared
+import Shared
 import Combine
 
 /**

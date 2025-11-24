@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Forgot password screen matching Android ForgotPasswordScreen
 struct ForgotPasswordView: View {

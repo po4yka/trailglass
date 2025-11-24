@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 import MapKit
 
 struct RegionDetailView: View {

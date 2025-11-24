@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /**
  * SwiftUI trips screen with TripsController integration.

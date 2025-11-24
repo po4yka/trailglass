@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Photo detail screen showing comprehensive photo information with metadata
 struct PhotoDetailView: View {

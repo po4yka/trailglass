@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Detail view for a frequent place
 struct PlaceDetailView: View {

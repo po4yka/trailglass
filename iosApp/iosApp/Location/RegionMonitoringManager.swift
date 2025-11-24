@@ -1,6 +1,6 @@
 import Foundation
 import CoreLocation
-import shared
+import Shared
 import Combine
 
 /**

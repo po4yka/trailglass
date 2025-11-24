@@ -1,6 +1,6 @@
 import ActivityKit
 import Foundation
-import shared
+import Shared
 
 /// Manages Live Activities for location tracking
 /// This class bridges between Kotlin location tracking and iOS Live Activities

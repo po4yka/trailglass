@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// List of places
 struct PlacesList: View {

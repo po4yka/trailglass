@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import shared
+import Shared
 
 /// Map annotation item that can represent either a marker or cluster
 enum MapAnnotationItem: Identifiable {

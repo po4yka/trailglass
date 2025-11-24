@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 import Combine
 
 /// List of frequent places with glass styling

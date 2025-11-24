@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /**
  * SwiftUI photo detail screen with full metadata display.

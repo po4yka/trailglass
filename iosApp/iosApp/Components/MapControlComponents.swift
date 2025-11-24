@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 // MARK: - Map Visualization Selector
 // Liquid Glass visualization mode selector for map

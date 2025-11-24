@@ -1,6 +1,6 @@
 import Foundation
 import SwiftUI
-import shared
+import Shared
 
 /**
  Integration guide for Region Monitoring (Geofencing) in TrailGlass iOS.

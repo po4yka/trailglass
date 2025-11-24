@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 struct DiagnosticsView: View {
     @StateObject private var viewModel: DiagnosticsViewModel

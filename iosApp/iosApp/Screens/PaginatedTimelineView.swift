@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Paginated timeline view showing place visits with manual pagination
 /// This is an alternative to EnhancedTimelineView that uses direct repository access

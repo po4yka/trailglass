@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 import MapKit
 
 /// Route Replay screen - full-screen animated playback of trip route

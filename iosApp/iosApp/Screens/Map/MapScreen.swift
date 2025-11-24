@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import shared
+import Shared
 
 /// Main map screen matching Android MapScreen functionality
 struct MapScreen: View {

@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import shared
+import Shared
 
 /// UIColor extension for RGB color from integer
 extension UIColor {

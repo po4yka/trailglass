@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Registration screen matching Android RegisterScreen
 struct RegisterView: View {

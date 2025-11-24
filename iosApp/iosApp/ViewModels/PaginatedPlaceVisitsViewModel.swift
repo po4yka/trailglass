@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 import Combine
 
 /// ViewModel for paginated place visits using PlaceVisitRepository

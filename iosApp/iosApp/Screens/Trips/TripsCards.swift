@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /**
  * Trip glass card with Liquid Glass styling.

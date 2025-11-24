@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import shared
+import Shared
 
 /// Enhanced map view with routes and markers using MKMapView
 struct EnhancedMapView: UIViewRepresentable {

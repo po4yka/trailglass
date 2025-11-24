@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /**
  * SwiftUI photo gallery screen with Liquid Glass components.

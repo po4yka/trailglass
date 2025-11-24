@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import shared
+import Shared
 
 /// Enhanced MapKit view with clustering, heatmap, and custom markers
 struct EnhancedMapView: View {

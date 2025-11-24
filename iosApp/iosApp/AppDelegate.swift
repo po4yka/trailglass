@@ -1,6 +1,6 @@
 import UIKit
 import BackgroundTasks
-import shared
+import Shared
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
     // Application DI component

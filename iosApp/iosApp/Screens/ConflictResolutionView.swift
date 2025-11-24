@@ -1,5 +1,5 @@
 import SwiftUI
-import shared
+import Shared
 
 /// Conflict Resolution screen showing sync conflicts
 struct ConflictResolutionView: View {
