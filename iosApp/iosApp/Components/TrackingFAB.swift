@@ -127,10 +127,9 @@ private struct MainFAB: View {
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundColor(.white)
                 .frame(width: 56, height: 56)
-                .glassBackground(
-                    material: .thick,
-                    tint: isTracking && !isExpanded ? .coastalPath : .adaptivePrimary,
-                    cornerRadius: 28
+                .glassEffectTinted(
+                    isTracking && !isExpanded ? Color.coastalPath : Color.adaptivePrimary,
+                    opacity: 0.8
                 )
                 .glassShadow(elevation: 4)
                 .rotationEffect(.degrees(isExpanded ? 45 : 0))
@@ -157,10 +156,9 @@ private struct FABMenuItem: View {
                 .foregroundColor(.primary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
-                .glassBackground(
-                    material: .regular,
-                    tint: .adaptiveSurface,
-                    cornerRadius: 8
+                .glassEffectTinted(
+                    Color.adaptiveSurface,
+                    opacity: 0.7
                 )
                 .glassShadow(elevation: 2)
 

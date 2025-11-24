@@ -226,7 +226,10 @@ struct SyncStatusView_Previews: PreviewProvider {
                     lastSyncTime: nil,
                     pendingCount: 5,
                     conflictCount: 2,
-                    lastError: nil
+                    lastError: nil,
+                    networkState: NetworkState.CONNECTED,
+                    networkType: NetworkType.WIFI,
+                    isNetworkMetered: false
                 ),
                 onSync: {},
                 onViewConflicts: {}

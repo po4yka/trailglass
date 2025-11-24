@@ -55,11 +55,10 @@ public class KotlinJob {
 extension Kotlinx_coroutines_coreStateFlow {
     func subscribe<T>(onValue: @escaping (T?) -> Void) -> KotlinJob {
         let task = Task {
-            self.collect(
+            try await self.collect(
                 collector: FlowCollector<T> { value in
                     onValue(value as? T)
-                },
-                completionHandler: { _ in }
+                }
             )
         }
         return KotlinJob(task: task)
@@ -98,7 +97,7 @@ extension TimelineFilter {
     ) {
         self.init(
             transportTypes: Set(transportTypes),
-            placeCategories: Set(placeCategories),
+            placeCategories: Set(placeCategories) as! Set<PlaceCategory>,
             countries: [],
             cities: [],
             searchQuery: nil,
