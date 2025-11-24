@@ -5,3 +5,25 @@ PRODUCT_BUNDLE_IDENTIFIER=com.po4yka.trailglass.Trailglass$(TEAM_ID)
 
 CURRENT_PROJECT_VERSION=1
 MARKETING_VERSION=1.0
+
+// Kotlin Multiplatform Framework Configuration
+FRAMEWORK_SEARCH_PATHS = $(inherited) $(SRCROOT)/../shared/build/xcode-frameworks $(SRCROOT)/../shared/build/bin/iosSimulatorArm64/debugFramework $(SRCROOT)/../shared/build/bin/iosArm64/debugFramework
+
+// Swift Configuration
+SWIFT_VERSION = 5.10
+SWIFT_OPTIMIZATION_LEVEL = -Onone
+
+// Deployment Target
+IPHONEOS_DEPLOYMENT_TARGET = 16.0
+
+// Linker Flags
+OTHER_LDFLAGS = $(inherited) -framework Shared
+
+// Enable Modules
+CLANG_ENABLE_MODULES = YES
+SWIFT_OBJC_BRIDGING_HEADER =
+
+// Code Signing (for development)
+CODE_SIGN_IDENTITY = Apple Development
+CODE_SIGN_STYLE = Automatic
+DEVELOPMENT_TEAM = $(TEAM_ID)
