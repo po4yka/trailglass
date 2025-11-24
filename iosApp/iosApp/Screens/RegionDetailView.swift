@@ -2,22 +2,22 @@ import SwiftUI
 import Shared
 import MapKit
 
-struct RegionDetailView: View {
-    @ObservedObject var viewModel: RegionViewModel
+class RegionDetailViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
+    @Published var name: String = ""
+    @Published var regionDescription: String = ""
+    @Published var latitude: Double = 37.7749
+    @Published var longitude: Double = -122.4194
+    @Published var radiusMeters: Double = 100.0
+    @Published var notificationsEnabled: Bool = true
+    @Published var mapRegion: MKCoordinateRegion
+    @Published var selectedCoordinate: CLLocationCoordinate2D?
+    @Published var showingValidationError = false
+    @Published var validationErrorMessage = ""
+
+    private let locationManager = CLLocationManager()
+    let viewModel: RegionViewModel
     let region: Region?
     let onSave: () -> Void
-
-    @State private var name: String = ""
-    @State private var description: String = ""
-    @State private var latitude: Double = 37.7749
-    @State private var longitude: Double = -122.4194
-    @State private var radiusMeters: Double = 100.0
-    @State private var notificationsEnabled: Bool = true
-    @State private var mapRegion: MKCoordinateRegion
-    @State private var showingValidationError = false
-    @State private var validationErrorMessage = ""
-
-    @Environment(\.dismiss) private var dismiss
 
     init(viewModel: RegionViewModel, region: Region?, onSave: @escaping () -> Void) {
         self.viewModel = viewModel
@@ -25,26 +25,101 @@ struct RegionDetailView: View {
         self.onSave = onSave
 
         if let region = region {
-            _name = State(initialValue: region.name)
-            _description = State(initialValue: region.description_ ?? "")
-            _latitude = State(initialValue: region.latitude)
-            _longitude = State(initialValue: region.longitude)
-            _radiusMeters = State(initialValue: Double(region.radiusMeters))
-            _notificationsEnabled = State(initialValue: region.notificationsEnabled)
-            _mapRegion = State(initialValue: MKCoordinateRegion(
+            _name = Published(initialValue: region.name)
+            _regionDescription = Published(initialValue: region.description_ ?? "")
+            _latitude = Published(initialValue: region.latitude)
+            _longitude = Published(initialValue: region.longitude)
+            _radiusMeters = Published(initialValue: Double(region.radiusMeters))
+            _notificationsEnabled = Published(initialValue: region.notificationsEnabled)
+            _mapRegion = Published(initialValue: MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: region.latitude, longitude: region.longitude),
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             ))
         } else {
-            _mapRegion = State(initialValue: MKCoordinateRegion(
+            _mapRegion = Published(initialValue: MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
                 span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
             ))
         }
+
+        super.init()
+
+        // Set up location manager after super.init()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+    }
+
+    // MARK: - Actions
+
+    func useCurrentLocation() {
+        // Check location authorization status
+        let status = CLLocationManager.authorizationStatus()
+
+        switch status {
+        case .notDetermined:
+            // Request permission
+            locationManager.requestWhenInUseAuthorization()
+            print("Requesting location permission")
+        case .restricted, .denied:
+            // Show error - location services disabled
+            validationErrorMessage = "Location access is required to use current location. Please enable it in Settings."
+            showingValidationError = true
+        case .authorizedWhenInUse, .authorizedAlways:
+            // Get current location
+            if let location = locationManager.location {
+                let coordinate = location.coordinate
+                selectedCoordinate = coordinate
+                mapRegion.center = coordinate
+                latitude = coordinate.latitude
+                longitude = coordinate.longitude
+                print("Using current location: \(coordinate.latitude), \(coordinate.longitude)")
+            } else {
+                // Location not available
+                validationErrorMessage = "Current location is not available. Please try again."
+                showingValidationError = true
+            }
+        @unknown default:
+            break
+        }
+    }
+
+    func saveRegion() {
+        guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
+            validationErrorMessage = "Please enter a name for this place"
+            showingValidationError = true
+            return
+        }
+
+        viewModel.createRegion(
+            name: name,
+            description: regionDescription.isEmpty ? nil : regionDescription,
+            latitude: latitude,
+            longitude: longitude,
+            radiusMeters: radiusMeters,
+            notificationsEnabled: notificationsEnabled
+        )
+
+        onSave()
+    }
+
+    // MARK: - CLLocationManagerDelegate
+
+}
+
+struct RegionDetailView: View {
+    @StateObject private var detailViewModel: RegionDetailViewModel
+    @Environment(\.dismiss) private var dismiss
+
+    init(regionViewModel: RegionViewModel, region: Region?, onSave: @escaping () -> Void) {
+        _detailViewModel = StateObject(wrappedValue: RegionDetailViewModel(
+            viewModel: regionViewModel,
+            region: region,
+            onSave: onSave
+        ))
     }
 
     var isEditMode: Bool {
-        region != nil
+        detailViewModel.region != nil
     }
 
     var body: some View {
@@ -63,7 +138,7 @@ struct RegionDetailView: View {
 
                     notificationsSection
 
-                    if isEditMode, let region = region {
+                    if isEditMode, let region = detailViewModel.region {
                         statisticsSection(region: region)
                     }
 
@@ -82,17 +157,17 @@ struct RegionDetailView: View {
                 }
             }
         }
-        .alert("Validation Error", isPresented: $showingValidationError) {
+        .alert("Validation Error", isPresented: $detailViewModel.showingValidationError) {
             Button("OK", role: .cancel) {}
         } message: {
-            Text(validationErrorMessage)
+            Text(detailViewModel.validationErrorMessage)
         }
     }
 
     private var mapPreview: some View {
         GlassEffectGroup(spacing: 0, padding: 0) {
             ZStack {
-                Map(coordinateRegion: $mapRegion)
+                Map(coordinateRegion: $detailViewModel.mapRegion)
                 // Overlay the annotation on top of the map
                 GeometryReader { geometry in
                     ZStack {
@@ -113,15 +188,12 @@ struct RegionDetailView: View {
             }
             .frame(height: 200)
             .cornerRadius(12)
-            .onTapGesture {
-                // TODO: Allow user to tap on map to select location
-            }
         }
     }
 
     private var radiusInPixels: CGFloat {
-        let metersPerPoint = mapRegion.span.latitudeDelta * 111000 / 400
-        return CGFloat(radiusMeters / metersPerPoint)
+        let metersPerPoint = detailViewModel.mapRegion.span.latitudeDelta * 111000 / 400
+        return CGFloat(detailViewModel.radiusMeters / metersPerPoint)
     }
 
     private var basicInfoSection: some View {
@@ -135,7 +207,7 @@ struct RegionDetailView: View {
                     Text("Name")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    TextField("Home, Work, Gym, etc.", text: $name)
+                    TextField("Home, Work, Gym, etc.", text: $detailViewModel.name)
                         .textFieldStyle(GlassTextFieldStyle())
                 }
 
@@ -143,7 +215,7 @@ struct RegionDetailView: View {
                     Text("Description (Optional)")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
-                    TextField("Add a description", text: $description)
+                    TextField("Add a description", text: $detailViewModel.regionDescription)
                         .textFieldStyle(GlassTextFieldStyle())
                 }
             }
@@ -162,11 +234,14 @@ struct RegionDetailView: View {
                         Text("Latitude")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        TextField("Latitude", value: $latitude, format: .number)
+                        TextField("Latitude", value: $detailViewModel.latitude, format: .number)
                             .textFieldStyle(GlassTextFieldStyle())
                             .keyboardType(.decimalPad)
-                            .onChange(of: latitude) { newValue in
-                                updateMapRegion()
+                            .onChange(of: detailViewModel.latitude) { newValue in
+                                detailViewModel.mapRegion.center = CLLocationCoordinate2D(
+                                    latitude: newValue,
+                                    longitude: detailViewModel.longitude
+                                )
                             }
                     }
 
@@ -174,16 +249,19 @@ struct RegionDetailView: View {
                         Text("Longitude")
                             .font(.subheadline)
                             .foregroundColor(.secondary)
-                        TextField("Longitude", value: $longitude, format: .number)
+                        TextField("Longitude", value: $detailViewModel.longitude, format: .number)
                             .textFieldStyle(GlassTextFieldStyle())
                             .keyboardType(.decimalPad)
-                            .onChange(of: longitude) { newValue in
-                                updateMapRegion()
+                            .onChange(of: detailViewModel.longitude) { newValue in
+                                detailViewModel.mapRegion.center = CLLocationCoordinate2D(
+                                    latitude: detailViewModel.latitude,
+                                    longitude: newValue
+                                )
                             }
                     }
                 }
 
-                Button(action: useCurrentLocation) {
+                Button(action: detailViewModel.useCurrentLocation) {
                     HStack {
                         Image(systemName: "location.fill")
                         Text("Use Current Location")
@@ -212,14 +290,14 @@ struct RegionDetailView: View {
 
                     Spacer()
 
-                    Text(formatRadius(radiusMeters))
+                    Text(formatRadius(detailViewModel.radiusMeters))
                         .font(.subheadline)
                         .fontWeight(.medium)
                         .foregroundColor(.blueSlate)
                 }
 
                 Slider(
-                    value: $radiusMeters,
+                    value: $detailViewModel.radiusMeters,
                     in: Double(Region.companion.MIN_RADIUS_METERS)...5000.0,
                     step: 50
                 )
@@ -253,7 +331,7 @@ struct RegionDetailView: View {
 
                 Spacer()
 
-                Toggle("", isOn: $notificationsEnabled)
+                Toggle("", isOn: $detailViewModel.notificationsEnabled)
                     .labelsHidden()
                     .tint(.coastalPath)
             }
@@ -328,76 +406,14 @@ struct RegionDetailView: View {
             variant: .filled,
             tint: .coastalPath
         ) {
-            saveRegion()
+            detailViewModel.saveRegion()
         }
-        .disabled(name.isEmpty)
-        .opacity(name.isEmpty ? 0.5 : 1.0)
+        .disabled(detailViewModel.name.isEmpty)
+        .opacity(detailViewModel.name.isEmpty ? 0.5 : 1.0)
     }
 
-    private func updateMapRegion() {
-        withAnimation {
-            mapRegion.center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        }
-    }
 
-    private func useCurrentLocation() {
-        // TODO: Implement location manager to get current location
-        // For now, just show a placeholder
-        print("Use current location tapped")
-    }
 
-    private func saveRegion() {
-        guard !name.isEmpty else {
-            validationErrorMessage = "Please enter a name for this place"
-            showingValidationError = true
-            return
-        }
-
-        guard latitude >= -90 && latitude <= 90 else {
-            validationErrorMessage = "Latitude must be between -90 and 90"
-            showingValidationError = true
-            return
-        }
-
-        guard longitude >= -180 && longitude <= 180 else {
-            validationErrorMessage = "Longitude must be between -180 and 180"
-            showingValidationError = true
-            return
-        }
-
-        if let region = region {
-            let updatedRegion = Region(
-                id: region.id,
-                userId: region.userId,
-                name: name,
-                description: description.isEmpty ? nil : description,
-                latitude: latitude,
-                longitude: longitude,
-                radiusMeters: Int32(radiusMeters),
-                notificationsEnabled: notificationsEnabled,
-                createdAt: region.createdAt,
-                updatedAt: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
-                    epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
-                ),
-                enterCount: region.enterCount,
-                lastEnterTime: region.lastEnterTime,
-                lastExitTime: region.lastExitTime
-            )
-            viewModel.updateRegion(updatedRegion)
-        } else {
-            viewModel.createRegion(
-                name: name,
-                description: description.isEmpty ? nil : description,
-                latitude: latitude,
-                longitude: longitude,
-                radiusMeters: radiusMeters,
-                notificationsEnabled: notificationsEnabled
-            )
-        }
-
-        onSave()
-        dismiss()
-    }
 
     private func formatRadius(_ meters: Double) -> String {
         if meters >= 1000 {
@@ -428,6 +444,9 @@ struct GlassTextFieldStyle: TextFieldStyle {
                     )
             )
     }
+
+    // MARK: - CLLocationManagerDelegate
+
 }
 
 struct MapAnnotation: Identifiable {
@@ -438,7 +457,7 @@ struct MapAnnotation: Identifiable {
 #Preview {
     NavigationView {
         RegionDetailView(
-            viewModel: RegionViewModel(
+            regionViewModel: RegionViewModel(
                 appComponent: InjectIOSAppComponent(platformModule: IOSPlatformModule())
             ),
             region: nil,

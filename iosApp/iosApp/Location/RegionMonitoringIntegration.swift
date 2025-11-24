@@ -126,14 +126,7 @@ import Shared
  - The system automatically prioritizes nearest regions
  - Regions require minimum 50m radius, maximum 2000m
  - Background monitoring requires "Always" location permission
-
- TODO WHEN KMP REGIONCONTROLLER IS READY:
- 1. Update RegionViewModel to use RegionRepository from shared
- 2. Replace placeholder CRUD operations with actual repository calls
- 3. Add proper error handling from KMP domain layer
- 4. Implement region event persistence via RegionRepository
- 5. Add RegionController to AppComponent DI
- */
+*/
 
 // MARK: - Example Region Management View
 

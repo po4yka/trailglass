@@ -36,7 +36,7 @@ struct RegionsListView: View {
         .sheet(isPresented: $showingCreateSheet) {
             NavigationView {
                 RegionDetailView(
-                    viewModel: viewModel,
+                    regionViewModel: viewModel,
                     region: nil,
                     onSave: { showingCreateSheet = false }
                 )
@@ -45,7 +45,7 @@ struct RegionsListView: View {
         .sheet(item: $selectedRegion) { region in
             NavigationView {
                 RegionDetailView(
-                    viewModel: viewModel,
+                    regionViewModel: viewModel,
                     region: region,
                     onSave: { selectedRegion = nil }
                 )

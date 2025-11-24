@@ -35,6 +35,7 @@ class RegionCoordinator: ObservableObject {
 
     @Published var isActive: Bool = false
     @Published var lastEvent: RegionEventInfo?
+    @Published var recentEvents: [RegionEventInfo] = []
 
     private var cancellables = Set<AnyCancellable>()
 
@@ -179,13 +180,26 @@ class RegionCoordinator: ObservableObject {
         // Log event
         logRegionEvent(region: region, eventType: .enter)
 
-        // TODO: Save event to database via RegionRepository
-        // Example:
+        // Save event to database via RegionRepository when available
+        // For now, store in local cache until KMP RegionRepository is ready
+        let event = RegionEventInfo(
+            region: region,
+            type: .enter,
+            timestamp: Date()
+        )
+        recentEvents.insert(event, at: 0)
+        if recentEvents.count > 50 { // Keep only recent events
+            recentEvents = Array(recentEvents.prefix(50))
+        }
+
+        // TODO: When KMP RegionRepository is ready, uncomment:
         // Task {
         //     do {
         //         try await regionRepository.recordRegionEvent(
         //             regionId: region.id,
-        //             eventType: .ENTER
+        //             eventType: .ENTER,
+        //             timestamp: event.timestamp,
+        //             coordinate: event.coordinate
         //         )
         //     } catch {
         //         print("Failed to save region event: \(error)")
@@ -210,13 +224,26 @@ class RegionCoordinator: ObservableObject {
         // Log event
         logRegionEvent(region: region, eventType: .exit)
 
-        // TODO: Save event to database via RegionRepository
-        // Example:
+        // Save event to database via RegionRepository when available
+        // For now, store in local cache until KMP RegionRepository is ready
+        let event = RegionEventInfo(
+            region: region,
+            type: .exit,
+            timestamp: Date()
+        )
+        recentEvents.insert(event, at: 0)
+        if recentEvents.count > 50 { // Keep only recent events
+            recentEvents = Array(recentEvents.prefix(50))
+        }
+
+        // TODO: When KMP RegionRepository is ready, uncomment:
         // Task {
         //     do {
         //         try await regionRepository.recordRegionEvent(
         //             regionId: region.id,
-        //             eventType: .EXIT
+        //             eventType: .EXIT,
+        //             timestamp: event.timestamp,
+        //             coordinate: event.coordinate
         //         )
         //     } catch {
         //         print("Failed to save region event: \(error)")
@@ -232,12 +259,27 @@ class RegionCoordinator: ObservableObject {
     private func handleNotificationTapped(regionId: String) {
         print("Notification tapped for region: \(regionId)")
 
-        // TODO: Navigate to map view showing the region
-        // This would typically post a notification that the app's navigation system listens to
+        // Navigate to map view showing the region
+        // Post notification that the app's navigation system can listen to
         NotificationCenter.default.post(
             name: NSNotification.Name("ShowRegionOnMap"),
             object: nil,
-            userInfo: ["regionId": regionId]
+            userInfo: [
+                "regionId": regionId,
+                "action": "show_region",
+                "timestamp": Date()
+            ]
+        )
+
+        // Also post a more general navigation notification
+        NotificationCenter.default.post(
+            name: NSNotification.Name("NavigateToMap"),
+            object: nil,
+            userInfo: [
+                "tab": "map",
+                "regionId": regionId,
+                "zoomToRegion": true
+            ]
         )
     }
 
