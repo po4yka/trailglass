@@ -11,8 +11,11 @@ struct EnhancedTimelineView: View {
     @State private var showSearchBar = false
     @State private var scrollOffset: CGFloat = 0
 
-    init(controller: EnhancedTimelineController) {
-        _viewModel = StateObject(wrappedValue: EnhancedTimelineViewModel(controller: controller))
+    private let appComponent: AppComponent
+
+    init(controller: EnhancedTimelineController, locationTrackingController: LocationTrackingController, appComponent: AppComponent) {
+        self.appComponent = appComponent
+        _viewModel = StateObject(wrappedValue: EnhancedTimelineViewModel(controller: controller, locationTrackingController: locationTrackingController))
     }
 
     var body: some View {
@@ -115,6 +118,62 @@ struct EnhancedTimelineView: View {
                 currentFilter: viewModel.filter,
                 onFilterChanged: { viewModel.updateFilter($0) },
                 onDismiss: { showFilterSheet = false }
+            )
+        }
+        .sheet(isPresented: $viewModel.showPhotoPicker) {
+            PhotoPickerSheet(
+                onPhotoSelected: { photos in
+                    // Handle selected photos
+                    Task {
+                        for photo in photos {
+                            // Convert PhotosPickerItem to Photo and import
+                            if let data = try? await photo.loadTransferable(type: Data.self) {
+                                let uri = photo.identifier ?? "photo_\(UUID().uuidString)"
+                                let kotlinData = data.toKotlinByteArray()
+
+                                // Use PhotoGalleryController to import photo
+                                do {
+                                    try await appComponent.photoGalleryController.importPhoto(
+                                        uri: uri,
+                                        photoData: kotlinData,
+                                        timestamp: nil
+                                    )
+                                } catch {
+                                    print("Failed to import photo: \(error)")
+                                }
+                            }
+                        }
+                    }
+                },
+                onDismiss: { viewModel.showPhotoPicker = false }
+            )
+        }
+        .sheet(isPresented: $viewModel.showNoteEditor) {
+            NoteEditorSheet(
+                onNoteSaved: { title, content, attachLocation in
+                    // Handle note creation
+                    Task {
+                        // TODO: Create note via repository or use case
+                        print("Create note: \(title) - \(content) - attachLocation: \(attachLocation)")
+                        // For now, just close the sheet
+                        viewModel.showNoteEditor = false
+                    }
+                },
+                onDismiss: { viewModel.showNoteEditor = false }
+            )
+        }
+        .sheet(isPresented: $viewModel.showCheckIn) {
+            ManualCheckInSheet(
+                onCheckInSaved: { placeName, category, notes, latitude, longitude in
+                    // Handle check-in creation
+                    Task {
+                        // TODO: Create place visit via repository or use case
+                        print("Create check-in: \(placeName) at (\(latitude ?? 0), \(longitude ?? 0))")
+                        // For now, just close the sheet
+                        viewModel.showCheckIn = false
+                    }
+                },
+                onDismiss: { viewModel.showCheckIn = false }
             )
         }
         .onAppear {

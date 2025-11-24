@@ -259,7 +259,9 @@ struct TimelineFilterSheet: View {
  */
 class EnhancedTimelineViewModel: ObservableObject {
     private let controller: EnhancedTimelineController
+    private let locationTrackingController: LocationTrackingController
     private var stateObserver: KotlinJob?
+    private var trackingObserver: KotlinJob?
 
     @Published var items: [GetTimelineUseCaseTimelineItemUI] = []
     @Published var zoomLevel: TimelineZoomLevel = .day
@@ -269,46 +271,42 @@ class EnhancedTimelineViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: String?
     @Published var isTracking: Bool = false
+    @Published var showPhotoPicker = false
+    @Published var showNoteEditor = false
+    @Published var showCheckIn = false
 
-    init(controller: EnhancedTimelineController) {
+    init(controller: EnhancedTimelineController, locationTrackingController: LocationTrackingController) {
         self.controller = controller
+        self.locationTrackingController = locationTrackingController
         observeState()
+        observeTrackingState()
     }
 
     deinit {
         stateObserver?.cancel(cause: nil)
+        trackingObserver?.cancel(cause: nil)
     }
 
     // FAB actions
     func toggleTracking() {
-        // Get LocationTrackingController from appComponent (would need to be passed in)
-        // For now, this is a placeholder - the actual implementation would require
-        // passing the controller or appComponent to the ViewModel
-        // TODO: Pass locationTrackingController to ViewModel and implement:
-        // if isTracking {
-        //     locationTrackingController.stopTracking()
-        // } else {
-        //     locationTrackingController.startTracking(mode: .balanced)
-        // }
-        print("Toggle tracking - requires LocationTrackingController")
+        if isTracking {
+            locationTrackingController.stopTracking()
+        } else {
+            // Start tracking with balanced mode
+            locationTrackingController.startTracking(mode: TrackingMode.balanced)
+        }
     }
 
     func addPhoto() {
-        // Navigate to photo picker or camera
-        // This would typically be handled by navigation/presentation
-        print("Add photo - requires navigation implementation")
+        showPhotoPicker = true
     }
 
     func addNote() {
-        // Navigate to note editor
-        // This would typically be handled by navigation/presentation
-        print("Add note - requires navigation implementation")
+        showNoteEditor = true
     }
 
     func checkIn() {
-        // Create manual place visit/check-in
-        // This would require PlaceVisitRepository or a use case
-        print("Check-in - requires PlaceVisitRepository or use case")
+        showCheckIn = true
     }
 
     func loadTimeline() {
@@ -364,7 +362,18 @@ class EnhancedTimelineViewModel: ObservableObject {
                 self.searchQuery = state.searchQuery ?? ""
                 self.isLoading = state.isLoading
                 self.error = state.error
-                // Note: isTracking is managed separately via toggleTracking()
+                // Note: isTracking is managed separately via observeTrackingState()
+            }
+        }
+    }
+
+    private func observeTrackingState() {
+        // Observe tracking state from LocationTrackingController
+        trackingObserver = locationTrackingController.uiState.subscribe { [weak self] (state: LocationTrackingUIState?) in
+            guard let self = self, let state = state else { return }
+
+            DispatchQueue.main.async {
+                self.isTracking = state.trackingState.isTracking
             }
         }
     }

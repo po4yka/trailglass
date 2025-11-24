@@ -38,7 +38,7 @@ struct MainTabView: View {
                 case 0:
                     EnhancedStatsView(controller: appComponent.enhancedStatsController)
                 case 1:
-                    EnhancedTimelineView(controller: appComponent.enhancedTimelineController)
+                    EnhancedTimelineView(controller: appComponent.enhancedTimelineController, locationTrackingController: appComponent.locationTrackingController, appComponent: appComponent)
                 case 2:
                     MapScreen(mapController: appComponent.mapController)
                 case 3:
