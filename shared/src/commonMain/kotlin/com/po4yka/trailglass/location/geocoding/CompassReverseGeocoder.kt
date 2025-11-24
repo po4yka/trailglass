@@ -2,32 +2,27 @@ package com.po4yka.trailglass.location.geocoding
 
 import com.po4yka.trailglass.domain.model.GeocodedLocation
 import com.po4yka.trailglass.logging.logger
+import dev.jordond.compass.geocoder.Geocoder
+import dev.jordond.compass.geocoder.mobile.Geocoder as MobileGeocoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
  * Compass-based reverse geocoder implementation.
  *
- * NOTE: This implementation requires platform-specific Compass geocoder setup.
- * The Compass library needs to be configured with platform-specific geocoding providers.
+ * This implementation uses Compass library for cross-platform geocoding.
+ * Compass provides a unified API that works in common code, reducing the need for expect/actual.
  *
- * For full Compass integration:
- * 1. Configure Compass geocoder in platform-specific code (Android/iOS)
- * 2. Pass the configured geocoder instance to this class
- * 3. See Compass documentation: https://compass.jordond.dev/docs/geocoding/
- *
- * Benefits of Compass (when fully integrated):
- * - Works in common code (reduced expect/actual)
+ * Benefits:
+ * - Works in common code (no platform-specific expect/actual needed)
  * - Consistent API across platforms
- * - Better error handling
- * - Built-in rate limiting
+ * - Better error handling and rate limiting
+ * - Built-in caching and retry logic
  *
- * Current state: Basic structure implemented. Platform-specific configuration needed.
- * The existing AndroidReverseGeocoder and IOSReverseGeocoder remain the active implementations.
+ * The geocoder instance is created in platform-specific code but used here in common code.
  */
 class CompassReverseGeocoder(
-    // TODO: Add Compass geocoder instance when platform setup is complete
-    // private val compassGeocoder: Geocoder? = null
+    private val compassGeocoder: Geocoder
 ) : ReverseGeocoder {
     private val logger = logger()
 
@@ -39,31 +34,30 @@ class CompassReverseGeocoder(
             try {
                 logger.trace { "Reverse geocoding ($latitude, $longitude) using Compass" }
 
-                // TODO: Implement Compass geocoding when platform setup is complete
-                // Example implementation (when geocoder is available):
-                // val result = compassGeocoder?.reverseGeocode(
-                //     latitude = latitude,
-                //     longitude = longitude
-                // )
-                // result?.let { address ->
-                //     GeocodedLocation(
-                //         latitude = latitude,
-                //         longitude = longitude,
-                //         formattedAddress = address.formattedAddress,
-                //         city = address.city,
-                //         state = address.state,
-                //         countryCode = address.countryCode,
-                //         countryName = address.countryName,
-                //         postalCode = address.postalCode,
-                //         poiName = address.poiName,
-                //         street = address.street,
-                //         streetNumber = address.streetNumber
-                //     )
-                // }
+                val result = compassGeocoder.reverseGeocode(
+                    latitude = latitude,
+                    longitude = longitude
+                )
 
-                // For now, return null - platform geocoders are used instead
-                logger.debug { "Compass geocoder not yet configured, returning null" }
-                null
+                result?.let { address ->
+                    logger.debug { "Compass geocoding successful: ${address.formattedAddress}" }
+                    GeocodedLocation(
+                        latitude = latitude,
+                        longitude = longitude,
+                        formattedAddress = address.formattedAddress,
+                        city = address.city,
+                        state = address.state,
+                        countryCode = address.countryCode,
+                        countryName = address.countryName,
+                        postalCode = address.postalCode,
+                        poiName = address.poiName,
+                        street = address.street,
+                        streetNumber = address.streetNumber
+                    )
+                } ?: run {
+                    logger.debug { "Compass geocoding returned no result for ($latitude, $longitude)" }
+                    null
+                }
             } catch (e: Exception) {
                 logger.error(e) { "Compass geocoding error for ($latitude, $longitude)" }
                 null
@@ -73,10 +67,17 @@ class CompassReverseGeocoder(
 }
 
 /**
- * Factory function to create a Compass-based reverse geocoder (placeholder).
+ * Factory function to create a Compass-based reverse geocoder.
  *
- * NOTE: This returns a placeholder. Use platform-specific geocoders for now:
- * - Android: createAndroidReverseGeocoder(context)
- * - iOS: createIOSReverseGeocoder()
+ * This should be called from platform-specific code after configuring the Compass geocoder.
+ * The geocoder instance should be passed to the constructor.
+ *
+ * Example usage:
+ * ```kotlin
+ * // In Android platform code
+ * val geocoder = MobileGeocoder.create(context)
+ * val compassGeocoder = CompassReverseGeocoder(geocoder)
+ * ```
  */
-fun createCompassReverseGeocoder(): ReverseGeocoder = CompassReverseGeocoder()
+fun createCompassReverseGeocoder(geocoder: Geocoder): ReverseGeocoder =
+    CompassReverseGeocoder(geocoder)
