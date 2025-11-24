@@ -29,9 +29,10 @@ class PhotoController(
     private val getPhotosForDayUseCase: GetPhotosForDayUseCase,
     private val suggestPhotosUseCase: SuggestPhotosForVisitUseCase,
     private val attachPhotoUseCase: AttachPhotoToVisitUseCase,
+    val importPhotoUseCase: ImportPhotoUseCase, // Exposed for UI
     private val permissionFlow: PermissionFlowController,
     coroutineScope: CoroutineScope,
-    private val userId: String
+    val userId: String // Exposed for UI
 ) : Lifecycle {
     private val logger = logger()
 

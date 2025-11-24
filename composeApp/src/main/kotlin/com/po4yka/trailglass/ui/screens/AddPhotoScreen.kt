@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -45,12 +46,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.photo.PhotoImportHandler
 import com.po4yka.trailglass.ui.navigation.AddPhotoComponent
-import com.po4yka.trailglass.utils.rememberPhotoImportHandler
+import com.po4yka.trailglass.photo.rememberPhotoImportHandler
 import kotlinx.coroutines.launch
 
 /**
  * Add Photo screen allows users to select or capture a photo and optionally add location and caption.
  */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun AddPhotoScreen(
     component: AddPhotoComponent,
@@ -68,7 +70,7 @@ fun AddPhotoScreen(
     var showPicker by remember { mutableStateOf(false) }
 
     val (photoPicker, importHandler) = rememberPhotoImportHandler(
-        importPhotoUseCase = component.photoController.photoGalleryController.importPhotoUseCase,
+        importPhotoUseCase = component.photoController.importPhotoUseCase,
         userId = component.photoController.userId,
         onImportSuccess = { photoId ->
             scope.launch {
@@ -107,7 +109,7 @@ fun AddPhotoScreen(
                 navigationIcon = {
                     androidx.compose.material3.IconButton(onClick = component.onBack) {
                         androidx.compose.material3.Icon(
-                            androidx.compose.material.icons.Icons.Default.ArrowBack,
+                            androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }

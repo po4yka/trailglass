@@ -42,6 +42,7 @@ internal class PhotoSyncApi(
      * @param metadata Photo metadata
      * @return Photo upload response with URLs and server version
      */
+    @OptIn(io.ktor.utils.io.InternalAPI::class)
     suspend fun uploadPhoto(
         client: HttpClient,
         token: String,

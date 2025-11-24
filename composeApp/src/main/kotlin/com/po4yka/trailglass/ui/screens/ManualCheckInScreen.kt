@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.Button
@@ -75,7 +76,7 @@ fun ManualCheckInScreen(
                 navigationIcon = {
                     androidx.compose.material3.IconButton(onClick = component.onBack) {
                         androidx.compose.material3.Icon(
-                            androidx.compose.material.icons.Icons.Default.ArrowBack,
+                            androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -154,7 +155,7 @@ fun ManualCheckInScreen(
                     expanded = showCategoryDropdown,
                     onDismissRequest = { showCategoryDropdown = false }
                 ) {
-                    PlaceCategory.allCases.forEach { cat ->
+                    PlaceCategory.entries.forEach { cat ->
                         DropdownMenuItem(
                             text = { Text(cat.displayName) },
                             onClick = {
@@ -339,3 +340,6 @@ fun ManualCheckInScreen(
         }
     }
 }
+
+private val PlaceCategory.displayName: String
+    get() = name.lowercase().replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }

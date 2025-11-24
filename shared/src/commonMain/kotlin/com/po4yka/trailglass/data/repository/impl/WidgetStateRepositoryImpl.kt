@@ -70,7 +70,7 @@ class WidgetStateRepositoryImpl(
                 )
             },
             locationTracker.trackingState.map { it.isTracking }
-        ) { (distanceAndPlaces, isTracking) ->
+        ) { distanceAndPlaces, isTracking ->
             WidgetStats(
                 distanceKm = distanceAndPlaces.first,
                 placesVisited = distanceAndPlaces.second,

@@ -38,11 +38,15 @@ import com.arkivanov.decompose.extensions.compose.subscribeAsState
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.ui.components.NetworkStatusWrapper
 import com.po4yka.trailglass.ui.dialogs.CreateTripDialog
+import com.po4yka.trailglass.ui.screens.AddNoteScreen
+import com.po4yka.trailglass.ui.screens.AddPhotoScreen
 import com.po4yka.trailglass.ui.screens.DeviceManagementScreen
 import com.po4yka.trailglass.ui.screens.DiagnosticsScreen
 import com.po4yka.trailglass.ui.screens.EnhancedStatsScreen
 import com.po4yka.trailglass.ui.screens.EnhancedTimelineScreen
 import com.po4yka.trailglass.ui.screens.LogViewerScreen
+import com.po4yka.trailglass.ui.screens.ManualCheckInScreen
+import com.po4yka.trailglass.ui.screens.MapPickerScreen
 import com.po4yka.trailglass.ui.screens.MapScreen
 import com.po4yka.trailglass.ui.screens.PhotoDetailScreenWrapper
 import com.po4yka.trailglass.ui.screens.PhotosScreenWrapper
@@ -211,13 +215,13 @@ fun MainScaffold(
                             controller = instance.component.enhancedTimelineController,
                             trackingController = instance.component.locationTrackingController,
                             onAddPhoto = {
-                                instance.component.navigateToScreen(RootComponent.Config.AddPhoto)
+                                rootComponent.navigateToScreen(RootComponent.Config.AddPhoto)
                             },
                             onAddNote = {
-                                instance.component.navigateToScreen(RootComponent.Config.AddNote)
+                                rootComponent.navigateToScreen(RootComponent.Config.AddNote)
                             },
                             onCheckIn = {
-                                instance.component.navigateToScreen(RootComponent.Config.ManualCheckIn)
+                                rootComponent.navigateToScreen(RootComponent.Config.ManualCheckIn)
                             },
                             modifier = Modifier
                         )
@@ -440,28 +444,7 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.AddNote -> {
-                        // Placeholder screen - TODO: Implement AddNoteScreen
-                        androidx.compose.material3.Scaffold(
-                            topBar = {
-                                androidx.compose.material3.TopAppBar(
-                                    title = { Text("Add Note") },
-                                    navigationIcon = {
-                                        IconButton(onClick = instance.component.onBack) {
-                                            Icon(Icons.Default.ArrowBack, "Back")
-                                        }
-                                    }
-                                )
-                            }
-                        ) { padding ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(padding),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("Add Note Screen - Coming Soon")
-                            }
-                        }
+                        AddNoteScreen(instance.component)
                     }
 
                     is RootComponent.Child.ManualCheckIn -> {

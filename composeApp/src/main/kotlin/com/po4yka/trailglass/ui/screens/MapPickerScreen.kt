@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -55,6 +56,7 @@ import kotlinx.coroutines.launch
 /**
  * Map Picker screen allows users to select a location by dragging a marker on Google Maps.
  */
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 fun MapPickerScreen(
     component: MapPickerComponent,
@@ -102,7 +104,7 @@ fun MapPickerScreen(
                 navigationIcon = {
                     androidx.compose.material3.IconButton(onClick = component.onBack) {
                         androidx.compose.material3.Icon(
-                            androidx.compose.material.icons.Icons.Default.ArrowBack,
+                            androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back"
                         )
                     }
@@ -192,14 +194,14 @@ fun MapPickerScreen(
                     cameraPositionState = cameraPositionState,
                     properties = MapProperties(
                         isMyLocationEnabled = true,
-                        mapType = com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL
+                        mapType = com.google.maps.android.compose.MapType.NORMAL
                     ),
                     uiSettings = MapUiSettings(
                         zoomControlsEnabled = true,
                         myLocationButtonEnabled = false,
                         compassEnabled = true
                     ),
-                    onMapLoaded = { googleMap = it },
+                    onMapLoaded = { /* Map loaded */ },
                     onMapClick = { latLng ->
                         selectedLatLng = latLng
                         markerState.position = latLng
@@ -250,7 +252,7 @@ fun MapPickerScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    String(format: "%.6f", latLng.latitude),
+                                    "%.6f".format(latLng.latitude),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -262,7 +264,7 @@ fun MapPickerScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    String(format: "%.6f", latLng.longitude),
+                                    "%.6f".format(latLng.longitude),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }

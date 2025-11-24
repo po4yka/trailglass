@@ -55,8 +55,8 @@ import com.po4yka.trailglass.ui.screens.routeview.PrivacyWarningDialog
 import com.po4yka.trailglass.ui.screens.routeview.RouteViewContent
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import com.google.android.gms.maps.Snapshotter
-import com.google.android.gms.maps.model.SnapshotOptions
+// import com.google.android.gms.maps.Snapshotter
+// import com.google.android.gms.maps.model.SnapshotOptions
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import android.graphics.Bitmap
@@ -128,6 +128,12 @@ fun RouteViewScreen(
             return
         }
 
+        snackbarHostState.showSnackbar(
+            message = "Map snapshot sharing not implemented yet",
+            duration = SnackbarDuration.Short
+        )
+
+        /*
         try {
             // Create snapshot using Google Maps Snapshotter
             // Note: Snapshotter requires a GoogleMap instance. For Compose, we need to either:
@@ -208,6 +214,7 @@ fun RouteViewScreen(
                 duration = SnackbarDuration.Short
             )
         }
+        */
     }
 
     Scaffold(

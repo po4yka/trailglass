@@ -87,10 +87,10 @@ kotlin {
             // Paging 3 - Pagination support (Android only)
             api(libs.androidx.paging.common)
 
-            // Firebase - compileOnly for Android platform implementations
-            compileOnly(libs.firebase.crashlytics)
-            compileOnly(libs.firebase.messaging)
-            compileOnly(libs.firebase.perf)
+            // Firebase - implementation for Android platform implementations
+            implementation(libs.firebase.crashlytics)
+            implementation(libs.firebase.messaging)
+            implementation(libs.firebase.perf)
         }
         iosMain.dependencies {
             implementation(libs.sqldelight.native)
