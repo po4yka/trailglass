@@ -436,28 +436,7 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.AddPhoto -> {
-                        // Placeholder screen - TODO: Implement AddPhotoScreen
-                        androidx.compose.material3.Scaffold(
-                            topBar = {
-                                androidx.compose.material3.TopAppBar(
-                                    title = { Text("Add Photo") },
-                                    navigationIcon = {
-                                        IconButton(onClick = instance.component.onBack) {
-                                            Icon(Icons.Default.ArrowBack, "Back")
-                                        }
-                                    }
-                                )
-                            }
-                        ) { padding ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(padding),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("Add Photo Screen - Coming Soon")
-                            }
-                        }
+                        AddPhotoScreen(instance.component)
                     }
 
                     is RootComponent.Child.AddNote -> {
@@ -486,61 +465,11 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.ManualCheckIn -> {
-                        // Placeholder screen - TODO: Implement ManualCheckInScreen
-                        androidx.compose.material3.Scaffold(
-                            topBar = {
-                                androidx.compose.material3.TopAppBar(
-                                    title = { Text("Manual Check-In") },
-                                    navigationIcon = {
-                                        IconButton(onClick = instance.component.onBack) {
-                                            Icon(Icons.Default.ArrowBack, "Back")
-                                        }
-                                    }
-                                )
-                            }
-                        ) { padding ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(padding),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text("Manual Check-In Screen - Coming Soon")
-                            }
-                        }
+                        ManualCheckInScreen(instance.component)
                     }
 
                     is RootComponent.Child.MapPicker -> {
-                        // Placeholder screen - TODO: Implement MapPickerScreen
-                        androidx.compose.material3.Scaffold(
-                            topBar = {
-                                androidx.compose.material3.TopAppBar(
-                                    title = { Text("Pick Location") },
-                                    navigationIcon = {
-                                        IconButton(onClick = instance.component.onBack) {
-                                            Icon(Icons.Default.ArrowBack, "Back")
-                                        }
-                                    }
-                                )
-                            }
-                        ) { padding ->
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(padding),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("Map Picker Screen - Coming Soon")
-                                    if (instance.component.initialLat != null && instance.component.initialLon != null) {
-                                        Text(
-                                            "Initial: ${instance.component.initialLat}, ${instance.component.initialLon}",
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
-                                    }
-                                }
-                            }
-                        }
+                        MapPickerScreen(instance.component)
                     }
                 }
             }
