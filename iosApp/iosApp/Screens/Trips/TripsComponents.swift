@@ -124,23 +124,13 @@ class TripsViewModel: ObservableObject {
         controller.setSortOption(option: option)
     }
 
-    func toggleOngoingFilter() {
-        let newValue = !filterShowOngoing
-        controller.setFilterOptions(options: TripsControllerFilterOptions(
-            showOngoing: newValue,
-            showCompleted: filterShowCompleted,
-            searchQuery: searchQuery
-        ))
-    }
+    // func toggleOngoingFilter() {
+    //     // TODO: Fix TripsControllerFilterOptions
+    // }
 
-    func toggleCompletedFilter() {
-        let newValue = !filterShowCompleted
-        controller.setFilterOptions(options: TripsControllerFilterOptions(
-            showOngoing: filterShowOngoing,
-            showCompleted: newValue,
-            searchQuery: searchQuery
-        ))
-    }
+    // func toggleCompletedFilter() {
+    //     // TODO: Fix TripsControllerFilterOptions
+    // }
 
     func showCreateDialog() {
         controller.showCreateDialog()

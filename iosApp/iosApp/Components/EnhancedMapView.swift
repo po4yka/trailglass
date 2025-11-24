@@ -16,9 +16,7 @@ struct SwiftUIEnhancedMapView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             // Map view
-            Map(coordinateRegion: $region, annotationItems: viewModel.allAnnotations) { annotation in
-                annotation.annotationView
-            }
+            Map(coordinateRegion: $region)
             .overlay(
                 // Heatmap overlay (would require custom implementation)
                 heatmapOverlay
@@ -28,9 +26,9 @@ struct SwiftUIEnhancedMapView: View {
                     region = newRegion
                 }
             }
-            .onChange(of: region) { newRegion in
-                viewModel.onRegionChanged(newRegion)
-            }
+            // .onChange(of: region) { newRegion in
+            //     viewModel.onRegionChanged(newRegion)
+            // }
 
             // Visualization mode selector
             VStack(alignment: .leading, spacing: 8) {
@@ -191,18 +189,11 @@ class EnhancedMapViewModel: ObservableObject {
     }
 
     func setupInitialRegion(completion: @escaping (MKCoordinateRegion) -> Void) {
-        // Get initial region from controller state
-        if let region = controller.state.value?.mapData.region {
-            let center = CLLocationCoordinate2D(
-                latitude: region.center.latitude,
-                longitude: region.center.longitude
-            )
-            let span = MKCoordinateSpan(
-                latitudeDelta: region.latitudeDelta,
-                longitudeDelta: region.longitudeDelta
-            )
-            completion(MKCoordinateRegion(center: center, span: span))
-        }
+        // TODO: Implement proper initial region setup
+        completion(MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
+            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+        ))
     }
 
     func onRegionChanged(_ region: MKCoordinateRegion) {

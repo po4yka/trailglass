@@ -61,8 +61,8 @@ struct TripGlassCard: View {
                 }
 
                 // Description
-                if let description = trip.description {
-                    Text(description)
+                if !trip.description.isEmpty {
+                    Text(trip.description)
                         .font(.body)
                         .lineLimit(2)
                         .foregroundColor(.primary)
@@ -94,11 +94,7 @@ struct TripGlassCard: View {
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .glassEffectTinted(.coastalPath, opacity: 0.6)
-.cornerRadius(
-                                    material: .ultraThin,
-                                    tint: .coolSteel,
-                                    cornerRadius: 6
-                                )
+                                .cornerRadius(6)
                                 .foregroundColor(.primary)
                             }
 
@@ -168,7 +164,14 @@ struct TripsContent: View {
                                 .padding(.horizontal, 4)
 
                             ForEach(ongoing, id: \.id) { trip in
-                                NavigationLink(destination: TripDetailView(tripId: trip.id, appComponent: appComponent)) {
+                                NavigationLink(destination: TripDetailView(
+                                    trip: trip,
+                                    onBack: {},
+                                    onEdit: {},
+                                    onShare: {},
+                                    onExport: { _ in },
+                                    onDelete: {}
+                                )) {
                                     TripGlassCard(trip: trip)
                                 }
                                 .buttonStyle(PlainButtonStyle())
@@ -186,7 +189,14 @@ struct TripsContent: View {
                                 .padding(.top, ongoing.isEmpty ? 0 : 12)
 
                             ForEach(completed, id: \.id) { trip in
-                                NavigationLink(destination: TripDetailView(tripId: trip.id, appComponent: appComponent)) {
+                                NavigationLink(destination: TripDetailView(
+                                    trip: trip,
+                                    onBack: {},
+                                    onEdit: {},
+                                    onShare: {},
+                                    onExport: { _ in },
+                                    onDelete: {}
+                                )) {
                                     TripGlassCard(trip: trip)
                                 }
                                 .buttonStyle(PlainButtonStyle())

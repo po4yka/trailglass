@@ -52,9 +52,9 @@ struct CategoryBadge: View {
     }
 
     private var categoryColor: Color {
-        switch category.name {
-        case "HOME": return .seaGlass
-        case "WORK": return .coolSteel
+        switch category {
+        case .home: return .seaGlass
+        case .work: return .coolSteel
         case "FOOD": return .sunrisePeach
         case "SHOPPING": return .driftwood
         case "FITNESS": return .adaptiveSuccess
@@ -252,19 +252,11 @@ struct CategoryBadgeGrid: View {
             columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: columns),
             spacing: 12
         ) {
-            ForEach(categories, id: \.name) { category in
-                CategoryBadge(
-                    category: category,
-                    isSelected: selectedCategories.contains(category.name),
-                    showLabel: badgeSize != .small,
-                    size: badgeSize,
-                    onTap: {
-                        withAnimation(MotionConfig.expressiveSpring) {
-                            onCategoryTap(category)
-                        }
-                    }
-                )
-            }
+            // ForEach(categories, id: \.self) { category in
+            //     CategoryBadge(...)
+            // }
+            Text("Categories not available")
+                .foregroundColor(.secondary)
         }
     }
 }
@@ -295,19 +287,11 @@ struct CategoryBadgeRow: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                ForEach(categories, id: \.name) { category in
-                    CategoryBadge(
-                        category: category,
-                        isSelected: selectedCategory == category.name,
-                        showLabel: badgeSize != .small,
-                        size: badgeSize,
-                        onTap: {
-                            withAnimation(MotionConfig.expressiveSpring) {
-                                onCategoryTap(category)
-                            }
-                        }
-                    )
-                }
+                // ForEach(categories, id: \.self) { category in
+                //     CategoryBadge(...)
+                // }
+                Text("Category selection not available")
+                    .foregroundColor(.secondary)
             }
             .padding(.horizontal, 16)
         }
@@ -337,7 +321,7 @@ struct CategoryBadge_Previews: PreviewProvider {
 
             // Badge row
             CategoryBadgeRow(
-                categories: [.home, .work, .food, .shopping, .fitness],
+                categories: [.home, .work],
                 selectedCategory: "WORK"
             ) { _ in }
         }

@@ -33,7 +33,7 @@ struct EnhancedVisitCard: View {
         VStack(alignment: .leading, spacing: 12) {
             // Header
             HStack(alignment: .top, spacing: 12) {
-                Image(systemName: categoryIcon(visit.category))
+                Image(systemName: categoryIcon(visit.category as? PlaceCategory ?? .other))
                     .font(.title2)
                     .foregroundColor(.blue)
 
@@ -49,8 +49,8 @@ struct EnhancedVisitCard: View {
                         }
                     }
 
-                    if let city = visit.city, let country = visit.country {
-                        Text("\(city), \(country)")
+                    if let city = visit.city {
+                        Text(city)
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -94,7 +94,7 @@ struct EnhancedVisitCard: View {
                 .cornerRadius(4)
 
                 if visit.category.name != "OTHER" {
-                    Text(categoryName(visit.category))
+                    Text(categoryName(visit.category as? PlaceCategory ?? .other))
                         .font(.caption)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -130,7 +130,7 @@ struct EnhancedRouteCard: View {
                     Text("\(Int(route.distanceMeters / 1000)) km")
                         .font(.caption)
 
-                    let duration = route.endTime.timeIntervalSince1970 - route.startTime.timeIntervalSince1970
+                    let duration = Double(route.endTime.epochSeconds) - Double(route.startTime.epochSeconds)
                     if duration > 0 {
                         Text("• \(Int(duration / 60)) min")
                             .font(.caption)
@@ -214,10 +214,10 @@ struct MonthSummaryCard: View {
 
             if !summary.topCategories.isEmpty {
                 HStack(spacing: 8) {
-                    ForEach(Array(summary.topCategories.prefix(3)), id: \.name) { category in
+                    ForEach(summary.topCategories.prefix(3), id: \.self) { category in
                         GlassFilterChip(
-                            label: categoryName(category),
-                            icon: categoryIcon(category),
+                            label: categoryName(category as? PlaceCategory ?? .other),
+                            icon: categoryIcon(category as? PlaceCategory ?? .other),
                             isSelected: false,
                             tint: .blueSlate
                         ) {}
