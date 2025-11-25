@@ -49,7 +49,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
+import com.google.maps.android.compose.rememberUpdatedMarkerState
 import com.po4yka.trailglass.ui.navigation.MapPickerComponent
 import kotlinx.coroutines.launch
 
@@ -80,7 +80,7 @@ fun MapPickerScreen(
     var googleMap by remember { mutableStateOf<GoogleMap?>(null) }
 
     val cameraPositionState = rememberCameraPositionState()
-    val markerState = rememberMarkerState(
+    val markerState = rememberUpdatedMarkerState(
         position = selectedLatLng ?: LatLng(37.7749, -122.4194) // Default to SF
     )
 

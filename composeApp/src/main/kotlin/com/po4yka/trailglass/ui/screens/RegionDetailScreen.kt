@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Map
@@ -95,7 +95,7 @@ fun RegionDetailScreen(
                 title = { Text(if (isEditMode) "Edit Place" else "Create Place") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -118,26 +118,21 @@ fun RegionDetailScreen(
                     IconButton(
                         onClick = {
                             // Validate
-                            var hasError = false
-                            if (name.isBlank()) {
-                                nameError = "Name is required"
-                                hasError = true
+                            val newNameError = if (name.isBlank()) "Name is required" else null
+                            val newLocationError = if (latitude == 0.0 && longitude == 0.0) {
+                                "Please pick a location on the map"
                             } else {
-                                nameError = null
+                                null
                             }
+                            nameError = newNameError
+                            locationError = newLocationError
 
-                            if (latitude == 0.0 && longitude == 0.0) {
-                                locationError = "Please pick a location on the map"
-                                hasError = true
-                            } else {
-                                locationError = null
-                            }
-
-                            if (!hasError) {
+                            if (newNameError == null && newLocationError == null) {
                                 scope.launch {
-                                    if (isEditMode && regionId != null) {
+                                    val id = regionId
+                                    if (id != null) {
                                         controller.updateRegion(
-                                            regionId = regionId,
+                                            regionId = id,
                                             name = name.trim(),
                                             description = description.trim().ifBlank { null },
                                             latitude = latitude,
@@ -308,26 +303,21 @@ fun RegionDetailScreen(
             Button(
                 onClick = {
                     // Validate
-                    var hasError = false
-                    if (name.isBlank()) {
-                        nameError = "Name is required"
-                        hasError = true
+                    val newNameError = if (name.isBlank()) "Name is required" else null
+                    val newLocationError = if (latitude == 0.0 && longitude == 0.0) {
+                        "Please pick a location on the map"
                     } else {
-                        nameError = null
+                        null
                     }
+                    nameError = newNameError
+                    locationError = newLocationError
 
-                    if (latitude == 0.0 && longitude == 0.0) {
-                        locationError = "Please pick a location on the map"
-                        hasError = true
-                    } else {
-                        locationError = null
-                    }
-
-                    if (!hasError) {
+                    if (newNameError == null && newLocationError == null) {
                         scope.launch {
-                            if (isEditMode && regionId != null) {
+                            val id = regionId
+                            if (id != null) {
                                 controller.updateRegion(
-                                    regionId = regionId,
+                                    regionId = id,
                                     name = name.trim(),
                                     description = description.trim().ifBlank { null },
                                     latitude = latitude,

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Circle
-import com.google.maps.android.compose.DragState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
@@ -122,7 +121,7 @@ fun RegionMapPicker(
                 title = { Text("Pick Location") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
@@ -165,8 +164,8 @@ fun RegionMapPicker(
                 }
 
                 // Update marker position when dragged
-                LaunchedEffect(markerState.position) {
-                    if (markerState.position != markerPosition && markerState.dragState == com.google.maps.android.compose.DragState.END) {
+                LaunchedEffect(markerState.position, markerState.isDragging) {
+                    if (markerState.position != markerPosition && !markerState.isDragging) {
                         markerPosition = markerState.position
                     }
                 }

@@ -20,13 +20,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsOff
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,6 +49,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,7 +106,7 @@ fun RegionsScreen(
                     }
                     Box {
                         IconButton(onClick = { showSortMenu = true }) {
-                            Icon(Icons.Default.Sort, contentDescription = "Sort")
+                            Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort")
                         }
                         DropdownMenu(
                             expanded = showSortMenu,
@@ -254,17 +255,14 @@ private fun RegionsList(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         items(regions, key = { it.id }) { region ->
-            val dismissState =
-                rememberSwipeToDismissBoxState(
-                    confirmValueChange = { dismissValue ->
-                        if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                            onRegionDelete(region.id)
-                            true
-                        } else {
-                            false
-                        }
-                    }
-                )
+            val dismissState = rememberSwipeToDismissBoxState()
+
+            // Handle dismiss action when state changes
+            LaunchedEffect(dismissState.currentValue) {
+                if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                    onRegionDelete(region.id)
+                }
+            }
 
             SwipeToDismissBox(
                 state = dismissState,
