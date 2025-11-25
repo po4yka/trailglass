@@ -173,3 +173,4 @@ docs/design-prompts/generated/*.jpg
 docs/design-prompts/generated/*.jpeg
 docs/design-prompts/generated/*.webp
 !docs/design-prompts/generated/README.md
+.vscode/settings.json
