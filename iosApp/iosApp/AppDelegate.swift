@@ -11,31 +11,33 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // Crash handler instance - kept alive for app lifetime
     private var crashHandler: CrashHandler?
 
+    // Track if background initialization is complete
+    private var backgroundInitComplete = false
+
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+        let startTime = CFAbsoluteTimeGetCurrent()
         AppLogger.info("TrailGlass iOS app starting up...", category: "AppDelegate")
 
-        // Initialize logging configuration first
+        // Critical path: Initialize logging first (lightweight)
         initializeLogging()
 
-        // Initialize crash reporting early to catch startup crashes
+        // Critical path: Initialize crash reporting early to catch startup crashes
+        // This must be synchronous to catch crashes during init
         initializeCrashReporting()
 
-        // Initialize sync coordinator
-        initializeSyncCoordinator()
-
-        // Register background tasks
+        // Register background tasks (must be done in didFinishLaunching)
         BackgroundSyncManager.shared.registerBackgroundTasks()
 
-        // Configure BackgroundSyncManager with SyncManager from DI
-        BackgroundSyncManager.shared.configure(syncManager: appComponent.syncManager)
+        // Move heavy initialization to background
+        Task.detached(priority: .utility) { [weak self] in
+            await self?.initializeInBackground()
+        }
 
-        // Schedule first background sync
-        BackgroundSyncManager.shared.scheduleBackgroundSync()
-
-        AppLogger.info("TrailGlass iOS app initialized successfully", category: "AppDelegate")
+        let duration = (CFAbsoluteTimeGetCurrent() - startTime) * 1000
+        AppLogger.info("TrailGlass iOS app main thread init completed in \(Int(duration))ms", category: "AppDelegate")
 
         return true
     }
@@ -44,6 +46,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         AppLogger.debug("App entering background", category: "AppDelegate")
         // Schedule background sync when app goes to background
         BackgroundSyncManager.shared.scheduleBackgroundSync()
+    }
+
+    // MARK: - Background Initialization
+
+    /// Perform heavy initialization tasks in background.
+    /// This keeps the main thread responsive during app startup.
+    private func initializeInBackground() async {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        AppLogger.info("Starting background initialization...", category: "AppDelegate")
+
+        // Configure BackgroundSyncManager with SyncManager from DI
+        BackgroundSyncManager.shared.configure(syncManager: appComponent.syncManager)
+
+        // Schedule first background sync
+        BackgroundSyncManager.shared.scheduleBackgroundSync()
+
+        // Initialize sync coordinator
+        await initializeSyncCoordinatorAsync()
+
+        backgroundInitComplete = true
+
+        let duration = (CFAbsoluteTimeGetCurrent() - startTime) * 1000
+        AppLogger.info("Background initialization completed in \(Int(duration))ms", category: "AppDelegate")
+    }
+
+    /// Async version of sync coordinator initialization
+    private func initializeSyncCoordinatorAsync() async {
+        do {
+            // Access syncCoordinator to ensure it's initialized
+            // The actual initialization happens in the DI component
+            _ = appComponent.syncCoordinator
+            AppLogger.info("SyncCoordinator initialized successfully", category: "Sync")
+        } catch {
+            AppLogger.error("Failed to initialize SyncCoordinator: \(error)", category: "Sync")
+        }
     }
 
     // MARK: - Private Methods
@@ -76,20 +113,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
 
         AppLogger.info("Crash reporting initialized", category: "Crash")
-    }
-
-    private func initializeSyncCoordinator() {
-        // Initialize sync coordinator on app startup
-        Task {
-            do {
-                // Access syncCoordinator to ensure it's initialized
-                // The actual initialization happens in the DI component
-                _ = appComponent.syncCoordinator
-                AppLogger.info("SyncCoordinator initialized successfully", category: "Sync")
-            } catch {
-                AppLogger.error("Failed to initialize SyncCoordinator: \(error)", category: "Sync")
-            }
-        }
     }
 
     // Public method to trigger immediate sync (can be called from UI)

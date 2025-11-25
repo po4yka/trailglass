@@ -1,6 +1,7 @@
 package com.po4yka.trailglass
 
 import android.app.Application
+import android.os.StrictMode
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.perf.FirebasePerformance
 import com.po4yka.trailglass.crash.CrashHandler
@@ -13,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger {}
 
@@ -20,6 +22,7 @@ private val logger = KotlinLogging.logger {}
  * TrailGlass Application class.
  *
  * Initializes the dependency injection component and provides application-wide dependencies.
+ * Heavy initialization is moved off the main thread to improve startup performance.
  */
 class TrailGlassApplication : Application() {
     /** Application-level DI component. Provides all application dependencies (repositories, controllers, etc.) */
@@ -33,27 +36,22 @@ class TrailGlassApplication : Application() {
     }
 
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    private val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    /** Track if background initialization is complete */
+    private val backgroundInitComplete = AtomicBoolean(false)
 
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize Firebase Crashlytics
-        initializeCrashlytics()
-
-        // Initialize Firebase Performance Monitoring
-        initializePerformanceMonitoring()
-
-        // Install custom crash handler
+        // Critical path: Only install crash handler synchronously
+        // This ensures we capture any crashes during the rest of initialization
         installCrashHandler()
 
-        // Start network connectivity monitoring
-        startNetworkMonitoring()
-
-        // Initialize sync coordinator
-        initializeSyncCoordinator()
-
-        // Schedule background sync
-        scheduleBackgroundSync()
+        // Move all heavy initialization to background thread
+        ioScope.launch {
+            initializeInBackground()
+        }
     }
 
     override fun onTerminate() {
@@ -63,17 +61,46 @@ class TrailGlassApplication : Application() {
         stopNetworkMonitoring()
     }
 
+    /**
+     * Perform heavy initialization tasks in background.
+     * This keeps the main thread responsive during app startup.
+     */
+    private suspend fun initializeInBackground() {
+        val startTime = System.currentTimeMillis()
+        logger.info { "Starting background initialization..." }
+
+        try {
+            // Initialize Firebase services (can be slow due to network calls)
+            initializeCrashlytics()
+            initializePerformanceMonitoring()
+
+            // Start network connectivity monitoring
+            startNetworkMonitoring()
+
+            // Initialize sync coordinator
+            initializeSyncCoordinator()
+
+            // Schedule background sync (WorkManager operations)
+            scheduleBackgroundSync()
+
+            backgroundInitComplete.set(true)
+
+            val duration = System.currentTimeMillis() - startTime
+            logger.info { "Background initialization completed in ${duration}ms" }
+        } catch (e: Exception) {
+            logger.error(e) { "Error during background initialization: ${e.message}" }
+        }
+    }
+
     /** Initialize SyncCoordinator on app startup. */
-    private fun initializeSyncCoordinator() {
-        applicationScope.launch {
-            try {
-                // Access syncCoordinator to ensure it's initialized
-                // The actual initialization happens in the DI component
-                appComponent.syncCoordinator
-                logger.info { "SyncCoordinator initialized successfully" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to initialize SyncCoordinator: ${e.message}" }
-            }
+    private suspend fun initializeSyncCoordinator() {
+        try {
+            // Access syncCoordinator to ensure it's initialized
+            // The actual initialization happens in the DI component
+            appComponent.syncCoordinator
+            logger.info { "SyncCoordinator initialized successfully" }
+        } catch (e: Exception) {
+            logger.error(e) { "Failed to initialize SyncCoordinator: ${e.message}" }
         }
     }
 
@@ -153,8 +180,22 @@ class TrailGlassApplication : Application() {
         }
     }
 
+    /** Check if background initialization is complete. */
+    fun isBackgroundInitComplete(): Boolean = backgroundInitComplete.get()
+
     /** Trigger immediate sync (can be called from UI). */
     fun triggerImmediateSync() {
-        SyncScheduler.triggerImmediateSync(applicationContext)
+        if (backgroundInitComplete.get()) {
+            SyncScheduler.triggerImmediateSync(applicationContext)
+        } else {
+            // Queue for later execution when init is complete
+            ioScope.launch {
+                // Wait for background init to complete
+                while (!backgroundInitComplete.get()) {
+                    kotlinx.coroutines.delay(100)
+                }
+                SyncScheduler.triggerImmediateSync(applicationContext)
+            }
+        }
     }
 }
