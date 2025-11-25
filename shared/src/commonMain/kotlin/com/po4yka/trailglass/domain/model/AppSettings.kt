@@ -91,7 +91,8 @@ data class AppearanceSettings(
     val theme: AppTheme = AppTheme.SYSTEM,
     val useDeviceWallpaper: Boolean = false,
     val showMapInTimeline: Boolean = true,
-    val compactView: Boolean = false
+    val compactView: Boolean = false,
+    val photoGalleryViewMode: PhotoGalleryViewMode = PhotoGalleryViewMode.GRID
 )
 
 @Serializable
@@ -99,6 +100,12 @@ enum class AppTheme {
     LIGHT,
     DARK,
     SYSTEM
+}
+
+@Serializable
+enum class PhotoGalleryViewMode {
+    GRID,
+    LIST
 }
 
 /** Account settings and sync preferences. */

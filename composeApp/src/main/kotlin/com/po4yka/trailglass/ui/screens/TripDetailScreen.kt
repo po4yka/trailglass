@@ -136,7 +136,7 @@ fun TripDetailScreen(
                                 onExport(ExportFormat.GPX)
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Map, contentDescription = null)
+                                Icon(Icons.Default.Map, contentDescription = "Export as GPX")
                             }
                         )
                         DropdownMenuItem(
@@ -146,7 +146,7 @@ fun TripDetailScreen(
                                 onExport(ExportFormat.KML)
                             },
                             leadingIcon = {
-                                Icon(Icons.Default.Public, contentDescription = null)
+                                Icon(Icons.Default.Public, contentDescription = "Export as KML")
                             }
                         )
                     }
@@ -198,7 +198,7 @@ fun TripDetailScreen(
                             containerColor = MaterialTheme.colorScheme.primary
                         )
                 ) {
-                    Icon(Icons.Default.Map, contentDescription = null)
+                    Icon(Icons.Default.Map, contentDescription = "View route on map")
                     Spacer(Modifier.width(8.dp))
                     Text("View Route on Map")
                 }
@@ -251,7 +251,7 @@ fun TripDetailScreen(
                                         leadingIcon = {
                                             Icon(
                                                 Icons.Default.Tag,
-                                                contentDescription = null,
+                                                contentDescription = "Tag",
                                                 modifier = Modifier.size(16.dp)
                                             )
                                         }

@@ -31,7 +31,9 @@ struct MapActionFAB: View {
                 if isExpanded {
                     FABMenuItem(
                         icon: isFollowModeEnabled ? "location.fill" : "location",
-                        label: isFollowModeEnabled ? "Stop Following" : "Follow Location"
+                        label: isFollowModeEnabled ? "Stop Following" : "Follow Location",
+                        accessibilityLabel: isFollowModeEnabled ? "Stop Following" : "Follow Location",
+                        accessibilityHint: isFollowModeEnabled ? "Stop following your current location on the map" : "Center map on your current location and follow as you move"
                     ) {
                         onToggleFollowMode()
                         withAnimation(MotionConfig.expressiveSpring) {
@@ -42,7 +44,9 @@ struct MapActionFAB: View {
 
                     FABMenuItem(
                         icon: "arrow.up.left.and.arrow.down.right",
-                        label: "Fit to Data"
+                        label: "Fit to Data",
+                        accessibilityLabel: "Fit to Data",
+                        accessibilityHint: "Adjust map view to show all visible locations and routes"
                     ) {
                         onFitToData()
                         withAnimation(MotionConfig.expressiveSpring) {
@@ -53,7 +57,9 @@ struct MapActionFAB: View {
 
                     FABMenuItem(
                         icon: "arrow.clockwise",
-                        label: "Refresh"
+                        label: "Refresh",
+                        accessibilityLabel: "Refresh",
+                        accessibilityHint: "Reload map data from database"
                     ) {
                         onRefresh()
                         withAnimation(MotionConfig.expressiveSpring) {
@@ -79,6 +85,8 @@ struct MapActionFAB: View {
                 .glassEffectTinted(.coastalPath, opacity: 0.8)
                 .clipShape(Circle())
                 .shadow(color: .black.opacity(DarkModeConfig.shadowOpacity(for: colorScheme)), radius: 8)
+                .accessibilityLabel(isExpanded ? "Close map menu" : "Open map menu")
+                .accessibilityHint(isExpanded ? "Closes the map action menu" : "Opens menu with map view options")
             }
         }
     }
@@ -89,6 +97,8 @@ struct MapActionFAB: View {
 private struct FABMenuItem: View {
     let icon: String
     let label: String
+    let accessibilityLabel: String
+    let accessibilityHint: String
     let action: () -> Void
 
     var body: some View {
@@ -111,6 +121,8 @@ private struct FABMenuItem: View {
             .glassEffect(variant: .regular)
             .glassEffectTinted(.coolSteel, opacity: 0.6)
             .clipShape(Circle())
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint(accessibilityHint)
         }
     }
 }

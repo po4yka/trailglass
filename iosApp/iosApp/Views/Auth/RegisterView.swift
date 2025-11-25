@@ -145,6 +145,8 @@ struct RegisterView: View {
                                 Image(systemName: viewModel.passwordVisible ? "eye.slash" : "eye")
                                     .foregroundColor(.gray)
                             }
+                            .accessibilityLabel(viewModel.passwordVisible ? "Hide password" : "Show password")
+                            .accessibilityHint("Toggles password visibility")
                         }
                         .padding()
                         .background(Color(UIColor.secondarySystemBackground))
@@ -192,6 +194,8 @@ struct RegisterView: View {
                                 Image(systemName: viewModel.confirmPasswordVisible ? "eye.slash" : "eye")
                                     .foregroundColor(.gray)
                             }
+                            .accessibilityLabel(viewModel.confirmPasswordVisible ? "Hide password" : "Show password")
+                            .accessibilityHint("Toggles confirm password visibility")
                         }
                         .padding()
                         .background(viewModel.confirmPasswordError != nil ? Color.red.opacity(0.1) : Color(UIColor.secondarySystemBackground))
@@ -225,6 +229,8 @@ struct RegisterView: View {
                     .foregroundColor(.white)
                     .cornerRadius(12)
                     .disabled(!viewModel.canRegister || viewModel.isLoading)
+                    .accessibilityLabel(viewModel.isLoading ? "Creating account" : "Create Account")
+                    .accessibilityHint(viewModel.canRegister ? "Create a new TrailGlass account" : "Fill in all fields correctly to create account")
 
                     // Login link
                     HStack {
@@ -236,6 +242,8 @@ struct RegisterView: View {
                                 .fontWeight(.semibold)
                         }
                         .disabled(viewModel.isLoading)
+                        .accessibilityLabel("Log in")
+                        .accessibilityHint("Navigate to log in with existing account")
                     }
 
                     // Continue as Guest
@@ -250,6 +258,8 @@ struct RegisterView: View {
                         }
                     }
                     .disabled(viewModel.isLoading)
+                    .accessibilityLabel("Continue as Guest")
+                    .accessibilityHint("Use the app without creating an account, data stored locally only")
 
                     Text("No account needed. All data stored locally only.")
                         .font(.caption)

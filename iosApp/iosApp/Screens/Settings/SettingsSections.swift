@@ -277,6 +277,8 @@ struct AccountSettingsSection: View {
                 Text("Device Management")
             }
         }
+        .accessibilityLabel("Device Management")
+        .accessibilityHint("View and manage connected devices")
     }
 }
 
@@ -299,6 +301,8 @@ struct DeveloperSection: View {
                     .foregroundColor(.secondary)
             }
         }
+        .accessibilityLabel("Places")
+        .accessibilityHint("View and manage monitored places")
 
         NavigationLink(destination: LogViewerView()) {
             HStack {
@@ -312,6 +316,8 @@ struct DeveloperSection: View {
                     .foregroundColor(.secondary)
             }
         }
+        .accessibilityLabel("Logs")
+        .accessibilityHint("View application logs and debug information")
 
         NavigationLink(destination: DiagnosticsView(controller: appComponent.diagnosticsController)) {
             HStack {
@@ -325,6 +331,8 @@ struct DeveloperSection: View {
                     .foregroundColor(.secondary)
             }
         }
+        .accessibilityLabel("Diagnostics")
+        .accessibilityHint("View system diagnostics and health information")
     }
 }
 
@@ -403,6 +411,8 @@ struct DataManagementSection: View {
                 ) {
                     onExportData()
                 }
+                .accessibilityLabel("Export Data")
+                .accessibilityHint("Export all your travel data to a file")
 
                 GlassButton(
                     title: "Import Data",
@@ -412,6 +422,8 @@ struct DataManagementSection: View {
                 ) {
                     onImportData()
                 }
+                .accessibilityLabel("Import Data")
+                .accessibilityHint("Import travel data from a file")
 
                 GlassButton(
                     title: "Clear All Data",
@@ -420,6 +432,8 @@ struct DataManagementSection: View {
                     tint: .driftwood,
                     action: onClearData
                 )
+                .accessibilityLabel("Clear All Data")
+                .accessibilityHint("Permanently delete all travel data from this device")
             }
         }
     }
@@ -532,6 +546,9 @@ struct TrackingModeRow: View {
             )
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel("\(title) tracking mode")
+        .accessibilityHint(isSelected ? "Currently selected, \(batteryImpact)" : "Double tap to switch to \(title) mode, \(batteryImpact)")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 

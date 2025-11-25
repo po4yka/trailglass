@@ -28,7 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.domain.model.MapMarker
 import com.po4yka.trailglass.feature.map.MapController
 import com.po4yka.trailglass.ui.components.MapView
@@ -122,7 +124,7 @@ private fun MarkerInfoCard(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = marker.title ?: "Unknown location",
+                        text = marker.title ?: stringResource(R.string.map_unknown_location),
                         style = MaterialTheme.typography.titleMedium
                     )
 
@@ -137,7 +139,7 @@ private fun MarkerInfoCard(
                 }
 
                 IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, contentDescription = "Close")
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_close))
                 }
             }
 
@@ -150,18 +152,18 @@ private fun MarkerInfoCard(
                     onClick = onViewDetails,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.Info, contentDescription = null)
+                    Icon(Icons.Default.Info, contentDescription = stringResource(R.string.cd_details))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Details")
+                    Text(stringResource(R.string.action_details))
                 }
 
                 OutlinedButton(
                     onClick = onAddPhoto,
                     modifier = Modifier.weight(1f)
                 ) {
-                    Icon(Icons.Default.AddPhotoAlternate, contentDescription = null)
+                    Icon(Icons.Default.AddPhotoAlternate, contentDescription = stringResource(R.string.cd_add_photo))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("Add Photo")
+                    Text(stringResource(R.string.action_add_photo))
                 }
             }
         }

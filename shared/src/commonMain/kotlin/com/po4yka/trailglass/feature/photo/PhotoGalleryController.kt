@@ -1,5 +1,7 @@
 package com.po4yka.trailglass.feature.photo
 
+import com.po4yka.trailglass.data.storage.SettingsStorage
+import com.po4yka.trailglass.domain.model.PhotoGalleryViewMode
 import com.po4yka.trailglass.domain.model.PhotoGroup
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
@@ -28,6 +30,7 @@ import me.tatarka.inject.annotations.Inject
 class PhotoGalleryController(
     private val getPhotoGalleryUseCase: GetPhotoGalleryUseCase,
     private val importPhotoUseCase: ImportPhotoUseCase,
+    private val settingsStorage: SettingsStorage,
     coroutineScope: CoroutineScope,
     private val userId: String
 ) : Lifecycle {
@@ -44,11 +47,24 @@ class PhotoGalleryController(
         val photoGroups: List<PhotoGroup> = emptyList(),
         val isLoading: Boolean = false,
         val error: String? = null,
-        val showImportDialog: Boolean = false
+        val showImportDialog: Boolean = false,
+        val viewMode: PhotoGalleryViewMode = PhotoGalleryViewMode.GRID
     )
 
     private val _state = MutableStateFlow(GalleryState())
     val state: StateFlow<GalleryState> = _state.asStateFlow()
+
+    init {
+        // Load initial view mode from settings
+        controllerScope.launch {
+            try {
+                val settings = settingsStorage.getSettings()
+                _state.update { it.copy(viewMode = settings.appearanceSettings.photoGalleryViewMode) }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to load initial view mode" }
+            }
+        }
+    }
 
     /** Load photo gallery for recent time period (last 30 days). */
     fun loadGallery() {
@@ -164,6 +180,34 @@ class PhotoGalleryController(
     /** Clear error state. */
     fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+
+    /** Toggle between grid and list view modes. */
+    fun toggleViewMode() {
+        val newMode =
+            if (_state.value.viewMode == PhotoGalleryViewMode.GRID) {
+                PhotoGalleryViewMode.LIST
+            } else {
+                PhotoGalleryViewMode.GRID
+            }
+
+        logger.debug { "Toggling view mode to: $newMode" }
+        _state.update { it.copy(viewMode = newMode) }
+
+        // Save preference
+        controllerScope.launch {
+            try {
+                val currentSettings = settingsStorage.getSettings()
+                val updatedSettings =
+                    currentSettings.copy(
+                        appearanceSettings = currentSettings.appearanceSettings.copy(photoGalleryViewMode = newMode)
+                    )
+                settingsStorage.saveSettings(updatedSettings)
+                logger.debug { "View mode preference saved: $newMode" }
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to save view mode preference" }
+            }
+        }
     }
 
     /**

@@ -20,4 +20,214 @@
     <string name="widget_tracking_active">Tracking active</string>
     <string name="widget_tracking_inactive">Not tracking</string>
     <string name="widget_no_data">No data yet</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_navigate_back">Navigate back</string>
+    <string name="cd_open_settings">Open settings</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_close_menu">Close menu</string>
+    <string name="cd_open_menu">Open menu</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_sort">Sort</string>
+    <string name="cd_refresh">Refresh</string>
+    <string name="cd_create_trip">Create trip</string>
+    <string name="cd_create_region">Create region</string>
+    <string name="cd_add_photo">Add photo</string>
+    <string name="cd_take_photo">Take photo</string>
+    <string name="cd_select_photo">Select photo from gallery</string>
+    <string name="cd_add_note">Add note</string>
+    <string name="cd_check_in">Check in to location</string>
+    <string name="cd_start_tracking">Start tracking</string>
+    <string name="cd_stop_tracking">Stop tracking</string>
+    <string name="cd_toggle_favorite">Toggle favorite</string>
+    <string name="cd_add_to_favorites">Add to favorites</string>
+    <string name="cd_remove_from_favorites">Remove from favorites</string>
+    <string name="cd_follow_location">Follow location</string>
+    <string name="cd_stop_following">Stop following location</string>
+    <string name="cd_fit_to_data">Fit map to data</string>
+    <string name="cd_refresh_map">Refresh map</string>
+    <string name="cd_notifications_enabled">Notifications enabled</string>
+    <string name="cd_notifications_disabled">Notifications disabled</string>
+    <string name="cd_delete">Delete</string>
+    <string name="cd_export">Export diagnostics</string>
+    <string name="cd_clear_logs">Clear logs</string>
+    <string name="cd_share">Share</string>
+    <string name="cd_loading">Loading</string>
+    <string name="cd_details">View details</string>
+    <string name="cd_location">Location</string>
+    <string name="cd_error">Error</string>
+    <string name="cd_warning">Warning</string>
+    <string name="cd_info">Information</string>
+    <string name="cd_success">Success</string>
+
+    <!-- Screens -->
+    <string name="screen_timeline">Timeline</string>
+    <string name="screen_statistics">Statistics &amp; Analytics</string>
+    <string name="screen_map">Map</string>
+    <string name="screen_settings">Settings</string>
+    <string name="screen_trips">Trips</string>
+    <string name="screen_places">Places</string>
+    <string name="screen_photos">Photos</string>
+
+    <!-- Common Actions -->
+    <string name="action_search">Search</string>
+    <string name="action_filter">Filters</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_close">Close</string>
+    <string name="action_details">Details</string>
+    <string name="action_add_photo">Add Photo</string>
+    <string name="action_add_note">Add Note</string>
+    <string name="action_check_in">Check In</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_done">Done</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_reset">Reset</string>
+    <string name="action_apply">Apply</string>
+    <string name="action_import">Import</string>
+    <string name="action_export">Export</string>
+
+    <!-- Timeline -->
+    <string name="timeline_filter_title">Filter Timeline</string>
+    <string name="timeline_filter_transport_types">Transport Types</string>
+    <string name="timeline_filter_place_categories">Place Categories</string>
+    <string name="timeline_filter_options">Options</string>
+    <string name="timeline_day_start">Day Start</string>
+    <string name="timeline_day_end">Day End</string>
+    <string name="timeline_empty_title">No Timeline Data</string>
+    <string name="timeline_empty_message">Start tracking to build your timeline</string>
+
+    <!-- Stats -->
+    <string name="stats_overview">Overview</string>
+    <string name="stats_distance_traveled">Distance Traveled</string>
+    <string name="stats_places_visited">Places Visited</string>
+    <string name="stats_most_visited_places">Most Visited Places</string>
+    <string name="stats_travel_patterns">Travel Patterns</string>
+    <string name="stats_geography">Geography</string>
+    <string name="stats_filter_transport_mode">Filter by Transport Mode</string>
+    <string name="stats_clear_filter">Clear Filter</string>
+    <string name="stats_empty_title">No Statistics Available</string>
+    <string name="stats_empty_message">Track some trips to see your stats</string>
+
+    <!-- Map -->
+    <string name="map_unknown_location">Unknown location</string>
+
+    <!-- Trips -->
+    <string name="trips_total">%1$d total</string>
+    <string name="trips_ongoing">Ongoing</string>
+    <string name="trips_past">Past Trips</string>
+    <string name="trips_all">All Trips</string>
+    <string name="trips_empty_title">No Trips Yet</string>
+    <string name="trips_empty_message">Start tracking your adventures</string>
+    <string name="trips_create">Create Trip</string>
+    <string name="trips_badge_ongoing">Ongoing</string>
+    <string name="trips_badge_auto">Auto</string>
+
+    <!-- Settings -->
+    <string name="settings_location_tracking">Location Tracking</string>
+    <string name="settings_permissions">Permissions</string>
+    <string name="settings_advanced">Advanced</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_developer">Developer</string>
+    <string name="settings_about">About</string>
+
+    <!-- Tracking -->
+    <string name="tracking_status_active">Tracking Active</string>
+    <string name="tracking_status_inactive">Tracking Inactive</string>
+    <string name="tracking_grant_permissions">Grant Permissions</string>
+    <string name="tracking_start">Start Tracking</string>
+    <string name="tracking_stop">Stop Tracking</string>
+
+    <!-- Tracking Modes -->
+    <string name="tracking_mode_title">Tracking Mode</string>
+    <string name="tracking_mode_off">Off</string>
+    <string name="tracking_mode_off_desc">No tracking, GPS off</string>
+    <string name="tracking_mode_efficient">Efficient</string>
+    <string name="tracking_mode_efficient_desc">Major movements only (WiFi/Cell changes)</string>
+    <string name="tracking_mode_balanced">Balanced</string>
+    <string name="tracking_mode_balanced_desc">Periodic updates (5min/500m)</string>
+    <string name="tracking_mode_high">High</string>
+    <string name="tracking_mode_high_desc">Continuous tracking (30sec/10m)</string>
+    <string name="tracking_battery_none">No battery impact</string>
+    <string name="tracking_battery_minimal">Minimal (1-2%% per day)</string>
+    <string name="tracking_battery_low">Low (3-5%% per day)</string>
+    <string name="tracking_battery_moderate">Moderate (10-15%% per day)</string>
+    <string name="tracking_stop_to_change">Stop tracking to change mode</string>
+
+    <!-- Permissions -->
+    <string name="permission_location_title">Location Permission</string>
+    <string name="permission_background_title">Background Location</string>
+    <string name="permission_granted">Granted</string>
+    <string name="permission_not_granted">Not granted</string>
+    <string name="permission_always_allowed">Always allowed</string>
+    <string name="permission_only_while_using">Only while using app</string>
+    <string name="permission_request">Request Permission</string>
+    <string name="permission_background_desc">Enable background location to automatically track trips and visits even when the app is closed.</string>
+    <string name="permission_enable_background">Enable Background Tracking</string>
+
+    <!-- Navigation -->
+    <string name="nav_algorithm_settings">Algorithm Settings</string>
+    <string name="nav_algorithm_settings_desc">Configure distance, bearing, and interpolation</string>
+    <string name="nav_device_management">Device Management</string>
+    <string name="nav_device_management_desc">Manage your connected devices</string>
+    <string name="nav_logs">Logs</string>
+    <string name="nav_logs_desc">View application logs</string>
+    <string name="nav_diagnostics">Diagnostics</string>
+    <string name="nav_diagnostics_desc">View system diagnostics and status</string>
+
+    <!-- About -->
+    <string name="about_app_name">TrailGlass</string>
+    <string name="about_version">Version 1.0.0-alpha</string>
+
+    <!-- Error Messages -->
+    <string name="error_title">Something went wrong</string>
+
+    <!-- Manual Check-in -->
+    <string name="checkin_place_name_hint">e.g., Home, Office, Gym</string>
+    <string name="checkin_category">Category</string>
+    <string name="checkin_description_optional">Description (optional)</string>
+    <string name="checkin_description_hint">Add details about this place...</string>
+    <string name="checkin_address_hint">Enter address or place name</string>
+    <string name="checkin_latitude">Latitude</string>
+    <string name="checkin_latitude_hint">e.g. 37.7749</string>
+    <string name="checkin_longitude">Longitude</string>
+    <string name="checkin_longitude_hint">e.g. -122.4194</string>
+    <string name="checkin_last_entered">Last Entered</string>
+    <string name="checkin_place_name_label">Enter place name...</string>
+
+    <!-- Photo Management -->
+    <string name="photo_caption_optional">Caption (optional)</string>
+    <string name="photo_caption_hint">Add a caption...</string>
+    <string name="photo_attach_visit">Attach to Visit</string>
+    <string name="photo_source_camera">Camera</string>
+    <string name="photo_source_gallery">Gallery</string>
+    <string name="photo_import">Import Photos</string>
+
+    <!-- Note Management -->
+    <string name="note_title_hint">Enter note title...</string>
+    <string name="note_content">Content</string>
+    <string name="note_content_hint">Add any notes about this visit...</string>
+
+    <!-- Trip Management -->
+    <string name="trip_delete_title">Delete Trip?</string>
+    <string name="trip_export_gpx">Export as GPX</string>
+    <string name="trip_export_kml">Export as KML</string>
+
+    <!-- Device Management -->
+    <string name="device_delete_title">Delete Device?</string>
+
+    <!-- Conflict Resolution -->
+    <string name="conflict_keep_mine">Keep My Version</string>
+    <string name="conflict_keep_server">Keep Server Version</string>
+    <string name="conflict_merge">Merge Both</string>
+
+    <!-- Log Levels -->
+    <string name="log_level_debug">DEBUG</string>
+    <string name="log_level_info">INFO</string>
+    <string name="log_level_warn">WARN</string>
+    <string name="log_level_error">ERROR</string>
+    <string name="log_level_all">All</string>
 </resources>

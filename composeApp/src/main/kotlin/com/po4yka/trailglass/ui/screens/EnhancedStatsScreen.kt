@@ -24,8 +24,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.stats.EnhancedStatsController
 import com.po4yka.trailglass.feature.stats.GetStatsUseCase
@@ -69,12 +71,12 @@ fun EnhancedStatsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Statistics & Analytics",
+                    stringResource(R.string.screen_statistics),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold
                 )
                 IconButton(onClick = { controller.refresh() }) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.cd_refresh))
                 }
             }
         }

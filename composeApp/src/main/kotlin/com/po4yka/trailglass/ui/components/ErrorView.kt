@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 
 /** Reusable error view component. */
 @Composable
@@ -42,7 +44,7 @@ fun ErrorView(
             )
 
             Text(
-                text = "Something went wrong",
+                text = stringResource(R.string.error_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -55,7 +57,7 @@ fun ErrorView(
             )
 
             Button(onClick = onRetry) {
-                Text("Retry")
+                Text(stringResource(R.string.action_retry))
             }
         }
     }

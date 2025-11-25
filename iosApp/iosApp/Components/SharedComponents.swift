@@ -19,6 +19,8 @@ struct ErrorView: View {
 
             Button("Retry", action: onRetry)
                 .buttonStyle(.borderedProminent)
+                .accessibilityLabel("Retry")
+                .accessibilityHint("Retry the failed operation")
         }
         .padding()
         .frame(maxWidth: .infinity)

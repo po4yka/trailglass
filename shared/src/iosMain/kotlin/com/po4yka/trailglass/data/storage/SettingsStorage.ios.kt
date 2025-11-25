@@ -6,6 +6,7 @@ import com.po4yka.trailglass.domain.model.AppTheme
 import com.po4yka.trailglass.domain.model.AppearanceSettings
 import com.po4yka.trailglass.domain.model.DataManagement
 import com.po4yka.trailglass.domain.model.DistanceUnit
+import com.po4yka.trailglass.domain.model.PhotoGalleryViewMode
 import com.po4yka.trailglass.domain.model.PrivacySettings
 import com.po4yka.trailglass.domain.model.TemperatureUnit
 import com.po4yka.trailglass.domain.model.TimeFormat
@@ -54,6 +55,7 @@ class IOSSettingsStorage : SettingsStorage {
         const val APPEARANCE_DEVICE_WALLPAPER = "appearance_device_wallpaper"
         const val APPEARANCE_MAP_IN_TIMELINE = "appearance_map_in_timeline"
         const val APPEARANCE_COMPACT_VIEW = "appearance_compact_view"
+        const val APPEARANCE_PHOTO_GALLERY_VIEW_MODE = "appearance_photo_gallery_view_mode"
 
         // Account
         const val ACCOUNT_EMAIL = "account_email"
@@ -96,6 +98,7 @@ class IOSSettingsStorage : SettingsStorage {
         userDefaults.setBool(settings.appearanceSettings.useDeviceWallpaper, Keys.APPEARANCE_DEVICE_WALLPAPER)
         userDefaults.setBool(settings.appearanceSettings.showMapInTimeline, Keys.APPEARANCE_MAP_IN_TIMELINE)
         userDefaults.setBool(settings.appearanceSettings.compactView, Keys.APPEARANCE_COMPACT_VIEW)
+        userDefaults.setObject(settings.appearanceSettings.photoGalleryViewMode.name, Keys.APPEARANCE_PHOTO_GALLERY_VIEW_MODE)
 
         // Account
         settings.accountSettings.email?.let { userDefaults.setObject(it, Keys.ACCOUNT_EMAIL) }
@@ -140,6 +143,7 @@ class IOSSettingsStorage : SettingsStorage {
             Keys.APPEARANCE_DEVICE_WALLPAPER,
             Keys.APPEARANCE_MAP_IN_TIMELINE,
             Keys.APPEARANCE_COMPACT_VIEW,
+            Keys.APPEARANCE_PHOTO_GALLERY_VIEW_MODE,
             Keys.ACCOUNT_EMAIL,
             Keys.ACCOUNT_AUTO_SYNC,
             Keys.ACCOUNT_SYNC_WIFI_ONLY,
@@ -239,7 +243,11 @@ class IOSSettingsStorage : SettingsStorage {
                         } else {
                             true
                         },
-                    compactView = userDefaults.boolForKey(Keys.APPEARANCE_COMPACT_VIEW)
+                    compactView = userDefaults.boolForKey(Keys.APPEARANCE_COMPACT_VIEW),
+                    photoGalleryViewMode =
+                        (userDefaults.stringForKey(Keys.APPEARANCE_PHOTO_GALLERY_VIEW_MODE) as? String)?.let {
+                            PhotoGalleryViewMode.valueOf(it)
+                        } ?: PhotoGalleryViewMode.GRID
                 ),
             accountSettings =
                 AccountSettings(

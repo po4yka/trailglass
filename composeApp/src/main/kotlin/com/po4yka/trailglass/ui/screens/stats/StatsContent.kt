@@ -14,8 +14,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.domain.model.TransportType
 import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
 import com.po4yka.trailglass.ui.components.TransportModeSelector
@@ -47,7 +49,7 @@ fun EnhancedStatsContent(
         }
 
         item {
-            SectionHeader("Overview")
+            SectionHeader(stringResource(R.string.stats_overview))
         }
 
         item {
@@ -55,7 +57,7 @@ fun EnhancedStatsContent(
         }
 
         item {
-            SectionHeader("Distance Traveled")
+            SectionHeader(stringResource(R.string.stats_distance_traveled))
         }
 
         item {
@@ -69,7 +71,7 @@ fun EnhancedStatsContent(
         }
 
         item {
-            SectionHeader("Places Visited")
+            SectionHeader(stringResource(R.string.stats_places_visited))
         }
 
         item {
@@ -84,7 +86,7 @@ fun EnhancedStatsContent(
 
         if (filteredStats.placeStats.mostVisitedPlaces.isNotEmpty()) {
             item {
-                SectionHeader("Most Visited Places")
+                SectionHeader(stringResource(R.string.stats_most_visited_places))
             }
 
             filteredStats.placeStats.mostVisitedPlaces.take(5).forEach { place ->
@@ -95,7 +97,7 @@ fun EnhancedStatsContent(
         }
 
         item {
-            SectionHeader("Travel Patterns")
+            SectionHeader(stringResource(R.string.stats_travel_patterns))
         }
 
         item {
@@ -109,7 +111,7 @@ fun EnhancedStatsContent(
         }
 
         item {
-            SectionHeader("Geography")
+            SectionHeader(stringResource(R.string.stats_geography))
         }
 
         item {
@@ -132,7 +134,7 @@ private fun TransportFilterCard(
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Filter by Transport Mode",
+                stringResource(R.string.stats_filter_transport_mode),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -154,17 +156,13 @@ private fun TransportFilterCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Showing: ${
-                            selectedTransportMode.name.lowercase().replaceFirstChar {
-                                it.uppercase()
-                            }
-                        }",
+                        "Showing ${selectedTransportMode.name.lowercase().replaceFirstChar { it.uppercase() }} mode",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     )
                     TextButton(onClick = { onTransportModeSelected(selectedTransportMode) }) {
-                        Text("Clear Filter")
+                        Text(stringResource(R.string.stats_clear_filter))
                     }
                 }
             }

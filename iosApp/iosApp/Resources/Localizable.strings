@@ -1,0 +1,133 @@
+/* TrailGlass iOS Localization */
+
+/* Screens */
+"screen.timeline" = "Timeline";
+"screen.statistics" = "Statistics";
+"screen.map" = "Map";
+"screen.settings" = "Settings";
+"screen.trips" = "Trips";
+"screen.places" = "Places";
+"screen.photos" = "Photos";
+"screen.showcase" = "Showcase";
+
+/* Common Actions */
+"action.search" = "Search";
+"action.filter" = "Filter";
+"action.refresh" = "Refresh";
+"action.close" = "Close";
+"action.details" = "Details";
+"action.add_photo" = "Add Photo";
+"action.add_note" = "Add Note";
+"action.check_in" = "Check In";
+"action.save" = "Save";
+"action.cancel" = "Cancel";
+"action.delete" = "Delete";
+"action.done" = "Done";
+"action.confirm" = "Confirm";
+"action.dismiss" = "Dismiss";
+"action.retry" = "Retry";
+"action.reset" = "Reset";
+"action.apply" = "Apply";
+"action.import" = "Import";
+"action.export" = "Export";
+
+/* Timeline */
+"timeline.filter_title" = "Filter Timeline";
+"timeline.filter_transport_types" = "Transport Types";
+"timeline.filter_place_categories" = "Place Categories";
+"timeline.filter_options" = "Options";
+"timeline.day_start" = "Day Start";
+"timeline.day_end" = "Day End";
+"timeline.empty.title" = "No Timeline Data";
+"timeline.empty.message" = "Start tracking to build your timeline";
+"timeline.day_view" = "Day View";
+"timeline.week_view" = "Week View";
+"timeline.month_view" = "Month View";
+"timeline.year_view" = "Year View";
+"timeline.items_available" = "Timeline items available: %d";
+
+/* Stats */
+"stats.overview" = "Overview";
+"stats.distance_traveled" = "Distance Traveled";
+"stats.places_visited" = "Places Visited";
+"stats.most_visited_places" = "Most Visited Places";
+"stats.travel_patterns" = "Travel Patterns";
+"stats.geography" = "Geography";
+"stats.filter_transport_mode" = "Filter by Transport Mode";
+"stats.clear_filter" = "Clear Filter";
+"stats.empty.title" = "No Statistics Available";
+"stats.empty.message" = "Track some trips to see your stats";
+"stats.year_overview" = "Year Overview";
+"stats.month_overview" = "Month Overview";
+"stats.no_stats" = "No stats available";
+
+/* Map */
+"map.unknown_location" = "Unknown location";
+
+/* Trips */
+"trips.total" = "%d total";
+"trips.ongoing" = "Ongoing";
+"trips.past" = "Past Trips";
+"trips.all" = "All Trips";
+"trips.empty.title" = "No Trips Yet";
+"trips.empty.message" = "Start tracking your adventures";
+"trips.create" = "Create Trip";
+"trips.badge.ongoing" = "Ongoing";
+"trips.badge.auto" = "Auto";
+
+/* Settings */
+"settings.location_tracking" = "Location Tracking";
+"settings.permissions" = "Permissions";
+"settings.advanced" = "Advanced";
+"settings.account" = "Account";
+"settings.developer" = "Developer";
+"settings.about" = "About";
+
+/* Tracking */
+"tracking.status_active" = "Tracking Active";
+"tracking.status_inactive" = "Tracking Inactive";
+"tracking.grant_permissions" = "Grant Permissions";
+"tracking.start" = "Start Tracking";
+"tracking.stop" = "Stop Tracking";
+
+/* Tracking Modes */
+"tracking.mode_title" = "Tracking Mode";
+"tracking.mode_off" = "Off";
+"tracking.mode_off_desc" = "No tracking, GPS off";
+"tracking.mode_efficient" = "Efficient";
+"tracking.mode_efficient_desc" = "Major movements only (WiFi/Cell changes)";
+"tracking.mode_balanced" = "Balanced";
+"tracking.mode_balanced_desc" = "Periodic updates (5min/500m)";
+"tracking.mode_high" = "High";
+"tracking.mode_high_desc" = "Continuous tracking (30sec/10m)";
+"tracking.battery_none" = "No battery impact";
+"tracking.battery_minimal" = "Minimal (1-2% per day)";
+"tracking.battery_low" = "Low (3-5% per day)";
+"tracking.battery_moderate" = "Moderate (10-15% per day)";
+"tracking.stop_to_change" = "Stop tracking to change mode";
+
+/* Permissions */
+"permission.location_title" = "Location Permission";
+"permission.background_title" = "Background Location";
+"permission.granted" = "Granted";
+"permission.not_granted" = "Not granted";
+"permission.always_allowed" = "Always allowed";
+"permission.only_while_using" = "Only while using app";
+"permission.request" = "Request Permission";
+"permission.background_desc" = "Enable background location to automatically track trips and visits even when the app is closed.";
+"permission.enable_background" = "Enable Background Tracking";
+
+/* About */
+"about.app_name" = "TrailGlass";
+"about.version" = "Version 1.0.0-alpha";
+
+/* Error Messages */
+"error.title" = "Something went wrong";
+
+/* Accessibility */
+"accessibility.done" = "Done";
+"accessibility.close_settings" = "Close settings and return to the previous screen";
+"accessibility.refresh" = "Refresh";
+"accessibility.search" = "Search";
+"accessibility.filter" = "Filter";
+"accessibility.settings" = "Settings";

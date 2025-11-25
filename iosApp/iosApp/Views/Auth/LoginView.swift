@@ -120,6 +120,8 @@ struct LoginView: View {
                             Image(systemName: viewModel.passwordVisible ? "eye.slash" : "eye")
                                 .foregroundColor(.gray)
                         }
+                        .accessibilityLabel(viewModel.passwordVisible ? "Hide password" : "Show password")
+                        .accessibilityHint("Toggles password visibility")
                     }
                     .padding()
                     .background(Color(UIColor.secondarySystemBackground))
@@ -134,6 +136,8 @@ struct LoginView: View {
                             .font(.body)
                     }
                     .disabled(viewModel.isLoading)
+                    .accessibilityLabel("Forgot password")
+                    .accessibilityHint("Navigate to password recovery")
                 }
 
                 // Login button
@@ -152,6 +156,8 @@ struct LoginView: View {
                 .foregroundColor(.white)
                 .cornerRadius(12)
                 .disabled(!viewModel.canLogin || viewModel.isLoading)
+                .accessibilityLabel(viewModel.isLoading ? "Logging in" : "Log In")
+                .accessibilityHint(viewModel.canLogin ? "Log in with your email and password" : "Enter email and password to log in")
 
                 // Register link
                 HStack {
@@ -163,6 +169,8 @@ struct LoginView: View {
                             .fontWeight(.semibold)
                     }
                     .disabled(viewModel.isLoading)
+                    .accessibilityLabel("Sign up")
+                    .accessibilityHint("Navigate to create a new account")
                 }
 
                 // Continue as Guest
@@ -177,6 +185,8 @@ struct LoginView: View {
                     }
                 }
                 .disabled(viewModel.isLoading)
+                .accessibilityLabel("Continue as Guest")
+                .accessibilityHint("Use the app without creating an account, data stored locally only")
 
                 Text("No account needed. All data stored locally only.")
                     .font(.caption)

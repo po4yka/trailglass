@@ -214,6 +214,8 @@ struct LargeFlexibleNavigationBar<Subtitle: View, Background: View>: View {
                                     .font(.system(size: 20, weight: .medium))
                                     .foregroundColor(.coolSteel)
                             }
+                            .accessibilityLabel(action.accessibilityLabel ?? "")
+                            .accessibilityHint(action.accessibilityHint ?? "")
                         }
                     }
                     .padding(.trailing, 16)
@@ -280,6 +282,8 @@ struct MediumFlexibleNavigationBar<Subtitle: View>: View {
                                     .font(.system(size: 18, weight: .medium))
                                     .foregroundColor(.coolSteel)
                             }
+                            .accessibilityLabel(action.accessibilityLabel ?? "")
+                            .accessibilityHint(action.accessibilityHint ?? "")
                         }
                     }
                     .padding(.trailing, 16)
@@ -294,7 +298,16 @@ struct MediumFlexibleNavigationBar<Subtitle: View>: View {
 struct NavigationAction: Identifiable {
     let id = UUID()
     let icon: String
+    let accessibilityLabel: String?
+    let accessibilityHint: String?
     let action: () -> Void
+
+    init(icon: String, accessibilityLabel: String? = nil, accessibilityHint: String? = nil, action: @escaping () -> Void) {
+        self.icon = icon
+        self.accessibilityLabel = accessibilityLabel
+        self.accessibilityHint = accessibilityHint
+        self.action = action
+    }
 }
 
 /// Convenience extension for common navigation bar patterns

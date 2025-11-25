@@ -25,9 +25,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BrokenImage
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.ViewList
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
@@ -50,9 +52,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
+import com.po4yka.trailglass.domain.model.PhotoGalleryViewMode
 import com.po4yka.trailglass.domain.model.PhotoGroup
 import com.po4yka.trailglass.domain.model.PhotoWithMetadata
 import com.po4yka.trailglass.ui.components.ErrorView
+import com.po4yka.trailglass.ui.components.PhotoList
 
 /** Photo gallery screen showing photos grouped by date. */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +78,20 @@ fun PhotoGalleryScreen(
             TopAppBar(
                 title = { Text("Photos") },
                 actions = {
+                    IconButton(onClick = { controller.toggleViewMode() }) {
+                        Icon(
+                            imageVector = if (state.viewMode == PhotoGalleryViewMode.GRID) {
+                                Icons.Default.ViewList
+                            } else {
+                                Icons.Default.GridView
+                            },
+                            contentDescription = if (state.viewMode == PhotoGalleryViewMode.GRID) {
+                                "Switch to list view"
+                            } else {
+                                "Switch to grid view"
+                            }
+                        )
+                    }
                     IconButton(onClick = { controller.importPhotos() }) {
                         Icon(Icons.Default.Add, contentDescription = "Import Photos")
                     }
@@ -112,6 +130,7 @@ fun PhotoGalleryScreen(
             state.photoGroups.isNotEmpty() -> {
                 PhotoGalleryContent(
                     photoGroups = state.photoGroups,
+                    viewMode = state.viewMode,
                     onPhotoClick = onPhotoClick,
                     modifier =
                         Modifier
@@ -136,6 +155,7 @@ fun PhotoGalleryScreen(
 @Composable
 private fun PhotoGalleryContent(
     photoGroups: List<PhotoGroup>,
+    viewMode: PhotoGalleryViewMode,
     onPhotoClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -147,6 +167,7 @@ private fun PhotoGalleryContent(
         items(photoGroups) { group ->
             PhotoGroupSection(
                 group = group,
+                viewMode = viewMode,
                 onPhotoClick = onPhotoClick
             )
         }
@@ -156,6 +177,7 @@ private fun PhotoGalleryContent(
 @Composable
 private fun PhotoGroupSection(
     group: PhotoGroup,
+    viewMode: PhotoGalleryViewMode,
     onPhotoClick: (String) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -187,11 +209,21 @@ private fun PhotoGroupSection(
             )
         }
 
-        // Photo grid
-        PhotoGroupGrid(
-            photos = group.photos,
-            onPhotoClick = onPhotoClick
-        )
+        // Photo grid or list based on view mode
+        when (viewMode) {
+            PhotoGalleryViewMode.GRID -> {
+                PhotoGroupGrid(
+                    photos = group.photos,
+                    onPhotoClick = onPhotoClick
+                )
+            }
+            PhotoGalleryViewMode.LIST -> {
+                PhotoList(
+                    photos = group.photos,
+                    onPhotoClick = onPhotoClick
+                )
+            }
+        }
     }
 }
 
@@ -332,10 +364,13 @@ interface PhotoGalleryController {
     fun importPhotos()
 
     fun refresh()
+
+    fun toggleViewMode()
 }
 
 data class PhotoGalleryState(
     val photoGroups: List<PhotoGroup> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
+    val viewMode: PhotoGalleryViewMode = PhotoGalleryViewMode.GRID
 )

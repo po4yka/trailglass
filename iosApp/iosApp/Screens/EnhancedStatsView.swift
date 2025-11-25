@@ -19,7 +19,7 @@ struct EnhancedStatsView: View {
         VStack(spacing: 0) {
             // Large flexible navigation bar with chart preview background
             LargeFlexibleNavigationBar(
-                title: "Statistics",
+                title: String(localized: "screen.statistics"),
                 scrollOffset: scrollOffset,
                 actions: [
                     NavigationAction(icon: "arrow.clockwise") {
@@ -30,7 +30,7 @@ struct EnhancedStatsView: View {
                     }
                 ],
                 subtitle: {
-                    Text(viewModel.selectedPeriod == .year ? "Year Overview" : "Month Overview")
+                    Text(viewModel.selectedPeriod == .year ? String(localized: "stats.year_overview") : String(localized: "stats.month_overview"))
                 },
                 backgroundContent: {
                     HeroGradientBackground(
@@ -51,7 +51,7 @@ struct EnhancedStatsView: View {
             } else if let stats = viewModel.stats {
                 StatsContent(stats: stats, viewModel: viewModel, scrollOffset: $scrollOffset)
             } else {
-                Text("No stats available")
+                Text(String(localized: "stats.no_stats"))
                     .foregroundColor(.secondary)
             }
         }

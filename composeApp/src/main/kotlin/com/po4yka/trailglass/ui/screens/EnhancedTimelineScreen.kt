@@ -25,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.feature.timeline.EnhancedTimelineController
 import com.po4yka.trailglass.ui.components.ErrorView
 import com.po4yka.trailglass.ui.screens.timeline.ActiveFiltersChips
@@ -67,13 +69,13 @@ fun EnhancedTimelineScreen(
                             }
                         )
                     } else {
-                        Text("Timeline")
+                        Text(stringResource(R.string.screen_timeline))
                     }
                 },
                 actions = {
                     if (!showSearchBar) {
                         IconButton(onClick = { showSearchBar = true }) {
-                            Icon(Icons.Default.Search, contentDescription = "Search")
+                            Icon(Icons.Default.Search, contentDescription = stringResource(R.string.cd_search))
                         }
                         IconButton(onClick = { showFilterSheet = true }) {
                             Badge(
@@ -88,10 +90,10 @@ fun EnhancedTimelineScreen(
                                     Text("${state.filter.activeFilterCount}")
                                 }
                             }
-                            Icon(Icons.Default.FilterList, contentDescription = "Filters")
+                            Icon(Icons.Default.FilterList, contentDescription = stringResource(R.string.action_filter))
                         }
                         IconButton(onClick = { controller.refresh() }) {
-                            Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                            Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.cd_refresh))
                         }
                     }
                 }

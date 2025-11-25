@@ -47,6 +47,19 @@ private struct ModeButton: View {
         )
         .scaleEffect(isSelected ? 1.0 : 0.95)
         .animation(MotionConfig.quickSpring, value: isSelected)
+        .accessibilityLabel(accessibilityLabelForMode(mode))
+        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to switch to this visualization mode")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
+    }
+
+    private func accessibilityLabelForMode(_ mode: MapVisualizationMode) -> String {
+        switch mode {
+        case .markers: return "Markers view"
+        case .clusters: return "Clusters view"
+        case .heatmap: return "Heatmap view"
+        case .hybrid: return "Hybrid view"
+        default: return "Map view"
+        }
     }
 
     private var backgroundColor: Color {
@@ -117,6 +130,8 @@ private struct MapOptionToggle: View {
             Toggle("", isOn: $isOn)
                 .labelsHidden()
                 .tint(.coastalPath)
+                .accessibilityLabel("\(label) toggle")
+                .accessibilityHint(isOn ? "Double tap to disable \(label.lowercased())" : "Double tap to enable \(label.lowercased())")
         }
         .animation(MotionConfig.standardSpring, value: isOn)
     }

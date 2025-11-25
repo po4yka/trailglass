@@ -40,8 +40,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.domain.model.Trip
 import com.po4yka.trailglass.ui.theme.MorphableShapes
 import com.po4yka.trailglass.ui.theme.animateShapeMorph
@@ -64,7 +66,7 @@ fun TripsScreen(
                 onClick = onCreateTrip,
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create Trip")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.cd_create_trip))
             }
         }
     ) { paddingValues ->
@@ -107,18 +109,18 @@ private fun TripsContent(
             ) {
                 Column {
                     Text(
-                        text = "Trips",
+                        text = stringResource(R.string.screen_trips),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "${trips.size} total",
+                        text = stringResource(R.string.trips_total, trips.size),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = onRefresh) {
-                    Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.cd_refresh))
                 }
             }
         }
@@ -130,7 +132,7 @@ private fun TripsContent(
         // Ongoing trips section
         if (ongoingTrips.isNotEmpty()) {
             item {
-                SectionHeader("Ongoing")
+                SectionHeader(stringResource(R.string.trips_ongoing))
             }
             items(ongoingTrips) { trip ->
                 TripCard(
@@ -143,7 +145,11 @@ private fun TripsContent(
         // Completed trips section
         if (completedTrips.isNotEmpty()) {
             item {
-                SectionHeader(if (ongoingTrips.isNotEmpty()) "Past Trips" else "All Trips")
+                SectionHeader(
+                    stringResource(
+                        if (ongoingTrips.isNotEmpty()) R.string.trips_past else R.string.trips_all
+                    )
+                )
             }
             items(completedTrips) { trip ->
                 TripCard(
@@ -225,7 +231,7 @@ private fun TripCard(
                         )
                         if (trip.isOngoing) {
                             Badge {
-                                Text("Ongoing")
+                                Text(stringResource(R.string.trips_badge_ongoing))
                             }
                         }
                     }
@@ -253,7 +259,7 @@ private fun TripCard(
                         color = MaterialTheme.colorScheme.tertiaryContainer
                     ) {
                         Text(
-                            text = "Auto",
+                            text = stringResource(R.string.trips_badge_auto),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onTertiaryContainer,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -339,19 +345,19 @@ private fun EmptyTripsView(
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "No Trips Yet",
+                text = stringResource(R.string.trips_empty_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "Start tracking your adventures",
+                text = stringResource(R.string.trips_empty_message),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Button(onClick = onCreateTrip) {
                 Icon(Icons.Default.Add, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Create Trip")
+                Text(stringResource(R.string.trips_create))
             }
         }
     }

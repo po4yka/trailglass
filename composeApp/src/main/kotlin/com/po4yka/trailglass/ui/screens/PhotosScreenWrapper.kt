@@ -43,7 +43,8 @@ fun PhotosScreenWrapper(
                                 PhotoGalleryState(
                                     photoGroups = sharedState.photoGroups,
                                     isLoading = sharedState.isLoading,
-                                    error = sharedState.error
+                                    error = sharedState.error,
+                                    viewMode = sharedState.viewMode
                                 )
                         }
                     }
@@ -59,6 +60,10 @@ fun PhotosScreenWrapper(
 
             override fun refresh() {
                 photoGalleryController.refresh()
+            }
+
+            override fun toggleViewMode() {
+                photoGalleryController.toggleViewMode()
             }
         }
 

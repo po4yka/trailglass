@@ -26,8 +26,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.feature.timeline.GetTimelineUseCase
 import com.po4yka.trailglass.feature.timeline.TimelineFilter
 import com.po4yka.trailglass.feature.timeline.TimelineZoomLevel
@@ -46,11 +48,11 @@ fun EnhancedTimelineContent(
         items(items) { item ->
             when (item) {
                 is GetTimelineUseCase.TimelineItemUI.DayStartUI -> {
-                    DayMarkerCard(text = "Day Start", icon = Icons.Default.WbSunny)
+                    DayMarkerCard(text = stringResource(R.string.timeline_day_start), icon = Icons.Default.WbSunny)
                 }
 
                 is GetTimelineUseCase.TimelineItemUI.DayEndUI -> {
-                    DayMarkerCard(text = "Day End", icon = Icons.Default.NightsStay)
+                    DayMarkerCard(text = stringResource(R.string.timeline_day_end), icon = Icons.Default.NightsStay)
                 }
 
                 is GetTimelineUseCase.TimelineItemUI.VisitUI -> {
@@ -97,7 +99,7 @@ fun TimelineFilterBottomSheet(
                     .padding(bottom = 24.dp)
         ) {
             Text(
-                "Filter Timeline",
+                stringResource(R.string.timeline_filter_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -107,7 +109,7 @@ fun TimelineFilterBottomSheet(
             LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 // Transport types
                 item {
-                    FilterSection(title = "Transport Types") {
+                    FilterSection(title = stringResource(R.string.timeline_filter_transport_types)) {
                         TransportTypeFilterChips(
                             selectedTypes = localFilter.transportTypes,
                             onTypeToggled = { type ->
@@ -124,7 +126,7 @@ fun TimelineFilterBottomSheet(
 
                 // Place categories
                 item {
-                    FilterSection(title = "Place Categories") {
+                    FilterSection(title = stringResource(R.string.timeline_filter_place_categories)) {
                         PlaceCategoryFilterChips(
                             selectedCategories = localFilter.placeCategories,
                             onCategoryToggled = { category ->
@@ -147,7 +149,7 @@ fun TimelineFilterBottomSheet(
 
                 // Favorites only
                 item {
-                    FilterSection(title = "Options") {
+                    FilterSection(title = stringResource(R.string.timeline_filter_options)) {
                         FavoritesFilterSwitch(
                             showOnlyFavorites = localFilter.showOnlyFavorites,
                             onToggled = { localFilter = localFilter.copy(showOnlyFavorites = it) }
@@ -167,7 +169,7 @@ fun TimelineFilterBottomSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Reset")
+                            Text(stringResource(R.string.action_reset))
                         }
                         Button(
                             onClick = {
@@ -176,7 +178,7 @@ fun TimelineFilterBottomSheet(
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Apply")
+                            Text(stringResource(R.string.action_apply))
                         }
                     }
                 }

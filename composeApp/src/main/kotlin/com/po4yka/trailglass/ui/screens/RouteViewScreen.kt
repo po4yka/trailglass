@@ -339,7 +339,7 @@ fun RouteViewScreen(
                         ) {
                             Icon(
                                 Icons.Default.Error,
-                                contentDescription = null,
+                                contentDescription = "Error loading route",
                                 modifier = Modifier.size(64.dp),
                                 tint = MaterialTheme.colorScheme.error
                             )
@@ -349,7 +349,7 @@ fun RouteViewScreen(
                                 color = MaterialTheme.colorScheme.error
                             )
                             Button(onClick = { controller.loadRoute(tripId) }) {
-                                Icon(Icons.Default.Refresh, contentDescription = null)
+                                Icon(Icons.Default.Refresh, contentDescription = "Retry loading route")
                                 Spacer(Modifier.width(8.dp))
                                 Text("Retry")
                             }

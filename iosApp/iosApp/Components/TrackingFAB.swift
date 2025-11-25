@@ -33,7 +33,9 @@ struct TrackingFAB: View {
                         FABMenuItem(
                             icon: "location.fill",
                             label: "Check In",
-                            tint: .neutralCategory
+                            tint: .neutralCategory,
+                            accessibilityLabel: "Check In",
+                            accessibilityHint: "Manually check in to your current location"
                         ) {
                             onCheckIn()
                             withAnimation(MotionConfig.smooth) {
@@ -50,7 +52,9 @@ struct TrackingFAB: View {
                         FABMenuItem(
                             icon: "note.text",
                             label: "Add Note",
-                            tint: .blueSlate
+                            tint: .blueSlate,
+                            accessibilityLabel: "Add Note",
+                            accessibilityHint: "Create a new note entry for your journey"
                         ) {
                             onAddNote()
                             withAnimation(MotionConfig.smooth) {
@@ -67,7 +71,9 @@ struct TrackingFAB: View {
                         FABMenuItem(
                             icon: "camera.fill",
                             label: "Add Photo",
-                            tint: .coolSteel
+                            tint: .coolSteel,
+                            accessibilityLabel: "Add Photo",
+                            accessibilityHint: "Attach a photo to your current location"
                         ) {
                             onAddPhoto()
                             withAnimation(MotionConfig.smooth) {
@@ -84,7 +90,9 @@ struct TrackingFAB: View {
                         FABMenuItem(
                             icon: isTracking ? "stop.fill" : "play.fill",
                             label: isTracking ? "Stop Tracking" : "Start Tracking",
-                            tint: isTracking ? .adaptiveWarning : .activeRoute
+                            tint: isTracking ? .adaptiveWarning : .activeRoute,
+                            accessibilityLabel: isTracking ? "Stop Tracking" : "Start Tracking",
+                            accessibilityHint: isTracking ? "Stop recording your location" : "Begin recording your location"
                         ) {
                             onToggleTracking()
                             withAnimation(MotionConfig.smooth) {
@@ -105,6 +113,10 @@ struct TrackingFAB: View {
                     isExpanded: $isExpanded,
                     isTracking: isTracking
                 )
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(isExpanded ? "Close menu" : "Open tracking menu")
+                .accessibilityHint(isExpanded ? "Closes the tracking action menu" : "Opens menu with tracking, photo, note, and check-in options")
+                .accessibilityAddTraits(.isButton)
             }
             .padding(16)
         }
@@ -144,6 +156,8 @@ private struct FABMenuItem: View {
     let icon: String
     let label: String
     let tint: Color
+    let accessibilityLabel: String
+    let accessibilityHint: String
     let action: () -> Void
 
     @State private var isPressed = false
@@ -177,6 +191,8 @@ private struct FABMenuItem: View {
                     .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
             }
             .buttonStyle(PressableButtonStyle())
+            .accessibilityLabel(accessibilityLabel)
+            .accessibilityHint(accessibilityHint)
         }
     }
 }

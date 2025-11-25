@@ -17,6 +17,7 @@ import com.po4yka.trailglass.domain.model.AppTheme
 import com.po4yka.trailglass.domain.model.AppearanceSettings
 import com.po4yka.trailglass.domain.model.DataManagement
 import com.po4yka.trailglass.domain.model.DistanceUnit
+import com.po4yka.trailglass.domain.model.PhotoGalleryViewMode
 import com.po4yka.trailglass.domain.model.PrivacySettings
 import com.po4yka.trailglass.domain.model.TemperatureUnit
 import com.po4yka.trailglass.domain.model.TimeFormat
@@ -64,6 +65,7 @@ class AndroidSettingsStorage(
         val APPEARANCE_DEVICE_WALLPAPER = booleanPreferencesKey("appearance_device_wallpaper")
         val APPEARANCE_MAP_IN_TIMELINE = booleanPreferencesKey("appearance_map_in_timeline")
         val APPEARANCE_COMPACT_VIEW = booleanPreferencesKey("appearance_compact_view")
+        val APPEARANCE_PHOTO_GALLERY_VIEW_MODE = stringPreferencesKey("appearance_photo_gallery_view_mode")
 
         // Account
         val ACCOUNT_EMAIL = stringPreferencesKey("account_email")
@@ -120,6 +122,7 @@ class AndroidSettingsStorage(
             preferences[Keys.APPEARANCE_DEVICE_WALLPAPER] = settings.appearanceSettings.useDeviceWallpaper
             preferences[Keys.APPEARANCE_MAP_IN_TIMELINE] = settings.appearanceSettings.showMapInTimeline
             preferences[Keys.APPEARANCE_COMPACT_VIEW] = settings.appearanceSettings.compactView
+            preferences[Keys.APPEARANCE_PHOTO_GALLERY_VIEW_MODE] = settings.appearanceSettings.photoGalleryViewMode.name
 
             // Account
             settings.accountSettings.email?.let { preferences[Keys.ACCOUNT_EMAIL] = it }
@@ -191,7 +194,11 @@ class AndroidSettingsStorage(
                         } ?: AppTheme.SYSTEM,
                     useDeviceWallpaper = this[Keys.APPEARANCE_DEVICE_WALLPAPER] ?: false,
                     showMapInTimeline = this[Keys.APPEARANCE_MAP_IN_TIMELINE] ?: true,
-                    compactView = this[Keys.APPEARANCE_COMPACT_VIEW] ?: false
+                    compactView = this[Keys.APPEARANCE_COMPACT_VIEW] ?: false,
+                    photoGalleryViewMode =
+                        this[Keys.APPEARANCE_PHOTO_GALLERY_VIEW_MODE]?.let {
+                            PhotoGalleryViewMode.valueOf(it)
+                        } ?: PhotoGalleryViewMode.GRID
                 ),
             accountSettings =
                 AccountSettings(

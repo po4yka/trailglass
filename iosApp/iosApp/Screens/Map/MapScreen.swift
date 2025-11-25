@@ -64,16 +64,16 @@ struct MapScreen: View {
                 title: "Map",
                 scrollOffset: scrollOffset,
                 actions: [
-                    NavigationAction(icon: "mappin.and.ellipse") {
+                    NavigationAction(icon: "mappin.and.ellipse", accessibilityLabel: "Places", accessibilityHint: "View all saved places") {
                         showPlacesSheet = true
                     },
-                    NavigationAction(icon: "location.fill") {
+                    NavigationAction(icon: "location.fill", accessibilityLabel: "Center on location", accessibilityHint: "Center map on your current location") {
                         viewModel.centerOnUserLocation()
                     },
-                    NavigationAction(icon: "rectangle.expand.vertical") {
+                    NavigationAction(icon: "rectangle.expand.vertical", accessibilityLabel: "Fit all markers", accessibilityHint: "Adjust map view to show all markers") {
                         viewModel.fitAllMarkers()
                     },
-                    NavigationAction(icon: "arrow.clockwise") {
+                    NavigationAction(icon: "arrow.clockwise", accessibilityLabel: "Refresh", accessibilityHint: "Reload map data") {
                         viewModel.refreshData()
                     }
                 ],

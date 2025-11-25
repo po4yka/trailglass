@@ -167,6 +167,9 @@ private struct TransportModeButton: View {
             .scaleEffect(isSelected ? 1.05 : 1.0)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(modeName) transport mode")
+        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to filter by \(modeName)")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 
@@ -292,6 +295,9 @@ private struct CompactModeButton: View {
             .scaleEffect(isSelected ? 1.1 : 1.0)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel("\(mode.name.lowercased().capitalized) transport mode")
+        .accessibilityHint(isSelected ? "Currently selected" : "Double tap to filter by \(mode.name.lowercased().capitalized)")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 

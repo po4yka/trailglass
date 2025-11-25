@@ -17,14 +17,14 @@ struct MainTabView: View {
         // Using 4 main tabs: Stats, Timeline, Map, Trips
         // Settings moved to toolbar, Photos/Places accessible via nested navigation
         var baseTabs = [
-            TabItem(title: "Stats", icon: "chart.bar.fill", tag: 0),
-            TabItem(title: "Timeline", icon: "clock.fill", tag: 1),
-            TabItem(title: "Map", icon: "map.fill", tag: 2),
-            TabItem(title: "Trips", icon: "suitcase.fill", tag: 3)
+            TabItem(title: String(localized: "screen.statistics"), icon: "chart.bar.fill", tag: 0),
+            TabItem(title: String(localized: "screen.timeline"), icon: "clock.fill", tag: 1),
+            TabItem(title: String(localized: "screen.map"), icon: "map.fill", tag: 2),
+            TabItem(title: String(localized: "screen.trips"), icon: "suitcase.fill", tag: 3)
         ]
 
         #if DEBUG
-        baseTabs.append(TabItem(title: "Showcase", icon: "sparkles", tag: 4))
+        baseTabs.append(TabItem(title: String(localized: "screen.showcase"), icon: "sparkles", tag: 4))
         #endif
 
         return baseTabs
@@ -74,9 +74,11 @@ struct MainTabView: View {
                 EnhancedSettingsView(controller: appComponent.settingsController, appComponent: appComponent)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
-                            Button("Done") {
+                            Button(String(localized: "action.done")) {
                                 showSettingsSheet = false
                             }
+                            .accessibilityLabel(String(localized: "accessibility.done"))
+                            .accessibilityHint(String(localized: "accessibility.close_settings"))
                         }
                     }
             }

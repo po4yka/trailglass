@@ -23,7 +23,7 @@ struct EnhancedTimelineView: View {
         VStack(spacing: 0) {
             // Large flexible navigation bar with hero background
             LargeFlexibleNavigationBar(
-                title: "Timeline",
+                title: String(localized: "screen.timeline"),
                 scrollOffset: scrollOffset,
                 actions: [
                     NavigationAction(icon: "photo.stack") {
@@ -91,7 +91,7 @@ struct EnhancedTimelineView: View {
                     }
                 } else if !viewModel.items.isEmpty {
                     // TimelineContent(...) // Commented out - requires rebuilt Kotlin framework
-                    Text("Timeline items available: \(viewModel.items.count)")
+                    Text(String(localized: "timeline.items_available", defaultValue: "Timeline items available: \(viewModel.items.count)"))
                         .foregroundColor(.secondary)
                 } else {
                     VStack {
@@ -188,7 +188,7 @@ struct EnhancedTimelineView: View {
                 PhotoGalleryView(appComponent: appComponent)
                     .toolbar {
                         ToolbarItem(placement: .topBarLeading) {
-                            Button("Done") {
+                            Button(String(localized: "action.done")) {
                                 showPhotosSheet = false
                             }
                         }
@@ -200,16 +200,16 @@ struct EnhancedTimelineView: View {
     private func formatDateForZoom(_ date: LocalDate, _ zoom: TimelineZoomLevel) -> String {
         switch zoom {
         case .day:
-            return "Day View • \(date.year)-\(String(format: "%02d", date.monthNumber))-\(String(format: "%02d", date.dayOfMonth))"
+            return String(localized: "timeline.day_view") + " • \(date.year)-\(String(format: "%02d", date.monthNumber))-\(String(format: "%02d", date.dayOfMonth))"
         case .week:
-            return "Week View"
+            return String(localized: "timeline.week_view")
         case .month:
             let formatter = DateFormatter()
-            return "Month View • \(formatter.shortMonthSymbols[Int(date.monthNumber) - 1]) \(date.year)"
+            return String(localized: "timeline.month_view") + " • \(formatter.shortMonthSymbols[Int(date.monthNumber) - 1]) \(date.year)"
         case .year:
-            return "Year View • \(date.year)"
+            return String(localized: "timeline.year_view") + " • \(date.year)"
         default:
-            return "Timeline"
+            return String(localized: "screen.timeline")
         }
     }
 }

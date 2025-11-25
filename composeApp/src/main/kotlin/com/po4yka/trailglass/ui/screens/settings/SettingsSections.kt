@@ -30,8 +30,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import com.po4yka.trailglass.location.tracking.TrackingMode
 
 @Composable
@@ -75,17 +77,19 @@ internal fun TrackingStatusCard(
 
                 Column {
                     Text(
-                        text = if (isTracking) "Tracking Active" else "Tracking Inactive",
+                        text = stringResource(
+                            if (isTracking) R.string.tracking_status_active else R.string.tracking_status_inactive
+                        ),
                         style = MaterialTheme.typography.titleMedium
                     )
 
                     if (isTracking) {
                         val modeDescription =
                             when (mode) {
-                                TrackingMode.IDLE -> "Off"
-                                TrackingMode.SIGNIFICANT -> "Efficient"
-                                TrackingMode.PASSIVE -> "Balanced"
-                                TrackingMode.ACTIVE -> "High"
+                                TrackingMode.IDLE -> stringResource(R.string.tracking_mode_off)
+                                TrackingMode.SIGNIFICANT -> stringResource(R.string.tracking_mode_efficient)
+                                TrackingMode.PASSIVE -> stringResource(R.string.tracking_mode_balanced)
+                                TrackingMode.ACTIVE -> stringResource(R.string.tracking_mode_high)
                             }
                         Text(
                             text = "Mode: $modeDescription • $samplesRecorded samples today",
@@ -103,21 +107,21 @@ internal fun TrackingStatusCard(
                     onClick = onRequestPermissions,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Grant Permissions")
+                    Text(stringResource(R.string.tracking_grant_permissions))
                 }
             } else if (isTracking) {
                 OutlinedButton(
                     onClick = onStopTracking,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Stop Tracking")
+                    Text(stringResource(R.string.tracking_stop))
                 }
             } else {
                 Button(
                     onClick = onStartTracking,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Start Tracking")
+                    Text(stringResource(R.string.tracking_start))
                 }
             }
         }
@@ -152,12 +156,14 @@ internal fun PermissionsCard(
 
                 Column {
                     Text(
-                        text = "Location Permission",
+                        text = stringResource(R.string.permission_location_title),
                         style = MaterialTheme.typography.titleSmall
                     )
 
                     Text(
-                        text = if (hasPermissions) "Granted" else "Not granted",
+                        text = stringResource(
+                            if (hasPermissions) R.string.permission_granted else R.string.permission_not_granted
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -171,7 +177,7 @@ internal fun PermissionsCard(
                     onClick = onRequestPermissions,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Request Permission")
+                    Text(stringResource(R.string.permission_request))
                 }
             }
 
@@ -198,17 +204,18 @@ internal fun PermissionsCard(
 
                     Column {
                         Text(
-                            text = "Background Location",
+                            text = stringResource(R.string.permission_background_title),
                             style = MaterialTheme.typography.titleSmall
                         )
 
                         Text(
-                            text =
+                            text = stringResource(
                                 if (hasBackgroundPermission) {
-                                    "Always allowed"
+                                    R.string.permission_always_allowed
                                 } else {
-                                    "Only while using app"
-                                },
+                                    R.string.permission_only_while_using
+                                }
+                            ),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -219,7 +226,7 @@ internal fun PermissionsCard(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Enable background location to automatically track trips and visits even when the app is closed.",
+                        text = stringResource(R.string.permission_background_desc),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -230,7 +237,7 @@ internal fun PermissionsCard(
                         onClick = onRequestBackgroundPermission,
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text("Enable Background Tracking")
+                        Text(stringResource(R.string.permission_enable_background))
                     }
                 }
             }
@@ -253,16 +260,16 @@ internal fun TrackingModeCard(
                     .selectableGroup()
         ) {
             Text(
-                text = "Tracking Mode",
+                text = stringResource(R.string.tracking_mode_title),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 
             TrackingModeOption(
                 mode = TrackingMode.IDLE,
-                title = "Off",
-                description = "No tracking, GPS off",
-                batteryImpact = "No battery impact",
+                title = stringResource(R.string.tracking_mode_off),
+                description = stringResource(R.string.tracking_mode_off_desc),
+                batteryImpact = stringResource(R.string.tracking_battery_none),
                 selected = currentMode == TrackingMode.IDLE,
                 enabled = !isTracking,
                 onSelect = { onModeSelected(TrackingMode.IDLE) }
@@ -272,9 +279,9 @@ internal fun TrackingModeCard(
 
             TrackingModeOption(
                 mode = TrackingMode.SIGNIFICANT,
-                title = "Efficient",
-                description = "Major movements only (WiFi/Cell changes)",
-                batteryImpact = "Minimal (1-2% per day)",
+                title = stringResource(R.string.tracking_mode_efficient),
+                description = stringResource(R.string.tracking_mode_efficient_desc),
+                batteryImpact = stringResource(R.string.tracking_battery_minimal),
                 selected = currentMode == TrackingMode.SIGNIFICANT,
                 enabled = !isTracking,
                 onSelect = { onModeSelected(TrackingMode.SIGNIFICANT) }
@@ -284,9 +291,9 @@ internal fun TrackingModeCard(
 
             TrackingModeOption(
                 mode = TrackingMode.PASSIVE,
-                title = "Balanced",
-                description = "Periodic updates (5min/500m)",
-                batteryImpact = "Low (3-5% per day)",
+                title = stringResource(R.string.tracking_mode_balanced),
+                description = stringResource(R.string.tracking_mode_balanced_desc),
+                batteryImpact = stringResource(R.string.tracking_battery_low),
                 selected = currentMode == TrackingMode.PASSIVE,
                 enabled = !isTracking,
                 onSelect = { onModeSelected(TrackingMode.PASSIVE) }
@@ -296,9 +303,9 @@ internal fun TrackingModeCard(
 
             TrackingModeOption(
                 mode = TrackingMode.ACTIVE,
-                title = "High",
-                description = "Continuous tracking (30sec/10m)",
-                batteryImpact = "Moderate (10-15% per day)",
+                title = stringResource(R.string.tracking_mode_high),
+                description = stringResource(R.string.tracking_mode_high_desc),
+                batteryImpact = stringResource(R.string.tracking_battery_moderate),
                 selected = currentMode == TrackingMode.ACTIVE,
                 enabled = !isTracking,
                 onSelect = { onModeSelected(TrackingMode.ACTIVE) }
@@ -307,7 +314,7 @@ internal fun TrackingModeCard(
             if (isTracking) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Stop tracking to change mode",
+                    text = stringResource(R.string.tracking_stop_to_change),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -380,11 +387,11 @@ internal fun AboutCard(modifier: Modifier = Modifier) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "TrailGlass",
+                text = stringResource(R.string.about_app_name),
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                text = "Version 1.0.0-alpha",
+                text = stringResource(R.string.about_version),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

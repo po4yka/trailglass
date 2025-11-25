@@ -100,7 +100,7 @@ fun RouteReplayScreen(
                     ) {
                         Icon(
                             Icons.Default.Error,
-                            contentDescription = null,
+                            contentDescription = "Error loading replay",
                             modifier = Modifier.size(64.dp),
                             tint = MaterialTheme.colorScheme.error
                         )
@@ -116,7 +116,7 @@ fun RouteReplayScreen(
                                 Text("Close")
                             }
                             Button(onClick = { controller.loadRoute(tripId) }) {
-                                Icon(Icons.Default.Refresh, contentDescription = null)
+                                Icon(Icons.Default.Refresh, contentDescription = "Retry loading replay")
                                 Spacer(Modifier.width(8.dp))
                                 Text("Retry")
                             }

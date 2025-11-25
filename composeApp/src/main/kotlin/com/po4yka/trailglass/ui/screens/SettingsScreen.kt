@@ -14,7 +14,9 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.po4yka.trailglass.R
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -79,7 +81,7 @@ fun SettingsScreen(
     ) {
         // Tracking section
         item {
-            SettingsSectionHeader(text = "Location Tracking")
+            SettingsSectionHeader(text = stringResource(R.string.settings_location_tracking))
         }
 
         item {
@@ -108,7 +110,7 @@ fun SettingsScreen(
 
         // Permissions section
         item {
-            SettingsSectionHeader(text = "Permissions")
+            SettingsSectionHeader(text = stringResource(R.string.settings_permissions))
         }
 
         item {
@@ -124,42 +126,42 @@ fun SettingsScreen(
 
         // Advanced section
         item {
-            SettingsSectionHeader(text = "Advanced")
+            SettingsSectionHeader(text = stringResource(R.string.settings_advanced))
         }
 
         item {
             SettingsNavigationCard(
                 icon = Icons.Default.Settings,
-                title = "Algorithm Settings",
-                description = "Configure distance, bearing, and interpolation",
+                title = stringResource(R.string.nav_algorithm_settings),
+                description = stringResource(R.string.nav_algorithm_settings_desc),
                 onClick = onNavigateToAlgorithmSettings
             )
         }
 
         // Account section
         item {
-            SettingsSectionHeader(text = "Account")
+            SettingsSectionHeader(text = stringResource(R.string.settings_account))
         }
 
         item {
             SettingsNavigationCard(
                 icon = Icons.Default.Devices,
-                title = "Device Management",
-                description = "Manage your connected devices",
+                title = stringResource(R.string.nav_device_management),
+                description = stringResource(R.string.nav_device_management_desc),
                 onClick = onNavigateToDeviceManagement
             )
         }
 
         // Developer section
         item {
-            SettingsSectionHeader(text = "Developer")
+            SettingsSectionHeader(text = stringResource(R.string.settings_developer))
         }
 
         item {
             SettingsNavigationCard(
                 icon = Icons.Default.Description,
-                title = "Logs",
-                description = "View application logs",
+                title = stringResource(R.string.nav_logs),
+                description = stringResource(R.string.nav_logs_desc),
                 onClick = onNavigateToLogs
             )
         }
@@ -167,15 +169,15 @@ fun SettingsScreen(
         item {
             SettingsNavigationCard(
                 icon = Icons.Default.BugReport,
-                title = "Diagnostics",
-                description = "View system diagnostics and status",
+                title = stringResource(R.string.nav_diagnostics),
+                description = stringResource(R.string.nav_diagnostics_desc),
                 onClick = onNavigateToDiagnostics
             )
         }
 
         // About section
         item {
-            SettingsSectionHeader(text = "About")
+            SettingsSectionHeader(text = stringResource(R.string.settings_about))
         }
 
         item {
