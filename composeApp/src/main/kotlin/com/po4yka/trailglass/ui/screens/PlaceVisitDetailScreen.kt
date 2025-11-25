@@ -203,7 +203,7 @@ private fun PlaceVisitContent(
                             Icon(
                                 Icons.Default.Place,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
@@ -218,7 +218,7 @@ private fun PlaceVisitContent(
                             Icon(
                                 Icons.Default.LocationCity,
                                 contentDescription = null,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
@@ -380,7 +380,7 @@ private fun DetailRow(
         Icon(
             icon,
             contentDescription = null,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.width(12.dp))

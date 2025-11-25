@@ -348,6 +348,9 @@ fun MainScaffold(
                                 onClearSearch = {
                                     instance.component.placesController.clearSearch()
                                 },
+                                onNavigateToSettings = {
+                                    rootComponent.navigateToScreen(RootComponent.Config.Settings)
+                                },
                                 modifier = Modifier.padding(innerPadding)
                             )
                         }

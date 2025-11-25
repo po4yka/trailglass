@@ -163,7 +163,8 @@ fun MapPickerScreen(
                             ) {
                                 androidx.compose.material3.Icon(
                                     Icons.Default.Search,
-                                    contentDescription = "Search"
+                                    contentDescription = "Search",
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
@@ -182,7 +183,8 @@ fun MapPickerScreen(
                 ) {
                     androidx.compose.material3.Icon(
                         Icons.Default.MyLocation,
-                        contentDescription = "My Location"
+                        contentDescription = "My Location",
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -300,6 +302,7 @@ fun MapPickerScreen(
                         androidx.compose.material3.Icon(
                             Icons.Default.MyLocation,
                             contentDescription = null,
+                            modifier = Modifier.size(24.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
 

@@ -58,6 +58,8 @@ struct FloatingTabBar: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
             .animation(.spring(response: 0.35, dampingFraction: 0.75), value: isMinimized)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Navigation tab bar")
         }
         .ignoresSafeArea(.keyboard)
     }
@@ -80,7 +82,7 @@ private struct TabBarButton: View {
 
                 if !isMinimized {
                     Text(tab.title)
-                        .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                        .font(.system(size: 12, weight: isSelected ? .semibold : .regular))
                         .foregroundColor(isSelected ? Color.coolSteel : Color.blueSlate.opacity(0.6))
                         .lineLimit(1)
                 }
@@ -89,6 +91,9 @@ private struct TabBarButton: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(TabButtonStyle())
+        .accessibilityLabel(tab.title)
+        .accessibilityHint("Double tap to switch to \(tab.title) tab")
+        .accessibilityAddTraits(isSelected ? [.isButton, .isSelected] : .isButton)
     }
 }
 

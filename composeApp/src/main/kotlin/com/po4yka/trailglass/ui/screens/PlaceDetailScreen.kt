@@ -316,7 +316,7 @@ private fun PlaceDetailContent(
                                     Icon(
                                         Icons.AutoMirrored.Filled.Notes,
                                         contentDescription = null,
-                                        modifier = Modifier.size(20.dp),
+                                        modifier = Modifier.size(24.dp),
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                     Text(
@@ -328,7 +328,7 @@ private fun PlaceDetailContent(
                                 Text(
                                     text = notes,
                                     style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.padding(start = 28.dp)
+                                    modifier = Modifier.padding(start = 32.dp)
                                 )
                             }
                         }
@@ -354,7 +354,7 @@ private fun StatRow(
         Icon(
             icon,
             contentDescription = null,
-            modifier = Modifier.size(20.dp),
+            modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.primary
         )
         Column(modifier = Modifier.weight(1f)) {

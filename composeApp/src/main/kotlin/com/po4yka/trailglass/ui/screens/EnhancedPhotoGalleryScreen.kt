@@ -251,8 +251,8 @@ private fun PhotoGroupGrid(
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = Modifier.heightIn(max = 800.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         userScrollEnabled = false
     ) {
         items(photos) { photoWithMeta ->
@@ -319,7 +319,7 @@ private fun PhotoGridItem(
                         contentDescription = "Attached to visit",
                         modifier =
                             Modifier
-                                .size(16.dp)
+                                .size(24.dp)
                                 .padding(2.dp),
                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
@@ -363,7 +363,7 @@ private fun EmptyGalleryView(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(onClick = onImportClick) {
-            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Text("Import Photos")
         }

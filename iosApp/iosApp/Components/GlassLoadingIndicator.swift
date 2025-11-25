@@ -72,6 +72,8 @@ struct GlassLoadingIndicator: View {
                 LinearProgress(width: size, color: color)
             }
         }
+        .accessibilityLabel("Loading")
+        .accessibilityAddTraits(.updatesFrequently)
     }
 }
 

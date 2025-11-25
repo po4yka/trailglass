@@ -7,6 +7,24 @@ import kotlin.time.measureTime
 
 private val logger = KotlinLogging.logger {}
 
+/** Format a Double to 2 decimal places (KMP-compatible). */
+private fun Double.format2(): String {
+    val rounded = kotlin.math.round(this * 100) / 100
+    val str = rounded.toString()
+    val dotIndex = str.indexOf('.')
+    return if (dotIndex == -1) {
+        "$str.00"
+    } else {
+        val decimals = str.length - dotIndex - 1
+        when {
+            decimals == 0 -> "${str}00"
+            decimals == 1 -> "${str}0"
+            decimals > 2 -> str.substring(0, dotIndex + 3)
+            else -> str
+        }
+    }
+}
+
 /**
  * Standalone benchmark runner that can be executed to generate performance reports. This provides a simple way to run
  * performance benchmarks and see results.
@@ -87,9 +105,9 @@ object BenchmarkRunner {
                 results.add(result)
 
                 logger.info { "  $name:" }
-                logger.info { "    Average: ${String.format("%.2f", avgTime)}us" }
-                logger.info { "    Min: ${String.format("%.2f", minTime)}us" }
-                logger.info { "    Max: ${String.format("%.2f", maxTime)}us" }
+                logger.info { "    Average: ${avgTime.format2()}us" }
+                logger.info { "    Min: ${minTime.format2()}us" }
+                logger.info { "    Max: ${maxTime.format2()}us" }
             }
 
             // Show comparisons
@@ -99,12 +117,7 @@ object BenchmarkRunner {
             for (i in 1 until scenarioResults.size) {
                 val ratio = scenarioResults[i].averageTimeMicros / baseline.averageTimeMicros
                 logger.info {
-                    "    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${
-                        String.format(
-                            "%.2f",
-                            ratio
-                        )
-                    }x"
+                    "    ${scenarioResults[i].algorithmName} vs ${baseline.algorithmName}: ${ratio.format2()}x"
                 }
             }
             logger.info { "" }
@@ -159,7 +172,7 @@ object BenchmarkRunner {
                 scenarioResults.add(result)
                 results.add(result)
 
-                logger.info { "  $name: ${String.format("%.2f", avgTime)}us avg" }
+                logger.info { "  $name: ${avgTime.format2()}us avg" }
             }
             logger.info { "" }
         }
@@ -211,7 +224,7 @@ object BenchmarkRunner {
                     val result = BenchmarkResult("$name-$steps", scenario.name, avgTime, 0.0, 0.0)
                     results.add(result)
 
-                    logger.info { "    $name: ${String.format("%.2f", avgTime)}us" }
+                    logger.info { "    $name: ${avgTime.format2()}us" }
                 }
                 logger.info { "" }
             }
@@ -232,7 +245,7 @@ object BenchmarkRunner {
         logger.info { "Average performance across all distances:" }
         byAlgorithm.forEach { (algo, results) ->
             val avg = results.map { it.averageTimeMicros }.average()
-            logger.info { "  $algo: ${String.format("%.2f", avg)}us" }
+            logger.info { "  $algo: ${avg.format2()}us" }
         }
 
         logger.info { "" }

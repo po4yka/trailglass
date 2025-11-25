@@ -77,6 +77,9 @@ struct LoginView: View {
                             .onSubmit {
                                 passwordFocused = true
                             }
+                            .onChange(of: viewModel.email) { _ in
+                                viewModel.clearError()
+                            }
                     }
                     .padding()
                     .background(Color(UIColor.secondarySystemBackground))
@@ -97,6 +100,9 @@ struct LoginView: View {
                                 .onSubmit {
                                     viewModel.login()
                                 }
+                                .onChange(of: viewModel.password) { _ in
+                                    viewModel.clearError()
+                                }
                         } else {
                             SecureField("Password", text: $viewModel.password)
                                 .focused($passwordFocused)
@@ -104,6 +110,9 @@ struct LoginView: View {
                                 .submitLabel(.done)
                                 .onSubmit {
                                     viewModel.login()
+                                }
+                                .onChange(of: viewModel.password) { _ in
+                                    viewModel.clearError()
                                 }
                         }
 
@@ -178,9 +187,6 @@ struct LoginView: View {
                 Spacer()
             }
             .padding(24)
-        }
-        .onDisappear {
-            viewModel.clearError()
         }
     }
 }

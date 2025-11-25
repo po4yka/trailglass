@@ -9,6 +9,24 @@ import kotlin.time.measureTime
 
 private val logger = KotlinLogging.logger {}
 
+/** Format a Double to 2 decimal places (KMP-compatible). */
+private fun Double.format2(): String {
+    val rounded = kotlin.math.round(this * 100) / 100
+    val str = rounded.toString()
+    val dotIndex = str.indexOf('.')
+    return if (dotIndex == -1) {
+        "$str.00"
+    } else {
+        val decimals = str.length - dotIndex - 1
+        when {
+            decimals == 0 -> "${str}00"
+            decimals == 1 -> "${str}0"
+            decimals > 2 -> str.substring(0, dotIndex + 3)
+            else -> str
+        }
+    }
+}
+
 /**
  * Performance benchmark tests for geographic algorithms.
  *
@@ -22,7 +40,8 @@ private val logger = KotlinLogging.logger {}
  *
  * Note: Results may vary based on platform (JVM, Native, JS) and hardware.
  */
-@Ignore("Performance benchmarks - run manually")
+// Performance benchmarks - run manually by removing @Ignore
+@Ignore
 class AlgorithmPerformanceBenchmark {
     companion object {
         private const val ITERATIONS = 1000
@@ -274,9 +293,9 @@ class AlgorithmPerformanceBenchmark {
                 val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
                 val comparison =
                     if (ratio > 1) {
-                        "${String.format("%.2f", ratio)}x slower"
+                        "${ratio.format2()}x slower"
                     } else {
-                        "${String.format("%.2f", 1 / ratio)}x faster"
+                        "${(1 / ratio).format2()}x faster"
                     }
                 logger.info { "    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison" }
             }
@@ -329,9 +348,9 @@ class AlgorithmPerformanceBenchmark {
                 val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
                 val comparison =
                     if (ratio > 1) {
-                        "${String.format("%.2f", ratio)}x slower"
+                        "${ratio.format2()}x slower"
                     } else {
-                        "${String.format("%.2f", 1 / ratio)}x faster"
+                        "${(1 / ratio).format2()}x faster"
                     }
                 logger.info { "    ${result.algorithmName} vs ${baseline.algorithmName}: $comparison" }
             }
@@ -393,9 +412,9 @@ class AlgorithmPerformanceBenchmark {
                     val ratio = result.averageTimeNanos.toDouble() / baseline.averageTimeNanos
                     val comparison =
                         if (ratio > 1) {
-                            "${String.format("%.2f", ratio)}x slower"
+                            "${ratio.format2()}x slower"
                         } else {
-                            "${String.format("%.2f", 1 / ratio)}x faster"
+                            "${(1 / ratio).format2()}x faster"
                         }
                     val algoName = result.algorithmName.substringBefore(" (")
                     val baselineName = baseline.algorithmName.substringBefore(" (")
@@ -460,26 +479,17 @@ class AlgorithmPerformanceBenchmark {
         logger.info { "Performance ratios (across all distances):" }
         logger.info {
             "  Haversine vs Simple: ${
-                String.format(
-                    "%.2f",
-                    haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
-                )
+                (haversineAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds).format2()
             }x"
         }
         logger.info {
             "  Vincenty vs Simple: ${
-                String.format(
-                    "%.2f",
-                    vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds
-                )
+                (vincentyAvg.inWholeNanoseconds.toDouble() / simpleAvg.inWholeNanoseconds).format2()
             }x"
         }
         logger.info {
             "  Vincenty vs Haversine: ${
-                String.format(
-                    "%.2f",
-                    vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds
-                )
+                (vincentyAvg.inWholeNanoseconds.toDouble() / haversineAvg.inWholeNanoseconds).format2()
             }x"
         }
 

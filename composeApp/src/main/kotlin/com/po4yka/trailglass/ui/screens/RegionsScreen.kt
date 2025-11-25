@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
@@ -57,6 +59,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -77,6 +81,8 @@ fun RegionsScreen(
     modifier: Modifier = Modifier
 ) {
     val state by controller.state.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
     var showSearch by remember { mutableStateOf(false) }
     var showSortMenu by remember { mutableStateOf(false) }
     var showLocationPermissionDialog by remember { mutableStateOf(false) }
@@ -101,11 +107,21 @@ fun RegionsScreen(
             TopAppBar(
                 title = { Text("Places") },
                 actions = {
-                    IconButton(onClick = { showSearch = !showSearch }) {
+                    IconButton(onClick = {
+                        if (showSearch) {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                        }
+                        showSearch = !showSearch
+                    }) {
                         Icon(Icons.Default.Search, contentDescription = "Search")
                     }
                     Box {
-                        IconButton(onClick = { showSortMenu = true }) {
+                        IconButton(onClick = {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            showSortMenu = true
+                        }) {
                             Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = "Sort")
                         }
                         DropdownMenu(
@@ -115,6 +131,8 @@ fun RegionsScreen(
                             DropdownMenuItem(
                                 text = { Text("Name") },
                                 onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
                                     controller.setSortOption(RegionSortOption.NAME)
                                     showSortMenu = false
                                 }
@@ -122,6 +140,8 @@ fun RegionsScreen(
                             DropdownMenuItem(
                                 text = { Text("Distance") },
                                 onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
                                     showSortMenu = false
                                     // Check if we need location permission
                                     if (state.currentLocation == null) {
@@ -139,6 +159,8 @@ fun RegionsScreen(
                             DropdownMenuItem(
                                 text = { Text("Most Visited") },
                                 onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
                                     controller.setSortOption(RegionSortOption.MOST_VISITED)
                                     showSortMenu = false
                                 }
@@ -146,6 +168,8 @@ fun RegionsScreen(
                             DropdownMenuItem(
                                 text = { Text("Last Entered") },
                                 onClick = {
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
                                     controller.setSortOption(RegionSortOption.LAST_ENTERED)
                                     showSortMenu = false
                                 }
@@ -229,6 +253,8 @@ fun RegionsScreen(
                         currentLocation = state.currentLocation,
                         onRegionClick = onNavigateToDetail,
                         onRegionDelete = { controller.deleteRegion(it) },
+                        keyboardController = keyboardController,
+                        focusManager = focusManager,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -247,9 +273,22 @@ private fun RegionsList(
     currentLocation: com.po4yka.trailglass.domain.model.Coordinate?,
     onRegionClick: (String) -> Unit,
     onRegionDelete: (String) -> Unit,
+    keyboardController: androidx.compose.ui.platform.SoftwareKeyboardController?,
+    focusManager: androidx.compose.ui.focus.FocusManager,
     modifier: Modifier = Modifier
 ) {
+    val listState = rememberLazyListState()
+
+    // Dismiss keyboard when scrolling
+    LaunchedEffect(listState.isScrollInProgress) {
+        if (listState.isScrollInProgress) {
+            keyboardController?.hide()
+            focusManager.clearFocus()
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)

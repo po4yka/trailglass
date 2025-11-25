@@ -76,6 +76,9 @@ struct RegisterView: View {
                                 .onSubmit {
                                     emailFocused = true
                                 }
+                                .onChange(of: viewModel.displayName) { _ in
+                                    viewModel.clearError()
+                                }
                         }
                         .padding()
                         .background(Color(UIColor.secondarySystemBackground))
@@ -99,6 +102,9 @@ struct RegisterView: View {
                                 .onSubmit {
                                     passwordFocused = true
                                 }
+                                .onChange(of: viewModel.email) { _ in
+                                    viewModel.clearError()
+                                }
                         }
                         .padding()
                         .background(Color(UIColor.secondarySystemBackground))
@@ -119,6 +125,9 @@ struct RegisterView: View {
                                     .onSubmit {
                                         confirmPasswordFocused = true
                                     }
+                                    .onChange(of: viewModel.password) { _ in
+                                        viewModel.clearError()
+                                    }
                             } else {
                                 SecureField("Password", text: $viewModel.password)
                                     .focused($passwordFocused)
@@ -126,6 +135,9 @@ struct RegisterView: View {
                                     .submitLabel(.next)
                                     .onSubmit {
                                         confirmPasswordFocused = true
+                                    }
+                                    .onChange(of: viewModel.password) { _ in
+                                        viewModel.clearError()
                                     }
                             }
 
@@ -160,6 +172,9 @@ struct RegisterView: View {
                                     .onSubmit {
                                         viewModel.register()
                                     }
+                                    .onChange(of: viewModel.confirmPassword) { _ in
+                                        viewModel.clearError()
+                                    }
                             } else {
                                 SecureField("Confirm Password", text: $viewModel.confirmPassword)
                                     .focused($confirmPasswordFocused)
@@ -167,6 +182,9 @@ struct RegisterView: View {
                                     .submitLabel(.done)
                                     .onSubmit {
                                         viewModel.register()
+                                    }
+                                    .onChange(of: viewModel.confirmPassword) { _ in
+                                        viewModel.clearError()
                                     }
                             }
 
@@ -176,8 +194,19 @@ struct RegisterView: View {
                             }
                         }
                         .padding()
-                        .background(Color(UIColor.secondarySystemBackground))
+                        .background(viewModel.confirmPasswordError != nil ? Color.red.opacity(0.1) : Color(UIColor.secondarySystemBackground))
                         .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(viewModel.confirmPasswordError != nil ? Color.red : Color.clear, lineWidth: 1)
+                        )
+
+                        if let error = viewModel.confirmPasswordError, !viewModel.confirmPassword.isEmpty {
+                            Text(error)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .padding(.horizontal, 4)
+                        }
                     }
 
                     // Register button
@@ -241,9 +270,6 @@ struct RegisterView: View {
                 }
             }
         }
-        .onDisappear {
-            viewModel.clearError()
-        }
     }
 }
 
@@ -268,6 +294,10 @@ class RegisterViewModel: ObservableObject {
         if !password.isEmpty && password.count < 8 {
             return "Password must be at least 8 characters"
         }
+        return nil
+    }
+
+    var confirmPasswordError: String? {
         if !confirmPassword.isEmpty && !passwordMatch {
             return "Passwords do not match"
         }
@@ -280,6 +310,7 @@ class RegisterViewModel: ObservableObject {
         !password.isEmpty &&
         passwordMatch &&
         passwordError == nil &&
+        confirmPasswordError == nil &&
         !isLoading
     }
 

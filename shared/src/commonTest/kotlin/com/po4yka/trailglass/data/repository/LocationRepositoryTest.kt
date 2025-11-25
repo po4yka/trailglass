@@ -47,7 +47,7 @@ class LocationRepositoryTest {
             val result = repository.insertSample(sample)
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
         }
 
     @Test
@@ -61,7 +61,7 @@ class LocationRepositoryTest {
             val result = repository.getSampleById("sample1")
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
             val retrieved = result.getOrNull()
             retrieved shouldNotBe null
             retrieved?.id shouldBe "sample1"
@@ -78,7 +78,7 @@ class LocationRepositoryTest {
             val result = repository.getSampleById("non_existent")
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
             result.getOrNull() shouldBe null
         }
 
@@ -104,7 +104,7 @@ class LocationRepositoryTest {
                 )
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
             val samples = result.getOrNull()!!
             samples.size shouldBe 2
             samples.any { it.id == "sample1" } shouldBe true
@@ -128,7 +128,7 @@ class LocationRepositoryTest {
             val result = repository.getSamplesForTrip("trip_123")
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
             val samples = result.getOrNull()!!
             samples.size shouldBe 1
             samples.first().id shouldBe "trip1_sample"
@@ -151,7 +151,7 @@ class LocationRepositoryTest {
             val result = repository.getUnprocessedSamples(userId, limit = 10)
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
             val samples = result.getOrNull()!!
             samples.size shouldBe 2
             samples.all { it.tripId == null } shouldBe true
@@ -170,7 +170,7 @@ class LocationRepositoryTest {
             val result = repository.getUnprocessedSamples(userId, limit = 3)
 
             // Then
-            result.isSuccess() shouldBe true
+            result.isSuccess shouldBe true
             result.getOrNull()!!.size shouldBe 3
         }
 
@@ -185,7 +185,7 @@ class LocationRepositoryTest {
             val updateResult = repository.updateTripId("sample1", "trip_789")
 
             // Then
-            updateResult.isSuccess() shouldBe true
+            updateResult.isSuccess shouldBe true
 
             val retrievedResult = repository.getSampleById("sample1")
             retrievedResult.getOrNull()?.tripId shouldBe "trip_789"
@@ -202,7 +202,7 @@ class LocationRepositoryTest {
             val updateResult = repository.updateTripId("sample1", null)
 
             // Then
-            updateResult.isSuccess() shouldBe true
+            updateResult.isSuccess shouldBe true
 
             val retrievedResult = repository.getSampleById("sample1")
             retrievedResult.getOrNull()?.tripId shouldBe null
@@ -219,7 +219,7 @@ class LocationRepositoryTest {
             val deleteResult = repository.deleteSample("sample1")
 
             // Then
-            deleteResult.isSuccess() shouldBe true
+            deleteResult.isSuccess shouldBe true
 
             // Sample should no longer be retrievable
             val retrievedResult = repository.getSampleById("sample1")
@@ -241,7 +241,7 @@ class LocationRepositoryTest {
             val deleteResult = repository.deleteOldSamples(userId, beforeTime = cutoffTime)
 
             // Then
-            deleteResult.isSuccess() shouldBe true
+            deleteResult.isSuccess shouldBe true
 
             repository.getSampleById("old").getOrNull() shouldBe null
             repository.getSampleById("recent").getOrNull() shouldNotBe null

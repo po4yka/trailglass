@@ -33,9 +33,15 @@ struct MapScreen: View {
                 if let error = viewModel.error {
                     VStack {
                         Spacer()
-                        ErrorBanner(message: error) {
-                            viewModel.clearError()
-                        }
+                        ErrorBanner(
+                            message: error,
+                            onRetry: {
+                                viewModel.refreshData()
+                            },
+                            onDismiss: {
+                                viewModel.clearError()
+                            }
+                        )
                         .padding()
                     }
                 }

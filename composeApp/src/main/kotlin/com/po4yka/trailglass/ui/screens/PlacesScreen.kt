@@ -43,6 +43,7 @@ fun PlacesScreen(
     onRefresh: () -> Unit = {},
     onSearch: (String) -> Unit = {},
     onClearSearch: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showSearch by remember { mutableStateOf(false) }
@@ -65,7 +66,10 @@ fun PlacesScreen(
         }
 
         if (places.isEmpty() && searchQuery.isBlank()) {
-            EmptyPlacesView(modifier = Modifier.fillMaxSize())
+            EmptyPlacesView(
+                onNavigateToSettings = onNavigateToSettings,
+                modifier = Modifier.fillMaxSize()
+            )
         } else if (places.isEmpty() && searchQuery.isNotBlank()) {
             NoSearchResultsView(
                 query = searchQuery,

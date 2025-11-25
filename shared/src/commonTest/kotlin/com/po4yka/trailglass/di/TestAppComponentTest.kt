@@ -27,7 +27,7 @@ class TestAppComponentTest {
                 )
 
             val insertResult = component.locationRepository.insertSample(sample)
-            assertTrue(insertResult.isSuccess(), "Sample should be inserted successfully")
+            assertTrue(insertResult.isSuccess, "Sample should be inserted successfully")
 
             val retrieved = component.locationRepository.getSampleById(sample.id).getOrNull()
             assertEquals(sample.id, retrieved?.id)

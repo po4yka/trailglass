@@ -44,6 +44,7 @@ struct GlassCard<Content: View>: View {
             .shadow(radius: 2)
             .scaleEffect(isPressed ? MotionConfig.pressScale : 1.0)
             .animation(MotionConfig.buttonPress, value: isPressed)
+            .accessibilityElement(children: .combine)
     }
 
     func onTap(_ action: @escaping () -> Void) -> some View {
@@ -136,6 +137,20 @@ struct VisitGlassCard: View {
             }
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(.isButton)
+    }
+
+    private var accessibilityLabel: String {
+        var label = "Visit to \(visit.displayName)"
+        if let city = visit.city {
+            label += " in \(city)"
+        }
+        if visit.isFavorite {
+            label += ", favorite"
+        }
+        label += ", duration \(formatDuration(visit.duration))"
+        return label
     }
 }
 
@@ -191,6 +206,21 @@ struct RouteGlassCard: View {
             }
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(.isButton)
+    }
+
+    private var accessibilityLabel: String {
+        let distance = Int(route.distanceMeters / 1000)
+        let duration = Double(route.endTime.epochSeconds) - Double(route.startTime.epochSeconds)
+        var label = "Route by \(transportName(route.transportType)), \(distance) kilometers"
+        if duration > 0 {
+            label += ", \(Int(duration / 60)) minutes"
+        }
+        if route.confidence < 0.7 {
+            label += ", low confidence"
+        }
+        return label
     }
 }
 
@@ -226,6 +256,8 @@ struct StatGlassCard: View {
             }
             .frame(maxWidth: .infinity)
         }
+        .accessibilityLabel("\(title): \(value)")
+        .accessibilityAddTraits(.isStaticText)
     }
 }
 
@@ -282,6 +314,18 @@ struct SummaryGlassCard: View {
                 }
             }
         }
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(.isSummaryElement)
+    }
+
+    private var accessibilityLabel: String {
+        var label = title
+        if let subtitle = subtitle {
+            label += ", \(subtitle)"
+        }
+        label += ". "
+        label += stats.map { "\($0.label): \($0.value)" }.joined(separator: ", ")
+        return label
     }
 }
 

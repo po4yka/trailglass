@@ -92,6 +92,9 @@ struct GlassButton: View {
         }
         .buttonStyle(PlainButtonStyle())
         .disabled(isDisabled)
+        .accessibilityLabel(title ?? "Button")
+        .accessibilityHint(isSelected ? "Selected" : "")
+        .accessibilityAddTraits(.isButton)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in
@@ -188,6 +191,9 @@ struct GlassFilterChip: View {
             // .shimmer(style: isPressed ? .interactive : .subtle, isActive: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(label)
+        .accessibilityHint(isSelected ? "Selected" : "")
+        .accessibilityAddTraits(.isButton)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in
@@ -243,6 +249,8 @@ struct GlassIconButton: View {
                 // // .shimmer(style: .interactive, isActive: isPressed)
         }
         .buttonStyle(PlainButtonStyle())
+        .accessibilityLabel(accessibilityLabelForIcon(icon))
+        .accessibilityAddTraits(.isButton)
         .simultaneousGesture(
             DragGesture(minimumDistance: 0)
                 .onChanged { _ in
@@ -258,6 +266,14 @@ struct GlassIconButton: View {
                     }
                 }
         )
+    }
+
+    private func accessibilityLabelForIcon(_ iconName: String) -> String {
+        let components = iconName.split(separator: ".")
+        if let first = components.first {
+            return String(first).capitalized
+        }
+        return "Button"
     }
 }
 
@@ -293,6 +309,9 @@ struct GlassToggleButton: View {
                 isOn.toggle()
             }
         }
+        .accessibilityAddTraits(.isButton)
+        .accessibilityValue(isOn ? "On" : "Off")
+        .accessibilityHint("Double tap to toggle")
     }
 }
 

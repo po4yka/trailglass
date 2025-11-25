@@ -149,7 +149,10 @@ fun RegisterScreen(
         // Display name field
         OutlinedTextField(
             value = displayName,
-            onValueChange = { displayName = it },
+            onValueChange = {
+                displayName = it
+                authController.clearError()
+            },
             label = { Text("Display Name") },
             placeholder = { Text("Your Name") },
             leadingIcon = {
@@ -174,7 +177,10 @@ fun RegisterScreen(
         // Email field
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = {
+                email = it
+                authController.clearError()
+            },
             label = { Text("Email") },
             placeholder = { Text("you@example.com") },
             leadingIcon = {
@@ -199,7 +205,10 @@ fun RegisterScreen(
         // Password field
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                authController.clearError()
+            },
             label = { Text("Password") },
             placeholder = { Text("At least 8 characters") },
             leadingIcon = {
@@ -255,7 +264,10 @@ fun RegisterScreen(
         // Confirm password field
         OutlinedTextField(
             value = confirmPassword,
-            onValueChange = { confirmPassword = it },
+            onValueChange = {
+                confirmPassword = it
+                authController.clearError()
+            },
             label = { Text("Confirm Password") },
             placeholder = { Text("Re-enter your password") },
             leadingIcon = {
@@ -370,7 +382,7 @@ fun RegisterScreen(
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Continue as Guest")
@@ -385,12 +397,5 @@ fun RegisterScreen(
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-    }
-
-    // Clear error when leaving screen
-    DisposableEffect(Unit) {
-        onDispose {
-            authController.clearError()
-        }
     }
 }

@@ -133,7 +133,10 @@ fun LoginScreen(
         // Email field
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = {
+                email = it
+                authController.clearError()
+            },
             label = { Text("Email") },
             placeholder = { Text("you@example.com") },
             leadingIcon = {
@@ -158,7 +161,10 @@ fun LoginScreen(
         // Password field
         OutlinedTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = {
+                password = it
+                authController.clearError()
+            },
             label = { Text("Password") },
             placeholder = { Text("Enter your password") },
             leadingIcon = {
@@ -271,7 +277,7 @@ fun LoginScreen(
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text("Continue as Guest")
@@ -284,12 +290,5 @@ fun LoginScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 4.dp)
         )
-    }
-
-    // Clear error when leaving screen
-    DisposableEffect(Unit) {
-        onDispose {
-            authController.clearError()
-        }
     }
 }

@@ -311,9 +311,13 @@ sealed class Result<out T> {
         val error: TrailGlassError
     ) : Result<Nothing>()
 
-    fun isSuccess(): Boolean = this is Success
+    /** Property-style accessor for success check. Mirrors kotlin.Result API. */
+    val isSuccess: Boolean
+        get() = this is Success
 
-    fun isError(): Boolean = this is Error
+    /** Property-style accessor for error check. */
+    val isError: Boolean
+        get() = this is Error
 
     fun getOrNull(): T? =
         when (this) {
@@ -325,6 +329,18 @@ sealed class Result<out T> {
         when (this) {
             is Success -> null
             is Error -> error
+        }
+
+    /**
+     * Returns the encapsulated value if this instance represents success,
+     * or throws the encapsulated error's cause (or an IllegalStateException) if it is an error.
+     *
+     * Mirrors kotlin.Result.getOrThrow() API for familiarity.
+     */
+    fun getOrThrow(): T =
+        when (this) {
+            is Success -> data
+            is Error -> throw error.cause ?: IllegalStateException(error.userMessage)
         }
 
     inline fun onSuccess(action: (T) -> Unit): Result<T> {
@@ -364,3 +380,36 @@ inline fun <T> resultOf(block: () -> T): Result<T> =
             )
         )
     }
+
+/**
+ * Convert kotlin.Result to domain Result.
+ *
+ * Use this when bridging between Kotlin standard library Result and domain Result,
+ * such as when working with APIs that return kotlin.Result.
+ *
+ * @param mapError Optional function to convert exception to a specific TrailGlassError.
+ *                 Defaults to creating Unknown error.
+ */
+inline fun <T> kotlin.Result<T>.toDomainResult(
+    mapError: (Throwable) -> TrailGlassError = { e ->
+        TrailGlassError.Unknown(
+            technicalMessage = e.message ?: "Unknown error",
+            cause = e
+        )
+    }
+): Result<T> = fold(
+    onSuccess = { Result.Success(it) },
+    onFailure = { Result.Error(mapError(it)) }
+)
+
+/**
+ * Convert kotlin.Result to domain Result with a specific error type.
+ *
+ * Convenience overload that accepts a TrailGlassError directly for the failure case.
+ */
+inline fun <T> kotlin.Result<T>.toDomainResult(
+    error: TrailGlassError
+): Result<T> = fold(
+    onSuccess = { Result.Success(it) },
+    onFailure = { Result.Error(error) }
+)

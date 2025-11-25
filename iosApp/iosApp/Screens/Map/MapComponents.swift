@@ -33,7 +33,14 @@ class RoutePolyline: MKPolyline {
 /// Error banner
 struct ErrorBanner: View {
     let message: String
+    let onRetry: (() -> Void)?
     let onDismiss: () -> Void
+
+    init(message: String, onRetry: (() -> Void)? = nil, onDismiss: @escaping () -> Void) {
+        self.message = message
+        self.onRetry = onRetry
+        self.onDismiss = onDismiss
+    }
 
     var body: some View {
         HStack {
@@ -45,6 +52,19 @@ struct ErrorBanner: View {
                 .font(.body)
 
             Spacer()
+
+            if let onRetry = onRetry {
+                Button(action: onRetry) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.clockwise")
+                        Text("Retry")
+                    }
+                    .foregroundColor(.white)
+                    .fontWeight(.semibold)
+                }
+                .buttonStyle(.bordered)
+                .tint(.white.opacity(0.2))
+            }
 
             Button(action: onDismiss) {
                 Image(systemName: "xmark.circle.fill")
