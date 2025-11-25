@@ -8,9 +8,11 @@ import Shared
 struct EnhancedStatsView: View {
     @StateObject private var viewModel: EnhancedStatsViewModel
     @State private var scrollOffset: CGFloat = 0
+    var onSettingsTapped: (() -> Void)?
 
-    init(controller: EnhancedStatsController) {
+    init(controller: EnhancedStatsController, onSettingsTapped: (() -> Void)? = nil) {
         _viewModel = StateObject(wrappedValue: EnhancedStatsViewModel(controller: controller))
+        self.onSettingsTapped = onSettingsTapped
     }
 
     var body: some View {
@@ -22,6 +24,9 @@ struct EnhancedStatsView: View {
                 actions: [
                     NavigationAction(icon: "arrow.clockwise") {
                         viewModel.refresh()
+                    },
+                    NavigationAction(icon: "gear") {
+                        onSettingsTapped?()
                     }
                 ],
                 subtitle: {

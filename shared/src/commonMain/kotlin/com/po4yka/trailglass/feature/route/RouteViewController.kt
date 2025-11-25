@@ -15,6 +15,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
@@ -69,25 +70,27 @@ class RouteViewController(
     fun loadRoute(tripId: String) {
         controllerScope.launch {
             logger.info { "Loading route for trip $tripId" }
-            _state.value = _state.value.copy(isLoading = true, error = null)
+            _state.update { it.copy(isLoading = true, error = null) }
 
             getTripRouteUseCase
                 .execute(tripId)
                 .onSuccess { tripRoute ->
                     logger.info { "Route loaded successfully: ${tripRoute.fullPath.size} points" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             tripRoute = tripRoute,
                             isLoading = false,
                             shouldRecenterCamera = true // Trigger initial camera fit
                         )
+                    }
                 }.onError { error ->
                     logger.error { "Failed to load route for trip $tripId - ${error.getTechnicalDetails()}" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             isLoading = false,
                             error = error.getUserFriendlyMessage()
                         )
+                    }
                 }
         }
     }
@@ -95,45 +98,39 @@ class RouteViewController(
     /** Change map style. */
     fun setMapStyle(style: MapStyle) {
         logger.debug { "Changing map style to $style" }
-        _state.value = _state.value.copy(mapStyle = style)
+        _state.update { it.copy(mapStyle = style) }
     }
 
     /** Show/hide map style selector. */
     fun toggleMapStyleSelector() {
-        _state.value =
-            _state.value.copy(
-                showMapStyleSelector = !_state.value.showMapStyleSelector
-            )
+        _state.update { it.copy(showMapStyleSelector = !it.showMapStyleSelector) }
     }
 
     /** Show/hide statistics screen. */
     fun toggleStatistics() {
-        _state.value =
-            _state.value.copy(
-                showStatistics = !_state.value.showStatistics
-            )
+        _state.update { it.copy(showStatistics = !it.showStatistics) }
     }
 
     /** Recenter camera to fit entire route. */
     fun recenterCamera() {
         logger.debug { "Recenter camera requested" }
-        _state.value = _state.value.copy(shouldRecenterCamera = true)
+        _state.update { it.copy(shouldRecenterCamera = true) }
     }
 
     /** Acknowledge camera recentering (called after UI applies camera move). */
     fun acknowledgeRecenter() {
-        _state.value = _state.value.copy(shouldRecenterCamera = false)
+        _state.update { it.copy(shouldRecenterCamera = false) }
     }
 
     /** Select a photo marker on the map. */
     fun selectPhotoMarker(marker: PhotoMarker?) {
         logger.debug { "Photo marker selected: ${marker?.photoId}" }
-        _state.value = _state.value.copy(selectedPhotoMarker = marker)
+        _state.update { it.copy(selectedPhotoMarker = marker) }
     }
 
     /** Clear error state. */
     fun clearError() {
-        _state.value = _state.value.copy(error = null)
+        _state.update { it.copy(error = null) }
     }
 
     /** Get route bounds for camera positioning. */
@@ -154,26 +151,28 @@ class RouteViewController(
 
         controllerScope.launch {
             logger.info { "Exporting route to $format" }
-            _state.value = _state.value.copy(isExporting = true)
+            _state.update { it.copy(isExporting = true) }
 
             when (val result = exportRouteUseCase.execute(route, tripName, format)) {
                 is Result.Success -> {
                     val exportResult = result.data
                     logger.info { "Export successful: ${exportResult.fileName}" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             isExporting = false,
                             exportResult = exportResult
                         )
+                    }
                 }
                 is Result.Error -> {
                     val error = result.error
                     logger.error { "Export failed: ${error.getTechnicalDetails()}" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             isExporting = false,
                             error = error.getUserFriendlyMessage()
                         )
+                    }
                 }
             }
         }
@@ -181,7 +180,7 @@ class RouteViewController(
 
     /** Clear export result after handling. */
     fun clearExportResult() {
-        _state.value = _state.value.copy(exportResult = null)
+        _state.update { it.copy(exportResult = null) }
     }
 
     /**

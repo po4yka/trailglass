@@ -222,7 +222,13 @@ class PlacesController(
         }
     }
 
-    /** Get a specific place by ID. */
+    /**
+     * Get a specific place by ID.
+     *
+     * Note: This is a direct repository query that bypasses state management.
+     * Use this for one-off lookups where you need data immediately without
+     * affecting the controller's state. For reactive data, prefer observing [state].
+     */
     suspend fun getPlaceById(placeId: String): FrequentPlace? =
         try {
             frequentPlaceRepository.getPlaceById(placeId)

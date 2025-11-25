@@ -10,6 +10,7 @@ struct EnhancedTimelineView: View {
     @State private var showFilterSheet = false
     @State private var showSearchBar = false
     @State private var scrollOffset: CGFloat = 0
+    @State private var showPhotosSheet = false
 
     private let appComponent: AppComponent
 
@@ -25,6 +26,9 @@ struct EnhancedTimelineView: View {
                 title: "Timeline",
                 scrollOffset: scrollOffset,
                 actions: [
+                    NavigationAction(icon: "photo.stack") {
+                        showPhotosSheet = true
+                    },
                     NavigationAction(icon: "magnifyingglass") {
                         showSearchBar.toggle()
                     },
@@ -178,6 +182,18 @@ struct EnhancedTimelineView: View {
         }
         .onAppear {
             viewModel.loadTimeline()
+        }
+        .sheet(isPresented: $showPhotosSheet) {
+            NavigationStack {
+                PhotoGalleryView(appComponent: appComponent)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button("Done") {
+                                showPhotosSheet = false
+                            }
+                        }
+                    }
+            }
         }
     }
 

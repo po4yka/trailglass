@@ -245,16 +245,17 @@ class DefaultRootComponent(
     @OptIn(DelicateDecomposeApi::class)
     override fun navigateToScreen(config: RootComponent.Config) {
         when (config) {
-            // Main screens - replace the stack
+            // Main 4-tab screens - replace the stack
             is RootComponent.Config.Stats,
             is RootComponent.Config.Timeline,
             is RootComponent.Config.Map,
-            is RootComponent.Config.Photos,
-            is RootComponent.Config.Trips,
-            is RootComponent.Config.Places,
-            is RootComponent.Config.Settings -> navigation.replaceAll(config)
+            is RootComponent.Config.Trips -> navigation.replaceAll(config)
 
-            // Detail screens - push onto stack
+            // Secondary/detail screens - push onto stack
+            // Photos, Places, Settings are now pushed (accessible via nested navigation or top bar)
+            is RootComponent.Config.Photos,
+            is RootComponent.Config.Places,
+            is RootComponent.Config.Settings,
             is RootComponent.Config.RouteView,
             is RootComponent.Config.RouteReplay,
             is RootComponent.Config.TripStatistics,
@@ -351,7 +352,8 @@ class DefaultRootComponent(
                     component =
                         DefaultPhotosComponent(
                             componentContext = componentContext,
-                            photoGalleryController = appComponent.photoGalleryController
+                            photoGalleryController = appComponent.photoGalleryController,
+                            onBack = { navigation.pop() }
                         )
                 )
 
@@ -369,7 +371,8 @@ class DefaultRootComponent(
                     component =
                         DefaultPlacesComponent(
                             componentContext = componentContext,
-                            placesController = appComponent.placesController
+                            placesController = appComponent.placesController,
+                            onBack = { navigation.pop() }
                         )
                 )
 
@@ -378,7 +381,8 @@ class DefaultRootComponent(
                     component =
                         DefaultSettingsComponent(
                             componentContext = componentContext,
-                            locationTrackingController = appComponent.locationTrackingController
+                            locationTrackingController = appComponent.locationTrackingController,
+                            onBack = { navigation.pop() }
                         )
                 )
 

@@ -217,7 +217,7 @@ class RouteReplayController(
     /** Stop and cleanup. */
     fun stop() {
         pause()
-        _state.value = ReplayState()
+        _state.update { ReplayState() }
     }
 
     /** Animation loop that updates vehicle position. */

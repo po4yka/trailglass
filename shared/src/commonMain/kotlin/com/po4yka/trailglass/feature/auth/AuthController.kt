@@ -11,6 +11,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
@@ -91,14 +92,9 @@ class AuthController(
                 }
 
                 val isAuthenticated = checkAuthStatusUseCase.execute()
-                if (isAuthenticated) {
-                    // User is already authenticated, but we need user info
-                    // For now, we'll set to unauthenticated and let them login
-                    // In a real app, we'd fetch user profile here
-                    _state.value = AuthState.Unauthenticated
-                } else {
-                    _state.value = AuthState.Unauthenticated
-                }
+                // User is either authenticated or not - both cases set Unauthenticated for now
+                // In a real app, we'd fetch user profile here if authenticated
+                _state.value = AuthState.Unauthenticated
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -115,8 +111,8 @@ class AuthController(
     ) {
         logger.info { "Login requested for: $email" }
 
-        val previousState = _state.value
-        _state.value = AuthState.Loading("Logging in...")
+        // Atomically capture previous state and set loading state
+        val previousState = _state.getAndUpdate { AuthState.Loading("Logging in...") }
 
         controllerScope.launch {
             try {
@@ -159,8 +155,8 @@ class AuthController(
     ) {
         logger.info { "Registration requested for: $email" }
 
-        val previousState = _state.value
-        _state.value = AuthState.Loading("Creating account...")
+        // Atomically capture previous state and set loading state
+        val previousState = _state.getAndUpdate { AuthState.Loading("Creating account...") }
 
         controllerScope.launch {
             try {

@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CardTravel
 import androidx.compose.material.icons.filled.Map
@@ -120,15 +120,18 @@ fun MainScaffold(
     val activeChild = childStack.active
 
     // Determine current screen from active child
+    // Only 4 main tabs: Stats, Timeline, Map, Trips
+    // Photos, Places, Settings are now accessed via nested navigation or top bar
     val currentScreen =
         when (activeChild.instance) {
             is RootComponent.Child.Stats -> Screen.Stats
             is RootComponent.Child.Timeline -> Screen.Timeline
             is RootComponent.Child.Map -> Screen.Map
-            is RootComponent.Child.Photos -> Screen.Photos
             is RootComponent.Child.Trips -> Screen.Trips
-            is RootComponent.Child.Places -> Screen.Places
-            is RootComponent.Child.Settings -> Screen.Settings
+            // These screens don't show in bottom nav but still show the nav bar
+            is RootComponent.Child.Photos,
+            is RootComponent.Child.Places,
+            is RootComponent.Child.Settings,
             is RootComponent.Child.RouteView,
             is RootComponent.Child.RouteReplay,
             is RootComponent.Child.TripStatistics,
@@ -144,10 +147,10 @@ fun MainScaffold(
             is RootComponent.Child.AddPhoto,
             is RootComponent.Child.AddNote,
             is RootComponent.Child.ManualCheckIn,
-            is RootComponent.Child.MapPicker -> null // No bottom nav for detail screens
+            is RootComponent.Child.MapPicker -> null // No bottom nav for detail/secondary screens
         }
 
-    // Show bottom nav and top bar only for main screens
+    // Show bottom nav and top bar only for main 4-tab screens
     val showBottomNav = currentScreen != null
 
     // Dialog state for trip creation
@@ -162,23 +165,35 @@ fun MainScaffold(
                     colors =
                         TopAppBarDefaults.topAppBarColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            titleContentColor = MaterialTheme.colorScheme.onPrimary
-                        )
+                            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    actions = {
+                        // Settings icon in top bar (accessible from all main screens)
+                        IconButton(
+                            onClick = { rootComponent.navigateToScreen(RootComponent.Config.Settings) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Settings"
+                            )
+                        }
+                    }
                 )
             }
         },
         bottomBar = {
             if (showBottomNav) {
                 NavigationBar {
+                    // Material 3 guidelines: max 5 items in bottom navigation
+                    // Using 4 main tabs: Stats, Timeline, Map, Trips
+                    // Settings moved to TopAppBar, Photos/Places accessible via nested navigation
                     val screens =
                         listOf(
                             Screen.Stats,
                             Screen.Timeline,
                             Screen.Map,
-                            Screen.Photos,
-                            Screen.Trips,
-                            Screen.Places,
-                            Screen.Settings
+                            Screen.Trips
                         )
 
                     screens.forEach { screen ->
@@ -241,13 +256,31 @@ fun MainScaffold(
                     }
 
                     is RootComponent.Child.Photos -> {
-                        PhotosScreenWrapper(
-                            photoGalleryController = instance.component.photoGalleryController,
-                            onPhotoClick = { photoId ->
-                                rootComponent.navigateToScreen(RootComponent.Config.PhotoDetail(photoId))
-                            },
-                            modifier = Modifier
-                        )
+                        Scaffold(
+                            topBar = {
+                                TopAppBar(
+                                    title = { Text("Photos") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        }
+                                    },
+                                    colors = TopAppBarDefaults.topAppBarColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                )
+                            }
+                        ) { innerPadding ->
+                            PhotosScreenWrapper(
+                                photoGalleryController = instance.component.photoGalleryController,
+                                onPhotoClick = { photoId ->
+                                    rootComponent.navigateToScreen(RootComponent.Config.PhotoDetail(photoId))
+                                },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
                     }
 
                     is RootComponent.Child.Trips -> {
@@ -285,40 +318,76 @@ fun MainScaffold(
                                 .collectAsState()
                                 .value
 
-                        PlacesScreen(
-                            places = placesState.places,
-                            searchQuery = placesState.searchQuery,
-                            onPlaceClick = { place ->
-                                rootComponent.navigateToScreen(RootComponent.Config.PlaceDetail(place.id))
-                            },
-                            onRefresh = { instance.component.placesController.refresh() },
-                            onSearch = { query ->
-                                instance.component.placesController.search(query)
-                            },
-                            onClearSearch = {
-                                instance.component.placesController.clearSearch()
-                            },
-                            modifier = Modifier
-                        )
+                        Scaffold(
+                            topBar = {
+                                TopAppBar(
+                                    title = { Text("Places") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        }
+                                    },
+                                    colors = TopAppBarDefaults.topAppBarColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                )
+                            }
+                        ) { innerPadding ->
+                            PlacesScreen(
+                                places = placesState.places,
+                                searchQuery = placesState.searchQuery,
+                                onPlaceClick = { place ->
+                                    rootComponent.navigateToScreen(RootComponent.Config.PlaceDetail(place.id))
+                                },
+                                onRefresh = { instance.component.placesController.refresh() },
+                                onSearch = { query ->
+                                    instance.component.placesController.search(query)
+                                },
+                                onClearSearch = {
+                                    instance.component.placesController.clearSearch()
+                                },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
                     }
 
                     is RootComponent.Child.Settings -> {
-                        SettingsScreen(
-                            trackingController = instance.component.locationTrackingController,
-                            onNavigateToDeviceManagement = {
-                                rootComponent.navigateToScreen(RootComponent.Config.DeviceManagement)
-                            },
-                            onNavigateToAlgorithmSettings = {
-                                rootComponent.navigateToScreen(RootComponent.Config.AlgorithmSettings)
-                            },
-                            onNavigateToLogs = {
-                                rootComponent.navigateToScreen(RootComponent.Config.LogViewer)
-                            },
-                            onNavigateToDiagnostics = {
-                                rootComponent.navigateToScreen(RootComponent.Config.Diagnostics)
-                            },
-                            modifier = Modifier
-                        )
+                        Scaffold(
+                            topBar = {
+                                TopAppBar(
+                                    title = { Text("Settings") },
+                                    navigationIcon = {
+                                        IconButton(onClick = instance.component.onBack) {
+                                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        }
+                                    },
+                                    colors = TopAppBarDefaults.topAppBarColors(
+                                        containerColor = MaterialTheme.colorScheme.primary,
+                                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                )
+                            }
+                        ) { innerPadding ->
+                            SettingsScreen(
+                                trackingController = instance.component.locationTrackingController,
+                                onNavigateToDeviceManagement = {
+                                    rootComponent.navigateToScreen(RootComponent.Config.DeviceManagement)
+                                },
+                                onNavigateToAlgorithmSettings = {
+                                    rootComponent.navigateToScreen(RootComponent.Config.AlgorithmSettings)
+                                },
+                                onNavigateToLogs = {
+                                    rootComponent.navigateToScreen(RootComponent.Config.LogViewer)
+                                },
+                                onNavigateToDiagnostics = {
+                                    rootComponent.navigateToScreen(RootComponent.Config.Diagnostics)
+                                },
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
                     }
 
                     is RootComponent.Child.PhotoDetail -> {

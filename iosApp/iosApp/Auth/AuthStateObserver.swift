@@ -43,7 +43,8 @@ final class AuthStateObserver: ObservableObject {
         self.authController = authController
 
         // Set initial state synchronously
-        if let initialState = authController.state.value {
+        // Note: StateFlow.value returns Any? in Swift, need to cast to AuthState
+        if let initialState = authController.state.value as? AuthState {
             updateState(initialState)
         }
 

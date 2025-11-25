@@ -9,6 +9,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
@@ -46,39 +47,38 @@ class TripStatisticsController(
     fun loadStatistics(tripId: String) {
         controllerScope.launch {
             logger.info { "Loading statistics for trip $tripId" }
-            _state.value = _state.value.copy(isLoading = true, error = null)
+            _state.update { it.copy(isLoading = true, error = null) }
 
             getTripRouteUseCase
                 .execute(tripId)
                 .onSuccess { tripRoute ->
                     logger.info { "Statistics loaded successfully" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             tripRoute = tripRoute,
                             isLoading = false
                         )
+                    }
                 }.onError { error ->
                     logger.error { "Failed to load statistics for trip $tripId - ${error.getTechnicalDetails()}" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             isLoading = false,
                             error = error.getUserFriendlyMessage()
                         )
+                    }
                 }
         }
     }
 
     /** Toggle transport breakdown visibility. */
     fun toggleTransportBreakdown() {
-        _state.value =
-            _state.value.copy(
-                showTransportBreakdown = !_state.value.showTransportBreakdown
-            )
+        _state.update { it.copy(showTransportBreakdown = !it.showTransportBreakdown) }
     }
 
     /** Clear error state. */
     fun clearError() {
-        _state.value = _state.value.copy(error = null)
+        _state.update { it.copy(error = null) }
     }
 
     /**

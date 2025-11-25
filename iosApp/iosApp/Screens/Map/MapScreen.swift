@@ -7,9 +7,12 @@ struct MapScreen: View {
     @StateObject private var viewModel: MapViewModel
     @State private var showLocationPermissionDialog = false
     @State private var scrollOffset: CGFloat = 0
+    @State private var showPlacesSheet = false
+    var appComponent: AppComponent?
 
-    init(mapController: MapController) {
+    init(mapController: MapController, appComponent: AppComponent? = nil) {
         _viewModel = StateObject(wrappedValue: MapViewModel(controller: mapController))
+        self.appComponent = appComponent
     }
 
     var body: some View {
@@ -55,6 +58,9 @@ struct MapScreen: View {
                 title: "Map",
                 scrollOffset: scrollOffset,
                 actions: [
+                    NavigationAction(icon: "mappin.and.ellipse") {
+                        showPlacesSheet = true
+                    },
                     NavigationAction(icon: "location.fill") {
                         viewModel.centerOnUserLocation()
                     },
@@ -90,6 +96,20 @@ struct MapScreen: View {
         }
         .onAppear {
             viewModel.refreshData()
+        }
+        .sheet(isPresented: $showPlacesSheet) {
+            if let appComponent = appComponent {
+                NavigationStack {
+                    SimplePlacesView(placesController: appComponent.placesController)
+                        .toolbar {
+                            ToolbarItem(placement: .topBarLeading) {
+                                Button("Done") {
+                                    showPlacesSheet = false
+                                }
+                            }
+                        }
+                }
+            }
         }
     }
 }
