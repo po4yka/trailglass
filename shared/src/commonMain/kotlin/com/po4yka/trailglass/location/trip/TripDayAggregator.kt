@@ -119,66 +119,55 @@ class TripDayAggregator(
         routes: List<RouteSegment>,
         dayStart: Instant,
         dayEnd: Instant
-    ): List<TimelineItem> {
-        val items = mutableListOf<TimelineItem>()
-
-        // Add day start marker
-        items.add(
-            TimelineItem.DayStart(
-                id = generateTimelineItemId("day_start", date),
-                timestamp = dayStart
-            )
-        )
-
-        // Merge visits and routes into a single sorted timeline
-        val visitItems =
-            visits.map { visit ->
-                TimelineItem.Visit(
-                    id = generateTimelineItemId("visit", visit.id),
-                    timestamp = visit.startTime,
-                    placeVisit = visit
+    ): List<TimelineItem> =
+        buildList {
+            // Add day start marker
+            add(
+                TimelineItem.DayStart(
+                    id = generateTimelineItemId("day_start", date),
+                    timestamp = dayStart
                 )
-            }
-
-        val routeItems =
-            routes.map { route ->
-                TimelineItem.Route(
-                    id = generateTimelineItemId("route", route.id),
-                    timestamp = route.startTime,
-                    routeSegment = route
-                )
-            }
-
-        // Combine and sort by timestamp
-        val allItems = (visitItems + routeItems).sortedBy { it.timestamp }
-        items.addAll(allItems)
-
-        // Add day end marker
-        items.add(
-            TimelineItem.DayEnd(
-                id = generateTimelineItemId("day_end", date),
-                timestamp = dayEnd
             )
-        )
 
-        return items
-    }
+            // Merge visits and routes into a single sorted timeline
+            val visitItems =
+                visits.map { visit ->
+                    TimelineItem.Visit(
+                        id = generateTimelineItemId("visit", visit.id),
+                        timestamp = visit.startTime,
+                        placeVisit = visit
+                    )
+                }
+
+            val routeItems =
+                routes.map { route ->
+                    TimelineItem.Route(
+                        id = generateTimelineItemId("route", route.id),
+                        timestamp = route.startTime,
+                        routeSegment = route
+                    )
+                }
+
+            // Combine and sort by timestamp
+            addAll((visitItems + routeItems).sortedBy { it.timestamp })
+
+            // Add day end marker
+            add(
+                TimelineItem.DayEnd(
+                    id = generateTimelineItemId("day_end", date),
+                    timestamp = dayEnd
+                )
+            )
+        }
 
     /** Generate a range of dates from start to end (inclusive). */
     private fun generateDayRange(
         start: LocalDate,
         end: LocalDate
-    ): List<LocalDate> {
-        val days = mutableListOf<LocalDate>()
-        var current = start
-
-        while (current <= end) {
-            days.add(current)
-            current = current.plus(1, DateTimeUnit.DAY)
-        }
-
-        return days
-    }
+    ): List<LocalDate> =
+        generateSequence(start) { current ->
+            current.plus(1, DateTimeUnit.DAY).takeIf { it <= end }
+        }.toList()
 
     /** Generate a deterministic ID for a TripDay. */
     private fun generateTripDayId(

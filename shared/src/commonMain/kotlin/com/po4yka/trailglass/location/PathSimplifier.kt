@@ -52,20 +52,18 @@ class PathSimplifier(
     ): List<Coordinate> {
         if (points.size < 3) return points
 
-        // Find the point with the maximum distance from the line segment
-        var maxDistance = 0.0
-        var maxIndex = 0
-
         val start = points.first()
         val end = points.last()
 
-        for (i in 1 until points.lastIndex) {
-            val distance = perpendicularDistance(points[i], start, end)
-            if (distance > maxDistance) {
-                maxDistance = distance
-                maxIndex = i
-            }
-        }
+        // Find the point with the maximum distance from the line segment
+        val (maxIndex, maxDistance) =
+            (1 until points.lastIndex)
+                .asSequence()
+                .map { index ->
+                    val distance = perpendicularDistance(points[index], start, end)
+                    index to distance
+                }.maxByOrNull { it.second }
+                ?: (0 to 0.0)
 
         // If max distance is greater than epsilon, recursively simplify
         return if (maxDistance > epsilon) {
