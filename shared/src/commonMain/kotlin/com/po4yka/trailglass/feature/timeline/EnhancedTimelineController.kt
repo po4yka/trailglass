@@ -2,6 +2,7 @@ package com.po4yka.trailglass.feature.timeline
 
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -78,6 +79,8 @@ class EnhancedTimelineController(
 
                 _state.update { it.copy(items = items, isLoading = false) }
                 logger.info { "Loaded ${items.size} timeline items" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load timeline" }
                 _state.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }

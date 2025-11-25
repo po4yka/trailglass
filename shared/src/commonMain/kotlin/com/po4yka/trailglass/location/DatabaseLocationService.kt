@@ -1,6 +1,5 @@
 package com.po4yka.trailglass.location
 
-import com.po4yka.trailglass.data.auth.DefaultUserSession
 import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.domain.model.LocationSample
@@ -16,7 +15,7 @@ class DatabaseLocationService(
     private val locationRepository: LocationRepository,
     private val placeVisitRepository: PlaceVisitRepository,
     reverseGeocoder: ReverseGeocoder,
-    private val userId: String = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
+    private val userId: String
 ) : LocationRecorder {
     private val placeVisitProcessor = PlaceVisitProcessor(reverseGeocoder)
 

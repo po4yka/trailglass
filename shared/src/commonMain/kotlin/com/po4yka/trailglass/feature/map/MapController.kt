@@ -13,6 +13,7 @@ import com.po4yka.trailglass.domain.service.LocationService
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -119,38 +120,44 @@ class MapController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            try {
-                val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
+            val result = getMapDataUseCase.execute(userId, startTime, endTime)
 
-                // Set camera to region center with smooth animation if available
-                val cameraMove =
-                    mapData.region?.let { region ->
-                        CameraMove.Ease(
-                            position =
-                                CameraPosition(
-                                    target = region.center,
-                                    zoom = MapOperations.calculateZoomLevel(region)
-                                ),
-                            durationMs = 1500
+            result
+                .onSuccess { mapData ->
+                    // Set camera to region center with smooth animation if available
+                    val cameraMove =
+                        mapData.region?.let { region ->
+                            CameraMove.Ease(
+                                position =
+                                    CameraPosition(
+                                        target = region.center,
+                                        zoom = MapOperations.calculateZoomLevel(region)
+                                    ),
+                                durationMs = 1500
+                            )
+                        }
+
+                    _state.update {
+                        it.copy(
+                            mapData = mapData,
+                            cameraMove = cameraMove,
+                            isLoading = false
                         )
                     }
 
-                _state.update {
-                    it.copy(
-                        mapData = mapData,
-                        cameraMove = cameraMove,
-                        isLoading = false
-                    )
+                    logger.info {
+                        "Loaded map data: ${mapData.markers.size} markers, " +
+                            "${mapData.routes.size} routes"
+                    }
+                }.onError { error ->
+                    logger.error { "Failed to load map data: ${error.getTechnicalDetails()}" }
+                    _state.update {
+                        it.copy(
+                            error = error.getUserFriendlyMessage(),
+                            isLoading = false
+                        )
+                    }
                 }
-
-                logger.info {
-                    "Loaded map data: ${mapData.markers.size} markers, " +
-                        "${mapData.routes.size} routes"
-                }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to load map data" }
-                _state.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }
-            }
         }
     }
 

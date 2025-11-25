@@ -3,7 +3,7 @@ package com.po4yka.trailglass.data.repository.impl
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
-import com.po4yka.trailglass.data.auth.DefaultUserSession
+import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.domain.model.Coordinate
@@ -21,7 +21,8 @@ import me.tatarka.inject.annotations.Inject
 /** SQLDelight implementation of RouteSegmentRepository. */
 @Inject
 class RouteSegmentRepositoryImpl(
-    private val database: Database
+    private val database: Database,
+    private val userSession: UserSession
 ) : RouteSegmentRepository {
     private val logger = logger()
     private val queries = database.routeSegmentsQueries
@@ -48,7 +49,7 @@ class RouteSegmentRepositoryImpl(
                         transport_type = segment.transportType.name,
                         distance_meters = segment.distanceMeters,
                         average_speed_mps = segment.averageSpeedMps,
-                        user_id = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous",
+                        user_id = userSession.getCurrentUserId() ?: "anonymous",
                         trip_id = null,
                         created_at = now,
                         updated_at = now,

@@ -1,7 +1,7 @@
 package com.po4yka.trailglass.di
 
 import android.content.Context
-import com.po4yka.trailglass.data.auth.DefaultUserSession
+import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.db.AndroidDatabaseDriverFactory
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
 import com.po4yka.trailglass.data.file.AndroidPhotoDirectoryProvider
@@ -75,7 +75,7 @@ class AndroidPlatformModule(
     override fun applicationScope(): CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     @Provides
-    override fun userId(): String = DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous"
+    override fun userId(userSession: UserSession): String = userSession.getCurrentUserId() ?: "anonymous"
 
     @Provides
     override fun deviceId(): String =

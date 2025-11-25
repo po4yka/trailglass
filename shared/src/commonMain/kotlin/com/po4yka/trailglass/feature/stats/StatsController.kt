@@ -2,6 +2,7 @@ package com.po4yka.trailglass.feature.stats
 
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -56,6 +57,8 @@ class StatsController(
                     "Loaded stats for $period: ${stats.countriesVisited.size} countries, " +
                         "${stats.totalTrips} trips"
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load stats for $period" }
                 _state.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }

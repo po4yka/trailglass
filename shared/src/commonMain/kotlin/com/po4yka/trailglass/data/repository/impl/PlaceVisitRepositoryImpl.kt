@@ -1,6 +1,6 @@
 package com.po4yka.trailglass.data.repository.impl
 
-import com.po4yka.trailglass.data.auth.DefaultUserSession
+import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.domain.model.CategoryConfidence
@@ -20,7 +20,8 @@ import me.tatarka.inject.annotations.Inject
 /** SQLDelight implementation of PlaceVisitRepository. */
 @Inject
 class PlaceVisitRepositoryImpl(
-    private val database: Database
+    private val database: Database,
+    private val userSession: UserSession
 ) : PlaceVisitRepository {
     private val visitQueries = database.placeVisitQueries
     private val logger = logger()
@@ -31,33 +32,35 @@ class PlaceVisitRepositoryImpl(
                 "Inserting place visit: ${visit.id} at ${visit.city ?: "(${visit.centerLatitude}, ${visit.centerLongitude})"}"
             }
             try {
-                // Insert the visit
-                visitQueries.insertVisit(
-                    id = visit.id,
-                    start_time = visit.startTime.toEpochMilliseconds(),
-                    end_time = visit.endTime.toEpochMilliseconds(),
-                    center_latitude = visit.centerLatitude,
-                    center_longitude = visit.centerLongitude,
-                    approximate_address = visit.approximateAddress,
-                    poi_name = visit.poiName,
-                    city = visit.city,
-                    country_code = visit.countryCode,
-                    category = visit.category.name,
-                    category_confidence = visit.categoryConfidence.name,
-                    significance = visit.significance.name,
-                    user_label = visit.userLabel,
-                    user_notes = visit.userNotes,
-                    is_favorite = if (visit.isFavorite) 1L else 0L,
-                    frequent_place_id = visit.frequentPlaceId,
-                    user_id = visit.userId ?: DefaultUserSession.getInstance().getCurrentUserId() ?: "anonymous",
-                    created_at = visit.createdAt?.toEpochMilliseconds() ?: Clock.System.now().toEpochMilliseconds(),
-                    updated_at = visit.updatedAt?.toEpochMilliseconds() ?: Clock.System.now().toEpochMilliseconds(),
-                    deleted_at = null
-                )
+                database.transaction {
+                    // Insert the visit
+                    visitQueries.insertVisit(
+                        id = visit.id,
+                        start_time = visit.startTime.toEpochMilliseconds(),
+                        end_time = visit.endTime.toEpochMilliseconds(),
+                        center_latitude = visit.centerLatitude,
+                        center_longitude = visit.centerLongitude,
+                        approximate_address = visit.approximateAddress,
+                        poi_name = visit.poiName,
+                        city = visit.city,
+                        country_code = visit.countryCode,
+                        category = visit.category.name,
+                        category_confidence = visit.categoryConfidence.name,
+                        significance = visit.significance.name,
+                        user_label = visit.userLabel,
+                        user_notes = visit.userNotes,
+                        is_favorite = if (visit.isFavorite) 1L else 0L,
+                        frequent_place_id = visit.frequentPlaceId,
+                        user_id = visit.userId ?: userSession.getCurrentUserId() ?: "anonymous",
+                        created_at = visit.createdAt?.toEpochMilliseconds() ?: Clock.System.now().toEpochMilliseconds(),
+                        updated_at = visit.updatedAt?.toEpochMilliseconds() ?: Clock.System.now().toEpochMilliseconds(),
+                        deleted_at = null
+                    )
 
-                // Link samples
-                visit.locationSampleIds.forEach { sampleId ->
-                    visitQueries.linkSample(visit.id, sampleId)
+                    // Link samples
+                    visit.locationSampleIds.forEach { sampleId ->
+                        visitQueries.linkSample(visit.id, sampleId)
+                    }
                 }
                 logger.debug {
                     "Successfully inserted place visit ${visit.id} with ${visit.locationSampleIds.size} linked samples"
@@ -157,8 +160,10 @@ class PlaceVisitRepositoryImpl(
         visitId: String,
         sampleIds: List<String>
     ) = withContext(Dispatchers.IO) {
-        sampleIds.forEach { sampleId ->
-            visitQueries.linkSample(visitId, sampleId)
+        database.transaction {
+            sampleIds.forEach { sampleId ->
+                visitQueries.linkSample(visitId, sampleId)
+            }
         }
     }
 

@@ -122,6 +122,7 @@ class AndroidEncryptionService : EncryptionService {
                         ?: throw EncryptionException("Encryption key not found")
 
                 val keyBytes = secretKey.encoded
+                    ?: throw EncryptionException("Key cannot be exported - hardware-backed keys cannot be extracted")
 
                 // Derive a key from the password using PBKDF2
                 val salt =

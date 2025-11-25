@@ -5,6 +5,7 @@ import com.po4yka.trailglass.domain.model.PhotoWithMetadata
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import com.po4yka.trailglass.photo.PhotoMetadataExtractor
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -110,6 +111,8 @@ class PhotoDetailController(
                 }
 
                 logger.info { "Loaded photo $photoId successfully" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load photo $photoId" }
                 _state.update {

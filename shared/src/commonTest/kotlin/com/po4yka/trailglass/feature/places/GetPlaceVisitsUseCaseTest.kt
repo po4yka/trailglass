@@ -3,6 +3,7 @@ package com.po4yka.trailglass.feature.places
 import com.po4yka.trailglass.TestDatabaseHelper
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.impl.PlaceVisitRepositoryImpl
+import com.po4yka.trailglass.di.FakeUserSession
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
@@ -23,7 +24,7 @@ class GetPlaceVisitsUseCaseTest {
     @BeforeTest
     fun setup() {
         TestDatabaseHelper.clearDatabase(database)
-        repository = PlaceVisitRepositoryImpl(database)
+        repository = PlaceVisitRepositoryImpl(database, FakeUserSession(userId))
         useCase = GetPlaceVisitsUseCase(repository)
     }
 

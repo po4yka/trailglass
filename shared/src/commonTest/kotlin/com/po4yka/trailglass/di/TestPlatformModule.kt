@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.di
 
+import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.db.DatabaseDriverFactory
 import com.po4yka.trailglass.data.network.NetworkConnectivityMonitor
 import com.po4yka.trailglass.data.network.NetworkInfo
@@ -59,7 +60,7 @@ class TestPlatformModule(
 
     override fun applicationScope(): CoroutineScope = testScope
 
-    override fun userId(): String = testUserId
+    override fun userId(userSession: UserSession): String = userSession.getCurrentUserId() ?: testUserId
 
     override fun deviceId(): String = testDeviceId
 
@@ -95,6 +96,16 @@ class TestPlatformModule(
     override fun performanceMonitoringService(): PerformanceMonitoringService = FakePerformanceMonitoringService()
 
     override fun platformDiagnostics(): PlatformDiagnostics = FakePlatformDiagnostics()
+}
+
+class FakeUserSession(
+    private var currentUserId: String? = "test-user"
+) : UserSession {
+    override fun getCurrentUserId(): String? = currentUserId
+    override fun isAuthenticated(): Boolean = currentUserId != null
+    override fun setUserId(userId: String?) {
+        currentUserId = userId
+    }
 }
 
 class InMemoryTokenStorage : TokenStorage {

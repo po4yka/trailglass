@@ -260,11 +260,17 @@ class LocationTrackingController(
      * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
      * needed.
      *
-     * Cancels all running coroutines including flow collectors.
+     * Cancels all running coroutines including flow collectors and cleans up the location tracker.
      */
     override fun cleanup() {
         logger.info { "Cleaning up LocationTrackingController" }
         controllerScope.cancel()
+
+        // Clean up the location tracker if it implements Lifecycle
+        if (locationTracker is Lifecycle) {
+            locationTracker.cleanup()
+        }
+
         logger.debug { "LocationTrackingController cleanup complete" }
     }
 }

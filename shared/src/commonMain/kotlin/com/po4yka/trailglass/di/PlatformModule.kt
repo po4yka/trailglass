@@ -25,7 +25,7 @@ interface PlatformModule {
     fun applicationScope(): CoroutineScope
 
     /** Current user ID. */
-    fun userId(): String
+    fun userId(userSession: com.po4yka.trailglass.data.auth.UserSession): String
 
     /** Device identifier. */
     fun deviceId(): String

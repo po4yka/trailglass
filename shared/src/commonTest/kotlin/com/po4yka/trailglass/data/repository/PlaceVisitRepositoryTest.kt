@@ -3,6 +3,7 @@ package com.po4yka.trailglass.data.repository
 import com.po4yka.trailglass.TestDatabaseHelper
 import com.po4yka.trailglass.data.repository.impl.LocationRepositoryImpl
 import com.po4yka.trailglass.data.repository.impl.PlaceVisitRepositoryImpl
+import com.po4yka.trailglass.di.FakeUserSession
 import com.po4yka.trailglass.domain.model.CategoryConfidence
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
@@ -32,7 +33,7 @@ class PlaceVisitRepositoryTest {
     @BeforeTest
     fun setup() {
         TestDatabaseHelper.clearDatabase(database)
-        visitRepository = PlaceVisitRepositoryImpl(database)
+        visitRepository = PlaceVisitRepositoryImpl(database, FakeUserSession(userId))
         locationRepository = LocationRepositoryImpl(database)
     }
 

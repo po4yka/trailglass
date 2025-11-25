@@ -3,6 +3,7 @@ package com.po4yka.trailglass.feature.auth
 import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -97,6 +98,8 @@ class AuthController(
                 } else {
                     _state.value = AuthState.Unauthenticated
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to check auth status" }
                 _state.value = AuthState.Unauthenticated
@@ -143,6 +146,8 @@ class AuthController(
                         _state.value = AuthState.Error(errorMessage, previousState)
                         logger.error(error) { "Login failed for: $email" }
                     }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _state.value =
                     AuthState.Error(
@@ -200,6 +205,8 @@ class AuthController(
                         _state.value = AuthState.Error(errorMessage, previousState)
                         logger.error(error) { "Registration failed for: $email" }
                     }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _state.value =
                     AuthState.Error(

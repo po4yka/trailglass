@@ -3,6 +3,7 @@ package com.po4yka.trailglass.feature.stats
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.stats.models.ComprehensiveStatistics
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -57,6 +58,8 @@ class EnhancedStatsController(
                     "Loaded comprehensive stats for $period: ${stats.distanceStats.totalDistanceKm.toInt()} km, " +
                         "${stats.geographicStats.countries.size} countries"
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load comprehensive stats for $period" }
                 _state.update {

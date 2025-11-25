@@ -11,6 +11,7 @@ import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.location.tracking.TrackingMode
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -178,6 +179,8 @@ class DiagnosticsController(
                 refreshLocationStatus()
 
                 _state.update { it.copy(isLoading = false) }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Error refreshing diagnostics" }
                 _state.update { it.copy(isLoading = false, error = e.message ?: "Unknown error") }

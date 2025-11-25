@@ -8,6 +8,7 @@ import com.po4yka.trailglass.domain.model.TransitionType
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.location.CurrentLocationProvider
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -172,6 +173,8 @@ class RegionsController(
                         )
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load regions" }
                 _state.update {

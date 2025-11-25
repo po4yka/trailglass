@@ -12,6 +12,7 @@ import com.po4yka.trailglass.domain.permission.isGranted
 import com.po4yka.trailglass.domain.permission.requiresSettings
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -130,6 +131,8 @@ class PermissionFlowController(
                         requestPermissionInternal(permissionType, rationale)
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Error starting permission flow" }
                 _state.update {
@@ -318,6 +321,8 @@ class PermissionFlowController(
                         }
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Error requesting permission" }
                 _state.update {

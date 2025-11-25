@@ -7,6 +7,7 @@ import com.po4yka.trailglass.domain.permission.PermissionType
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -143,6 +144,8 @@ class PhotoController(
                 val photos = getPhotosForDayUseCase.execute(date, userId)
                 _state.update { it.copy(photos = photos, isLoading = false) }
                 logger.info { "Loaded ${photos.size} photos for $date" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load photos for $date" }
                 _state.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }
@@ -175,6 +178,8 @@ class PhotoController(
                 val suggested = suggestPhotosUseCase.execute(visit, userId)
                 _state.update { it.copy(suggestedPhotos = suggested, isLoading = false) }
                 logger.info { "Loaded ${suggested.size} suggested photos for visit ${visit.id}" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load suggestions for visit ${visit.id}" }
                 _state.update { it.copy(error = e.message ?: "Unknown error", isLoading = false) }

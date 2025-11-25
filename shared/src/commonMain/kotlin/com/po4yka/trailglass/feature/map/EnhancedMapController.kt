@@ -69,81 +69,81 @@ class EnhancedMapController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            try {
-                // Load base map data
-                val mapData = getMapDataUseCase.execute(userId, startTime, endTime)
+            val result = getMapDataUseCase.execute(userId, startTime, endTime)
 
-                // Convert to enhanced markers
-                val enhancedMarkers =
-                    mapData.markers.map { marker ->
-                        // Would need to load additional data like category, visit count
-                        // For now, use placeholder values
-                        EnhancedMapMarker(
-                            id = marker.id,
-                            coordinate = marker.coordinate,
-                            title = marker.title,
-                            snippet = marker.snippet,
-                            placeVisitId = marker.placeVisitId,
-                            category = PlaceCategory.OTHER, // Would load from place visit
-                            isFavorite = false,
-                            visitCount = 1
+            result
+                .onSuccess { mapData ->
+                    // Convert to enhanced markers
+                    val enhancedMarkers =
+                        mapData.markers.map { marker ->
+                            // Would need to load additional data like category, visit count
+                            // For now, use placeholder values
+                            EnhancedMapMarker(
+                                id = marker.id,
+                                coordinate = marker.coordinate,
+                                title = marker.title,
+                                snippet = marker.snippet,
+                                placeVisitId = marker.placeVisitId,
+                                category = PlaceCategory.OTHER, // Would load from place visit
+                                isFavorite = false,
+                                visitCount = 1
+                            )
+                        }
+
+                    // Apply clustering if enabled
+                    val (clusters, singleMarkers) =
+                        if (enableClustering) {
+                            markerClusterer.cluster(
+                                markers = enhancedMarkers,
+                                zoomLevel = _state.value.zoomLevel
+                            )
+                        } else {
+                            Pair(emptyList(), enhancedMarkers)
+                        }
+
+                    // Generate heatmap if enabled
+                    val heatmap =
+                        if (enableHeatmap) {
+                            heatmapGenerator.generate(
+                                markers = enhancedMarkers,
+                                intensityMode = HeatmapGenerator.IntensityMode.VISIT_COUNT
+                            )
+                        } else {
+                            null
+                        }
+
+                    // Update state
+                    _state.update {
+                        it.copy(
+                            mapData =
+                                EnhancedMapDisplayData(
+                                    markers = singleMarkers,
+                                    clusters = clusters,
+                                    routes = mapData.routes,
+                                    heatmapData = heatmap,
+                                    region = mapData.region,
+                                    clusteringEnabled = enableClustering,
+                                    heatmapEnabled = enableHeatmap
+                                ),
+                            clusteringEnabled = enableClustering,
+                            heatmapEnabled = enableHeatmap,
+                            isLoading = false
                         )
                     }
 
-                // Apply clustering if enabled
-                val (clusters, singleMarkers) =
-                    if (enableClustering) {
-                        markerClusterer.cluster(
-                            markers = enhancedMarkers,
-                            zoomLevel = _state.value.zoomLevel
-                        )
-                    } else {
-                        Pair(emptyList(), enhancedMarkers)
+                    logger.info {
+                        "Loaded enhanced map data: ${enhancedMarkers.size} markers, " +
+                            "${clusters.size} clusters, ${mapData.routes.size} routes"
                     }
-
-                // Generate heatmap if enabled
-                val heatmap =
-                    if (enableHeatmap) {
-                        heatmapGenerator.generate(
-                            markers = enhancedMarkers,
-                            intensityMode = HeatmapGenerator.IntensityMode.VISIT_COUNT
+                }.onError { error ->
+                    logger.error { "Failed to load enhanced map data: ${error.getTechnicalDetails()}" }
+                    _state.update {
+                        it.copy(
+                            error = error.getUserFriendlyMessage(),
+                            isLoading = false
                         )
-                    } else {
-                        null
                     }
-
-                // Update state
-                _state.update {
-                    it.copy(
-                        mapData =
-                            EnhancedMapDisplayData(
-                                markers = singleMarkers,
-                                clusters = clusters,
-                                routes = mapData.routes,
-                                heatmapData = heatmap,
-                                region = mapData.region,
-                                clusteringEnabled = enableClustering,
-                                heatmapEnabled = enableHeatmap
-                            ),
-                        clusteringEnabled = enableClustering,
-                        heatmapEnabled = enableHeatmap,
-                        isLoading = false
-                    )
                 }
-
-                logger.info {
-                    "Loaded enhanced map data: ${enhancedMarkers.size} markers, " +
-                        "${clusters.size} clusters, ${mapData.routes.size} routes"
-                }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to load enhanced map data" }
-                _state.update {
-                    it.copy(
-                        error = e.message ?: "Unknown error",
-                        isLoading = false
-                    )
-                }
-            }
         }
     }
 

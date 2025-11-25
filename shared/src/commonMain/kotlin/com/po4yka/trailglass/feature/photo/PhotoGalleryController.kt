@@ -3,6 +3,7 @@ package com.po4yka.trailglass.feature.photo
 import com.po4yka.trailglass.domain.model.PhotoGroup
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -78,6 +79,8 @@ class PhotoGalleryController(
                 }
 
                 logger.info { "Loaded ${photoGroups.size} photo groups" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load photo gallery" }
                 _state.update {
@@ -127,6 +130,8 @@ class PhotoGalleryController(
                 }
 
                 logger.info { "Loaded ${photoGroups.size} photo groups (all time)" }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Failed to load all photos" }
                 _state.update {
@@ -202,6 +207,8 @@ class PhotoGalleryController(
                         }
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 logger.error(e) { "Exception while importing photo" }
                 _state.update {

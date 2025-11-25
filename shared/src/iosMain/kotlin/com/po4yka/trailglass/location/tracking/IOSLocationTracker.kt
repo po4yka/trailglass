@@ -3,6 +3,7 @@ package com.po4yka.trailglass.location.tracking
 import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
@@ -19,7 +20,11 @@ import platform.darwin.NSObject
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
-/** iOS implementation of LocationTracker using CLLocationManager. */
+/**
+ * iOS implementation of LocationTracker using CLLocationManager.
+ *
+ * IMPORTANT: Call [cleanup] when this tracker is no longer needed to prevent memory leaks.
+ */
 @OptIn(ExperimentalForeignApi::class, ExperimentalUuidApi::class)
 class IOSLocationTracker(
     private val repository: LocationRepository,
@@ -27,7 +32,7 @@ class IOSLocationTracker(
     private val deviceId: String,
     private val userId: String,
     private val coroutineScope: kotlinx.coroutines.CoroutineScope
-) : LocationTracker {
+) : LocationTracker, Lifecycle {
     private val logger = logger()
     private val locationManager = CLLocationManager()
     private val delegate = LocationManagerDelegate()
@@ -105,6 +110,25 @@ class IOSLocationTracker(
         }
 
         logger.info { "Location tracking stopped" }
+    }
+
+    /**
+     * Cleanup and release all resources held by this tracker.
+     *
+     * This breaks the retain cycle between the delegate and the tracker by clearing
+     * the delegate reference from the locationManager and the tracker reference from the delegate.
+     *
+     * IMPORTANT: Call this method when the tracker is no longer needed to prevent memory leaks.
+     * After cleanup, this tracker should not be used again.
+     */
+    override fun cleanup() {
+        logger.info { "Cleaning up IOSLocationTracker" }
+
+        // Break the retain cycle by clearing references
+        locationManager.delegate = null
+        delegate.locationTracker = null
+
+        logger.debug { "IOSLocationTracker cleanup complete" }
     }
 
     override suspend fun hasPermissions(): Boolean {
