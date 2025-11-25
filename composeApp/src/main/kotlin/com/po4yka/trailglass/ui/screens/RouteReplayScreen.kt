@@ -125,7 +125,7 @@ fun RouteReplayScreen(
                 }
             }
 
-            state.tripRoute != null && state.vehicleState != null -> {
+            state.tripRoute != null && state.vehicleState != null && state.cameraPosition != null -> {
                 // Replay content
                 RouteReplayContent(
                     controller = controller,

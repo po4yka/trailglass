@@ -72,20 +72,34 @@ class IOSSecureTokenStorage : TokenStorage {
         value: String
     ) {
         val query = createKeychainQuery(key)
+        if (query == null) {
+            logger.error { "Failed to create keychain query for save: $key" }
+            return
+        }
 
         // Delete existing item
-        SecItemDelete(query as CFDictionaryRef)
+        SecItemDelete(query)
 
         // Add new item
-        val addQuery = CFDictionaryCreateMutableCopy(null, 0, query as CFDictionaryRef)
         val data = value.toNSData()
+        if (data == null) {
+            logger.error { "Failed to encode value for keychain storage: $key" }
+            return
+        }
+
+        val addQuery = CFDictionaryCreateMutableCopy(null, 0, query)
+        if (addQuery == null) {
+            logger.error { "Failed to create mutable copy for keychain save: $key" }
+            return
+        }
+
         CFDictionarySetValue(
             addQuery,
             kSecValueData,
             CFBridgingRetain(data)
         )
 
-        val status = SecItemAdd(addQuery as CFDictionaryRef, null)
+        val status = SecItemAdd(addQuery, null)
         if (status != errSecSuccess) {
             logger.error { "Keychain save failed for key: $key, status: $status" }
         }
@@ -94,18 +108,31 @@ class IOSSecureTokenStorage : TokenStorage {
     @OptIn(ExperimentalForeignApi::class)
     private fun getFromKeychain(key: String): String? {
         val query = createKeychainQuery(key)
+        if (query == null) {
+            logger.error { "Failed to create keychain query for get: $key" }
+            return null
+        }
 
-        val searchQuery = CFDictionaryCreateMutableCopy(null, 0, query as CFDictionaryRef)
+        val searchQuery = CFDictionaryCreateMutableCopy(null, 0, query)
+        if (searchQuery == null) {
+            logger.error { "Failed to create mutable copy for keychain get: $key" }
+            return null
+        }
+
         CFDictionarySetValue(searchQuery, kSecReturnData, kCFBooleanTrue)
         CFDictionarySetValue(searchQuery, kSecMatchLimit, kSecMatchLimitOne)
 
         memScoped {
             val result = alloc<CFTypeRefVar>()
-            val status = SecItemCopyMatching(searchQuery as CFDictionaryRef, result.ptr)
+            val status = SecItemCopyMatching(searchQuery, result.ptr)
 
             return if (status == errSecSuccess) {
-                val data = result.value as NSData
-                NSString.create(data, NSUTF8StringEncoding) as String
+                val data = result.value as? NSData
+                if (data != null) {
+                    NSString.create(data, NSUTF8StringEncoding) as? String
+                } else {
+                    null
+                }
             } else {
                 null
             }
@@ -115,27 +142,39 @@ class IOSSecureTokenStorage : TokenStorage {
     @OptIn(ExperimentalForeignApi::class)
     private fun deleteFromKeychain(key: String) {
         val query = createKeychainQuery(key)
-        SecItemDelete(query as CFDictionaryRef)
+        if (query != null) {
+            SecItemDelete(query)
+        } else {
+            logger.error { "Failed to create keychain query for deletion: $key" }
+        }
     }
 
     @OptIn(ExperimentalForeignApi::class)
-    private fun createKeychainQuery(key: String): CFDictionaryRef =
-        CFDictionaryCreateMutable(
+    private fun createKeychainQuery(key: String): CFDictionaryRef? {
+        val serviceString = SERVICE_NAME.toCFString()
+        val accountString = key.toCFString()
+        if (serviceString == null || accountString == null) {
+            logger.error { "Failed to create CFString for keychain query: $key" }
+            return null
+        }
+
+        return CFDictionaryCreateMutable(
             null,
             4,
             null,
             null
-        )!!.apply {
+        )?.apply {
             CFDictionarySetValue(this, kSecClass, kSecClassGenericPassword)
-            CFDictionarySetValue(this, kSecAttrService, SERVICE_NAME.toCFString())
-            CFDictionarySetValue(this, kSecAttrAccount, key.toCFString())
+            CFDictionarySetValue(this, kSecAttrService, serviceString)
+            CFDictionarySetValue(this, kSecAttrAccount, accountString)
             CFDictionarySetValue(this, kSecAttrAccessible, kSecAttrAccessibleAfterFirstUnlock)
         } as CFDictionaryRef
+    }
 
-    private fun String.toNSData(): NSData = (this as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!
+    private fun String.toNSData(): NSData? = (this as NSString).dataUsingEncoding(NSUTF8StringEncoding)
 
     @OptIn(ExperimentalForeignApi::class)
-    private fun String.toCFString(): CFStringRef = CFStringCreateWithCString(null, this, kCFStringEncodingUTF8)!!
+    private fun String.toCFString(): CFStringRef? = CFStringCreateWithCString(null, this, kCFStringEncodingUTF8)
 
     companion object {
         private const val SERVICE_NAME = "com.po4yka.trailglass"

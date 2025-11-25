@@ -45,7 +45,7 @@ fun EnhancedTimelineContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(items) { item ->
+        items(items, key = { it.id }) { item ->
             when (item) {
                 is GetTimelineUseCase.TimelineItemUI.DayStartUI -> {
                     DayMarkerCard(text = stringResource(R.string.timeline_day_start), icon = Icons.Default.WbSunny)

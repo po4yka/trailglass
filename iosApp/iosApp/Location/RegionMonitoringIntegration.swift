@@ -55,10 +55,12 @@ import Shared
      @EnvironmentObject var appDelegate: AppDelegate
      @StateObject private var viewModel: RegionViewModel
 
-     init(appComponent: AppComponent) {
-         let delegate = UIApplication.shared.delegate as! AppDelegate
-         _viewModel = StateObject(wrappedValue: delegate.regionViewModel)
-     }
+    init(appComponent: AppComponent) {
+        guard let delegate = UIApplication.shared.delegate as? AppDelegate else {
+            fatalError("AppDelegate is not of expected type")
+        }
+        _viewModel = StateObject(wrappedValue: delegate.regionViewModel)
+    }
 
      var body: some View {
          VStack {

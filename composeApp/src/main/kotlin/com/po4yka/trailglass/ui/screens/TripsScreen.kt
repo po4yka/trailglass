@@ -134,7 +134,7 @@ private fun TripsContent(
             item {
                 SectionHeader(stringResource(R.string.trips_ongoing))
             }
-            items(ongoingTrips) { trip ->
+            items(ongoingTrips, key = { it.id }) { trip ->
                 TripCard(
                     trip = trip,
                     onClick = { onTripClick(trip) }
@@ -151,7 +151,7 @@ private fun TripsContent(
                     )
                 )
             }
-            items(completedTrips) { trip ->
+            items(completedTrips, key = { it.id }) { trip ->
                 TripCard(
                     trip = trip,
                     onClick = { onTripClick(trip) }
@@ -269,9 +269,9 @@ private fun TripCard(
             }
 
             // Description
-            if (trip.description != null) {
+            trip.description?.let { description ->
                 Text(
-                    text = trip.description!!,
+                    text = description,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(top = 8.dp),
                     maxLines = 2

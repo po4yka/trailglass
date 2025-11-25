@@ -51,8 +51,8 @@ fun EnhancedTimelineScreen(
     var showFilterSheet by remember { mutableStateOf(false) }
     var showSearchBar by remember { mutableStateOf(false) }
 
-    // Tracking state
-    val trackingState by (trackingController?.uiState?.collectAsState() ?: remember { mutableStateOf(null) })
+    // Tracking state - collect state only when controller exists
+    val trackingState = trackingController?.uiState?.collectAsState()?.value
     val isTracking = trackingState?.trackingState?.isTracking ?: false
 
     Scaffold(
@@ -157,7 +157,7 @@ fun EnhancedTimelineScreen(
 
                 state.error != null -> {
                     ErrorView(
-                        error = state.error!!,
+                        error = state.error.orEmpty(),
                         onRetry = { controller.refresh() },
                         modifier = Modifier.fillMaxSize()
                     )

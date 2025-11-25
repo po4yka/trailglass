@@ -187,16 +187,8 @@ struct LargeFlexibleNavigationBar<Subtitle: View, Background: View>: View {
         self.title = title
         self.scrollOffset = scrollOffset
         self.actions = actions
-        if let emptyView = EmptyView() as? Subtitle {
-            self.subtitle = emptyView
-        } else {
-            self.subtitle = nil
-        }
-        if let emptyView = EmptyView() as? Background {
-            self.backgroundContent = emptyView
-        } else {
-            self.backgroundContent = nil
-        }
+        self.subtitle = EmptyView()
+        self.backgroundContent = EmptyView()
     }
 
     var body: some View {
@@ -260,11 +252,7 @@ struct MediumFlexibleNavigationBar<Subtitle: View>: View {
         self.title = title
         self.scrollOffset = scrollOffset
         self.actions = actions
-        if let emptyView = EmptyView() as? Subtitle {
-            self.subtitle = emptyView
-        } else {
-            self.subtitle = nil
-        }
+        self.subtitle = EmptyView()
     }
 
     var body: some View {

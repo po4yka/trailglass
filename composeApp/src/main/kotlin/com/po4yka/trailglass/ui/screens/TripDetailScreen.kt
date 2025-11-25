@@ -89,8 +89,8 @@ fun TripDetailScreen(
             } ?: append("Started ${startDate.date}")
 
             // Duration
-            if (trip.duration != null) {
-                append(" • ${formatDuration(trip.duration!!)}")
+            trip.duration?.let { duration ->
+                append(" • ${formatDuration(duration)}")
             }
 
             // Distance
@@ -210,7 +210,7 @@ fun TripDetailScreen(
             }
 
             // Description card
-            if (trip.description != null) {
+            trip.description?.let { description ->
                 item {
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -221,7 +221,7 @@ fun TripDetailScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = trip.description!!,
+                                text = description,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }

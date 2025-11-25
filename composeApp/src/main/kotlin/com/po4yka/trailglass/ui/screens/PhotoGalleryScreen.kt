@@ -118,7 +118,7 @@ fun PhotoGalleryScreen(
 
             state.error != null -> {
                 ErrorView(
-                    error = state.error!!,
+                    error = state.error.orEmpty(),
                     onRetry = { controller.refresh() },
                     modifier =
                         Modifier

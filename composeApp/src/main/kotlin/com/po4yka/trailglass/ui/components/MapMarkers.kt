@@ -117,24 +117,8 @@ internal fun RenderHeatmap(heatmapData: HeatmapData) {
             }
         }
 
-    // Track the current overlay reference to enable proper cleanup
-    var currentOverlay by remember { mutableStateOf<TileOverlay?>(null) }
-
-    // Use DisposableEffect for proper lifecycle management
-    // This ensures cleanup when the composable leaves composition or when heatmapPoints change
-    DisposableEffect(heatmapPoints) {
-        onDispose {
-            // Remove the overlay when the effect is disposed or keys change
-            currentOverlay?.remove()
-            currentOverlay = null
-        }
-    }
-
-    // Render heatmap using MapEffect
+    // Render heatmap using MapEffect with proper lifecycle management
     MapEffect(heatmapPoints) { map ->
-        // Remove previous overlay before adding a new one
-        currentOverlay?.remove()
-
         // Create gradient
         val gradient = com.google.maps.android.heatmaps.Gradient(
             heatmapData.gradient.colors.toIntArray(),
@@ -151,11 +135,11 @@ internal fun RenderHeatmap(heatmapData: HeatmapData) {
                 .gradient(gradient) // Use custom gradient
                 .build()
 
-        // Add tile overlay to the map and store the reference
-        currentOverlay =
-            map.addTileOverlay(
-                TileOverlayOptions().tileProvider(heatmapProvider)
-            )
+        // Add tile overlay to the map
+        // Note: MapEffect handles cleanup automatically when the effect recomposes
+        map.addTileOverlay(
+            TileOverlayOptions().tileProvider(heatmapProvider)
+        )
     }
 }
 
