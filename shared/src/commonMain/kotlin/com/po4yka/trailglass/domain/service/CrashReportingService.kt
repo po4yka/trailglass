@@ -34,32 +34,32 @@ interface CrashReportingService {
      * @param key The key for the custom value
      * @param value The value (String, Int, Boolean, Float, Double, Long)
      */
-    fun setCustomKey(
+    fun setCustomKeyString(
         key: String,
         value: String
     )
 
-    fun setCustomKey(
+    fun setCustomKeyInt(
         key: String,
         value: Int
     )
 
-    fun setCustomKey(
+    fun setCustomKeyBool(
         key: String,
         value: Boolean
     )
 
-    fun setCustomKey(
+    fun setCustomKeyFloat(
         key: String,
         value: Float
     )
 
-    fun setCustomKey(
+    fun setCustomKeyDouble(
         key: String,
         value: Double
     )
 
-    fun setCustomKey(
+    fun setCustomKeyLong(
         key: String,
         value: Long
     )

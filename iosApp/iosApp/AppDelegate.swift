@@ -8,14 +8,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return InjectIOSAppComponent(platformModule: IOSPlatformModule())
     }()
 
+    // Crash handler instance - kept alive for app lifetime
+    private var crashHandler: CrashHandler?
+
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         AppLogger.info("TrailGlass iOS app starting up...", category: "AppDelegate")
 
-        // Initialize logging configuration
+        // Initialize logging configuration first
         initializeLogging()
+
+        // Initialize crash reporting early to catch startup crashes
+        initializeCrashReporting()
 
         // Initialize sync coordinator
         initializeSyncCoordinator()
@@ -52,6 +58,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Initialize Kotlin logging configuration
         LoggingConfig.shared.initialize(isDebugBuild: isDebug)
         AppLogger.debug("Logging initialized: isDebug=\(isDebug)", category: "AppDelegate")
+    }
+
+    private func initializeCrashReporting() {
+        AppLogger.debug("Initializing crash reporting...", category: "Crash")
+
+        // Create and install CrashHandler from Kotlin shared code
+        crashHandler = CrashHandler(crashReportingService: appComponent.crashReportingService)
+        crashHandler?.install()
+
+        // Set up Swift-level exception handling
+        CrashReporter.shared.configure(crashReportingService: appComponent.crashReportingService)
+
+        // Check if app crashed on previous execution
+        if appComponent.crashReportingService.didCrashOnPreviousExecution() {
+            AppLogger.warn("App crashed on previous execution", category: "Crash")
+        }
+
+        AppLogger.info("Crash reporting initialized", category: "Crash")
     }
 
     private func initializeSyncCoordinator() {

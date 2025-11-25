@@ -32,7 +32,7 @@ class SetCrashReportingUserUseCase(
 
         // Set custom user attributes
         customAttributes.forEach { (key, value) ->
-            crashReportingService.setCustomKey("user_$key", value)
+            crashReportingService.setCustomKeyString("user_$key", value)
         }
     }
 

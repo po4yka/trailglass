@@ -20,9 +20,14 @@ struct EnhancedTimelineView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Large flexible navigation bar with hero background
-            LargeFlexibleNavigationBar(
+        ZStack(alignment: .top) {
+            // Background color to fill the entire screen
+            Color(.systemBackground)
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                // Large flexible navigation bar with hero background
+                LargeFlexibleNavigationBar(
                 title: String(localized: "screen.timeline"),
                 scrollOffset: scrollOffset,
                 actions: [
@@ -116,7 +121,9 @@ struct EnhancedTimelineView: View {
                     }
                 }
             }
-        }
+            } // Close VStack
+        } // Close ZStack
+        .ignoresSafeArea(edges: .top)
         .sheet(isPresented: $showFilterSheet) {
             TimelineFilterSheet(
                 currentFilter: viewModel.filter,

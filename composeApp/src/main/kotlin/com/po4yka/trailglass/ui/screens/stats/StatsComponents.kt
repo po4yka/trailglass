@@ -35,9 +35,10 @@ import kotlinx.datetime.toLocalDateTime
 fun SectionHeader(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.headlineSmall,
+        style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(top = 8.dp)
+        color = MaterialTheme.colorScheme.onSurface,
+        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
     )
 }
 

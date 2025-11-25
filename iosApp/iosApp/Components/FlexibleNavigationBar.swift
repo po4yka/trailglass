@@ -1,8 +1,9 @@
 import SwiftUI
 
 /// Flexible navigation bar that collapses on scroll
-/// Supports three variants: Large (180pt), Medium (128pt), Compact (64pt)
+/// Supports three variants: Large, Medium, Compact
 /// Features parallax background, fading subtitle, and glass material
+/// Automatically accounts for safe area insets
 struct FlexibleNavigationBar<Title: View, Subtitle: View, Background: View>: View {
     let title: Title
     let subtitle: Subtitle?
@@ -40,10 +41,10 @@ struct FlexibleNavigationBar<Title: View, Subtitle: View, Background: View>: Vie
         variant.maxHeight
     }
 
-    private var minHeight: CGFloat = 64
+    private var minHeight: CGFloat = 44
 
-    private var currentHeight: CGFloat {
-        max(minHeight, maxHeight + scrollOffset)
+    private func currentHeight(safeAreaTop: CGFloat) -> CGFloat {
+        max(minHeight + safeAreaTop, maxHeight + safeAreaTop + scrollOffset)
     }
 
     private var progress: CGFloat {
@@ -52,46 +53,50 @@ struct FlexibleNavigationBar<Title: View, Subtitle: View, Background: View>: Vie
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Background with parallax effect
-            if backgroundContent != nil {
-                GeometryReader { geometry in
+        GeometryReader { geometry in
+            let safeAreaTop = geometry.safeAreaInsets.top
+            let height = currentHeight(safeAreaTop: safeAreaTop)
+
+            ZStack(alignment: .bottom) {
+                // Background with parallax effect
+                if backgroundContent != nil {
                     backgroundContent
-                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .frame(width: geometry.size.width, height: height)
                         .offset(y: -scrollOffset * 0.5) // Parallax effect
                         .opacity(1 - progress)
                 }
-            }
 
-            // Glass material that intensifies when collapsed
-            GlassNavigationMaterial(intensity: 0.7 + (progress * 0.3))
+                // Glass material that intensifies when collapsed
+                GlassNavigationMaterial(intensity: 0.7 + (progress * 0.3))
 
-            // Content
-            VStack(spacing: 0) {
-                Spacer()
+                // Content
+                VStack(spacing: 0) {
+                    Spacer()
 
-                // Title and subtitle
-                VStack(spacing: 4) {
-                    title
-                        .font(titleFont)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
-                        .lineLimit(1)
+                    // Title and subtitle
+                    VStack(spacing: 4) {
+                        title
+                            .font(titleFont)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
 
-                    if subtitle != nil {
-                        subtitle
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .opacity(1 - progress) // Fade out on collapse
-                            .scaleEffect(1 - (progress * 0.2), anchor: .center)
+                        if subtitle != nil {
+                            subtitle
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .opacity(1 - progress) // Fade out on collapse
+                                .scaleEffect(1 - (progress * 0.2), anchor: .center)
+                        }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 12)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
             }
+            .frame(height: height)
         }
-        .frame(height: currentHeight)
-        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: currentHeight)
+        .frame(height: maxHeight + 60) // Approximate height including safe area
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: scrollOffset)
     }
 
     private var titleFont: Font {
@@ -108,11 +113,12 @@ enum NavigationBarVariant {
     case medium
     case compact
 
+    /// Content height (without safe area)
     var maxHeight: CGFloat {
         switch self {
-        case .large: return 180
-        case .medium: return 128
-        case .compact: return 64
+        case .large: return 140
+        case .medium: return 100
+        case .compact: return 44
         }
     }
 }

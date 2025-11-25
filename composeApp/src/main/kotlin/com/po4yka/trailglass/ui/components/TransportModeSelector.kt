@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.po4yka.trailglass.domain.model.TransportType
@@ -174,7 +175,8 @@ private fun TransportModeButton(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = getTransportLabel(mode),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
                     color = contentColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

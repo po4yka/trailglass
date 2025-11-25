@@ -85,6 +85,44 @@ enum AppLogger {
     static func error(_ error: Error, message: String? = nil, category: String = "Default") {
         let fullMessage = message.map { "\($0): \(error.localizedDescription)" } ?? error.localizedDescription
         self.error(fullMessage, category: category)
+
+        // Also add stack trace for errors
+        let stackTrace = Thread.callStackSymbols.joined(separator: "\n")
+        addErrorToLogBuffer(tag: category, message: fullMessage, stackTrace: stackTrace)
+    }
+
+    // MARK: - Breadcrumb Logging
+
+    /// Logs a breadcrumb for crash analysis.
+    /// Breadcrumbs help understand the sequence of events leading to a crash.
+    static func breadcrumb(_ message: String, category: String = "Breadcrumb") {
+        let logger = getLogger(category: category)
+        os_log(.info, log: logger, "[BREADCRUMB] %{public}@", message)
+        addBreadcrumbToLogBuffer(tag: category, message: message)
+
+        // Also log to CrashReporter for crash analysis
+        CrashReporter.shared.logBreadcrumb(message, category: category)
+    }
+
+    /// Logs a user action as a breadcrumb
+    static func userAction(_ action: String, screen: String? = nil) {
+        let message = screen.map { "[\($0)] \(action)" } ?? action
+        breadcrumb(message, category: "UserAction")
+    }
+
+    /// Logs a navigation event as a breadcrumb
+    static func navigation(from: String?, to: String) {
+        let message = from.map { "Navigate: \($0) -> \(to)" } ?? "Navigate to: \(to)"
+        breadcrumb(message, category: "Navigation")
+    }
+
+    /// Logs a network request as a breadcrumb
+    static func networkRequest(_ method: String, url: String, status: Int? = nil) {
+        var message = "\(method) \(url)"
+        if let status = status {
+            message += " -> \(status)"
+        }
+        breadcrumb(message, category: "Network")
     }
 
     // MARK: - Private Helpers
@@ -93,7 +131,35 @@ enum AppLogger {
     private static func addToLogBuffer(level: Shared.LogLevel, tag: String, message: String) {
         Task {
             do {
-                try await LogBuffer.shared.add(level: level, tag: tag, message: message)
+                try await LogBuffer.shared.add(level: level, tag: tag, message: message, stackTrace: nil, isBreadcrumb: false)
+            } catch {
+                // Silently ignore LogBuffer errors to avoid recursion
+            }
+        }
+    }
+
+    /// Adds a breadcrumb to the LogBuffer
+    private static func addBreadcrumbToLogBuffer(tag: String, message: String) {
+        Task {
+            do {
+                try await LogBuffer.shared.addBreadcrumb(tag: tag, message: message)
+            } catch {
+                // Silently ignore LogBuffer errors to avoid recursion
+            }
+        }
+    }
+
+    /// Adds an error with stack trace to the LogBuffer
+    private static func addErrorToLogBuffer(tag: String, message: String, stackTrace: String) {
+        Task {
+            do {
+                try await LogBuffer.shared.add(
+                    level: Shared.LogLevel.error,
+                    tag: tag,
+                    message: message,
+                    stackTrace: stackTrace,
+                    isBreadcrumb: false
+                )
             } catch {
                 // Silently ignore LogBuffer errors to avoid recursion
             }

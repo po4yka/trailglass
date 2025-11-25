@@ -31,27 +31,37 @@ final class AuthStateObserver: ObservableObject {
 
     private var stateObserver: KotlinJob?
     private var isStarted = false
-    private weak var authController: AuthController?
+    /// Strong reference to auth controller - it's a long-lived singleton from DI
+    private var authController: AuthController?
 
     private init() {}
 
     /// Start observing the auth controller. Should be called once at app startup.
     /// - Parameter authController: The Kotlin AuthController to observe
     func start(authController: AuthController) {
-        guard !isStarted else { return }
+        AppLogger.info("AuthStateObserver.start() called, isStarted: \(isStarted)", category: "Auth")
+        guard !isStarted else {
+            AppLogger.debug("AuthStateObserver already started, skipping", category: "Auth")
+            return
+        }
         isStarted = true
         self.authController = authController
+        AppLogger.info("AuthController stored in observer", category: "Auth")
 
         // Set initial state synchronously
         // Note: StateFlow.value returns Any? in Swift, need to cast to AuthState
         if let initialState = authController.state.value as? AuthState {
+            AppLogger.debug("Initial auth state: \(type(of: initialState))", category: "Auth")
             updateState(initialState)
+        } else {
+            AppLogger.warn("Could not get initial auth state", category: "Auth")
         }
 
         // Subscribe to state changes
         stateObserver = authController.state.subscribe { [weak self] (state: AuthState?) in
             guard let self = self, let state = state else { return }
             DispatchQueue.main.async {
+                AppLogger.debug("Auth state changed to: \(type(of: state))", category: "Auth")
                 self.updateState(state)
             }
         }
@@ -89,7 +99,13 @@ final class AuthStateObserver: ObservableObject {
     }
 
     func continueAsGuest() {
-        authController?.continueAsGuest()
+        AppLogger.debug("continueAsGuest called, authController: \(authController != nil ? "present" : "nil")", category: "Auth")
+        if let controller = authController {
+            AppLogger.info("Calling authController.continueAsGuest()", category: "Auth")
+            controller.continueAsGuest()
+        } else {
+            AppLogger.error("authController is nil in continueAsGuest()", category: "Auth")
+        }
     }
 
     func logout() {

@@ -135,8 +135,9 @@ private fun TransportFilterCard(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 stringResource(R.string.stats_filter_transport_mode),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
 

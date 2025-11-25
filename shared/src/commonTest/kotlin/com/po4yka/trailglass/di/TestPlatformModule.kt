@@ -256,12 +256,12 @@ class FakeCrashReportingService : CrashReportingService {
         // no-op
     }
 
-    override fun setCustomKey(key: String, value: String) {}
-    override fun setCustomKey(key: String, value: Int) {}
-    override fun setCustomKey(key: String, value: Boolean) {}
-    override fun setCustomKey(key: String, value: Float) {}
-    override fun setCustomKey(key: String, value: Double) {}
-    override fun setCustomKey(key: String, value: Long) {}
+    override fun setCustomKeyString(key: String, value: String) {}
+    override fun setCustomKeyInt(key: String, value: Int) {}
+    override fun setCustomKeyBool(key: String, value: Boolean) {}
+    override fun setCustomKeyFloat(key: String, value: Float) {}
+    override fun setCustomKeyDouble(key: String, value: Double) {}
+    override fun setCustomKeyLong(key: String, value: Long) {}
 
     override fun setUserId(userId: String) {
         // no-op

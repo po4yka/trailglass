@@ -30,7 +30,7 @@ class RecordExceptionUseCase(
 
         // Add additional context as custom keys
         additionalContext.forEach { (key, value) ->
-            crashReportingService.setCustomKey(key, value)
+            crashReportingService.setCustomKeyString(key, value)
         }
 
         // Record the exception

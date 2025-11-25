@@ -25,42 +25,42 @@ class AndroidCrashReportingService : CrashReportingService {
         crashlytics.log(message)
     }
 
-    override fun setCustomKey(
+    override fun setCustomKeyString(
         key: String,
         value: String
     ) {
         crashlytics.setCustomKey(key, value)
     }
 
-    override fun setCustomKey(
+    override fun setCustomKeyInt(
         key: String,
         value: Int
     ) {
         crashlytics.setCustomKey(key, value)
     }
 
-    override fun setCustomKey(
+    override fun setCustomKeyBool(
         key: String,
         value: Boolean
     ) {
         crashlytics.setCustomKey(key, value)
     }
 
-    override fun setCustomKey(
+    override fun setCustomKeyFloat(
         key: String,
         value: Float
     ) {
         crashlytics.setCustomKey(key, value)
     }
 
-    override fun setCustomKey(
+    override fun setCustomKeyDouble(
         key: String,
         value: Double
     ) {
         crashlytics.setCustomKey(key, value)
     }
 
-    override fun setCustomKey(
+    override fun setCustomKeyLong(
         key: String,
         value: Long
     ) {

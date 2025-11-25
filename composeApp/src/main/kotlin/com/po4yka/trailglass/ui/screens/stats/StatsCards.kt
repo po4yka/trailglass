@@ -92,21 +92,22 @@ fun StatCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
             )
 
             Text(
                 text = value,
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSecondaryContainer
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             )
         }
     }
@@ -116,7 +117,12 @@ fun StatCard(
 fun DistanceStatsCard(stats: ComprehensiveStatistics) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Distance Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Distance Overview",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             InfoRow("Total Distance", "${stats.distanceStats.totalDistanceKm.toInt()} km")
             InfoRow("Average Speed", "${stats.distanceStats.averageSpeed.toInt()} km/h")
@@ -140,8 +146,9 @@ fun TransportDistributionCard(
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 "Distance by Transport Type",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -180,7 +187,12 @@ fun TransportDistributionCard(
 fun PlaceStatsCard(stats: ComprehensiveStatistics) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Place Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Place Overview",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             InfoRow("Total Places", "${stats.placeStats.totalPlaces}")
             InfoRow("Total Visits", "${stats.placeStats.totalVisits}")
@@ -203,8 +215,9 @@ fun CategoryDistributionCard(stats: ComprehensiveStatistics) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 "Visits by Category",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -270,7 +283,12 @@ fun MostVisitedPlaceCard(place: PlaceVisitCount) {
 fun TravelPatternsCard(stats: ComprehensiveStatistics) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Travel Patterns", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Travel Patterns",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             stats.travelPatterns.peakTravelDay?.let { day ->
                 InfoRow("Most Active Day", day.name.lowercase().replaceFirstChar { it.uppercase() })
@@ -314,7 +332,12 @@ fun ActivityHeatmapCard(stats: ComprehensiveStatistics) {
 fun GeographicStatsCard(stats: ComprehensiveStatistics) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("Geographic Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            Text(
+                "Geographic Overview",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
 
             InfoRow("Countries Visited", "${stats.geographicStats.countries.size}")
             InfoRow("Cities Visited", "${stats.geographicStats.cities.size}")
@@ -336,8 +359,9 @@ fun TopCountriesCard(stats: ComprehensiveStatistics) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 "Top Countries",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -354,18 +378,21 @@ fun TopCountriesCard(stats: ComprehensiveStatistics) {
                         Text(
                             country.countryCode,
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             "${country.cities.size} cities",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
 
                     Text(
                         "${country.visitCount} visits",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
                 if (country != stats.geographicStats.topCountries.last()) {
@@ -387,13 +414,14 @@ private fun InfoRow(
     ) {
         Text(
             label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
         )
         Text(
             value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

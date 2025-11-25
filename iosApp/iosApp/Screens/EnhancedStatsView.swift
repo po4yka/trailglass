@@ -16,47 +16,52 @@ struct EnhancedStatsView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Large flexible navigation bar with chart preview background
-            LargeFlexibleNavigationBar(
-                title: String(localized: "screen.statistics"),
-                scrollOffset: scrollOffset,
-                actions: [
-                    NavigationAction(icon: "arrow.clockwise") {
-                        viewModel.refresh()
-                    },
-                    NavigationAction(icon: "gear") {
-                        onSettingsTapped?()
-                    }
-                ],
-                subtitle: {
-                    Text(viewModel.selectedPeriod == .year ? String(localized: "stats.year_overview") : String(localized: "stats.month_overview"))
-                },
-                backgroundContent: {
-                    HeroGradientBackground(
-                        startColor: Color.lightCyan,
-                        endColor: Color.coolSteel
-                    )
-                }
-            )
+        ZStack(alignment: .top) {
+            // Background color to fill the entire screen
+            Color(.systemBackground)
+                .ignoresSafeArea()
 
-            if viewModel.isLoading {
-                Spacer()
-                GlassLoadingIndicator(variant: .morphing, size: 72, color: .coolSteel)
-                Spacer()
-            } else if let error = viewModel.error {
-                ErrorView(error: error) {
-                    viewModel.refresh()
+            VStack(spacing: 0) {
+                // Large flexible navigation bar with chart preview background
+                LargeFlexibleNavigationBar(
+                    title: String(localized: "screen.statistics"),
+                    scrollOffset: scrollOffset,
+                    actions: [
+                        NavigationAction(icon: "arrow.clockwise") {
+                            viewModel.refresh()
+                        },
+                        NavigationAction(icon: "gear") {
+                            onSettingsTapped?()
+                        }
+                    ],
+                    subtitle: {
+                        Text(viewModel.selectedPeriod == .year ? String(localized: "stats.year_overview") : String(localized: "stats.month_overview"))
+                    },
+                    backgroundContent: {
+                        HeroGradientBackground(
+                            startColor: Color.lightCyan,
+                            endColor: Color.coolSteel
+                        )
+                    }
+                )
+
+                if viewModel.isLoading {
+                    Spacer()
+                    GlassLoadingIndicator(variant: .morphing, size: 72, color: .coolSteel)
+                    Spacer()
+                } else if let error = viewModel.error {
+                    ErrorView(error: error) {
+                        viewModel.refresh()
+                    }
+                } else if let stats = viewModel.stats {
+                    StatsContent(stats: stats, viewModel: viewModel, scrollOffset: $scrollOffset)
+                } else {
+                    Text(String(localized: "stats.no_stats"))
+                        .foregroundColor(.secondary)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-            } else if let stats = viewModel.stats {
-                StatsContent(stats: stats, viewModel: viewModel, scrollOffset: $scrollOffset)
-            } else {
-                Text(String(localized: "stats.no_stats"))
-                    .foregroundColor(.secondary)
             }
         }
-        // .onAppear {
-        //     viewModel.loadCurrentYear()
-        // }
+        .ignoresSafeArea(edges: .top)
     }
 }
