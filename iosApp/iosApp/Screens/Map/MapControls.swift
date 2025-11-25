@@ -265,7 +265,7 @@ class MapViewModel: ObservableObject {
             // Check if we have location permission
             let hasPermission = await controller.hasLocationPermission()
 
-            if hasPermission {
+            if hasPermission.boolValue {
                 // Get last known location and center map on it
                 // Note: This requires accessing locationService from controller
                 // For now, use the controller's moveCameraTo with a default location
@@ -284,7 +284,7 @@ class MapViewModel: ObservableObject {
 
     func fitAllMarkers() {
         // Fit camera to show all markers in the current map data
-        controller.fitToRegion(animated: true)
+        controller.fitToData(animated: true, durationMs: 1200)
     }
 
     func refreshData() {
