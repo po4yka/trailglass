@@ -285,6 +285,7 @@ class EnhancedTimelineViewModel: ObservableObject {
     deinit {
         stateObserver?.cancel(cause: nil)
         trackingObserver?.cancel(cause: nil)
+        controller.cleanup()
     }
 
     // FAB actions

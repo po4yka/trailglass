@@ -219,6 +219,7 @@ class MapViewModel: ObservableObject {
 
     deinit {
         stateObserver?.cancel(cause: nil)
+        controller.cleanup()
     }
 
     private func observeState() {

@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.arkivanov.decompose.defaultComponentContext
 import com.po4yka.trailglass.di.AppComponent
+import com.po4yka.trailglass.location.tracking.TrackingMode
 import com.po4yka.trailglass.ui.navigation.AppRootComponent
 import com.po4yka.trailglass.ui.navigation.DefaultAppRootComponent
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -69,29 +70,26 @@ class MainActivity : ComponentActivity() {
             // Tracking shortcuts
             path.startsWith("tracking/start") -> {
                 logger.info { "Starting tracking from shortcut" }
-                // TODO: Navigate to tracking screen and start tracking
-                // appRootComponent.navigateToTracking()
+                appComponent.locationTrackingController.startTracking(TrackingMode.ACTIVE)
+                appRootComponent.handleDeepLink("map")
             }
 
             // Stats shortcuts
             path.startsWith("stats/today") -> {
                 logger.info { "Opening today's stats from shortcut/widget" }
-                // TODO: Navigate to stats screen
-                // appRootComponent.navigateToStats()
+                appRootComponent.handleDeepLink("stats")
             }
 
             // Export shortcuts
             path.startsWith("export/recent") -> {
                 logger.info { "Opening export from shortcut" }
-                // TODO: Navigate to export screen
-                // appRootComponent.navigateToExport()
+                appRootComponent.handleDeepLink("settings")
             }
 
             // Timeline shortcut
             path == "timeline" -> {
                 logger.info { "Opening timeline from shortcut" }
-                // TODO: Navigate to timeline
-                // appRootComponent.navigateToTimeline()
+                appRootComponent.handleDeepLink("timeline")
             }
 
             else -> {

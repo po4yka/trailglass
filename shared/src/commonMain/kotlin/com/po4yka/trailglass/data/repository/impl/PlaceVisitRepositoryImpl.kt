@@ -86,20 +86,24 @@ class PlaceVisitRepositoryImpl(
         endTime: Instant
     ): List<PlaceVisit> =
         withContext(Dispatchers.IO) {
-            visitQueries
+            val visits = visitQueries
                 .getVisitsByTimeRange(
                     user_id = userId,
                     query_end_time = endTime.toEpochMilliseconds(),
                     query_start_time = startTime.toEpochMilliseconds()
                 ).executeAsList()
-                .map { visit ->
-                    val sampleIds =
-                        visitQueries
-                            .getSamplesForVisit(visit.id)
-                            .executeAsList()
-                            .map { it.id }
-                    visit.toPlaceVisit(sampleIds)
-                }
+
+            if (visits.isEmpty()) return@withContext emptyList()
+
+            val visitIds = visits.map { it.id }
+            val samples = visitQueries.getSamplesForVisits(visitIds).executeAsList()
+            val samplesByVisit = samples.groupBy { it.place_visit_id }
+
+            visits.map { visit ->
+                val visitSamples = samplesByVisit[visit.id] ?: emptyList()
+                val sampleIds = visitSamples.map { it.id }
+                visit.toPlaceVisit(sampleIds)
+            }
         }
 
     override suspend fun getVisitsByUser(
@@ -108,17 +112,21 @@ class PlaceVisitRepositoryImpl(
         offset: Int
     ): List<PlaceVisit> =
         withContext(Dispatchers.IO) {
-            visitQueries
+            val visits = visitQueries
                 .getVisitsByUser(userId, limit.toLong(), offset.toLong())
                 .executeAsList()
-                .map { visit ->
-                    val sampleIds =
-                        visitQueries
-                            .getSamplesForVisit(visit.id)
-                            .executeAsList()
-                            .map { it.id }
-                    visit.toPlaceVisit(sampleIds)
-                }
+
+            if (visits.isEmpty()) return@withContext emptyList()
+
+            val visitIds = visits.map { it.id }
+            val samples = visitQueries.getSamplesForVisits(visitIds).executeAsList()
+            val samplesByVisit = samples.groupBy { it.place_visit_id }
+
+            visits.map { visit ->
+                val visitSamples = samplesByVisit[visit.id] ?: emptyList()
+                val sampleIds = visitSamples.map { it.id }
+                visit.toPlaceVisit(sampleIds)
+            }
         }
 
     override suspend fun updateVisit(visit: PlaceVisit): Unit =

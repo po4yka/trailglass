@@ -80,6 +80,7 @@ class EnhancedStatsViewModel: ObservableObject {
 
     deinit {
         stateObserver?.cancel(cause: nil)
+        controller.cleanup()
     }
 
     func loadCurrentYear() {

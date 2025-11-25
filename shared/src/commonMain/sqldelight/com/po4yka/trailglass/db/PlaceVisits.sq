@@ -104,6 +104,13 @@ WHERE pvs.place_visit_id = ?
   AND ls.deleted_at IS NULL
 ORDER BY ls.timestamp ASC;
 
+getSamplesForVisits:
+SELECT ls.*, pvs.place_visit_id
+FROM location_samples ls
+JOIN place_visit_samples pvs ON ls.id = pvs.location_sample_id
+WHERE pvs.place_visit_id IN ?
+ORDER BY ls.timestamp ASC;
+
 softDelete:
 UPDATE place_visits
 SET deleted_at = ?, updated_at = ?

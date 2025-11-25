@@ -54,7 +54,7 @@ android {
 
     lint {
         lintConfig = file("$rootDir/config/android-lint.xml")
-        abortOnError = false
+        abortOnError = true
         checkAllWarnings = true
         warningsAsErrors = false
         baseline = file("lint-baseline.xml")

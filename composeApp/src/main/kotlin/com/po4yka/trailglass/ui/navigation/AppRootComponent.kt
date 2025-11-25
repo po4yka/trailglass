@@ -20,6 +20,9 @@ interface AppRootComponent {
     /** Navigate to main app (after successful authentication). */
     fun navigateToMain()
 
+    /** Handle deep link navigation. */
+    fun handleDeepLink(path: String)
+
     /** Sealed class representing top-level navigation configurations. */
     @Serializable
     sealed interface Config {
@@ -68,6 +71,13 @@ class DefaultAppRootComponent(
 
     override fun navigateToMain() {
         navigation.replaceCurrent(AppRootComponent.Config.Main)
+    }
+
+    override fun handleDeepLink(path: String) {
+        val child = childStack.value.active.instance
+        if (child is AppRootComponent.Child.Main) {
+            child.component.handleDeepLink(path)
+        }
     }
 
     private fun createChild(

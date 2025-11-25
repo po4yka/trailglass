@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.ui.navigation
 
 import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.po4yka.trailglass.feature.timeline.EnhancedTimelineController
 import com.po4yka.trailglass.feature.tracking.LocationTrackingController
 
@@ -16,4 +17,10 @@ class DefaultTimelineComponent(
     override val enhancedTimelineController: EnhancedTimelineController,
     override val locationTrackingController: LocationTrackingController
 ) : TimelineComponent,
-    ComponentContext by componentContext
+    ComponentContext by componentContext {
+    init {
+        lifecycle.doOnDestroy {
+            enhancedTimelineController.cleanup()
+        }
+    }
+}
