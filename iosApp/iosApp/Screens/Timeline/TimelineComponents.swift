@@ -292,8 +292,8 @@ class EnhancedTimelineViewModel: ObservableObject {
         if isTracking {
             locationTrackingController.stopTracking()
         } else {
-            // Start tracking with balanced mode
-            locationTrackingController.startTracking(mode: TrackingMode.balanced)
+            // Start tracking with passive mode (balanced battery usage)
+            locationTrackingController.startTracking(mode: TrackingMode.passive)
         }
     }
 

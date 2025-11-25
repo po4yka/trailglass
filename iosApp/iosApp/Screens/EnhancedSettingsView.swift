@@ -144,7 +144,7 @@ struct EnhancedSettingsView: View {
             do {
                 // Parse JSON
                 let decoder = JSONDecoder()
-                decoder.dateDecodingStrategy = .iso8601
+                decoder.dateEncodingStrategy = .iso8601
                 let exportData = try decoder.decode(TrailglassExportData.self, from: jsonData)
 
                 // Validate version compatibility
@@ -170,26 +170,29 @@ struct EnhancedSettingsView: View {
                                 nanosecondAdjustment: 0
                             )
                         }
+                        let now = Kotlinx_datetimeInstant.Companion.shared.now()
 
                         // Create trip object
                         let newTrip = Trip(
                             id: tripData.id,
                             name: tripData.name,
-                            description: tripData.description,
-                            userId: appComponent.userId,
                             startTime: startTime,
                             endTime: endTime,
+                            primaryCountry: nil, // Default to nil, can be updated later
                             isOngoing: endTime == nil,
-                            isAutoDetected: false,
-                            detectionConfidence: nil,
-                            coverPhotoUri: nil,
-                            tags: [],
-                            isPublic: false,
-                            primaryCountry: nil,
-                            countriesVisited: [],
-                            citiesVisited: [],
-                            totalDistanceMeters: 0.0,
-                            duration: nil
+                            userId: appComponent.userId,
+                            totalDistanceMeters: 0.0, // Default to 0.0
+                            visitedPlaceCount: 0, // Default to 0
+                            countriesVisited: [], // Default to empty
+                            citiesVisited: [], // Default to empty
+                            description: tripData.description,
+                            coverPhotoUri: nil, // Default to nil
+                            isPublic: false, // Default to false
+                            tags: [], // Default to empty
+                            isAutoDetected: false, // Default to false
+                            detectionConfidence: nil, // Default to nil
+                            createdAt: now,
+                            updatedAt: now
                         )
 
                         // Use repository to upsert trip (will insert or update if exists)

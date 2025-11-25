@@ -27,14 +27,19 @@ struct PlacesFilterSheet: View {
                 }
 
                 Section("Categories") {
-                    ForEach(PlaceCategory.allCases, id: \.self) { category in
-                        Toggle(category.displayName, isOn: Binding(
-                            get: { categories.contains(category.rawValue) },
+                    let allCategories: [Shared.PlaceCategory] = [
+                        .home, .work, .food, .shopping, .fitness,
+                        .entertainment, .travel, .healthcare, .education,
+                        .religious, .social, .outdoor, .service, .other
+                    ]
+                    ForEach(allCategories, id: \.name) { category in
+                        Toggle(categoryName(category), isOn: Binding(
+                            get  { categories.contains(category.name) },
                             set: { isOn in
                                 if isOn {
-                                    categories.insert(category.rawValue)
+                                    categories.insert(category.name)
                                 } else {
-                                    categories.remove(category.rawValue)
+                                    categories.remove(category.name)
                                 }
                             }
                         ))
@@ -185,10 +190,30 @@ class PlacesViewModel: ObservableObject {
 
     func applyFilters(_ filters: PlaceFilters) {
         self.filters = filters
-        // Convert categories to PlaceCategory set
-        let categorySet = Set(filters.categories.compactMap { categoryName in
-            return PlaceCategory(rawValue: categoryName)
-        })
+        // Convert category names to Shared.PlaceCategory and update controller
+        let categories = filters.categories.compactMap { categoryName -> Shared.PlaceCategory? in
+            // Convert string name back to enum
+            switch categoryName.uppercased() {
+            case "HOME": return .home
+            case "WORK": return .work
+            case "RESTAURANT": return .restaurant
+            case "SHOPPING": return .shopping
+            case "ENTERTAINMENT": return .entertainment
+            case "TRAVEL": return .travel
+            case "HEALTHCARE": return .healthcare
+            case "EDUCATION": return .education
+            case "TRANSPORTATION": return .transportation
+            case "FITNESS": return .fitness
+            case "OUTDOOR": return .outdoor
+            case "SOCIAL": return .social
+            case "SERVICE": return .service
+            case "RELIGIOUS": return .religious
+            case "GOVERNMENT": return .government
+            case "OTHER": return .other
+            default: return nil
+            }
+        }
+        controller.filterByCategories(categories: Set(categories))
     }
 
     func setSortOption(_ option: PlaceSortOption) {
@@ -208,11 +233,17 @@ struct PlaceItem: Identifiable {
     let isFavorite: Bool
 
     var categoryIcon: String {
-        PlaceCategory(rawValue: category)?.icon ?? "mappin.circle"
+        guard let category = Shared.PlaceCategory.companion.values().first(where: { $0.name == self.category }) else {
+            return "mappin.circle.fill"
+        }
+        return categoryIcon(category)
     }
 
     var categoryColor: Color {
-        PlaceCategory(rawValue: category)?.color ?? .gray
+        guard let category = Shared.PlaceCategory.companion.values().first(where: { $0.name == self.category }) else {
+            return .gray
+        }
+        return categoryColor(category)
     }
 
     init(from place: FrequentPlace) {
@@ -254,48 +285,6 @@ enum PlaceSortOption: String, CaseIterable {
         case .leastVisited: return .mostVisited // Map to mostVisited since leastVisited doesn't exist
         case .alphabetical: return .alphabetical
         case .recentlyVisited: return .recentlyVisited
-        }
-    }
-}
-
-/// Place categories
-enum PlaceCategory: String, CaseIterable {
-    case home
-    case work
-    case restaurant
-    case shopping
-    case entertainment
-    case travel
-    case other
-    case unknown
-
-    var displayName: String {
-        rawValue.capitalized
-    }
-
-    var icon: String {
-        switch self {
-        case .home: return "house.fill"
-        case .work: return "briefcase.fill"
-        case .restaurant: return "fork.knife"
-        case .shopping: return "cart.fill"
-        case .entertainment: return "theatermasks.fill"
-        case .travel: return "airplane"
-        case .other: return "mappin.circle"
-        case .unknown: return "questionmark.circle"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .home: return .blue
-        case .work: return .purple
-        case .restaurant: return .orange
-        case .shopping: return .green
-        case .entertainment: return .pink
-        case .travel: return .cyan
-        case .other: return .gray
-        case .unknown: return .gray
         }
     }
 }

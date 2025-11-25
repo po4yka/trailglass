@@ -217,10 +217,9 @@ struct FrequentPlaceItem: Identifiable {
         self.visitCount = frequentPlace.visitCount
         // Convert Duration to minutes
         self.averageDurationMinutes = Int(frequentPlace.averageDuration.inWholeMinutes)
-        // Try to access category and significance from FrequentPlace
-        // These may need to be accessed as properties or computed from other data
-        self.category = (frequentPlace as? NSObject)?.value(forKey: "category") as? String ?? "other"
-        self.significance = (frequentPlace as? NSObject)?.value(forKey: "significance") as? String ?? "medium"
+        // Access category and significance directly as they are properties of FrequentPlace
+        self.category = frequentPlace.category.name
+        self.significance = frequentPlace.significance.name
         self.isFavorite = frequentPlace.isFavorite
     }
 }
