@@ -1,13 +1,13 @@
 package com.po4yka.trailglass.crash
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.staticCFunction
 import platform.Foundation.NSException
 import platform.Foundation.NSSetUncaughtExceptionHandler
 import kotlin.native.concurrent.ThreadLocal
 
-private val logger = KotlinLogging.logger {}
+private val logger = logger("CrashHandler")
 
 @ThreadLocal
 private object IosExceptionHandler {

@@ -1,12 +1,11 @@
 package com.po4yka.trailglass.data.remote.auth
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.value
-import com.po4yka.trailglass.data.remote.auth.TokenStorage
 import me.tatarka.inject.annotations.Inject
 import platform.CoreFoundation.CFDictionaryCreateMutable
 import platform.CoreFoundation.CFDictionaryCreateMutableCopy
@@ -38,7 +37,7 @@ import platform.Security.kSecMatchLimitOne
 import platform.Security.kSecReturnData
 import platform.Security.kSecValueData
 
-private val logger = KotlinLogging.logger {}
+private val logger = logger("IOSSecureTokenStorage")
 
 /** iOS implementation using Keychain Services. */
 @Inject

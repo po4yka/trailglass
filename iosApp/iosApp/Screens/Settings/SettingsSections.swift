@@ -207,7 +207,8 @@ struct AppearanceSettingsSection: View {
                 theme: $0,
                 useDeviceWallpaper: appearance.useDeviceWallpaper,
                 showMapInTimeline: appearance.showMapInTimeline,
-                compactView: appearance.compactView
+                compactView: appearance.compactView,
+                photoGalleryViewMode: appearance.photoGalleryViewMode
             )) }
         )) {
             ForEach([AppTheme.light, .dark, .system], id: \.self) { theme in
@@ -221,7 +222,8 @@ struct AppearanceSettingsSection: View {
                 theme: appearance.theme,
                 useDeviceWallpaper: appearance.useDeviceWallpaper,
                 showMapInTimeline: $0,
-                compactView: appearance.compactView
+                compactView: appearance.compactView,
+                photoGalleryViewMode: appearance.photoGalleryViewMode
             )) }
         ))
 
@@ -231,7 +233,8 @@ struct AppearanceSettingsSection: View {
                 theme: appearance.theme,
                 useDeviceWallpaper: appearance.useDeviceWallpaper,
                 showMapInTimeline: appearance.showMapInTimeline,
-                compactView: $0
+                compactView: $0,
+                photoGalleryViewMode: appearance.photoGalleryViewMode
             )) }
         ))
     }

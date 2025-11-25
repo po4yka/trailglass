@@ -12,7 +12,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        print("TrailGlass iOS app starting up...")
+        AppLogger.info("TrailGlass iOS app starting up...", category: "AppDelegate")
+
+        // Initialize logging configuration
+        initializeLogging()
 
         // Initialize sync coordinator
         initializeSyncCoordinator()
@@ -26,17 +29,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Schedule first background sync
         BackgroundSyncManager.shared.scheduleBackgroundSync()
 
-        print("TrailGlass iOS app initialized successfully")
+        AppLogger.info("TrailGlass iOS app initialized successfully", category: "AppDelegate")
 
         return true
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
+        AppLogger.debug("App entering background", category: "AppDelegate")
         // Schedule background sync when app goes to background
         BackgroundSyncManager.shared.scheduleBackgroundSync()
     }
 
     // MARK: - Private Methods
+
+    private func initializeLogging() {
+        #if DEBUG
+        let isDebug = true
+        #else
+        let isDebug = false
+        #endif
+
+        // Initialize Kotlin logging configuration
+        LoggingConfig.shared.initialize(isDebugBuild: isDebug)
+        AppLogger.debug("Logging initialized: isDebug=\(isDebug)", category: "AppDelegate")
+    }
 
     private func initializeSyncCoordinator() {
         // Initialize sync coordinator on app startup
@@ -45,9 +61,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 // Access syncCoordinator to ensure it's initialized
                 // The actual initialization happens in the DI component
                 _ = appComponent.syncCoordinator
-                print("SyncCoordinator initialized successfully")
+                AppLogger.info("SyncCoordinator initialized successfully", category: "Sync")
             } catch {
-                print("Failed to initialize SyncCoordinator: \(error)")
+                AppLogger.error("Failed to initialize SyncCoordinator: \(error)", category: "Sync")
             }
         }
     }
@@ -56,7 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func triggerImmediateSync() {
         Task {
             let success = await BackgroundSyncManager.shared.triggerImmediateSync()
-            print("Immediate sync triggered: \(success ? "success" : "failed")")
+            AppLogger.info("Immediate sync triggered: \(success ? "success" : "failed")", category: "Sync")
         }
     }
 }

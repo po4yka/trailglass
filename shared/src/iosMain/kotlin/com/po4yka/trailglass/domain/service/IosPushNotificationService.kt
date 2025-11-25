@@ -1,6 +1,6 @@
 package com.po4yka.trailglass.domain.service
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import com.po4yka.trailglass.logging.logger
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -14,7 +14,7 @@ import platform.UserNotifications.UNUserNotificationCenter
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-private val logger = KotlinLogging.logger {}
+private val logger = logger("IosPushNotificationService")
 
 /**
  * iOS implementation of PushNotificationService using Firebase Cloud Messaging and APNs.

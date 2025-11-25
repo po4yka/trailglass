@@ -1,5 +1,10 @@
 package com.po4yka.trailglass.data.analytics
 
+import com.po4yka.trailglass.domain.error.TrailGlassError
+import com.po4yka.trailglass.logging.logger
+
+private val logger = logger("ErrorAnalytics")
+
 /**
  * iOS implementation of ErrorAnalytics.
  *
@@ -9,39 +14,56 @@ actual object ErrorAnalyticsFactory {
     actual fun create(): ErrorAnalytics {
         // Default to logging implementation
         // Can be replaced with Firebase Crashlytics:
-        // return FirebaseCrashlyticsErrorAnalytics()
+        // return IOSErrorAnalytics()
         return LoggingErrorAnalytics()
     }
 }
 
-// Example iOS-specific analytics implementation (commented out):
-
-/*
+/**
+ * iOS-specific analytics implementation using kotlin-logging.
+ *
+ * This implementation can integrate with Firebase Crashlytics while using
+ * kotlin-logging for consistent logging across the project.
+ *
+ * To enable Crashlytics:
+ * 1. Add Firebase Crashlytics iOS SDK via CocoaPods
+ * 2. Create Swift helper for Crashlytics interop
+ * 3. Replace LoggingErrorAnalytics with IOSErrorAnalytics in ErrorAnalyticsFactory
+ */
 class IOSErrorAnalytics : ErrorAnalytics {
-    // Integrate with NSLog or OS Logger
     override fun logError(error: TrailGlassError, context: Map<String, Any>) {
-        NSLog("ERROR: ${error.getTechnicalDetails()}")
-        // Could integrate with Crashlytics or other iOS analytics
+        logger.error { "ERROR: ${error.getTechnicalDetails()}" }
+        // TODO: Integrate with Crashlytics via Swift interop
+        // FirebaseCrashlyticsHelper.recordError(error)
     }
 
     override fun logNonFatal(error: TrailGlassError, context: Map<String, Any>) {
-        NSLog("NON_FATAL: ${error.userMessage}")
+        logger.warn { "NON_FATAL: ${error.userMessage}" }
+        // TODO: Integrate with Crashlytics via Swift interop
+        // FirebaseCrashlyticsHelper.recordNonFatal(error)
     }
 
     override fun logFatal(error: TrailGlassError, context: Map<String, Any>) {
-        NSLog("FATAL: ${error.getTechnicalDetails()}")
+        logger.error { "FATAL: ${error.getTechnicalDetails()}" }
+        // TODO: Integrate with Crashlytics via Swift interop
+        // FirebaseCrashlyticsHelper.recordFatal(error)
     }
 
     override fun setUserId(userId: String?) {
-        // Set user identifier
+        logger.debug { "Setting user ID: ${userId ?: "null"}" }
+        // TODO: Integrate with Crashlytics via Swift interop
+        // FirebaseCrashlyticsHelper.setUserId(userId)
     }
 
     override fun setCustomData(key: String, value: String) {
-        // Set custom data
+        logger.debug { "Setting custom data: $key = $value" }
+        // TODO: Integrate with Crashlytics via Swift interop
+        // FirebaseCrashlyticsHelper.setCustomKey(key, value)
     }
 
     override fun clearCustomData() {
-        // Clear custom data
+        logger.debug { "Clearing custom data" }
+        // TODO: Integrate with Crashlytics via Swift interop
+        // FirebaseCrashlyticsHelper.clearCustomData()
     }
 }
-*/

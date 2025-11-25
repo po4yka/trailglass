@@ -1,6 +1,6 @@
 package com.po4yka.trailglass.data.network
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,7 +28,7 @@ import platform.Network.nw_path_t
 import platform.Network.nw_path_uses_interface_type
 import platform.darwin.dispatch_queue_create
 
-private val logger = KotlinLogging.logger {}
+private val logger = logger("IOSNetworkConnectivityMonitor")
 
 /** iOS implementation of NetworkConnectivityMonitor using NWPathMonitor. */
 @Inject

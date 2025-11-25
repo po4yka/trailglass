@@ -1,9 +1,9 @@
 package com.po4yka.trailglass.domain.service
 
-import io.github.oshai.kotlinlogging.KotlinLogging
+import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
-private val logger = KotlinLogging.logger {}
+private val logger = logger("IosCrashReportingService")
 
 /**
  * iOS implementation of CrashReportingService using Firebase Crashlytics.
