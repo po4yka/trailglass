@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import Shared
 
 /// Registration screen matching Android RegisterScreen
@@ -246,10 +247,9 @@ struct RegisterView: View {
     }
 }
 
-/// ViewModel for RegisterView
+/// ViewModel for RegisterView using centralized AuthStateObserver
 class RegisterViewModel: ObservableObject {
-    private let controller: AuthController
-    private var stateObserver: KotlinJob?
+    private var cancellables = Set<AnyCancellable>()
 
     @Published var displayName: String = ""
     @Published var email: String = ""
@@ -284,19 +284,11 @@ class RegisterViewModel: ObservableObject {
     }
 
     init(controller: AuthController) {
-        self.controller = controller
-        observeState()
-    }
-
-    deinit {
-        stateObserver?.cancel(cause: nil)
-    }
-
-    private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] (state: AuthState?) in
-            guard let self = self, let state = state else { return }
-
-            Task { @MainActor in
+        // Observe the centralized auth state
+        AuthStateObserver.shared.$currentState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let self = self, let state = state else { return }
                 if state is AuthController.AuthStateLoading {
                     self.isLoading = true
                     self.errorMessage = nil
@@ -308,20 +300,20 @@ class RegisterViewModel: ObservableObject {
                     self.errorMessage = nil
                 }
             }
-        }
+            .store(in: &cancellables)
     }
 
     func register() {
         guard canRegister else { return }
-        controller.register(email: email, password: password, displayName: displayName)
+        AuthStateObserver.shared.register(email: email, password: password, displayName: displayName)
     }
 
     func continueAsGuest() {
-        controller.continueAsGuest()
+        AuthStateObserver.shared.continueAsGuest()
     }
 
     func clearError() {
-        controller.clearError()
+        AuthStateObserver.shared.clearError()
     }
 }
 

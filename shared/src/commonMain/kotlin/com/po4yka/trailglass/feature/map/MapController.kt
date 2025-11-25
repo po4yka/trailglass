@@ -25,6 +25,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 
@@ -52,6 +54,8 @@ class MapController(
             coroutineScope.coroutineContext + SupervisorJob()
         )
 
+    // Mutex protects locationTrackingJob access for thread safety during concurrent toggle calls
+    private val locationJobMutex = Mutex()
     private var locationTrackingJob: Job? = null
     private var pendingFollowModeParams: FollowModeParams? = null
 
@@ -273,10 +277,12 @@ class MapController(
         val isCurrentlyEnabled = _state.value.isFollowModeEnabled
 
         if (isCurrentlyEnabled) {
-            // Disable follow mode
+            // Disable follow mode - use mutex for thread-safe job access
             logger.info { "Disabling follow mode" }
-            locationTrackingJob?.cancel()
-            locationTrackingJob = null
+            locationJobMutex.withLock {
+                locationTrackingJob?.cancel()
+                locationTrackingJob = null
+            }
             _state.update { it.copy(isFollowModeEnabled = false) }
         } else {
             // Enable follow mode - check permission first
@@ -316,22 +322,26 @@ class MapController(
                 applyCameraMove(CameraMove.Ease(position, durationMs = 800))
             }
 
-            // Start tracking location updates
-            locationTrackingJob =
-                locationService.locationUpdates
-                    .onEach { coordinate ->
-                        logger.debug { "Location update: ${coordinate.latitude}, ${coordinate.longitude}" }
+            // Start tracking location updates with thread-safe job assignment
+            locationJobMutex.withLock {
+                // Cancel any existing tracking job before starting new one
+                locationTrackingJob?.cancel()
+                locationTrackingJob =
+                    locationService.locationUpdates
+                        .onEach { coordinate ->
+                            logger.debug { "Location update: ${coordinate.latitude}, ${coordinate.longitude}" }
 
-                        // Update camera to follow user
-                        val position =
-                            CameraPosition(
-                                target = coordinate,
-                                zoom = zoom,
-                                tilt = tilt,
-                                bearing = bearing
-                            )
-                        applyCameraMove(CameraMove.Ease(position, durationMs = 500))
-                    }.launchIn(controllerScope)
+                            // Update camera to follow user
+                            val position =
+                                CameraPosition(
+                                    target = coordinate,
+                                    zoom = zoom,
+                                    tilt = tilt,
+                                    bearing = bearing
+                                )
+                            applyCameraMove(CameraMove.Ease(position, durationMs = 500))
+                        }.launchIn(controllerScope)
+            }
 
             _state.update { it.copy(isFollowModeEnabled = true) }
         }
@@ -413,12 +423,12 @@ class MapController(
      * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
      * needed.
      *
-     * Cancels all running coroutines including flow collectors and location tracking.
+     * Cancels the controllerScope which automatically cancels all child jobs (including locationTrackingJob).
      */
     override fun cleanup() {
         logger.info { "Cleaning up MapController" }
-        locationTrackingJob?.cancel()
-        locationTrackingJob = null
+        // Cancelling controllerScope automatically cancels all child jobs (including locationTrackingJob)
+        // No need to cancel locationTrackingJob separately since it's launched in controllerScope
         controllerScope.cancel()
         logger.debug { "MapController cleanup complete" }
     }

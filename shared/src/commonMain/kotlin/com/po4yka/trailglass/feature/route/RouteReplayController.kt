@@ -13,7 +13,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
 import kotlin.math.PI
@@ -89,6 +92,8 @@ class RouteReplayController(
     private val _state = MutableStateFlow(ReplayState())
     val state: StateFlow<ReplayState> = _state.asStateFlow()
 
+    // Mutex protects animationJob access for thread safety
+    private val animationJobMutex = Mutex()
     private var animationJob: Job? = null
     private val animationFrameMs = 16L // ~60 FPS
 
@@ -96,29 +101,31 @@ class RouteReplayController(
     fun loadRoute(tripId: String) {
         controllerScope.launch {
             logger.info { "Loading route for replay: $tripId" }
-            _state.value = _state.value.copy(isLoading = true, error = null)
+            _state.update { it.copy(isLoading = true, error = null) }
 
             getTripRouteUseCase
                 .execute(tripId)
                 .onSuccess { tripRoute ->
                     logger.info { "Route loaded for replay: ${tripRoute.fullPath.size} points" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             tripRoute = tripRoute,
                             isLoading = false,
                             vehicleState = createInitialVehicleState(tripRoute),
                             cameraPosition =
-                                tripRoute.fullPath.firstOrNull()?.let {
-                                    Coordinate(it.latitude, it.longitude)
+                                tripRoute.fullPath.firstOrNull()?.let { point ->
+                                    Coordinate(point.latitude, point.longitude)
                                 }
                         )
+                    }
                 }.onError { error ->
                     logger.error { "Failed to load route for replay: $tripId - ${error.getTechnicalDetails()}" }
-                    _state.value =
-                        _state.value.copy(
+                    _state.update {
+                        it.copy(
                             isLoading = false,
                             error = error.getUserFriendlyMessage()
                         )
+                    }
                 }
         }
     }
@@ -129,23 +136,28 @@ class RouteReplayController(
         if (route.fullPath.isEmpty()) return
 
         logger.debug { "Starting playback at ${_state.value.progress * 100}%" }
-        _state.value = _state.value.copy(isPlaying = true)
+        _state.update { it.copy(isPlaying = true) }
 
-        // Cancel existing animation if any
-        animationJob?.cancel()
-
-        // Start animation loop
-        animationJob =
-            controllerScope.launch {
-                animateRoute()
+        // Cancel existing animation and start new one with proper synchronization
+        controllerScope.launch {
+            animationJobMutex.withLock {
+                animationJob?.cancel()
+                animationJob = controllerScope.launch {
+                    animateRoute()
+                }
             }
+        }
     }
 
     /** Pause playback. */
     fun pause() {
         logger.debug { "Pausing playback" }
-        _state.value = _state.value.copy(isPlaying = false)
-        animationJob?.cancel()
+        _state.update { it.copy(isPlaying = false) }
+        controllerScope.launch {
+            animationJobMutex.withLock {
+                animationJob?.cancel()
+            }
+        }
     }
 
     /** Toggle play/pause. */
@@ -168,20 +180,21 @@ class RouteReplayController(
         // Calculate new vehicle state at this position
         val newVehicleState = calculateVehicleStateAtProgress(route, clampedProgress)
 
-        _state.value =
-            _state.value.copy(
+        _state.update {
+            it.copy(
                 progress = clampedProgress,
                 vehicleState = newVehicleState,
                 cameraPosition = newVehicleState.position,
                 cameraBearing = newVehicleState.bearing
             )
+        }
     }
 
     /** Cycle through playback speeds. */
     fun cyclePlaybackSpeed() {
         val newSpeed = _state.value.playbackSpeed.next()
         logger.debug { "Changing playback speed to ${newSpeed.displayName}" }
-        _state.value = _state.value.copy(playbackSpeed = newSpeed)
+        _state.update { it.copy(playbackSpeed = newSpeed) }
     }
 
     /** Restart playback from the beginning. */
@@ -193,15 +206,12 @@ class RouteReplayController(
 
     /** Toggle controls visibility. */
     fun toggleControls() {
-        _state.value =
-            _state.value.copy(
-                showControls = !_state.value.showControls
-            )
+        _state.update { it.copy(showControls = !it.showControls) }
     }
 
     /** Clear error state. */
     fun clearError() {
-        _state.value = _state.value.copy(error = null)
+        _state.update { it.copy(error = null) }
     }
 
     /** Stop and cleanup. */
@@ -215,6 +225,7 @@ class RouteReplayController(
         val route = _state.value.tripRoute ?: return
         if (route.fullPath.isEmpty()) return
 
+        @Suppress("UNUSED_VARIABLE")
         val totalDuration = (route.endTime - route.startTime).inWholeMilliseconds.toDouble()
         val baseDurationMs = 60000.0 // Base duration: 1 minute for the entire route
 
@@ -230,18 +241,19 @@ class RouteReplayController(
             // Update vehicle state
             val newVehicleState = calculateVehicleStateAtProgress(route, newProgress)
 
-            _state.value =
-                _state.value.copy(
+            _state.update {
+                it.copy(
                     progress = newProgress,
                     vehicleState = newVehicleState,
                     cameraPosition = newVehicleState.position,
                     cameraBearing = newVehicleState.bearing
                 )
+            }
 
             // Stop if we reached the end
             if (newProgress >= 1f) {
                 logger.info { "Playback completed" }
-                _state.value = _state.value.copy(isPlaying = false)
+                _state.update { it.copy(isPlaying = false) }
                 break
             }
 
@@ -358,12 +370,12 @@ class RouteReplayController(
      * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
      * needed.
      *
-     * Cancels all running coroutines including the animation job and flow collectors.
+     * Cancels the controllerScope which automatically cancels all child jobs including animationJob.
      */
     override fun cleanup() {
         logger.info { "Cleaning up RouteReplayController" }
-        animationJob?.cancel()
-        animationJob = null
+        // Cancelling controllerScope automatically cancels all child jobs (including animationJob)
+        // No need to cancel animationJob separately since it's launched in controllerScope
         controllerScope.cancel()
         logger.debug { "RouteReplayController cleanup complete" }
     }

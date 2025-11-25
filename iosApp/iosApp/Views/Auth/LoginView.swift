@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import Shared
 
 /// Login screen for user authentication matching Android LoginScreen
@@ -184,10 +185,9 @@ struct LoginView: View {
     }
 }
 
-/// ViewModel for LoginView bridging Swift and Kotlin
+/// ViewModel for LoginView using centralized AuthStateObserver
 class LoginViewModel: ObservableObject {
-    private let controller: AuthController
-    private var stateObserver: KotlinJob?
+    private var cancellables = Set<AnyCancellable>()
 
     @Published var email: String = ""
     @Published var password: String = ""
@@ -200,26 +200,11 @@ class LoginViewModel: ObservableObject {
     }
 
     init(controller: AuthController) {
-        self.controller = controller
-        observeState()
-    }
-
-    deinit {
-        stateObserver?.cancel(cause: nil)
-    }
-
-    private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] (state: AuthState?) in
-            guard let self = self, let state = state else { return }
-
-            // Broadcast auth state change via NotificationCenter for other observers
-            NotificationCenter.default.post(
-                name: .authStateChanged,
-                object: nil,
-                userInfo: ["state": state]
-            )
-
-            Task { @MainActor in
+        // Observe the centralized auth state
+        AuthStateObserver.shared.$currentState
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] state in
+                guard let self = self, let state = state else { return }
                 if state is AuthController.AuthStateLoading {
                     self.isLoading = true
                     self.errorMessage = nil
@@ -231,20 +216,20 @@ class LoginViewModel: ObservableObject {
                     self.errorMessage = nil
                 }
             }
-        }
+            .store(in: &cancellables)
     }
 
     func login() {
         guard canLogin else { return }
-        controller.login(email: email, password: password)
+        AuthStateObserver.shared.login(email: email, password: password)
     }
 
     func continueAsGuest() {
-        controller.continueAsGuest()
+        AuthStateObserver.shared.continueAsGuest()
     }
 
     func clearError() {
-        controller.clearError()
+        AuthStateObserver.shared.clearError()
     }
 }
 

@@ -72,19 +72,24 @@ class PhotoController(
                 when (permState.lastResult) {
                     is PermissionResult.Granted -> {
                         logger.info { "Photo permission granted" }
-                        val pendingAction = _state.value.pendingAction
-                        if (pendingAction != null) {
-                            _state.update {
-                                it.copy(
-                                    pendingAction = null,
-                                    hasCameraPermission =
-                                        permState.currentRequest?.permissionType == PermissionType.CAMERA,
-                                    hasPhotoLibraryPermission =
-                                        permState.currentRequest?.permissionType == PermissionType.PHOTO_LIBRARY
-                                )
-                            }
-                            // Execute the pending action
-                            when (pendingAction) {
+                        // Atomically get and clear pendingAction using updateAndGet
+                        // The lambda captures the pending action before clearing it
+                        var capturedAction: PendingPhotoAction? = null
+                        _state.update { currentState ->
+                            capturedAction = currentState.pendingAction
+                            currentState.copy(
+                                pendingAction = null,
+                                hasCameraPermission =
+                                    if (permState.currentRequest?.permissionType == PermissionType.CAMERA)
+                                        true else currentState.hasCameraPermission,
+                                hasPhotoLibraryPermission =
+                                    if (permState.currentRequest?.permissionType == PermissionType.PHOTO_LIBRARY)
+                                        true else currentState.hasPhotoLibraryPermission
+                            )
+                        }
+                        // Execute the pending action after state update
+                        capturedAction?.let { action ->
+                            when (action) {
                                 PendingPhotoAction.TAKE_PHOTO -> executePhotoCapture()
                                 PendingPhotoAction.SELECT_FROM_LIBRARY -> executePhotoSelection()
                             }

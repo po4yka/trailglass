@@ -16,6 +16,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import me.tatarka.inject.annotations.Inject
 
@@ -51,11 +52,12 @@ class SettingsController(
     private fun loadSettings() {
         controllerScope.launch {
             getSettingsUseCase.execute().collect { settings ->
-                _state.value =
-                    _state.value.copy(
+                _state.update {
+                    it.copy(
                         settings = settings,
                         isLoading = false
                     )
+                }
             }
         }
     }
@@ -81,10 +83,9 @@ class SettingsController(
                         logger.info { "E2E encryption initialized successfully" }
                     }.onFailure { e ->
                         logger.error(e) { "Failed to initialize E2E encryption" }
-                        _state.value =
-                            _state.value.copy(
-                                error = "Failed to initialize encryption: ${e.message}"
-                            )
+                        _state.update {
+                            it.copy(error = "Failed to initialize encryption: ${e.message}")
+                        }
                         return@launch
                     }
             }
@@ -129,78 +130,92 @@ class SettingsController(
     fun resetToDefaults() {
         controllerScope.launch {
             try {
-                _state.value = _state.value.copy(isLoading = true, error = null)
+                _state.update { it.copy(isLoading = true, error = null) }
                 updateSettingsUseCase.resetToDefaults()
-                _state.value = _state.value.copy(isLoading = false)
+                _state.update { it.copy(isLoading = false) }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to reset settings" }
-                _state.value =
-                    _state.value.copy(
+                _state.update {
+                    it.copy(
                         isLoading = false,
                         error = "Failed to reset settings: ${e.message}"
                     )
+                }
             }
         }
     }
 
-    fun exportSettings(): String? {
-        var result: String? = null
+    /**
+     * Export settings asynchronously. The result will be available in the state.
+     * Use [state] to observe when export is complete.
+     */
+    fun exportSettings() {
         controllerScope.launch {
+            _state.update { it.copy(isLoading = true, error = null, exportedSettings = null) }
             try {
-                result = exportSettingsUseCase.exportSettings()
+                val exported = exportSettingsUseCase.exportSettings()
+                _state.update { it.copy(isLoading = false, exportedSettings = exported) }
+                logger.info { "Settings exported successfully" }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to export settings" }
-                _state.value = _state.value.copy(error = "Failed to export settings: ${e.message}")
+                _state.update { it.copy(isLoading = false, error = "Failed to export settings: ${e.message}") }
             }
         }
-        return result
+    }
+
+    /** Clear exported settings from state after it has been consumed. */
+    fun clearExportedSettings() {
+        _state.update { it.copy(exportedSettings = null) }
     }
 
     fun importSettings(json: String) {
         controllerScope.launch {
             try {
-                _state.value = _state.value.copy(isLoading = true, error = null)
+                _state.update { it.copy(isLoading = true, error = null) }
                 when (val result = exportSettingsUseCase.importSettings(json)) {
                     is com.po4yka.trailglass.domain.error.Result.Success -> {
-                        _state.value = _state.value.copy(isLoading = false)
+                        _state.update { it.copy(isLoading = false) }
                     }
 
                     is com.po4yka.trailglass.domain.error.Result.Error -> {
-                        _state.value =
-                            _state.value.copy(
+                        _state.update {
+                            it.copy(
                                 isLoading = false,
                                 error = result.error.userMessage
                             )
+                        }
                     }
                 }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to import settings" }
-                _state.value =
-                    _state.value.copy(
+                _state.update {
+                    it.copy(
                         isLoading = false,
                         error = "Failed to import settings: ${e.message}"
                     )
+                }
             }
         }
     }
 
     fun clearError() {
-        _state.value = _state.value.copy(error = null)
+        _state.update { it.copy(error = null) }
     }
 
     fun clearAllData() {
         controllerScope.launch {
             try {
-                _state.value = _state.value.copy(isLoading = true, error = null)
+                _state.update { it.copy(isLoading = true, error = null) }
                 clearDataUseCase.execute()
-                _state.value = _state.value.copy(isLoading = false)
+                _state.update { it.copy(isLoading = false) }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to clear all data" }
-                _state.value =
-                    _state.value.copy(
+                _state.update {
+                    it.copy(
                         isLoading = false,
                         error = "Failed to clear all data: ${e.message}"
                     )
+                }
             }
         }
     }
@@ -222,5 +237,6 @@ class SettingsController(
 data class SettingsState(
     val settings: AppSettings? = null,
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val exportedSettings: String? = null
 )

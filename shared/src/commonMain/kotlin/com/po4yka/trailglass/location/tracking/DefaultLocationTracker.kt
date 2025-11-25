@@ -46,7 +46,13 @@ class DefaultLocationTracker(
     private val _trackingState = MutableStateFlow(TrackingState())
     override val trackingState: StateFlow<TrackingState> = _trackingState.asStateFlow()
 
-    private val _locationUpdates = MutableSharedFlow<LocationSample>(replay = 0)
+    // SharedFlow with buffer to handle backpressure - drops oldest samples if buffer is full
+    // This prevents blocking the location processing loop if no one is collecting
+    private val _locationUpdates = MutableSharedFlow<LocationSample>(
+        replay = 1, // Keep latest sample for late subscribers
+        extraBufferCapacity = 64, // Buffer for bursts of location updates
+        onBufferOverflow = kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
+    )
     override val locationUpdates: Flow<LocationSample> = _locationUpdates.asSharedFlow()
 
     private var trackingJob: Job? = null
