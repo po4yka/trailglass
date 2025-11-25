@@ -63,8 +63,8 @@ struct EnhancedSettingsView: View {
             do {
                 // Get data from repositories
                 let trips = try await appComponent.tripRepository.getTripsForUser(userId: appComponent.userId)
-                let placeVisits = try await appComponent.placeVisitRepository.getPlaceVisitsForUser(userId: appComponent.userId)
-                let regions = try await appComponent.regionRepository.getRegionsForUser(userId: appComponent.userId)
+                let placeVisits = try await appComponent.placeVisitRepository.getVisitsByUser(userId: appComponent.userId, limit: 10000, offset: 0)
+                let regions = try await appComponent.regionRepository.getActiveRegions(userId: appComponent.userId)
 
                 // Convert to export format
                 let tripExports = trips.map { trip in
@@ -144,7 +144,7 @@ struct EnhancedSettingsView: View {
             do {
                 // Parse JSON
                 let decoder = JSONDecoder()
-                decoder.dateEncodingStrategy = .iso8601
+                decoder.dateDecodingStrategy = .iso8601
                 let exportData = try decoder.decode(TrailglassExportData.self, from: jsonData)
 
                 // Validate version compatibility
@@ -190,7 +190,7 @@ struct EnhancedSettingsView: View {
                             isPublic: false, // Default to false
                             tags: [], // Default to empty
                             isAutoDetected: false, // Default to false
-                            detectionConfidence: nil, // Default to nil
+                            detectionConfidence: 0.0, // Default to 0.0
                             createdAt: now,
                             updatedAt: now
                         )

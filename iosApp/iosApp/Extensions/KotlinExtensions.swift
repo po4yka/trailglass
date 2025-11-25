@@ -96,10 +96,10 @@ extension TimelineFilter {
         showOnlyFavorites: Bool = false
     ) {
         self.init(
-            transportTypes: Set(transportTypes),
-            placeCategories: Set(placeCategories),
-            countries: [],
-            cities: [],
+            transportTypes: NSSet(array: transportTypes) as! Set<TransportType>,
+            placeCategories: NSSet(array: placeCategories) as! Set<PlaceCategory>,
+            countries: NSSet() as! Set<String>,
+            cities: NSSet() as! Set<String>,
             searchQuery: nil,
             dateRange: nil,
             minDuration: nil,
