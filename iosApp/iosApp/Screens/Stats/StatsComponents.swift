@@ -85,7 +85,7 @@ class EnhancedStatsViewModel: ObservableObject {
 
     func loadCurrentYear() {
         let currentYear = Calendar.current.component(.year, from: Date())
-        let kotlinPeriod = GetStatsUseCasePeriodYear(year: Int32(currentYear))
+        let kotlinPeriod = KotlinStatsPeriodYear(year: Int32(currentYear))
         controller.loadPeriod(period: kotlinPeriod)
         selectedPeriod = .year
     }
@@ -93,16 +93,16 @@ class EnhancedStatsViewModel: ObservableObject {
     func loadPeriod(_ period: StatsPeriod) {
         selectedPeriod = period
 
-        let kotlinPeriod: GetStatsUseCasePeriod
+        let kotlinPeriod: KotlinStatsPeriod
         switch period {
         case .year:
             let currentYear = Calendar.current.component(.year, from: Date())
-            kotlinPeriod = GetStatsUseCasePeriodYear(year: Int32(currentYear))
+            kotlinPeriod = KotlinStatsPeriodYear(year: Int32(currentYear))
         case .month:
             let components = Calendar.current.dateComponents([.year, .month], from: Date())
             let year = Int32(components.year ?? Calendar.current.component(.year, from: Date()))
             let month = Int32(components.month ?? Calendar.current.component(.month, from: Date()))
-            kotlinPeriod = GetStatsUseCasePeriodMonth(year: Int32(year), month: Int32(month))
+            kotlinPeriod = KotlinStatsPeriodMonth(year: year, month: month)
         }
 
         controller.loadPeriod(period: kotlinPeriod)

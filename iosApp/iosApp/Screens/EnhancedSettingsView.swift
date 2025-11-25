@@ -70,10 +70,10 @@ struct EnhancedSettingsView: View {
                 let tripExports = trips.map { trip in
                     TripExportData(
                         id: trip.id,
-                        name: trip.name,
+                        name: trip.name ?? "",
                         description: trip.description,
                         startDate: Date(timeIntervalSince1970: TimeInterval(trip.startTime.epochSeconds)),
-                        endDate: trip.endTime?.epochSeconds.map { Date(timeIntervalSince1970: TimeInterval($0)) }
+                        endDate: trip.endTime.map { Date(timeIntervalSince1970: TimeInterval($0.epochSeconds)) }
                     )
                 }
 
@@ -170,7 +170,9 @@ struct EnhancedSettingsView: View {
                                 nanosecondAdjustment: 0
                             )
                         }
-                        let now = Kotlinx_datetimeInstant.Companion.shared.now()
+                        let now = Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
+                            epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
+                        )
 
                         // Create trip object
                         let newTrip = Trip(
@@ -207,7 +209,9 @@ struct EnhancedSettingsView: View {
                 // Import regions using RegionRepository
                 for regionData in exportData.regions {
                     do {
-                        let now = Kotlinx_datetimeInstant.Companion.shared.now()
+                        let now = Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
+                            epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
+                        )
 
                         // Create region object (Region uses latitude/longitude directly, not center)
                         let newRegion = Region(

@@ -32,6 +32,10 @@ public typealias TrackingUIState = LocationTrackingController.LocationTrackingUI
 public typealias TripStatsState = TripStatisticsController.StatisticsState
 public typealias RouteReplayState = RouteReplayController.ReplayState
 public typealias EnhancedTimelineState = EnhancedTimelineController.EnhancedTimelineState
+public typealias KotlinStatsPeriod = GetStatsUseCase.Period
+public typealias KotlinStatsPeriodYear = GetStatsUseCase.PeriodYear
+public typealias KotlinStatsPeriodMonth = GetStatsUseCase.PeriodMonth
+public typealias KotlinStatsPeriodCustom = GetStatsUseCase.PeriodCustom
 
 // Kotlin Duration is not exported; represent as seconds.
 public typealias KotlinDuration = Int64
