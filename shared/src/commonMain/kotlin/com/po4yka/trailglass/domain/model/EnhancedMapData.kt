@@ -29,8 +29,8 @@ data class HeatmapPoint(
 /** Heatmap data for visualization. */
 data class HeatmapData(
     val points: List<HeatmapPoint>,
-    val radius: Int = 20, // Radius in pixels
-    val opacity: Float = 0.6f,
+    val radius: Int = 40, // Radius in pixels (increased for better coverage)
+    val opacity: Float = 0.7f,
     val gradient: HeatmapGradient = HeatmapGradient.DEFAULT
 )
 
@@ -44,13 +44,13 @@ data class HeatmapGradient(
             HeatmapGradient(
                 colors =
                     listOf(
-                        0x00000000.toInt(), // Transparent
-                        0x550000FF.toInt(), // Blue
-                        0xAA00FF00.toInt(), // Green
-                        0xFFFFFF00.toInt(), // Yellow
-                        0xFFFF0000.toInt() // Red
+                        0x000022FF.toInt(), // Deep Blue (Transparent start handled by renderer)
+                        0x0099FFFF.toInt(), // Cyan
+                        0x00FF9900.toInt(), // Lime/Green
+                        0xFFFFCC00.toInt(), // Yellow
+                        0xFFFF0000.toInt()  // Red
                     ),
-                startPoints = listOf(0f, 0.2f, 0.4f, 0.6f, 1.0f)
+                startPoints = listOf(0.2f, 0.4f, 0.6f, 0.8f, 1.0f)
             )
 
         val COOL =

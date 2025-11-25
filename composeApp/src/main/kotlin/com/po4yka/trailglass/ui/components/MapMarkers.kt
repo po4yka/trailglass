@@ -135,13 +135,20 @@ internal fun RenderHeatmap(heatmapData: HeatmapData) {
         // Remove previous overlay before adding a new one
         currentOverlay?.remove()
 
+        // Create gradient
+        val gradient = com.google.maps.android.heatmaps.Gradient(
+            heatmapData.gradient.colors.toIntArray(),
+            heatmapData.gradient.startPoints.toFloatArray()
+        )
+
         // Create heatmap tile provider with custom gradient colors
         val heatmapProvider =
             HeatmapTileProvider
                 .Builder()
                 .weightedData(heatmapPoints)
-                .radius(50) // Radius of influence for each point in pixels
-                .opacity(0.6) // Transparency of heatmap layer
+                .radius(heatmapData.radius) // Use radius from data
+                .opacity(heatmapData.opacity.toDouble()) // Use opacity from data
+                .gradient(gradient) // Use custom gradient
                 .build()
 
         // Add tile overlay to the map and store the reference
