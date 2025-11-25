@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.feature.auth
 
 import com.po4yka.trailglass.data.auth.UserSession
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CancellationException
@@ -119,10 +120,9 @@ class AuthController(
 
         controllerScope.launch {
             try {
-                val result = loginUseCase.execute(email, password)
-
-                result
-                    .onSuccess { response ->
+                when (val result = loginUseCase.execute(email, password)) {
+                    is Result.Success -> {
+                        val response = result.data
                         _state.value =
                             AuthState.Authenticated(
                                 userId = response.userId,
@@ -130,22 +130,14 @@ class AuthController(
                                 displayName = response.displayName
                             )
                         logger.info { "Login successful for: ${response.email}" }
-                    }.onFailure { error ->
-                        val errorMessage =
-                            when {
-                                error.message?.contains("401") == true ||
-                                    error.message?.contains("Unauthorized") == true ->
-                                    "Invalid email or password"
-
-                                error.message?.contains("network") == true ||
-                                    error.message?.contains("timeout") == true ->
-                                    "Network error. Please check your connection."
-
-                                else -> error.message ?: "Login failed. Please try again."
-                            }
-                        _state.value = AuthState.Error(errorMessage, previousState)
-                        logger.error(error) { "Login failed for: $email" }
                     }
+                    is Result.Error -> {
+                        val error = result.error
+                        val errorMessage = error.getUserFriendlyMessage()
+                        _state.value = AuthState.Error(errorMessage, previousState)
+                        logger.error { "Login failed for: $email - ${error.getTechnicalDetails()}" }
+                    }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -172,10 +164,9 @@ class AuthController(
 
         controllerScope.launch {
             try {
-                val result = registerUseCase.execute(email, password, displayName)
-
-                result
-                    .onSuccess { response ->
+                when (val result = registerUseCase.execute(email, password, displayName)) {
+                    is Result.Success -> {
+                        val response = result.data
                         _state.value =
                             AuthState.Authenticated(
                                 userId = response.userId,
@@ -183,28 +174,14 @@ class AuthController(
                                 displayName = response.displayName
                             )
                         logger.info { "Registration successful for: ${response.email}" }
-                    }.onFailure { error ->
-                        val errorMessage =
-                            when {
-                                error.message?.contains("409") == true ||
-                                    error.message?.contains("already exists") == true ->
-                                    "An account with this email already exists"
-
-                                error.message?.contains("Invalid email") == true ->
-                                    "Please enter a valid email address"
-
-                                error.message?.contains("Password must") == true ->
-                                    error.message!!
-
-                                error.message?.contains("network") == true ||
-                                    error.message?.contains("timeout") == true ->
-                                    "Network error. Please check your connection."
-
-                                else -> error.message ?: "Registration failed. Please try again."
-                            }
-                        _state.value = AuthState.Error(errorMessage, previousState)
-                        logger.error(error) { "Registration failed for: $email" }
                     }
+                    is Result.Error -> {
+                        val error = result.error
+                        val errorMessage = error.getUserFriendlyMessage()
+                        _state.value = AuthState.Error(errorMessage, previousState)
+                        logger.error { "Registration failed for: $email - ${error.getTechnicalDetails()}" }
+                    }
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

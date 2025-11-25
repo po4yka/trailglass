@@ -6,11 +6,6 @@ import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
 import com.po4yka.trailglass.domain.service.LocationService
-import com.po4yka.trailglass.feature.tracking.PlaceVisitDetector
-import com.po4yka.trailglass.feature.tracking.PlaceVisitEvent
-import com.po4yka.trailglass.feature.tracking.TransportModeDetector
-import com.po4yka.trailglass.feature.tracking.TripDetector
-import com.po4yka.trailglass.feature.tracking.TripEvent
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -43,7 +38,7 @@ class DefaultLocationTracker(
     private val logger = logger()
 
     // Detectors
-    private val tripDetector = TripDetector()
+    private val tripDetector = RealTimeTripDetector()
     private val placeVisitDetector = PlaceVisitDetector()
     private val transportModeDetector = TransportModeDetector()
 

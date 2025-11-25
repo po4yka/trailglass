@@ -24,9 +24,7 @@ class DeleteTripUseCase(
                     ?: return TrailGlassResult.Error(TrailGlassError.Unknown("Trip not found: $tripId"))
 
             // Delete the trip
-            tripRepository.deleteTrip(tripId)
-
-            TrailGlassResult.Success(Unit)
+            return tripRepository.deleteTrip(tripId)
         } catch (e: Exception) {
             TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }

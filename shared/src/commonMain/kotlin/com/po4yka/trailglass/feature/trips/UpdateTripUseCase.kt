@@ -54,9 +54,10 @@ class UpdateTripUseCase(
                 )
 
             // Save updated trip
-            tripRepository.upsertTrip(updated)
-
-            TrailGlassResult.Success(updated)
+            when (val result = tripRepository.upsertTrip(updated)) {
+                is TrailGlassResult.Success -> TrailGlassResult.Success(updated)
+                is TrailGlassResult.Error -> return TrailGlassResult.Error(result.error)
+            }
         } catch (e: Exception) {
             TrailGlassResult.Error(TrailGlassError.Unknown(e.message ?: "Unknown error", e))
         }

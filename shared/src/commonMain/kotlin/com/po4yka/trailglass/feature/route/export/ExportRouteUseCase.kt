@@ -1,5 +1,7 @@
 package com.po4yka.trailglass.feature.route.export
 
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.TripRoute
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
@@ -77,7 +79,7 @@ class ExportRouteUseCase(
             logger.info { "Export successful: $fileName (${content.length} bytes)" }
             logger.warn { "Privacy: ${privacyInfo.warningMessage}" }
 
-            Result.success(
+            Result.Success(
                 ExportResult(
                     fileName = fileName,
                     content = content,
@@ -87,7 +89,12 @@ class ExportRouteUseCase(
             )
         } catch (e: Exception) {
             logger.error(e) { "Failed to export route to $format" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Failed to export route",
+                    cause = e
+                )
+            )
         }
 
     /** Generate privacy information for the export. */

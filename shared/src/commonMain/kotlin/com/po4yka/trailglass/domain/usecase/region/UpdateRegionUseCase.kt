@@ -55,11 +55,16 @@ class UpdateRegionUseCase(
 
             // Update the region with new updatedAt timestamp
             val updatedRegion = region.copy(updatedAt = Clock.System.now())
-            regionRepository.updateRegion(updatedRegion)
-
-            logger.info { "Updated region: ${updatedRegion.name} (${updatedRegion.id})" }
-
-            Result.success(updatedRegion)
+            when (val result = regionRepository.updateRegion(updatedRegion)) {
+                is com.po4yka.trailglass.domain.error.Result.Success -> {
+                    logger.info { "Updated region: ${updatedRegion.name} (${updatedRegion.id})" }
+                    Result.success(updatedRegion)
+                }
+                is com.po4yka.trailglass.domain.error.Result.Error -> {
+                    logger.error { "Failed to update region: ${result.error.getUserFriendlyMessage()}" }
+                    return Result.failure(Exception(result.error.getUserFriendlyMessage()))
+                }
+            }
         } catch (e: Exception) {
             logger.error(e) { "Failed to update region: ${region.id}" }
             Result.failure(e)

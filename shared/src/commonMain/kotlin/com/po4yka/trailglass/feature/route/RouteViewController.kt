@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.feature.route
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.PhotoMarker
 import com.po4yka.trailglass.domain.model.TripRoute
@@ -155,23 +156,26 @@ class RouteViewController(
             logger.info { "Exporting route to $format" }
             _state.value = _state.value.copy(isExporting = true)
 
-            exportRouteUseCase
-                .execute(route, tripName, format)
-                .onSuccess { result ->
-                    logger.info { "Export successful: ${result.fileName}" }
+            when (val result = exportRouteUseCase.execute(route, tripName, format)) {
+                is Result.Success -> {
+                    val exportResult = result.data
+                    logger.info { "Export successful: ${exportResult.fileName}" }
                     _state.value =
                         _state.value.copy(
                             isExporting = false,
-                            exportResult = result
-                        )
-                }.onFailure { error ->
-                    logger.error(error) { "Export failed" }
-                    _state.value =
-                        _state.value.copy(
-                            isExporting = false,
-                            error = "Export failed: ${error.message}"
+                            exportResult = exportResult
                         )
                 }
+                is Result.Error -> {
+                    val error = result.error
+                    logger.error { "Export failed: ${error.getTechnicalDetails()}" }
+                    _state.value =
+                        _state.value.copy(
+                            isExporting = false,
+                            error = error.getUserFriendlyMessage()
+                        )
+                }
+            }
         }
     }
 

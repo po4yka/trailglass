@@ -2,6 +2,8 @@ package com.po4yka.trailglass.feature.photo
 
 import com.po4yka.trailglass.data.file.PhotoDirectoryProvider
 import com.po4yka.trailglass.data.file.PhotoStorageManager
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
@@ -35,17 +37,25 @@ class CleanupPhotosUseCase(
 
             if (result.isFailure) {
                 logger.error { "Failed to cleanup photos: ${result.exceptionOrNull()?.message}" }
-                return Result.failure(
-                    result.exceptionOrNull() ?: Exception("Failed to cleanup photos")
+                return Result.Error(
+                    TrailGlassError.PhotoError.LoadFailed(
+                        technicalMessage = result.exceptionOrNull()?.message ?: "Failed to cleanup photos",
+                        cause = result.exceptionOrNull()
+                    )
                 )
             }
 
             val deletedCount = result.getOrThrow()
             logger.info { "Cleaned up $deletedCount orphaned photos" }
-            Result.success(deletedCount)
+            Result.Success(deletedCount)
         } catch (e: Exception) {
             logger.error(e) { "Failed to cleanup orphaned photos" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.PhotoError.LoadFailed(
+                    technicalMessage = e.message ?: "Failed to cleanup orphaned photos",
+                    cause = e
+                )
+            )
         }
     }
 }

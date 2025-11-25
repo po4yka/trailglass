@@ -3,6 +3,8 @@ package com.po4yka.trailglass.data.repository.impl
 import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.resultOf
 import com.po4yka.trailglass.domain.model.CategoryConfidence
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.LocationSource
@@ -26,12 +28,12 @@ class PlaceVisitRepositoryImpl(
     private val visitQueries = database.placeVisitQueries
     private val logger = logger()
 
-    override suspend fun insertVisit(visit: PlaceVisit) =
+    override suspend fun insertVisit(visit: PlaceVisit): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.info {
-                "Inserting place visit: ${visit.id} at ${visit.city ?: "(${visit.centerLatitude}, ${visit.centerLongitude})"}"
-            }
-            try {
+            resultOf {
+                logger.info {
+                    "Inserting place visit: ${visit.id} at ${visit.city ?: "(${visit.centerLatitude}, ${visit.centerLongitude})"}"
+                }
                 database.transaction {
                     // Insert the visit
                     visitQueries.insertVisit(
@@ -65,9 +67,6 @@ class PlaceVisitRepositoryImpl(
                 logger.debug {
                     "Successfully inserted place visit ${visit.id} with ${visit.locationSampleIds.size} linked samples"
                 }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to insert place visit ${visit.id}" }
-                throw e
             }
         }
 
@@ -132,28 +131,31 @@ class PlaceVisitRepositoryImpl(
             }
         }
 
-    override suspend fun updateVisit(visit: PlaceVisit): Unit =
+    override suspend fun updateVisit(visit: PlaceVisit): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Updating visit: ${visit.id}" }
-            visitQueries.updateVisit(
-                start_time = visit.startTime.toEpochMilliseconds(),
-                end_time = visit.endTime.toEpochMilliseconds(),
-                center_latitude = visit.centerLatitude,
-                center_longitude = visit.centerLongitude,
-                approximate_address = visit.approximateAddress,
-                poi_name = visit.poiName,
-                city = visit.city,
-                country_code = visit.countryCode,
-                category = visit.category.name,
-                category_confidence = visit.categoryConfidence.name,
-                significance = visit.significance.name,
-                user_label = visit.userLabel,
-                user_notes = visit.userNotes,
-                is_favorite = if (visit.isFavorite) 1L else 0L,
-                frequent_place_id = visit.frequentPlaceId,
-                updated_at = Clock.System.now().toEpochMilliseconds(),
-                id = visit.id
-            )
+            resultOf {
+                logger.debug { "Updating visit: ${visit.id}" }
+                visitQueries.updateVisit(
+                    start_time = visit.startTime.toEpochMilliseconds(),
+                    end_time = visit.endTime.toEpochMilliseconds(),
+                    center_latitude = visit.centerLatitude,
+                    center_longitude = visit.centerLongitude,
+                    approximate_address = visit.approximateAddress,
+                    poi_name = visit.poiName,
+                    city = visit.city,
+                    country_code = visit.countryCode,
+                    category = visit.category.name,
+                    category_confidence = visit.categoryConfidence.name,
+                    significance = visit.significance.name,
+                    user_label = visit.userLabel,
+                    user_notes = visit.userNotes,
+                    is_favorite = if (visit.isFavorite) 1L else 0L,
+                    frequent_place_id = visit.frequentPlaceId,
+                    updated_at = Clock.System.now().toEpochMilliseconds(),
+                    id = visit.id
+                )
+                Unit
+            }
         }
 
     override suspend fun linkSamples(
@@ -184,11 +186,14 @@ class PlaceVisitRepositoryImpl(
                 .map { it.toLocationSample() }
         }
 
-    override suspend fun deleteVisit(id: String): Unit =
+    override suspend fun deleteVisit(id: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting visit: $id" }
-            val now = Clock.System.now().toEpochMilliseconds()
-            visitQueries.softDelete(deleted_at = now, updated_at = now, id = id)
+            resultOf {
+                logger.debug { "Deleting visit: $id" }
+                val now = Clock.System.now().toEpochMilliseconds()
+                visitQueries.softDelete(deleted_at = now, updated_at = now, id = id)
+                Unit
+            }
         }
 
     private fun com.po4yka.trailglass.db.Place_visits.toPlaceVisit(sampleIds: List<String>) =

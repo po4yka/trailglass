@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.repository
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceSignificance
@@ -7,7 +8,7 @@ import com.po4yka.trailglass.domain.model.PlaceSignificance
 /** Repository for managing frequently visited places. */
 interface FrequentPlaceRepository {
     /** Insert a new frequent place. */
-    suspend fun insertPlace(place: FrequentPlace)
+    suspend fun insertPlace(place: FrequentPlace): Result<Unit>
 
     /** Get a frequent place by ID. */
     suspend fun getPlaceById(id: String): FrequentPlace?
@@ -28,10 +29,10 @@ interface FrequentPlaceRepository {
     ): List<FrequentPlace>
 
     /** Update an existing frequent place. */
-    suspend fun updatePlace(place: FrequentPlace)
+    suspend fun updatePlace(place: FrequentPlace): Result<Unit>
 
     /** Delete a frequent place. */
-    suspend fun deletePlace(id: String)
+    suspend fun deletePlace(id: String): Result<Unit>
 
     /** Get favorite frequent places for a user. */
     suspend fun getFavoritePlaces(userId: String): List<FrequentPlace>

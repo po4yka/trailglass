@@ -1,12 +1,13 @@
 package com.po4yka.trailglass.data.repository
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.Trip
 import kotlinx.datetime.Instant
 
 /** Repository for Trip data. */
 interface TripRepository {
     /** Insert or update a trip. */
-    suspend fun upsertTrip(trip: Trip)
+    suspend fun upsertTrip(trip: Trip): Result<Unit>
 
     /** Get a trip by ID. */
     suspend fun getTripById(tripId: String): Trip?
@@ -31,7 +32,7 @@ interface TripRepository {
     )
 
     /** Delete a trip. */
-    suspend fun deleteTrip(tripId: String)
+    suspend fun deleteTrip(tripId: String): Result<Unit>
 
     /** Get the total number of trips for a user. */
     suspend fun getTripCount(userId: String): Long

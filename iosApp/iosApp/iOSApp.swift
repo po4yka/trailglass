@@ -37,10 +37,11 @@ struct AppRootView: View {
 }
 
 /// Manages authentication state observation from Kotlin
+/// Uses NotificationCenter to receive state updates broadcast by LoginViewModel
 class AuthStateManager: ObservableObject {
     @Published var isAuthenticated: Bool = false
 
-    private var stateObserver: KotlinJob?
+    private var notificationObserver: NSObjectProtocol?
     private var isObserving = false
 
     func startObserving(authController: AuthController) {
@@ -57,37 +58,40 @@ class AuthStateManager: ObservableObject {
             let shouldAuth = initialState is AuthController.AuthStateAuthenticated ||
                              initialState is AuthController.AuthStateGuest
             print("[AuthStateManager] Initial state: \(type(of: initialState)), shouldAuth: \(shouldAuth)")
-            DispatchQueue.main.async {
-                self.isAuthenticated = shouldAuth
-            }
+            isAuthenticated = shouldAuth
         }
 
-        // Subscribe using the extension method
-        print("[AuthStateManager] Setting up subscription...")
-        stateObserver = authController.state.subscribe { [weak self] (state: AuthState?) in
-            if let state = state {
-                print("[AuthStateManager] Received state: \(type(of: state))")
-            } else {
-                print("[AuthStateManager] Received state: nil")
+        // Listen for auth state changes broadcast by LoginViewModel
+        print("[AuthStateManager] Setting up notification observer...")
+        notificationObserver = NotificationCenter.default.addObserver(
+            forName: .authStateChanged,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let self = self,
+                  let state = notification.userInfo?["state"] as? AuthState else {
+                print("[AuthStateManager] Notification received but state invalid")
+                return
             }
-            guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
-                if state is AuthController.AuthStateAuthenticated ||
-                   state is AuthController.AuthStateGuest {
-                    print("[AuthStateManager] Setting isAuthenticated = true")
-                    self.isAuthenticated = true
-                } else if state is AuthController.AuthStateUnauthenticated {
-                    print("[AuthStateManager] Setting isAuthenticated = false")
-                    self.isAuthenticated = false
-                }
+            print("[AuthStateManager] Received state via notification: \(type(of: state))")
+
+            if state is AuthController.AuthStateAuthenticated ||
+               state is AuthController.AuthStateGuest {
+                print("[AuthStateManager] Setting isAuthenticated = true")
+                self.isAuthenticated = true
+            } else if state is AuthController.AuthStateUnauthenticated {
+                print("[AuthStateManager] Setting isAuthenticated = false")
+                self.isAuthenticated = false
             }
         }
-        print("[AuthStateManager] Subscription created: \(stateObserver != nil)")
+        print("[AuthStateManager] Notification observer set up")
     }
 
     deinit {
         print("[AuthStateManager] deinit")
-        stateObserver?.cancel()
+        if let observer = notificationObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
     }
 }

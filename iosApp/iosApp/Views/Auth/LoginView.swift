@@ -212,6 +212,13 @@ class LoginViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: AuthState?) in
             guard let self = self, let state = state else { return }
 
+            // Broadcast auth state change via NotificationCenter for other observers
+            NotificationCenter.default.post(
+                name: .authStateChanged,
+                object: nil,
+                userInfo: ["state": state]
+            )
+
             Task { @MainActor in
                 if state is AuthController.AuthStateLoading {
                     self.isLoading = true

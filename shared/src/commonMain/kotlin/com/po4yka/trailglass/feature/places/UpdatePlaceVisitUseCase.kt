@@ -1,6 +1,8 @@
 package com.po4yka.trailglass.feature.places
 
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Clock
@@ -31,7 +33,11 @@ class UpdatePlaceVisitUseCase(
             // Get existing visit
             val existing =
                 placeVisitRepository.getVisitById(visitId)
-                    ?: return Result.failure(IllegalArgumentException("Visit not found: $visitId"))
+                    ?: return Result.Error(
+                        TrailGlassError.DatabaseError.QueryFailed(
+                            technicalMessage = "Visit not found: $visitId"
+                        )
+                    )
 
             // Update with new values
             val updated =
@@ -44,11 +50,17 @@ class UpdatePlaceVisitUseCase(
                 )
 
             // Save updated visit
-            placeVisitRepository.updateVisit(updated)
-
-            Result.success(updated)
+            when (val updateResult = placeVisitRepository.updateVisit(updated)) {
+                is Result.Success -> Result.Success(updated)
+                is Result.Error -> return Result.Error(updateResult.error)
+            }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.UpdateFailed(
+                    technicalMessage = e.message ?: "Failed to update place visit",
+                    cause = e
+                )
+            )
         }
     }
 
@@ -74,12 +86,22 @@ class UpdatePlaceVisitUseCase(
                             userLabel = userLabel ?: existing.userLabel,
                             category = category ?: existing.category,
                             updatedAt = Clock.System.now()
-                        ).also { placeVisitRepository.updateVisit(it) }
+                        ).also { updated ->
+                            when (val result = placeVisitRepository.updateVisit(updated)) {
+                                is Result.Success -> {}
+                                is Result.Error -> return Result.Error(result.error)
+                            }
+                        }
                 }
 
-            Result.success(updated)
+            Result.Success(updated)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.UpdateFailed(
+                    technicalMessage = e.message ?: "Failed to batch update place visits",
+                    cause = e
+                )
+            )
         }
     }
 }

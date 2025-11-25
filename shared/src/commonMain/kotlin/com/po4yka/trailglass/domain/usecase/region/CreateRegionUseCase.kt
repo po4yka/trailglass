@@ -79,10 +79,16 @@ class CreateRegionUseCase(
                 updatedAt = now
             )
 
-            regionRepository.insertRegion(region)
-            logger.info { "Created region: ${region.name} (${region.id})" }
-
-            Result.success(region)
+            when (val result = regionRepository.insertRegion(region)) {
+                is com.po4yka.trailglass.domain.error.Result.Success -> {
+                    logger.info { "Created region: ${region.name} (${region.id})" }
+                    Result.success(region)
+                }
+                is com.po4yka.trailglass.domain.error.Result.Error -> {
+                    logger.error { "Failed to insert region: ${result.error.getUserFriendlyMessage()}" }
+                    return Result.failure(Exception(result.error.getUserFriendlyMessage()))
+                }
+            }
         } catch (e: Exception) {
             logger.error(e) { "Failed to create region" }
             Result.failure(e)

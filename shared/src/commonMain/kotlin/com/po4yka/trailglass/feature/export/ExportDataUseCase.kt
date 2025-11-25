@@ -3,6 +3,8 @@ package com.po4yka.trailglass.feature.export
 import com.po4yka.trailglass.data.file.ExportManager
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.logging.logger
 import kotlinx.datetime.Instant
@@ -79,7 +81,12 @@ class ExportDataUseCase(
             }
         } catch (e: Exception) {
             logger.error(e) { "Failed to export data" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Failed to export data",
+                    cause = e
+                )
+            )
         }
 
     private suspend fun exportAllTrips(
@@ -97,14 +104,24 @@ class ExportDataUseCase(
                 logger.warn { "JSON export for all trips not supported, exporting first trip only" }
                 val trips = tripRepository.getTripsForUser(userId)
                 if (trips.isEmpty()) {
-                    return Result.failure(IllegalStateException("No trips to export"))
+                    return Result.Error(
+                        TrailGlassError.ValidationError.InvalidInput(
+                            fieldName = "trips",
+                            technicalMessage = "No trips to export"
+                        )
+                    )
                 }
                 exportManager.exportTripToJSON(trips.first(), outputPath)
             }
 
             Format.GPX -> {
                 logger.warn { "GPX export for trips not supported, use visits instead" }
-                Result.failure(IllegalArgumentException("GPX format is only supported for visits"))
+                Result.Error(
+                    TrailGlassError.ValidationError.InvalidInput(
+                        fieldName = "format",
+                        technicalMessage = "GPX format is only supported for visits"
+                    )
+                )
             }
         }
     }
@@ -116,7 +133,12 @@ class ExportDataUseCase(
     ): Result<Unit> {
         val trip =
             tripRepository.getTripById(tripId)
-                ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
+                ?: return Result.Error(
+                    TrailGlassError.ValidationError.InvalidInput(
+                        fieldName = "tripId",
+                        technicalMessage = "Trip not found: $tripId"
+                    )
+                )
 
         return when (format) {
             Format.CSV -> {
@@ -129,7 +151,12 @@ class ExportDataUseCase(
 
             Format.GPX -> {
                 logger.warn { "GPX export for trips not supported, use visits instead" }
-                Result.failure(IllegalArgumentException("GPX format is only supported for visits"))
+                Result.Error(
+                    TrailGlassError.ValidationError.InvalidInput(
+                        fieldName = "format",
+                        technicalMessage = "GPX format is only supported for visits"
+                    )
+                )
             }
         }
     }
@@ -141,7 +168,12 @@ class ExportDataUseCase(
     ): Result<Unit> {
         val trip =
             tripRepository.getTripById(tripId)
-                ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
+                ?: return Result.Error(
+                    TrailGlassError.ValidationError.InvalidInput(
+                        fieldName = "tripId",
+                        technicalMessage = "Trip not found: $tripId"
+                    )
+                )
 
         val visits =
             placeVisitRepository.getVisits(
@@ -175,7 +207,12 @@ class ExportDataUseCase(
             Format.GPX -> exportManager.exportVisitsToGPX(visits, outputPath)
             Format.JSON -> {
                 logger.warn { "JSON export for visits not fully supported" }
-                Result.failure(IllegalArgumentException("JSON format is only supported for trips"))
+                Result.Error(
+                    TrailGlassError.ValidationError.InvalidInput(
+                        fieldName = "format",
+                        technicalMessage = "JSON format is only supported for trips"
+                    )
+                )
             }
         }
 }

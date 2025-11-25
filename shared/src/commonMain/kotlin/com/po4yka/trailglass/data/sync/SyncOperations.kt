@@ -140,20 +140,25 @@ internal class SyncOperations(
         for (visitDto in remoteChanges.placeVisits) {
             try {
                 val visit = visitDto.toDomain()
-                placeVisitRepository.insertVisit(visit)
-
-                // Update sync metadata
-                syncMetadataRepository.upsertMetadata(
-                    SyncMetadata(
-                        entityId = visit.id,
-                        entityType = EntityType.PLACE_VISIT,
-                        serverVersion = visitDto.serverVersion ?: 1,
-                        lastModified = Clock.System.now(),
-                        lastSynced = Clock.System.now(),
-                        isPendingSync = false,
-                        deviceId = deviceId
-                    )
-                )
+                when (val result = placeVisitRepository.insertVisit(visit)) {
+                    is com.po4yka.trailglass.domain.error.Result.Success -> {
+                        // Update sync metadata
+                        syncMetadataRepository.upsertMetadata(
+                            SyncMetadata(
+                                entityId = visit.id,
+                                entityType = EntityType.PLACE_VISIT,
+                                serverVersion = visitDto.serverVersion ?: 1,
+                                lastModified = Clock.System.now(),
+                                lastSynced = Clock.System.now(),
+                                isPendingSync = false,
+                                deviceId = deviceId
+                            )
+                        )
+                    }
+                    is com.po4yka.trailglass.domain.error.Result.Error -> {
+                        logger.error { "Failed to insert place visit: ${result.error.getUserFriendlyMessage()}" }
+                    }
+                }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to apply remote place visit ${visitDto.id}" }
             }
@@ -163,20 +168,25 @@ internal class SyncOperations(
         for (tripDto in remoteChanges.trips) {
             try {
                 val trip = tripDto.toDomain()
-                tripRepository.upsertTrip(trip)
-
-                // Update sync metadata
-                syncMetadataRepository.upsertMetadata(
-                    SyncMetadata(
-                        entityId = trip.id,
-                        entityType = EntityType.TRIP,
-                        serverVersion = tripDto.serverVersion ?: 1,
-                        lastModified = Clock.System.now(),
-                        lastSynced = Clock.System.now(),
-                        isPendingSync = false,
-                        deviceId = deviceId
-                    )
-                )
+                when (val result = tripRepository.upsertTrip(trip)) {
+                    is com.po4yka.trailglass.domain.error.Result.Success -> {
+                        // Update sync metadata
+                        syncMetadataRepository.upsertMetadata(
+                            SyncMetadata(
+                                entityId = trip.id,
+                                entityType = EntityType.TRIP,
+                                serverVersion = tripDto.serverVersion ?: 1,
+                                lastModified = Clock.System.now(),
+                                lastSynced = Clock.System.now(),
+                                isPendingSync = false,
+                                deviceId = deviceId
+                            )
+                        )
+                    }
+                    is com.po4yka.trailglass.domain.error.Result.Error -> {
+                        logger.error { "Failed to upsert trip: ${result.error.getUserFriendlyMessage()}" }
+                    }
+                }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to apply remote trip ${tripDto.id}" }
             }
@@ -184,12 +194,12 @@ internal class SyncOperations(
 
         // Handle deletions
         for (deletedId in remoteChanges.deletedIds.placeVisits) {
-            placeVisitRepository.deleteVisit(deletedId)
+            placeVisitRepository.deleteVisit(deletedId) // Result ignored, logged internally
             syncMetadataRepository.deleteMetadata(deletedId, EntityType.PLACE_VISIT)
         }
 
         for (deletedId in remoteChanges.deletedIds.trips) {
-            tripRepository.deleteTrip(deletedId)
+            tripRepository.deleteTrip(deletedId) // Result ignored, logged internally
             syncMetadataRepository.deleteMetadata(deletedId, EntityType.TRIP)
         }
     }

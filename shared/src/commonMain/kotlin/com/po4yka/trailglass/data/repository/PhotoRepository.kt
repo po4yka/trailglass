@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.repository
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PhotoAttachment
 import kotlinx.datetime.Instant
@@ -8,7 +9,7 @@ import kotlinx.datetime.LocalDate
 /** Repository for photo data. */
 interface PhotoRepository {
     /** Insert or update a photo. */
-    suspend fun insertPhoto(photo: Photo)
+    suspend fun insertPhoto(photo: Photo): Result<Unit>
 
     /** Get a photo by ID. */
     suspend fun getPhotoById(photoId: String): Photo?
@@ -46,7 +47,7 @@ interface PhotoRepository {
     ): List<Photo>
 
     /** Delete a photo. */
-    suspend fun deletePhoto(photoId: String)
+    suspend fun deletePhoto(photoId: String): Result<Unit>
 
     /** Get total photo count for user. */
     suspend fun getPhotoCount(userId: String): Long
@@ -54,7 +55,7 @@ interface PhotoRepository {
     // Photo Attachments
 
     /** Attach a photo to a place visit. */
-    suspend fun attachPhotoToVisit(attachment: PhotoAttachment)
+    suspend fun attachPhotoToVisit(attachment: PhotoAttachment): Result<Unit>
 
     /** Get attachments for a photo. */
     suspend fun getAttachmentsForPhoto(photoId: String): List<PhotoAttachment>
@@ -72,11 +73,11 @@ interface PhotoRepository {
     ): Boolean
 
     /** Delete an attachment. */
-    suspend fun deleteAttachment(attachmentId: String)
+    suspend fun deleteAttachment(attachmentId: String): Result<Unit>
 
     /** Delete all attachments for a photo. */
-    suspend fun deleteAttachmentsForPhoto(photoId: String)
+    suspend fun deleteAttachmentsForPhoto(photoId: String): Result<Unit>
 
     /** Delete all attachments for a visit. */
-    suspend fun deleteAttachmentsForVisit(visitId: String)
+    suspend fun deleteAttachmentsForVisit(visitId: String): Result<Unit>
 }

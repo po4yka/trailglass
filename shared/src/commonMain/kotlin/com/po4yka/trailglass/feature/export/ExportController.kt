@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.feature.export
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CancellationException
@@ -146,8 +147,8 @@ class ExportController(
 
                 _state.update { it.copy(progress = 0.9f, currentOperation = "Finalizing...") }
 
-                result.fold(
-                    onSuccess = {
+                when (result) {
+                    is Result.Success -> {
                         logger.info { "Export completed successfully: $outputPath" }
                         _state.update {
                             it.copy(
@@ -158,19 +159,20 @@ class ExportController(
                                 showDialog = false
                             )
                         }
-                    },
-                    onFailure = { error ->
-                        logger.error(error) { "Export failed" }
+                    }
+                    is Result.Error -> {
+                        val error = result.error
+                        logger.error { "Export failed: ${error.getTechnicalDetails()}" }
                         _state.update {
                             it.copy(
                                 isExporting = false,
                                 progress = 0f,
                                 currentOperation = null,
-                                error = error.message ?: "Export failed"
+                                error = error.getUserFriendlyMessage()
                             )
                         }
                     }
-                )
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

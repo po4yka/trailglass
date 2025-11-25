@@ -1,6 +1,7 @@
 package com.po4yka.trailglass.feature.places
 
 import com.po4yka.trailglass.data.repository.FrequentPlaceRepository
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceSignificance
@@ -111,9 +112,9 @@ class PlacesController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            getFrequentPlacesUseCase
-                .execute(userId, _state.value.minSignificance)
-                .onSuccess { allPlaces ->
+            when (val result = getFrequentPlacesUseCase.execute(userId, _state.value.minSignificance)) {
+                is Result.Success -> {
+                    val allPlaces = result.data
                     logger.info { "Loaded ${allPlaces.size} frequent places" }
                     val currentState = _state.value
                     val filteredPlaces =
@@ -130,15 +131,18 @@ class PlacesController(
                             isLoading = false
                         )
                     }
-                }.onFailure { error ->
-                    logger.error(error) { "Failed to load frequent places" }
+                }
+                is Result.Error -> {
+                    val error = result.error
+                    logger.error { "Failed to load frequent places: ${error.getTechnicalDetails()}" }
                     _state.update {
                         it.copy(
-                            error = error.message ?: "Failed to load places",
+                            error = error.getUserFriendlyMessage(),
                             isLoading = false
                         )
                     }
                 }
+            }
         }
     }
 
@@ -149,9 +153,9 @@ class PlacesController(
         _state.update { it.copy(isLoading = true, error = null) }
 
         controllerScope.launch {
-            getFrequentPlacesUseCase
-                .refresh(userId)
-                .onSuccess { allPlaces ->
+            when (val result = getFrequentPlacesUseCase.refresh(userId)) {
+                is Result.Success -> {
+                    val allPlaces = result.data
                     logger.info { "Refreshed ${allPlaces.size} frequent places" }
                     val currentState = _state.value
                     val filteredPlaces =
@@ -168,15 +172,18 @@ class PlacesController(
                             isLoading = false
                         )
                     }
-                }.onFailure { error ->
-                    logger.error(error) { "Failed to refresh frequent places" }
+                }
+                is Result.Error -> {
+                    val error = result.error
+                    logger.error { "Failed to refresh frequent places: ${error.getTechnicalDetails()}" }
                     _state.update {
                         it.copy(
-                            error = error.message ?: "Failed to refresh places",
+                            error = error.getUserFriendlyMessage(),
                             isLoading = false
                         )
                     }
                 }
+            }
         }
     }
 

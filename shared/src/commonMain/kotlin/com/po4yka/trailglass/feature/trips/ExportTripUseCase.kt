@@ -3,6 +3,8 @@ package com.po4yka.trailglass.feature.trips
 import com.po4yka.trailglass.data.repository.LocationRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.feature.trips.export.GpxExporter
 import com.po4yka.trailglass.feature.trips.export.KmlExporter
 import com.po4yka.trailglass.logging.logger
@@ -41,7 +43,12 @@ class ExportTripUseCase(
             // Get trip
             val trip =
                 tripRepository.getTripById(tripId)
-                    ?: return Result.failure(IllegalArgumentException("Trip not found: $tripId"))
+                    ?: return Result.Error(
+                        TrailGlassError.ValidationError.InvalidInput(
+                            fieldName = "tripId",
+                            technicalMessage = "Trip not found: $tripId"
+                        )
+                    )
 
             // Get location samples for the trip
             val locationsResult = locationRepository.getSamplesForTrip(tripId)
@@ -71,10 +78,15 @@ class ExportTripUseCase(
 
             logger.info { "Successfully exported trip $tripId as ${format.name}" }
 
-            Result.success(exportedData)
+            Result.Success(exportedData)
         } catch (e: Exception) {
             logger.error(e) { "Failed to export trip $tripId" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Failed to export trip",
+                    cause = e
+                )
+            )
         }
     }
 }

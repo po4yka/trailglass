@@ -5,6 +5,8 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.TripRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.resultOf
 import com.po4yka.trailglass.domain.model.Trip
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
@@ -22,10 +24,10 @@ class TripRepositoryImpl(
     private val logger = logger()
     private val queries = database.tripsQueries
 
-    override suspend fun upsertTrip(trip: Trip) =
+    override suspend fun upsertTrip(trip: Trip): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Upserting trip: ${trip.id}" }
-            try {
+            resultOf {
+                logger.debug { "Upserting trip: ${trip.id}" }
                 val now =
                     kotlinx.datetime.Clock.System
                         .now()
@@ -43,9 +45,6 @@ class TripRepositoryImpl(
                     deleted_at = null
                 )
                 logger.trace { "Successfully upserted trip ${trip.id}" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to upsert trip ${trip.id}" }
-                throw e
             }
         }
 
@@ -158,15 +157,12 @@ class TripRepositoryImpl(
         }
     }
 
-    override suspend fun deleteTrip(tripId: String) =
+    override suspend fun deleteTrip(tripId: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting trip $tripId" }
-            try {
+            resultOf {
+                logger.debug { "Deleting trip $tripId" }
                 queries.deleteTrip(tripId)
                 logger.info { "Trip $tripId deleted" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete trip $tripId" }
-                throw e
             }
         }
 

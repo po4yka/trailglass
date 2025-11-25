@@ -1,18 +1,13 @@
-package com.po4yka.trailglass.feature.tracking
+package com.po4yka.trailglass.location.tracking
 
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.distanceMetersTo
 import kotlinx.datetime.Instant
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 /**
- * Detects trip start and end based on location patterns.
+ * Detects trip start and end based on location patterns in real-time.
  *
  * A trip is considered started when:
  * - User moves more than MIN_TRIP_DISTANCE from a stationary point
@@ -21,7 +16,7 @@ import kotlin.math.sqrt
  * A trip is considered ended when:
  * - User stays within STATIONARY_RADIUS for STATIONARY_DURATION
  */
-class TripDetector {
+class RealTimeTripDetector {
     private val logger = logger()
 
     companion object {
@@ -74,11 +69,7 @@ class TripDetector {
             return null
         }
 
-        val distance =
-            calculateDistance(
-                lastTripStartLocation!!,
-                location.coordinate
-            )
+        val distance = lastTripStartLocation!!.distanceMetersTo(location.coordinate)
 
         if (distance > MIN_TRIP_DISTANCE_METERS) {
             val duration = now.toEpochMilliseconds() - lastTripStartTime!!.toEpochMilliseconds()
@@ -116,11 +107,7 @@ class TripDetector {
             return null
         }
 
-        val distance =
-            calculateDistance(
-                stationaryStartLocation!!,
-                location.coordinate
-            )
+        val distance = stationaryStartLocation!!.distanceMetersTo(location.coordinate)
 
         if (distance <= STATIONARY_RADIUS_METERS) {
             // User is still stationary
@@ -154,31 +141,11 @@ class TripDetector {
         stationaryStartLocation = null
         stationaryStartTime = null
         currentTripActive = false
-        logger.debug { "Trip detector reset" }
-    }
-
-    /** Calculate distance between two coordinates in meters. Uses Haversine formula. */
-    private fun calculateDistance(
-        start: Coordinate,
-        end: Coordinate
-    ): Double {
-        val earthRadiusMeters = 6371000.0
-
-        val lat1 = (start.latitude * PI / 180.0)
-        val lat2 = (end.latitude * PI / 180.0)
-        val dLat = (end.latitude - start.latitude * PI / 180.0)
-        val dLon = (end.longitude - start.longitude * PI / 180.0)
-
-        val a =
-            sin(dLat / 2).pow(2) +
-                cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        return earthRadiusMeters * c
+        logger.debug { "Real-time trip detector reset" }
     }
 }
 
-/** Events emitted by trip detector. */
+/** Events emitted by real-time trip detector. */
 sealed class TripEvent {
     /** Trip has started. */
     data class TripStarted(

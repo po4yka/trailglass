@@ -233,22 +233,45 @@ class PhotoDetailController(
         controllerScope.launch {
             try {
                 // Delete all attachments first
-                photoRepository.deleteAttachmentsForPhoto(photoId)
-
-                // Delete the photo
-                photoRepository.deletePhoto(photoId)
-
-                logger.info { "Deleted photo $photoId successfully" }
-
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        showDeleteConfirmation = false,
-                        photo = null // Clear photo after deletion
-                    )
+                when (val attachResult = photoRepository.deleteAttachmentsForPhoto(photoId)) {
+                    is com.po4yka.trailglass.domain.error.Result.Success -> {}
+                    is com.po4yka.trailglass.domain.error.Result.Error -> {
+                        logger.error { "Failed to delete attachments: ${attachResult.error.getUserFriendlyMessage()}" }
+                        _state.update {
+                            it.copy(
+                                error = attachResult.error.getUserFriendlyMessage(),
+                                isLoading = false
+                            )
+                        }
+                        return@launch
+                    }
                 }
 
-                // Platform-specific code should navigate back after deletion
+                // Delete the photo
+                when (val deleteResult = photoRepository.deletePhoto(photoId)) {
+                    is com.po4yka.trailglass.domain.error.Result.Success -> {
+                        logger.info { "Deleted photo $photoId successfully" }
+
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                showDeleteConfirmation = false,
+                                photo = null // Clear photo after deletion
+                            )
+                        }
+
+                        // Platform-specific code should navigate back after deletion
+                    }
+                    is com.po4yka.trailglass.domain.error.Result.Error -> {
+                        logger.error { "Failed to delete photo: ${deleteResult.error.getUserFriendlyMessage()}" }
+                        _state.update {
+                            it.copy(
+                                error = deleteResult.error.getUserFriendlyMessage(),
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 logger.error(e) { "Failed to delete photo $photoId" }
                 _state.update {

@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.repository
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.LocationSample
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Instant
@@ -7,7 +8,7 @@ import kotlinx.datetime.Instant
 /** Repository for managing place visits. */
 interface PlaceVisitRepository {
     /** Insert a new place visit. */
-    suspend fun insertVisit(visit: PlaceVisit)
+    suspend fun insertVisit(visit: PlaceVisit): Result<Unit>
 
     /** Get a place visit by ID. */
     suspend fun getVisitById(id: String): PlaceVisit?
@@ -27,7 +28,7 @@ interface PlaceVisitRepository {
     ): List<PlaceVisit>
 
     /** Update an existing place visit. */
-    suspend fun updateVisit(visit: PlaceVisit)
+    suspend fun updateVisit(visit: PlaceVisit): Result<Unit>
 
     /** Link location samples to a place visit. */
     suspend fun linkSamples(
@@ -45,5 +46,5 @@ interface PlaceVisitRepository {
     suspend fun getSamplesForVisit(visitId: String): List<LocationSample>
 
     /** Soft delete a place visit. */
-    suspend fun deleteVisit(id: String)
+    suspend fun deleteVisit(id: String): Result<Unit>
 }

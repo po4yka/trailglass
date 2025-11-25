@@ -3,6 +3,8 @@ package com.po4yka.trailglass.feature.auth
 import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.data.remote.dto.RegisterResponse
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
@@ -35,19 +37,35 @@ class RegisterUseCase(
 
         // Validate inputs
         if (email.isBlank()) {
-            return Result.failure(IllegalArgumentException("Email cannot be empty"))
+            return Result.Error(
+                TrailGlassError.ValidationError.RequiredFieldMissing("Email")
+            )
         }
         if (password.isBlank()) {
-            return Result.failure(IllegalArgumentException("Password cannot be empty"))
+            return Result.Error(
+                TrailGlassError.ValidationError.RequiredFieldMissing("Password")
+            )
         }
         if (displayName.isBlank()) {
-            return Result.failure(IllegalArgumentException("Display name cannot be empty"))
+            return Result.Error(
+                TrailGlassError.ValidationError.RequiredFieldMissing("Display name")
+            )
         }
         if (!isValidEmail(email)) {
-            return Result.failure(IllegalArgumentException("Invalid email format"))
+            return Result.Error(
+                TrailGlassError.ValidationError.InvalidInput(
+                    fieldName = "email",
+                    technicalMessage = "Invalid email format"
+                )
+            )
         }
         if (password.length < 8) {
-            return Result.failure(IllegalArgumentException("Password must be at least 8 characters"))
+            return Result.Error(
+                TrailGlassError.ValidationError.InvalidInput(
+                    fieldName = "password",
+                    technicalMessage = "Password must be at least 8 characters"
+                )
+            )
         }
 
         return try {
@@ -63,10 +81,26 @@ class RegisterUseCase(
                     logger.error(error) { "Registration failed for email: $email" }
                 }
 
-            result
+            // Convert kotlin.Result to domain Result
+            result.fold(
+                onSuccess = { response -> Result.Success(response) },
+                onFailure = { exception ->
+                    Result.Error(
+                        TrailGlassError.NetworkError.RequestFailed(
+                            technicalMessage = exception.message ?: "Registration request failed",
+                            cause = exception
+                        )
+                    )
+                }
+            )
         } catch (e: Exception) {
             logger.error(e) { "Registration exception for email: $email" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Unknown registration error",
+                    cause = e
+                )
+            )
         }
     }
 

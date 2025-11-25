@@ -3,6 +3,8 @@ package com.po4yka.trailglass.feature.auth
 import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
 import com.po4yka.trailglass.data.remote.dto.LoginResponse
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
@@ -33,13 +35,22 @@ class LoginUseCase(
 
         // Validate inputs
         if (email.isBlank()) {
-            return Result.failure(IllegalArgumentException("Email cannot be empty"))
+            return Result.Error(
+                TrailGlassError.ValidationError.RequiredFieldMissing("Email")
+            )
         }
         if (password.isBlank()) {
-            return Result.failure(IllegalArgumentException("Password cannot be empty"))
+            return Result.Error(
+                TrailGlassError.ValidationError.RequiredFieldMissing("Password")
+            )
         }
         if (!isValidEmail(email)) {
-            return Result.failure(IllegalArgumentException("Invalid email format"))
+            return Result.Error(
+                TrailGlassError.ValidationError.InvalidInput(
+                    fieldName = "email",
+                    technicalMessage = "Invalid email format"
+                )
+            )
         }
 
         return try {
@@ -55,10 +66,26 @@ class LoginUseCase(
                     logger.error(error) { "Login failed for user: $email" }
                 }
 
-            result
+            // Convert kotlin.Result to domain Result
+            result.fold(
+                onSuccess = { response -> Result.Success(response) },
+                onFailure = { exception ->
+                    Result.Error(
+                        TrailGlassError.NetworkError.RequestFailed(
+                            technicalMessage = exception.message ?: "Login request failed",
+                            cause = exception
+                        )
+                    )
+                }
+            )
         } catch (e: Exception) {
             logger.error(e) { "Login exception for user: $email" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Unknown login error",
+                    cause = e
+                )
+            )
         }
     }
 

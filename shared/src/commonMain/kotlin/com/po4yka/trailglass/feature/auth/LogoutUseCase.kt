@@ -2,6 +2,7 @@ package com.po4yka.trailglass.feature.auth
 
 import com.po4yka.trailglass.data.auth.UserSession
 import com.po4yka.trailglass.data.remote.TrailGlassApiClient
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
@@ -37,12 +38,12 @@ class LogoutUseCase(
             userSession.setUserId(null)
             logger.info { "Logout successful, session cleared" }
 
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
             logger.error(e) { "Logout exception" }
             // Still clear session even on exception
             userSession.setUserId(null)
-            Result.success(Unit)
+            Result.Success(Unit)
         }
     }
 }

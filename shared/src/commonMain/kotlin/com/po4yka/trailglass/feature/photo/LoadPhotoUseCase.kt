@@ -1,6 +1,8 @@
 package com.po4yka.trailglass.feature.photo
 
 import com.po4yka.trailglass.data.file.PhotoStorageManager
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.logging.logger
 import me.tatarka.inject.annotations.Inject
 
@@ -24,15 +26,23 @@ class LoadPhotoUseCase(
             val result = photoStorageManager.loadPhoto(photoId)
             if (result.isFailure) {
                 logger.error { "Failed to load photo: ${result.exceptionOrNull()?.message}" }
-                return Result.failure(
-                    result.exceptionOrNull() ?: Exception("Failed to load photo")
+                return Result.Error(
+                    TrailGlassError.PhotoError.LoadFailed(
+                        technicalMessage = result.exceptionOrNull()?.message ?: "Failed to load photo",
+                        cause = result.exceptionOrNull()
+                    )
                 )
             }
 
-            Result.success(result.getOrNull())
+            Result.Success(result.getOrNull())
         } catch (e: Exception) {
             logger.error(e) { "Failed to load photo $photoId" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.PhotoError.LoadFailed(
+                    technicalMessage = e.message ?: "Failed to load photo",
+                    cause = e
+                )
+            )
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.po4yka.trailglass.feature.note
 
 import com.po4yka.trailglass.data.repository.NoteRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Note
 import com.po4yka.trailglass.logging.logger
@@ -56,10 +58,15 @@ class AddNoteUseCase(
 
             logger.info { "Created note $noteId for user $userId" }
 
-            Result.success(note)
+            Result.Success(note)
         } catch (e: Exception) {
             logger.error(e) { "Failed to create note for user $userId" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.InsertFailed(
+                    technicalMessage = e.message ?: "Failed to create note",
+                    cause = e
+                )
+            )
         }
     }
 }

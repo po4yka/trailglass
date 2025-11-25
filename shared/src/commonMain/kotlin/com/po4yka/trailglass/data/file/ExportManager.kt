@@ -1,5 +1,7 @@
 package com.po4yka.trailglass.data.file
 
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import com.po4yka.trailglass.domain.model.Trip
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -45,10 +47,15 @@ class ExportManager(
 
             fileOperations.writeFileText(outputPath, csv)
             logger.info { "Successfully exported trips to $outputPath" }
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
             logger.error(e) { "Failed to export trips to CSV" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Failed to export trips to CSV",
+                    cause = e
+                )
+            )
         }
 
     /**
@@ -90,10 +97,15 @@ class ExportManager(
 
             fileOperations.writeFileText(outputPath, csv)
             logger.info { "Successfully exported visits to $outputPath" }
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
             logger.error(e) { "Failed to export visits to CSV" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Export failed",
+                    cause = e
+                )
+            )
         }
 
     /**
@@ -144,10 +156,15 @@ class ExportManager(
 
             fileOperations.writeFileText(outputPath, gpx)
             logger.info { "Successfully exported visits to GPX: $outputPath" }
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
             logger.error(e) { "Failed to export visits to GPX" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Export failed",
+                    cause = e
+                )
+            )
         }
 
     /**
@@ -179,10 +196,15 @@ class ExportManager(
 
             fileOperations.writeFileText(outputPath, json)
             logger.info { "Successfully exported trip to JSON: $outputPath" }
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
             logger.error(e) { "Failed to export trip to JSON" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Export failed",
+                    cause = e
+                )
+            )
         }
 
     /**
@@ -208,9 +230,14 @@ class ExportManager(
             )
 
             logger.info { "Successfully created backup: $backupFile" }
-            Result.success(backupFile)
+            Result.Success(backupFile)
         } catch (e: Exception) {
             logger.error(e) { "Failed to create backup" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.Unknown(
+                    technicalMessage = e.message ?: "Export failed",
+                    cause = e
+                )
+            )
         }
 }

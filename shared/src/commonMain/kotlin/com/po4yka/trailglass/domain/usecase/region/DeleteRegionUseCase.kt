@@ -19,18 +19,25 @@ class DeleteRegionUseCase(
      * @param regionId The region ID to delete
      * @return Result indicating success or failure
      */
-    suspend fun execute(regionId: String): Result<Unit> =
-        try {
+    suspend fun execute(regionId: String): Result<Unit> {
+        return try {
             // Verify region exists before deleting
             val region = regionRepository.getRegionById(regionId)
                 ?: return Result.failure(IllegalArgumentException("Region not found: $regionId"))
 
-            regionRepository.deleteRegion(regionId)
-            logger.info { "Deleted region: ${region.name} ($regionId)" }
-
-            Result.success(Unit)
+            when (val result = regionRepository.deleteRegion(regionId)) {
+                is com.po4yka.trailglass.domain.error.Result.Success -> {
+                    logger.info { "Deleted region: ${region.name} ($regionId)" }
+                    Result.success(Unit)
+                }
+                is com.po4yka.trailglass.domain.error.Result.Error -> {
+                    logger.error { "Failed to delete region: ${result.error.getUserFriendlyMessage()}" }
+                    return Result.failure(Exception(result.error.getUserFriendlyMessage()))
+                }
+            }
         } catch (e: Exception) {
             logger.error(e) { "Failed to delete region: $regionId" }
             Result.failure(e)
         }
+    }
 }

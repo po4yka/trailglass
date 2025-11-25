@@ -46,9 +46,16 @@ class AttachPhotoToVisitUseCase(
                     caption = caption
                 )
 
-            photoRepository.attachPhotoToVisit(attachment)
-            logger.info { "Successfully attached photo $photoId to visit $visitId" }
-            Result.Success
+            when (val result = photoRepository.attachPhotoToVisit(attachment)) {
+                is com.po4yka.trailglass.domain.error.Result.Success -> {
+                    logger.info { "Successfully attached photo $photoId to visit $visitId" }
+                    Result.Success
+                }
+                is com.po4yka.trailglass.domain.error.Result.Error -> {
+                    logger.error { "Failed to attach photo: ${result.error.getUserFriendlyMessage()}" }
+                    Result.Error(result.error.getUserFriendlyMessage())
+                }
+            }
         } catch (e: Exception) {
             logger.error(e) { "Failed to attach photo $photoId to visit $visitId" }
             Result.Error(e.message ?: "Unknown error")

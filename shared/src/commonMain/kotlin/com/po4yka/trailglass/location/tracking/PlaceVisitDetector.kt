@@ -1,15 +1,10 @@
-package com.po4yka.trailglass.feature.tracking
+package com.po4yka.trailglass.location.tracking
 
 import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.Location
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.distanceMetersTo
 import kotlinx.datetime.Instant
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 /**
  * Detects when user visits and stays at a place.
@@ -52,7 +47,7 @@ class PlaceVisitDetector {
             return null
         }
 
-        val distance = calculateDistance(potentialVisitLocation!!, location.coordinate)
+        val distance = potentialVisitLocation!!.distanceMetersTo(location.coordinate)
 
         if (distance <= VISIT_RADIUS_METERS) {
             // User is still at the same place
@@ -61,7 +56,7 @@ class PlaceVisitDetector {
             if (duration >= MIN_VISIT_DURATION_MS) {
                 // Check if this is far enough from last visit
                 if (lastConfirmedVisitLocation == null ||
-                    calculateDistance(lastConfirmedVisitLocation!!, potentialVisitLocation!!) >=
+                    lastConfirmedVisitLocation!!.distanceMetersTo(potentialVisitLocation!!) >=
                     MIN_DISTANCE_FROM_LAST_VISIT
                 ) {
                     // Place visit detected!
@@ -97,26 +92,6 @@ class PlaceVisitDetector {
         potentialVisitStartTime = null
         lastConfirmedVisitLocation = null
         logger.debug { "Place visit detector reset" }
-    }
-
-    /** Calculate distance between two coordinates in meters. */
-    private fun calculateDistance(
-        start: Coordinate,
-        end: Coordinate
-    ): Double {
-        val earthRadiusMeters = 6371000.0
-
-        val lat1 = (start.latitude * PI / 180.0)
-        val lat2 = (end.latitude * PI / 180.0)
-        val dLat = (end.latitude - start.latitude * PI / 180.0)
-        val dLon = (end.longitude - start.longitude * PI / 180.0)
-
-        val a =
-            sin(dLat / 2).pow(2) +
-                cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-
-        return earthRadiusMeters * c
     }
 }
 

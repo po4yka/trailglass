@@ -5,6 +5,8 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.RegionRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.resultOf
 import com.po4yka.trailglass.domain.model.Region
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.Dispatchers
@@ -67,10 +69,10 @@ class RegionRepositoryImpl(
             }
         }
 
-    override suspend fun insertRegion(region: Region) =
+    override suspend fun insertRegion(region: Region): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.info { "Inserting region: ${region.id} - ${region.name}" }
-            try {
+            resultOf {
+                logger.info { "Inserting region: ${region.id} - ${region.name}" }
                 queries.insert(
                     id = region.id,
                     user_id = region.userId,
@@ -87,16 +89,13 @@ class RegionRepositoryImpl(
                     last_exit_time = region.lastExitTime?.toEpochMilliseconds()
                 )
                 logger.debug { "Successfully inserted region ${region.id}" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to insert region ${region.id}" }
-                throw e
             }
         }
 
-    override suspend fun updateRegion(region: Region) =
+    override suspend fun updateRegion(region: Region): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Updating region: ${region.id}" }
-            try {
+            resultOf {
+                logger.debug { "Updating region: ${region.id}" }
                 queries.update(
                     name = region.name,
                     description = region.description,
@@ -108,21 +107,15 @@ class RegionRepositoryImpl(
                     id = region.id
                 )
                 logger.debug { "Successfully updated region ${region.id}" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to update region ${region.id}" }
-                throw e
             }
         }
 
-    override suspend fun deleteRegion(id: String) =
+    override suspend fun deleteRegion(id: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting region $id" }
-            try {
+            resultOf {
+                logger.debug { "Deleting region $id" }
                 queries.delete(id)
                 logger.info { "Region $id deleted" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete region $id" }
-                throw e
             }
         }
 

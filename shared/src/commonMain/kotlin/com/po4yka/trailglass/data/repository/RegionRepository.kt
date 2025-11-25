@@ -1,5 +1,6 @@
 package com.po4yka.trailglass.data.repository
 
+import com.po4yka.trailglass.domain.error.Result
 import com.po4yka.trailglass.domain.model.Region
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
@@ -26,17 +27,17 @@ interface RegionRepository {
     /**
      * Insert a new region.
      */
-    suspend fun insertRegion(region: Region)
+    suspend fun insertRegion(region: Region): Result<Unit>
 
     /**
      * Update an existing region.
      */
-    suspend fun updateRegion(region: Region)
+    suspend fun updateRegion(region: Region): Result<Unit>
 
     /**
      * Delete a region.
      */
-    suspend fun deleteRegion(id: String)
+    suspend fun deleteRegion(id: String): Result<Unit>
 
     /**
      * Update region enter statistics.

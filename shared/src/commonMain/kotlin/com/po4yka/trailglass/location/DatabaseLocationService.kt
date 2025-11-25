@@ -35,7 +35,7 @@ class DatabaseLocationService(
 
         // Store detected visits
         detectedVisits.forEach { visit ->
-            placeVisitRepository.insertVisit(visit)
+            placeVisitRepository.insertVisit(visit) // Result is ignored here, errors are logged internally
         }
     }
 

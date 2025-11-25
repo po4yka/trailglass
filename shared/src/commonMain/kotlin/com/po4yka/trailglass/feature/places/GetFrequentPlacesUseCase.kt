@@ -2,6 +2,8 @@ package com.po4yka.trailglass.feature.places
 
 import com.po4yka.trailglass.data.repository.FrequentPlaceRepository
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceSignificance
 import com.po4yka.trailglass.logging.logger
@@ -45,10 +47,15 @@ class GetFrequentPlacesUseCase(
                         .thenByDescending { it.visitCount }
                 )
 
-            Result.success(sorted)
+            Result.Success(sorted)
         } catch (e: Exception) {
             logger.error(e) { "Failed to get frequent places for user $userId" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.QueryFailed(
+                    technicalMessage = e.message ?: "Failed to get frequent places",
+                    cause = e
+                )
+            )
         }
 
     /**
@@ -92,9 +99,14 @@ class GetFrequentPlacesUseCase(
                 }
             }
 
-            Result.success(updatedPlaces)
+            Result.Success(updatedPlaces)
         } catch (e: Exception) {
             logger.error(e) { "Failed to refresh frequent places for user $userId" }
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.QueryFailed(
+                    technicalMessage = e.message ?: "Failed to refresh frequent places",
+                    cause = e
+                )
+            )
         }
 }

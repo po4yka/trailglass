@@ -5,6 +5,8 @@ import app.cash.sqldelight.coroutines.mapToList
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.po4yka.trailglass.data.db.Database
 import com.po4yka.trailglass.data.repository.PhotoRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.resultOf
 import com.po4yka.trailglass.domain.model.Photo
 import com.po4yka.trailglass.domain.model.PhotoAttachment
 import com.po4yka.trailglass.logging.logger
@@ -28,10 +30,10 @@ class PhotoRepositoryImpl(
     private val logger = logger()
     private val queries = database.photosQueries
 
-    override suspend fun insertPhoto(photo: Photo) =
+    override suspend fun insertPhoto(photo: Photo): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Inserting photo: ${photo.id}" }
-            try {
+            resultOf {
+                logger.debug { "Inserting photo: ${photo.id}" }
                 queries.insertPhoto(
                     id = photo.id,
                     uri = photo.uri,
@@ -46,9 +48,6 @@ class PhotoRepositoryImpl(
                     added_at = photo.addedAt.toEpochMilliseconds()
                 )
                 logger.trace { "Successfully inserted photo ${photo.id}" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to insert photo ${photo.id}" }
-                throw e
             }
         }
 
@@ -171,15 +170,12 @@ class PhotoRepositoryImpl(
             }
         }
 
-    override suspend fun deletePhoto(photoId: String) =
+    override suspend fun deletePhoto(photoId: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting photo $photoId" }
-            try {
+            resultOf {
+                logger.debug { "Deleting photo $photoId" }
                 queries.deletePhoto(photoId)
                 logger.info { "Photo $photoId deleted" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete photo $photoId" }
-                throw e
             }
         }
 
@@ -196,10 +192,10 @@ class PhotoRepositoryImpl(
 
     // Photo Attachments
 
-    override suspend fun attachPhotoToVisit(attachment: PhotoAttachment) =
+    override suspend fun attachPhotoToVisit(attachment: PhotoAttachment): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Attaching photo ${attachment.photoId} to visit ${attachment.placeVisitId}" }
-            try {
+            resultOf {
+                logger.debug { "Attaching photo ${attachment.photoId} to visit ${attachment.placeVisitId}" }
                 queries.insertAttachment(
                     id = attachment.id,
                     photo_id = attachment.photoId,
@@ -208,9 +204,6 @@ class PhotoRepositoryImpl(
                     caption = attachment.caption
                 )
                 logger.trace { "Successfully attached photo ${attachment.photoId} to visit ${attachment.placeVisitId}" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to attach photo ${attachment.photoId}" }
-                throw e
             }
         }
 
@@ -279,39 +272,30 @@ class PhotoRepositoryImpl(
             }
         }
 
-    override suspend fun deleteAttachment(attachmentId: String) =
+    override suspend fun deleteAttachment(attachmentId: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting attachment $attachmentId" }
-            try {
+            resultOf {
+                logger.debug { "Deleting attachment $attachmentId" }
                 queries.deleteAttachment(attachmentId)
                 logger.info { "Attachment $attachmentId deleted" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete attachment $attachmentId" }
-                throw e
             }
         }
 
-    override suspend fun deleteAttachmentsForPhoto(photoId: String) =
+    override suspend fun deleteAttachmentsForPhoto(photoId: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting all attachments for photo $photoId" }
-            try {
+            resultOf {
+                logger.debug { "Deleting all attachments for photo $photoId" }
                 queries.deleteAttachmentsForPhoto(photoId)
                 logger.info { "Attachments for photo $photoId deleted" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete attachments for photo $photoId" }
-                throw e
             }
         }
 
-    override suspend fun deleteAttachmentsForVisit(visitId: String) =
+    override suspend fun deleteAttachmentsForVisit(visitId: String): Result<Unit> =
         withContext(Dispatchers.IO) {
-            logger.debug { "Deleting all attachments for visit $visitId" }
-            try {
+            resultOf {
+                logger.debug { "Deleting all attachments for visit $visitId" }
                 queries.deleteAttachmentsForVisit(visitId)
                 logger.info { "Attachments for visit $visitId deleted" }
-            } catch (e: Exception) {
-                logger.error(e) { "Failed to delete attachments for visit $visitId" }
-                throw e
             }
         }
 

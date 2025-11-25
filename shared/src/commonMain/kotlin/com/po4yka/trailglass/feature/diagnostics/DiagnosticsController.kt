@@ -8,6 +8,7 @@ import com.po4yka.trailglass.data.repository.RouteSegmentRepository
 import com.po4yka.trailglass.data.repository.TripRepository
 import com.po4yka.trailglass.data.sync.SyncCoordinator
 import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.location.tracking.TrackingMode
 import com.po4yka.trailglass.logging.logger
@@ -99,7 +100,7 @@ class DiagnosticsController(
     private val networkConnectivityMonitor: NetworkConnectivityMonitor,
     private val platformDiagnostics: PlatformDiagnostics,
     coroutineScope: CoroutineScope
-) {
+) : Lifecycle {
     private val logger = logger()
 
     private val controllerScope = CoroutineScope(
@@ -348,9 +349,16 @@ class DiagnosticsController(
         }
     }
 
-    fun cleanup() {
+    /**
+     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
+     * needed.
+     *
+     * Cancels all running coroutines including flow collectors.
+     */
+    override fun cleanup() {
         logger.info { "Cleaning up DiagnosticsController" }
         controllerScope.cancel()
+        logger.debug { "DiagnosticsController cleanup complete" }
     }
 
     private fun Double.formatDecimals(decimals: Int): String {

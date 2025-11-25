@@ -1,6 +1,8 @@
 package com.po4yka.trailglass.feature.places
 
 import com.po4yka.trailglass.data.repository.PlaceVisitRepository
+import com.po4yka.trailglass.domain.error.Result
+import com.po4yka.trailglass.domain.error.TrailGlassError
 import com.po4yka.trailglass.domain.model.PlaceVisit
 import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
@@ -25,9 +27,14 @@ class GetPlaceVisitsUseCase(
     ): Result<List<PlaceVisit>> =
         try {
             val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
-            Result.success(visits)
+            Result.Success(visits)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.QueryFailed(
+                    technicalMessage = e.message ?: "Failed to get place visits",
+                    cause = e
+                )
+            )
         }
 
     /**
@@ -45,8 +52,13 @@ class GetPlaceVisitsUseCase(
     ): Result<List<PlaceVisit>> =
         try {
             val visits = placeVisitRepository.getVisitsByUser(userId, limit, offset)
-            Result.success(visits)
+            Result.Success(visits)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(
+                TrailGlassError.DatabaseError.QueryFailed(
+                    technicalMessage = e.message ?: "Failed to get place visits",
+                    cause = e
+                )
+            )
         }
 }
