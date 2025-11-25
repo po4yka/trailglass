@@ -35,7 +35,7 @@ struct LogViewerView: View {
             }
         }
         .sheet(isPresented: $showingShareSheet) {
-            ShareSheet(activityItems: [viewModel.exportLogs()])
+            ShareSheet(items: [viewModel.exportLogs()])
         }
         .alert("Clear Logs", isPresented: $showingClearAlert) {
             Button("Cancel", role: .cancel) { }

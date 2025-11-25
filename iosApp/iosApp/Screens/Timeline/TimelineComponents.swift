@@ -183,8 +183,8 @@ struct TimelineFilterSheet: View {
                 }
 
                 Section("Place Categories") {
-                    ForEach(placeCategoryList(), id: \.rawValue) { category in
-                        Toggle(category.displayName, isOn: Binding(
+                    ForEach(placeCategoryList(), id: \.name) { category in
+                        Toggle(category.name, isOn: Binding(
                             get: { selectedCategories.contains(category) },
                             set: { _ in toggleCategory(category) }
                         ))
@@ -247,8 +247,8 @@ struct TimelineFilterSheet: View {
     }
 
     private func placeCategoryList() -> [PlaceCategory] {
-        // Return all categories except OTHER and UNKNOWN
-        [.home, .work, .restaurant, .shopping, .entertainment, .travel]
+        // Return all categories except OTHER
+        [.home, .work, .food, .shopping, .entertainment, .travel]
     }
 }
 
@@ -370,7 +370,7 @@ class EnhancedTimelineViewModel: ObservableObject {
 
     private func observeTrackingState() {
         // Observe tracking state from LocationTrackingController
-        trackingObserver = locationTrackingController.uiState.subscribe { [weak self] (state: LocationTrackingUIState?) in
+        trackingObserver = locationTrackingController.uiState.subscribe { [weak self] (state: TrackingUIState?) in
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {

@@ -25,8 +25,8 @@ struct ManualCheckInSheet: View {
                         .autocapitalization(.words)
 
                     Picker("Category", selection: $category) {
-                        ForEach(PlaceCategory.allCases, id: \.self) { cat in
-                            Text(cat.displayName).tag(cat)
+                        ForEach(PlaceCategory.entries, id: \.self) { cat in
+                            Text(cat.name).tag(cat)
                         }
                     }
 

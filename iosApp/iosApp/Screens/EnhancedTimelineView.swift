@@ -128,7 +128,7 @@ struct EnhancedTimelineView: View {
                         for photo in photos {
                             // Convert PhotosPickerItem to Photo and import
                             if let data = try? await photo.loadTransferable(type: Data.self) {
-                                let uri = photo.identifier ?? "photo_\(UUID().uuidString)"
+                                let uri = photo.itemIdentifier ?? "photo_\(UUID().uuidString)"
                                 let kotlinData = data.toKotlinByteArray()
 
                                 // Use PhotoGalleryController to import photo

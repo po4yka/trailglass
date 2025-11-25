@@ -129,7 +129,7 @@ private struct MetadataSection: View {
                 }
 
                 if let sizeBytes = photo.photo.sizeBytes {
-                    let sizeMB = Double(truncating: (sizeBytes ?? 0) as NSNumber) / (1024.0 * 1024.0)
+                    let sizeMB = Double(truncating: sizeBytes as NSNumber) / (1024.0 * 1024.0)
                     InfoRow(label: "Size", value: String(format: "%.2f MB", sizeMB))
                 }
             }

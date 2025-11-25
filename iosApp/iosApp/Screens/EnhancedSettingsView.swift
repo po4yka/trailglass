@@ -80,10 +80,10 @@ struct EnhancedSettingsView: View {
                 let placeExports = placeVisits.map { visit in
                     PlaceExportData(
                         id: visit.id,
-                        name: visit.name ?? "Unknown Place",
-                        latitude: visit.latitude,
-                        longitude: visit.longitude,
-                        category: visit.category?.name ?? "Unknown"
+                        name: visit.displayName,
+                        latitude: visit.centerLatitude,
+                        longitude: visit.centerLongitude,
+                        category: visit.category.name
                     )
                 }
 
@@ -91,9 +91,9 @@ struct EnhancedSettingsView: View {
                     RegionExportData(
                         id: region.id,
                         name: region.name,
-                        latitude: region.center.latitude,
-                        longitude: region.center.longitude,
-                        radiusMeters: region.radiusMeters
+                        latitude: region.latitude,
+                        longitude: region.longitude,
+                        radiusMeters: Double(region.radiusMeters)
                     )
                 }
 
@@ -101,8 +101,8 @@ struct EnhancedSettingsView: View {
                 var settingsDict: [String: String] = [:]
                 if let settings = viewModel.settings {
                     // Convert settings to dictionary (simplified)
-                    settingsDict["trackingEnabled"] = String(settings.trackingEnabled)
-                    settingsDict["syncEnabled"] = String(settings.syncEnabled)
+                    settingsDict["trackingAccuracy"] = settings.trackingPreferences.accuracy.name
+                    settingsDict["autoSync"] = String(settings.accountSettings.autoSync)
                 }
 
                 // Create export data structure

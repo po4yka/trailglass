@@ -99,13 +99,13 @@ struct PhotoGalleryView: View {
                     // Load photo data
                     if let data = try await item.loadTransferable(type: Data.self) {
                         // Use item identifier as URI (PhotosPickerItem provides unique identifier)
-                        let uri = item.identifier ?? "photo_\(UUID().uuidString)"
+                        let uri = item.itemIdentifier ?? "photo_\(UUID().uuidString)"
 
                         // Convert Swift Data to Kotlin ByteArray
                         let kotlinData = data.toKotlinByteArray()
 
                         // Import photo via controller
-                        viewModel.controller.importPhoto(
+                        appComponent.photoGalleryController.importPhoto(
                             uri: uri,
                             photoData: kotlinData,
                             timestamp: nil // Will extract from EXIF

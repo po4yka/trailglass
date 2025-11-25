@@ -181,12 +181,12 @@ private struct VisitCard: View {
         GlassCard(variant: .visit) {
             HStack(spacing: 12) {
                 // Category icon
-                Image(systemName: categoryIcon(visit.category as? PlaceCategory ?? .home))
+                Image(systemName: categoryIcon(visit.category))
                     .font(.title2)
-                    .foregroundColor(categoryColor(visit.category as? PlaceCategory ?? .home))
+                    .foregroundColor(categoryColor(visit.category))
                     .frame(width: 44, height: 44)
                     .glassEffectTinted(
-                        categoryColor(visit.category as? PlaceCategory ?? .home),
+                        categoryColor(visit.category),
                         opacity: 0.8
                     )
 
@@ -242,10 +242,10 @@ private struct VisitCard: View {
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
                     .glassEffectTinted(
-                        categoryColor(visit.category as? PlaceCategory ?? .home),
+                        categoryColor(visit.category),
                         opacity: 0.8
                     )
-                    .foregroundColor(categoryColor(visit.category as? PlaceCategory ?? .home))
+                    .foregroundColor(categoryColor(visit.category))
             }
         }
     }

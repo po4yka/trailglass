@@ -262,21 +262,26 @@ class MapViewModel: ObservableObject {
 
     func centerOnUserLocation() {
         Task {
-            // Check if we have location permission
-            let hasPermission = await controller.hasLocationPermission()
+            do {
+                // Check if we have location permission
+                let hasPermission = try await controller.hasLocationPermission()
 
-            if hasPermission.boolValue {
-                // Get last known location and center map on it
-                // Note: This requires accessing locationService from controller
-                // For now, use the controller's moveCameraTo with a default location
-                // In a full implementation, you would get the actual current location
-                // from locationService.getLastKnownLocation()
-                print("Centering on user location")
-                // The actual implementation would be:
-                // if let location = await controller.locationService.getLastKnownLocation() {
-                //     controller.moveCameraTo(coordinate: location, zoom: 15.0, animated: true)
-                // }
-            } else {
+                if hasPermission.boolValue {
+                    // Get last known location and center map on it
+                    // Note: This requires accessing locationService from controller
+                    // For now, use the controller's moveCameraTo with a default location
+                    // In a full implementation, you would get the actual current location
+                    // from locationService.getLastKnownLocation()
+                    print("Centering on user location")
+                    // The actual implementation would be:
+                    // if let location = await controller.locationService.getLastKnownLocation() {
+                    //     controller.moveCameraTo(coordinate: location, zoom: 15.0, animated: true)
+                    // }
+                } else {
+                    requestLocationPermission()
+                }
+            } catch {
+                print("Error checking location permission: \(error)")
                 requestLocationPermission()
             }
         }

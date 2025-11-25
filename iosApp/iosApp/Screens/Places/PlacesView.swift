@@ -98,10 +98,8 @@ struct PlacesView: View {
                         place: place,
                         onToggleFavorite: {
                             viewModel.toggleFavorite(placeId: place.id)
-                            // Update selected place after toggle
-                            if let updatedPlace = viewModel.controller.state.value.allPlaces.first(where: { $0.id == place.id }) {
-                                viewModel.selectedPlace = updatedPlace
-                            }
+                            // Dismiss sheet after toggle - view will refresh from state
+                            viewModel.selectedPlace = nil
                         },
                         onDismiss: {
                             viewModel.selectedPlace = nil

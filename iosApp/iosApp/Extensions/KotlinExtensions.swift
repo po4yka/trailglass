@@ -128,3 +128,7 @@ extension Data {
     }
 }
 
+// MARK: - FrequentPlace Identifiable Conformance
+
+extension FrequentPlace: Identifiable {}
+

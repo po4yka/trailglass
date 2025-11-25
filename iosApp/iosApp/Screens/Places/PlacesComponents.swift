@@ -34,7 +34,7 @@ struct PlacesFilterSheet: View {
                     ]
                     ForEach(allCategories, id: \.name) { category in
                         Toggle(categoryName(category), isOn: Binding(
-                            get  { categories.contains(category.name) },
+                            get: { categories.contains(category.name) },
                             set: { isOn in
                                 if isOn {
                                     categories.insert(category.name)
@@ -163,14 +163,14 @@ class PlacesViewModel: ObservableObject {
         // Find the FrequentPlace from the controller's state
         Task {
             // First try to find in current state
-            let currentState = controller.state.value
-            if let frequentPlace = currentState.allPlaces.first(where: { $0.id == place.id }) {
+            if let currentState = controller.state.value as? PlacesState,
+               let frequentPlace = currentState.places.first(where: { $0.id == place.id }) {
                 await MainActor.run {
                     selectedPlace = frequentPlace
                 }
             } else {
                 // If not found in state, fetch from controller
-                if let frequentPlace = await controller.getPlaceById(placeId: place.id) {
+                if let frequentPlace = try? await controller.getPlaceById(placeId: place.id) {
                     await MainActor.run {
                         selectedPlace = frequentPlace
                     }
@@ -196,24 +196,26 @@ class PlacesViewModel: ObservableObject {
             switch categoryName.uppercased() {
             case "HOME": return .home
             case "WORK": return .work
-            case "RESTAURANT": return .restaurant
+            case "FOOD": return .food
             case "SHOPPING": return .shopping
             case "ENTERTAINMENT": return .entertainment
             case "TRAVEL": return .travel
             case "HEALTHCARE": return .healthcare
             case "EDUCATION": return .education
-            case "TRANSPORTATION": return .transportation
             case "FITNESS": return .fitness
             case "OUTDOOR": return .outdoor
             case "SOCIAL": return .social
             case "SERVICE": return .service
             case "RELIGIOUS": return .religious
-            case "GOVERNMENT": return .government
             case "OTHER": return .other
             default: return nil
             }
         }
-        controller.filterByCategories(categories: Set(categories))
+        // Toggle categories to match the desired filter set
+        // First clear current categories, then toggle to set new ones
+        for category in categories {
+            controller.toggleCategoryFilter(category: category)
+        }
     }
 
     func setSortOption(_ option: PlaceSortOption) {
@@ -233,17 +235,17 @@ struct PlaceItem: Identifiable {
     let isFavorite: Bool
 
     var categoryIcon: String {
-        guard let category = Shared.PlaceCategory.companion.values().first(where: { $0.name == self.category }) else {
+        guard let category = Shared.PlaceCategory.entries.first(where: { $0.name == self.category }) else {
             return "mappin.circle.fill"
         }
-        return categoryIcon(category)
+        return Trailglass.categoryIcon(category)
     }
 
     var categoryColor: Color {
-        guard let category = Shared.PlaceCategory.companion.values().first(where: { $0.name == self.category }) else {
+        guard let category = Shared.PlaceCategory.entries.first(where: { $0.name == self.category }) else {
             return .gray
         }
-        return categoryColor(category)
+        return Trailglass.categoryColor(category)
     }
 
     init(from place: FrequentPlace) {
