@@ -1,16 +1,13 @@
 package com.po4yka.trailglass.feature.places
 
+import com.po4yka.trailglass.domain.model.Coordinate
 import com.po4yka.trailglass.domain.model.FrequentPlace
 import com.po4yka.trailglass.domain.model.PlaceCategory
 import com.po4yka.trailglass.domain.model.PlaceVisit
+import com.po4yka.trailglass.util.distanceMetersTo
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.PI
-import kotlin.math.asin
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 import kotlin.time.Duration
 
 /**
@@ -105,15 +102,11 @@ class PlaceClusterer(
             visited.add(index)
 
             // Find all visits within cluster radius
+            val visitCoord = Coordinate(visit.centerLatitude, visit.centerLongitude)
             visits.forEachIndexed { otherIndex, otherVisit ->
                 if (otherIndex !in visited) {
-                    val distance =
-                        calculateDistance(
-                            visit.centerLatitude,
-                            visit.centerLongitude,
-                            otherVisit.centerLatitude,
-                            otherVisit.centerLongitude
-                        )
+                    val otherCoord = Coordinate(otherVisit.centerLatitude, otherVisit.centerLongitude)
+                    val distance = visitCoord.distanceMetersTo(otherCoord)
 
                     if (distance <= clusterRadiusMeters) {
                         cluster.add(otherVisit)
@@ -136,15 +129,8 @@ class PlaceClusterer(
         userId: String,
         index: Int
     ): FrequentPlace {
-        // Calculate center point (mean of all visits)
-        val centerLat = cluster.map { it.centerLatitude }.average()
-        val centerLon = cluster.map { it.centerLongitude }.average()
-
-        // Aggregate statistics
-        val visitCount = cluster.size
-        val totalDuration = cluster.fold(Duration.ZERO) { acc, visit -> acc + visit.duration }
-        val firstVisit = cluster.minByOrNull { it.startTime }!!
-        val lastVisit = cluster.maxByOrNull { it.endTime }!!
+        // Aggregate cluster statistics in single pass
+        val stats = aggregateClusterStats(cluster)
 
         // Determine category based on all visits in cluster
         val (category, confidence) = determineCategoryForCluster(cluster)
@@ -152,9 +138,9 @@ class PlaceClusterer(
         // Determine significance
         val significance =
             categorizer.determineSignificance(
-                visitCount = visitCount,
-                totalDuration = totalDuration,
-                lastVisitTime = lastVisit.endTime
+                visitCount = stats.visitCount,
+                totalDuration = stats.totalDuration,
+                lastVisitTime = stats.lastVisitTime
             )
 
         // Use name/address from most recent visit with that information
@@ -167,9 +153,9 @@ class PlaceClusterer(
         val now = Clock.System.now()
 
         return FrequentPlace(
-            id = "place_${userId}_${index}_${centerLat.hashCode()}_${centerLon.hashCode()}",
-            centerLatitude = centerLat,
-            centerLongitude = centerLon,
+            id = "place_${userId}_${index}_${stats.centerLat.hashCode()}_${stats.centerLon.hashCode()}",
+            centerLatitude = stats.centerLat,
+            centerLongitude = stats.centerLon,
             radiusMeters = clusterRadiusMeters,
             name = name,
             address = address,
@@ -178,10 +164,10 @@ class PlaceClusterer(
             category = category,
             categoryConfidence = confidence,
             significance = significance,
-            visitCount = visitCount,
-            totalDuration = totalDuration,
-            firstVisitTime = firstVisit.startTime,
-            lastVisitTime = lastVisit.endTime,
+            visitCount = stats.visitCount,
+            totalDuration = stats.totalDuration,
+            firstVisitTime = stats.firstVisitTime,
+            lastVisitTime = stats.lastVisitTime,
             userId = userId,
             createdAt = now,
             updatedAt = now
@@ -225,20 +211,16 @@ class PlaceClusterer(
     private fun findNearestPlace(
         visit: PlaceVisit,
         places: List<FrequentPlace>
-    ): FrequentPlace? =
-        places
+    ): FrequentPlace? {
+        val visitCoord = Coordinate(visit.centerLatitude, visit.centerLongitude)
+        return places
             .map { place ->
-                val distance =
-                    calculateDistance(
-                        visit.centerLatitude,
-                        visit.centerLongitude,
-                        place.centerLatitude,
-                        place.centerLongitude
-                    )
-                place to distance
+                val placeCoord = Coordinate(place.centerLatitude, place.centerLongitude)
+                place to visitCoord.distanceMetersTo(placeCoord)
             }.filter { (_, distance) -> distance <= clusterRadiusMeters }
             .minByOrNull { (_, distance) -> distance }
             ?.first
+    }
 
     /** Update a frequent place with a new visit. */
     private fun updateFrequentPlaceWithVisit(
@@ -268,29 +250,51 @@ class PlaceClusterer(
         )
     }
 
+    /** Aggregated statistics for a cluster of visits. */
+    private data class ClusterStats(
+        val centerLat: Double,
+        val centerLon: Double,
+        val visitCount: Int,
+        val totalDuration: Duration,
+        val firstVisitTime: Instant,
+        val lastVisitTime: Instant
+    )
+
     /**
-     * Calculate distance between two coordinates using Haversine formula.
-     *
-     * @return Distance in meters
+     * Aggregate cluster statistics in a single pass through the visits.
+     * More efficient than multiple iterations for large clusters.
      */
-    private fun calculateDistance(
-        lat1: Double,
-        lon1: Double,
-        lat2: Double,
-        lon2: Double
-    ): Double {
-        val earthRadiusMeters = 6371000.0
+    private fun aggregateClusterStats(cluster: List<PlaceVisit>): ClusterStats {
+        var sumLat = 0.0
+        var sumLon = 0.0
+        var totalDuration = Duration.ZERO
+        var firstVisitTime: Instant? = null
+        var lastVisitTime: Instant? = null
 
-        val dLat = (lat2 - lat1) * PI / 180.0
-        val dLon = (lon2 - lon1) * PI / 180.0
+        cluster.forEach { visit ->
+            sumLat += visit.centerLatitude
+            sumLon += visit.centerLongitude
+            totalDuration += visit.duration
 
-        val a =
-            sin(dLat / 2).pow(2) +
-                cos(lat1 * PI / 180.0) * cos(lat2 * PI / 180.0) *
-                sin(dLon / 2).pow(2)
+            val startTime = visit.startTime
+            val endTime = visit.endTime
 
-        val c = 2 * asin(sqrt(a))
+            if (firstVisitTime == null || startTime < firstVisitTime!!) {
+                firstVisitTime = startTime
+            }
+            if (lastVisitTime == null || endTime > lastVisitTime!!) {
+                lastVisitTime = endTime
+            }
+        }
 
-        return earthRadiusMeters * c
+        val count = cluster.size
+        return ClusterStats(
+            centerLat = sumLat / count,
+            centerLon = sumLon / count,
+            visitCount = count,
+            totalDuration = totalDuration,
+            firstVisitTime = firstVisitTime ?: Clock.System.now(),
+            lastVisitTime = lastVisitTime ?: Clock.System.now()
+        )
     }
 }

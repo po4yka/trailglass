@@ -14,6 +14,7 @@ import Combine
  - Convert Region models to SwiftUI-friendly properties
  - Handle loading and error states
  */
+@MainActor
 class RegionViewModel: ObservableObject {
 
     // MARK: - Published Properties
@@ -46,7 +47,7 @@ class RegionViewModel: ObservableObject {
         stateObserver = regionsController.state.subscribe { [weak self] (state: RegionsState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.regions = state.regions
                 self.isLoading = state.isLoading
                 self.error = state.error
@@ -139,23 +140,21 @@ class RegionViewModel: ObservableObject {
             return
         }
 
-        var updatedRegion = regions[index]
-        updatedRegion = Region(
-            id: updatedRegion.id,
-            userId: updatedRegion.userId,
-            name: updatedRegion.name,
-            description: updatedRegion.description,
-            latitude: updatedRegion.latitude,
-            longitude: updatedRegion.longitude,
-            radiusMeters: updatedRegion.radiusMeters,
-            notificationsEnabled: !updatedRegion.notificationsEnabled,
-            createdAt: updatedRegion.createdAt,
-            updatedAt: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
-                epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
-            ),
-            enterCount: updatedRegion.enterCount,
-            lastEnterTime: updatedRegion.lastEnterTime,
-            lastExitTime: updatedRegion.lastExitTime
+        let existingRegion = regions[index]
+        let updatedRegion = Region(
+            id: existingRegion.id,
+            userId: existingRegion.userId,
+            name: existingRegion.name,
+            description: existingRegion.description,
+            latitude: existingRegion.latitude,
+            longitude: existingRegion.longitude,
+            radiusMeters: existingRegion.radiusMeters,
+            notificationsEnabled: !existingRegion.notificationsEnabled,
+            createdAt: existingRegion.createdAt,
+            updatedAt: Date().kotlinInstant,
+            enterCount: existingRegion.enterCount,
+            lastEnterTime: existingRegion.lastEnterTime,
+            lastExitTime: existingRegion.lastExitTime
         )
 
         updateRegion(updatedRegion)

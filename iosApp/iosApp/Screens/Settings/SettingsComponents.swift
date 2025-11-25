@@ -199,21 +199,14 @@ class SettingsViewModel: ObservableObject {
     }
 
     private func observeState() {
-        stateObserver = controller.state.subscribe { [weak self] (state: Any?) in
+        stateObserver = controller.state.subscribe { [weak self] (state: SettingsState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
-                // Extract properties from the state object
-                if let loading = (state as? NSObject)?.value(forKey: "isLoading") as? Bool {
-                    self.isLoading = loading
-                }
-                if let error = (state as? NSObject)?.value(forKey: "error") as? String {
-                    self.error = error
-                    self.showError = error != nil
-                }
-                if let settings = (state as? NSObject)?.value(forKey: "settings") as? AppSettings {
-                    self.settings = settings
-                }
+            Task { @MainActor in
+                self.isLoading = state.isLoading
+                self.error = state.error
+                self.showError = state.error != nil
+                self.settings = state.settings
             }
         }
     }

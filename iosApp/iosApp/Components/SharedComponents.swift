@@ -59,22 +59,37 @@ struct EmptyStateView: View {
     let icon: String
     let title: String
     let message: String
+    var actionTitle: String?
+    var onAction: (() -> Void)?
+    var tint: Color = .coolSteel
 
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 20) {
             Image(systemName: icon)
                 .font(.system(size: 64))
-                .foregroundColor(.secondary)
+                .foregroundColor(tint)
 
             Text(title)
                 .font(.title2)
-                .foregroundColor(.secondary)
+                .fontWeight(.semibold)
+                .foregroundColor(.primary)
 
             Text(message)
                 .font(.body)
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+
+            if let actionTitle = actionTitle, let onAction = onAction {
+                GlassButton(
+                    title: actionTitle,
+                    icon: nil,
+                    variant: .filled,
+                    tint: tint,
+                    action: onAction
+                )
+            }
         }
-        .padding()
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

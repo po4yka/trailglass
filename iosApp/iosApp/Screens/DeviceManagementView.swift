@@ -267,7 +267,7 @@ class DeviceManagementViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: DeviceManagementState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.devices = state.devices
                 self.deletingDeviceId = state.deletingDeviceId
                 self.errorMessage = state.error
@@ -302,7 +302,7 @@ class DeviceManagementViewModel: ObservableObject {
         guard let device = deviceToDelete else { return }
 
         controller.deleteDevice(deviceId: device.deviceId) { [weak self] in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.deviceToDelete = nil
             }
         }

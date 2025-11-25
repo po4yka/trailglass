@@ -2,6 +2,7 @@ import SwiftUI
 import Shared
 import MapKit
 
+@MainActor
 class RegionDetailViewModel: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var name: String = ""
     @Published var regionDescription: String = ""

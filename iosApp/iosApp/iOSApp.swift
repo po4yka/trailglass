@@ -8,13 +8,11 @@ struct iOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppRootView(
-                appComponent: appDelegate.appComponent,
-                authStateManager: authStateManager
-            )
-            .onAppear {
-                authStateManager.observe(authController: appDelegate.appComponent.authController)
-            }
+            AppRootView(appComponent: appDelegate.appComponent, authStateManager: authStateManager)
+                .onAppear {
+                    print("[iOSApp] onAppear - starting auth observation")
+                    authStateManager.startObserving(authController: appDelegate.appComponent.authController)
+                }
         }
     }
 }
@@ -25,6 +23,7 @@ struct AppRootView: View {
     @ObservedObject var authStateManager: AuthStateManager
 
     var body: some View {
+        let _ = print("[AppRootView] body - isAuthenticated: \(authStateManager.isAuthenticated)")
         Group {
             if authStateManager.isAuthenticated {
                 // Show main app
@@ -42,27 +41,53 @@ class AuthStateManager: ObservableObject {
     @Published var isAuthenticated: Bool = false
 
     private var stateObserver: KotlinJob?
+    private var isObserving = false
 
-    func observe(authController: AuthController) {
+    func startObserving(authController: AuthController) {
+        // Only start observing once
+        guard !isObserving else {
+            print("[AuthStateManager] Already observing, skipping")
+            return
+        }
+        isObserving = true
+        print("[AuthStateManager] startObserving called")
+
         // Set initial state
-        isAuthenticated = (authController.state.value as? AuthController.AuthStateAuthenticated) != nil
+        if let initialState = authController.state.value {
+            let shouldAuth = initialState is AuthController.AuthStateAuthenticated ||
+                             initialState is AuthController.AuthStateGuest
+            print("[AuthStateManager] Initial state: \(type(of: initialState)), shouldAuth: \(shouldAuth)")
+            DispatchQueue.main.async {
+                self.isAuthenticated = shouldAuth
+            }
+        }
 
-        // Observe state changes
+        // Subscribe using the extension method
+        print("[AuthStateManager] Setting up subscription...")
         stateObserver = authController.state.subscribe { [weak self] (state: AuthState?) in
+            if let state = state {
+                print("[AuthStateManager] Received state: \(type(of: state))")
+            } else {
+                print("[AuthStateManager] Received state: nil")
+            }
             guard let self = self, let state = state else { return }
 
             DispatchQueue.main.async {
-                if state is AuthController.AuthStateAuthenticated {
+                if state is AuthController.AuthStateAuthenticated ||
+                   state is AuthController.AuthStateGuest {
+                    print("[AuthStateManager] Setting isAuthenticated = true")
                     self.isAuthenticated = true
                 } else if state is AuthController.AuthStateUnauthenticated {
+                    print("[AuthStateManager] Setting isAuthenticated = false")
                     self.isAuthenticated = false
                 }
-                // Don't change state for Loading or Error states
             }
         }
+        print("[AuthStateManager] Subscription created: \(stateObserver != nil)")
     }
 
     deinit {
-        stateObserver?.cancel(cause: nil)
+        print("[AuthStateManager] deinit")
+        stateObserver?.cancel()
     }
 }

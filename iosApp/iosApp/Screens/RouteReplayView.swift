@@ -335,7 +335,7 @@ class RouteReplayViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: RouteReplayState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.isPlaying = state.isPlaying
                 self.progress = state.progress
                 self.playbackSpeed = state.playbackSpeed

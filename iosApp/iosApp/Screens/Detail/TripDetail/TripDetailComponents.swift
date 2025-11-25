@@ -94,7 +94,7 @@ class TripDetailViewModel: ObservableObject {
         statsObserver = statsController.state.subscribe { [weak self] (state: TripStatsState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.isLoading = state.isLoading
                 self.errorMessage = state.error
                 self.tripRoute = state.tripRoute
@@ -108,7 +108,7 @@ class TripDetailViewModel: ObservableObject {
         routeObserver = routeController.state.subscribe { [weak self] (state: RouteViewState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 // Route data is already loaded from stats controller
                 self.isExporting = state.isExporting
 
@@ -185,7 +185,7 @@ class TripDetailViewModel: ObservableObject {
 
     func deleteTrip() {
         tripsController.deleteTrip(tripId: tripId, onSuccess: { [weak self] in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self?.tripDeleted = true
             }
         })

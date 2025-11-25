@@ -3,10 +3,12 @@ import Shared
 import Combine
 
 /// ViewModel for paginated trips using TripRepository
+@MainActor
 class PaginatedTripsViewModel: ObservableObject {
     private let repository: TripRepository
     private let userId: String
     private var cancellables = Set<AnyCancellable>()
+    private var loadTask: Task<Void, Never>?
 
     @Published var trips: [Trip] = []
     @Published var ongoingTrips: [Trip] = []
@@ -19,6 +21,10 @@ class PaginatedTripsViewModel: ObservableObject {
         self.userId = userId
     }
 
+    deinit {
+        loadTask?.cancel()
+    }
+
     /// Load all trips for the user
     /// Note: TripRepository doesn't have pagination yet, so we load all at once
     func loadTrips() {
@@ -27,7 +33,8 @@ class PaginatedTripsViewModel: ObservableObject {
         isLoading = true
         error = nil
 
-        Task { @MainActor in
+        loadTask?.cancel()
+        loadTask = Task {
             do {
                 let fetchedTrips = try await repository.getTripsForUser(userId: userId)
 

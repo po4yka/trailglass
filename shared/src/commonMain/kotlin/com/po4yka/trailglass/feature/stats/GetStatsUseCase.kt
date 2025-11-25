@@ -71,29 +71,8 @@ class GetStatsUseCase(
         val visits = placeVisitRepository.getVisits(userId, startTime, endTime)
         logger.debug { "Found ${visits.size} visits" }
 
-        // Extract countries and cities
-        val countries = visits.mapNotNull { it.countryCode }.toSet()
-        val cities = visits.mapNotNull { it.city }.toSet()
-
-        // Count visits per country
-        val countryVisitCounts =
-            visits
-                .mapNotNull { it.countryCode }
-                .groupingBy { it }
-                .eachCount()
-                .toList()
-                .sortedByDescending { it.second }
-                .take(5)
-
-        // Count visits per city
-        val cityVisitCounts =
-            visits
-                .mapNotNull { it.city }
-                .groupingBy { it }
-                .eachCount()
-                .toList()
-                .sortedByDescending { it.second }
-                .take(5)
+        // Aggregate visit statistics in single pass for efficiency
+        val visitStats = aggregateVisitStatistics(visits)
 
         // Calculate total days
         val totalDays = calculateTotalDays(trips, period)
@@ -101,13 +80,13 @@ class GetStatsUseCase(
         val stats =
             Stats(
                 period = period,
-                countriesVisited = countries,
-                citiesVisited = cities,
+                countriesVisited = visitStats.countries,
+                citiesVisited = visitStats.cities,
                 totalTrips = trips.size,
                 totalDays = totalDays,
                 totalVisits = visits.size,
-                topCountries = countryVisitCounts,
-                topCities = cityVisitCounts
+                topCountries = visitStats.topCountries,
+                topCities = visitStats.topCities
             )
 
         logger.info {
@@ -168,5 +147,47 @@ class GetStatsUseCase(
         }
 
         return allDays.size
+    }
+
+    /** Aggregated visit statistics from single-pass processing. */
+    private data class VisitStatistics(
+        val countries: Set<String>,
+        val cities: Set<String>,
+        val topCountries: List<Pair<String, Int>>,
+        val topCities: List<Pair<String, Int>>
+    )
+
+    /**
+     * Aggregate visit statistics in a single pass through the data.
+     * More efficient than multiple iterations for large datasets.
+     */
+    private fun aggregateVisitStatistics(
+        visits: List<com.po4yka.trailglass.domain.model.PlaceVisit>
+    ): VisitStatistics {
+        val countryMap = mutableMapOf<String, Int>()
+        val cityMap = mutableMapOf<String, Int>()
+
+        // Single pass through visits
+        visits.forEach { visit ->
+            visit.countryCode?.let { country ->
+                countryMap[country] = (countryMap[country] ?: 0) + 1
+            }
+            visit.city?.let { city ->
+                cityMap[city] = (cityMap[city] ?: 0) + 1
+            }
+        }
+
+        return VisitStatistics(
+            countries = countryMap.keys.toSet(),
+            cities = cityMap.keys.toSet(),
+            topCountries = countryMap.entries
+                .sortedByDescending { it.value }
+                .take(5)
+                .map { it.key to it.value },
+            topCities = cityMap.entries
+                .sortedByDescending { it.value }
+                .take(5)
+                .map { it.key to it.value }
+        )
     }
 }

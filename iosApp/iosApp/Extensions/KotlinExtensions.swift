@@ -1,4 +1,34 @@
+import Foundation
 import Shared
+
+// MARK: - Type-safe Notification Names
+
+extension NSNotification.Name {
+    static let showRegionOnMap = NSNotification.Name("ShowRegionOnMap")
+    static let navigateToMap = NSNotification.Name("NavigateToMap")
+    static let regionEntered = NSNotification.Name("RegionEntered")
+    static let regionExited = NSNotification.Name("RegionExited")
+    static let syncCompleted = NSNotification.Name("SyncCompleted")
+    static let authStateChanged = NSNotification.Name("AuthStateChanged")
+}
+
+// MARK: - Date to Kotlin Instant Conversion
+
+extension Date {
+    /// Converts Swift Date to Kotlin Instant
+    var kotlinInstant: Kotlinx_datetimeInstant {
+        Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
+            epochMilliseconds: Int64(timeIntervalSince1970 * 1000)
+        )
+    }
+}
+
+extension Kotlinx_datetimeInstant {
+    /// Converts Kotlin Instant to Swift Date
+    var swiftDate: Date {
+        Date(timeIntervalSince1970: TimeInterval(epochSeconds))
+    }
+}
 
 // MARK: - Shared typealiases for Swift ergonomics
 
@@ -32,6 +62,9 @@ public typealias TrackingUIState = LocationTrackingController.LocationTrackingUI
 public typealias TripStatsState = TripStatisticsController.StatisticsState
 public typealias RouteReplayState = RouteReplayController.ReplayState
 public typealias EnhancedTimelineState = EnhancedTimelineController.EnhancedTimelineState
+// SettingsState is a top-level type in Shared module, no alias needed
+public typealias StatsState = StatsController.StatsState
+public typealias EnhancedStatsState = EnhancedStatsController.EnhancedStatsState
 public typealias KotlinStatsPeriod = GetStatsUseCase.Period
 public typealias KotlinStatsPeriodYear = GetStatsUseCase.PeriodYear
 public typealias KotlinStatsPeriodMonth = GetStatsUseCase.PeriodMonth
@@ -42,9 +75,9 @@ public typealias KotlinDuration = Int64
 
 // Simple cancellable wrapper for Flow subscriptions
 public class KotlinJob {
-    private var task: Task<Void, Error>?
+    private var task: Task<Void, Never>?
 
-    init(task: Task<Void, Error>?) {
+    init(task: Task<Void, Never>?) {
         self.task = task
     }
 
@@ -52,18 +85,48 @@ public class KotlinJob {
         task?.cancel()
         task = nil
     }
+
+    deinit {
+        task?.cancel()
+    }
 }
 
 // MARK: - Kotlinx_coroutines_coreStateFlow Extensions
 
 extension Kotlinx_coroutines_coreStateFlow {
+    /// Subscribe to StateFlow updates with automatic main thread dispatch
+    /// - Parameter onValue: Closure called on main thread with each new value
+    /// - Returns: KotlinJob that can be cancelled to stop observation
     func subscribe<T>(onValue: @escaping (T?) -> Void) -> KotlinJob {
         let task = Task {
-            try await self.collect(
-                collector: FlowCollector<T> { value in
-                    onValue(value as? T)
-                }
-            )
+            do {
+                try await self.collect(
+                    collector: FlowCollector<T> { value in
+                        onValue(value as? T)
+                    }
+                )
+            } catch {
+                // Task was cancelled or collection failed - this is expected on cleanup
+            }
+        }
+        return KotlinJob(task: task)
+    }
+
+    /// Subscribe to StateFlow with MainActor-isolated callback for UI updates
+    /// - Parameter onValue: Closure called on MainActor with each new value
+    /// - Returns: KotlinJob that can be cancelled to stop observation
+    @MainActor
+    func subscribeOnMain<T>(onValue: @escaping @MainActor (T?) -> Void) -> KotlinJob {
+        let task = Task { @MainActor in
+            do {
+                try await self.collect(
+                    collector: MainActorFlowCollector<T> { value in
+                        onValue(value as? T)
+                    }
+                )
+            } catch {
+                // Task was cancelled or collection failed - this is expected on cleanup
+            }
         }
         return KotlinJob(task: task)
     }
@@ -77,7 +140,7 @@ public extension KotlinDuration {
     var inWholeHours: Int64 { self / 3600 }
 }
 
-/// Flow collector helper
+/// Flow collector helper for background collection
 class FlowCollector<T>: Kotlinx_coroutines_coreFlowCollector {
     private let callback: (Any?) -> Void
 
@@ -91,6 +154,23 @@ class FlowCollector<T>: Kotlinx_coroutines_coreFlowCollector {
     }
 }
 
+/// Flow collector that dispatches to MainActor for UI updates
+@MainActor
+class MainActorFlowCollector<T>: Kotlinx_coroutines_coreFlowCollector {
+    private let callback: @MainActor (Any?) -> Void
+
+    init(_ callback: @escaping @MainActor (Any?) -> Void) {
+        self.callback = callback
+    }
+
+    nonisolated func emit(value: Any?, completionHandler: @escaping (Error?) -> Void) {
+        Task { @MainActor in
+            self.callback(value)
+            completionHandler(nil)
+        }
+    }
+}
+
 // MARK: - TimelineFilter Extensions
 
 extension TimelineFilter {
@@ -99,11 +179,16 @@ extension TimelineFilter {
         placeCategories: [PlaceCategory] = [],
         showOnlyFavorites: Bool = false
     ) {
+        // Safe conversion using Set initializers
+        let transportSet = Set(transportTypes)
+        let categorySet = Set(placeCategories)
+        let emptyStringSet = Set<String>()
+
         self.init(
-            transportTypes: NSSet(array: transportTypes) as! Set<TransportType>,
-            placeCategories: NSSet(array: placeCategories) as! Set<PlaceCategory>,
-            countries: NSSet() as! Set<String>,
-            cities: NSSet() as! Set<String>,
+            transportTypes: transportSet,
+            placeCategories: categorySet,
+            countries: emptyStringSet,
+            cities: emptyStringSet,
             searchQuery: nil,
             dateRange: nil,
             minDuration: nil,

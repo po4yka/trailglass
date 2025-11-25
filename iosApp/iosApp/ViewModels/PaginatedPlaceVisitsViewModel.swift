@@ -3,11 +3,13 @@ import Shared
 import Combine
 
 /// ViewModel for paginated place visits using PlaceVisitRepository
+@MainActor
 class PaginatedPlaceVisitsViewModel: ObservableObject {
     private let repository: PlaceVisitRepository
     private let userId: String
     private let config: PaginationConfig
     private var cancellables = Set<AnyCancellable>()
+    private var loadTask: Task<Void, Never>?
 
     @Published var visits: [PlaceVisit] = []
     @Published var isLoading: Bool = false
@@ -29,6 +31,10 @@ class PaginatedPlaceVisitsViewModel: ObservableObject {
         self.pageSize = config.pageSize
     }
 
+    deinit {
+        loadTask?.cancel()
+    }
+
     /// Load the initial page of data
     func loadInitialData() {
         guard !isLoading else { return }
@@ -38,7 +44,8 @@ class PaginatedPlaceVisitsViewModel: ObservableObject {
         currentPage = 0
         hasMorePages = true
 
-        Task { @MainActor in
+        loadTask?.cancel()
+        loadTask = Task {
             do {
                 let offset = currentPage * pageSize
                 let fetchedVisits = try await repository.getVisitsByUser(
@@ -81,7 +88,8 @@ class PaginatedPlaceVisitsViewModel: ObservableObject {
         isLoadingMore = true
         error = nil
 
-        Task { @MainActor in
+        loadTask?.cancel()
+        loadTask = Task {
             do {
                 currentPage += 1
                 let offset = currentPage * pageSize

@@ -3,7 +3,6 @@ package com.po4yka.trailglass.feature.tracking
 import com.po4yka.trailglass.di.AppScope
 import com.po4yka.trailglass.domain.permission.PermissionResult
 import com.po4yka.trailglass.domain.permission.PermissionType
-import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.feature.permission.PermissionFlowController
 import com.po4yka.trailglass.location.tracking.LocationTracker
 import com.po4yka.trailglass.location.tracking.TrackingMode
@@ -11,7 +10,6 @@ import com.po4yka.trailglass.location.tracking.TrackingState
 import com.po4yka.trailglass.logging.logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,7 +20,10 @@ import me.tatarka.inject.annotations.Inject
 /**
  * Controller for location tracking feature. Manages tracking state, user actions, and permission requests.
  *
- * IMPORTANT: Call [cleanup] when this controller is no longer needed to prevent memory leaks.
+ * This controller is application-scoped (@AppScope) because location tracking state must persist across screen
+ * navigation. The tracking should continue even when the user navigates away from the tracking screen.
+ *
+ * Note: Since this is an app-scoped singleton, it does not implement Lifecycle. Cleanup happens at app termination.
  */
 @Inject
 @AppScope
@@ -32,7 +33,7 @@ class LocationTrackingController(
     private val stopTrackingUseCase: StopTrackingUseCase,
     private val permissionFlow: PermissionFlowController,
     coroutineScope: CoroutineScope
-) : Lifecycle {
+) {
     private val logger = logger()
 
     // Create a child scope that can be cancelled independently
@@ -254,23 +255,5 @@ class LocationTrackingController(
     fun clearError() {
         _uiState.update { it.copy(error = null) }
         permissionFlow.clearError()
-    }
-
-    /**
-     * Cleanup method to release resources and prevent memory leaks. MUST be called when this controller is no longer
-     * needed.
-     *
-     * Cancels all running coroutines including flow collectors and cleans up the location tracker.
-     */
-    override fun cleanup() {
-        logger.info { "Cleaning up LocationTrackingController" }
-        controllerScope.cancel()
-
-        // Clean up the location tracker if it implements Lifecycle
-        if (locationTracker is Lifecycle) {
-            locationTracker.cleanup()
-        }
-
-        logger.debug { "LocationTrackingController cleanup complete" }
     }
 }

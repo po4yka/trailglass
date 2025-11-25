@@ -60,12 +60,13 @@ class AndroidLocationTracker(
         stopTracking()
 
         val locationRequest = createLocationRequest(mode)
-        locationCallback = createLocationCallback()
+        val callback = createLocationCallback()
+        locationCallback = callback
 
         try {
             fusedLocationClient.requestLocationUpdates(
                 locationRequest,
-                locationCallback!!,
+                callback,
                 context.mainLooper
             )
 
@@ -79,8 +80,10 @@ class AndroidLocationTracker(
             logger.info { "Location tracking started successfully" }
         } catch (e: SecurityException) {
             logger.error(e) { "Security exception when starting location tracking" }
+            locationCallback = null
         } catch (e: Exception) {
             logger.error(e) { "Failed to start location tracking" }
+            locationCallback = null
         }
     }
 

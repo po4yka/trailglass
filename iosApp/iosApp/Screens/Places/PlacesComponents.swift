@@ -133,7 +133,7 @@ class PlacesViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: PlacesState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.isLoading = state.isLoading
                 self.error = state.error
                 self.places = state.places.map { PlaceItem(from: $0) }

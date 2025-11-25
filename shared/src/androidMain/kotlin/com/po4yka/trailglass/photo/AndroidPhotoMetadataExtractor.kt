@@ -48,9 +48,10 @@ class AndroidPhotoMetadataExtractor(
         photoId: String
     ): PhotoMetadata {
         // Extract location using the non-deprecated latLong property
+        // latLong returns DoubleArray of size 2 when available, use getOrNull for safety
         val latLongPair = exif.latLong
-        val latitude = latLongPair?.get(0)
-        val longitude = latLongPair?.get(1)
+        val latitude = latLongPair?.getOrNull(0)
+        val longitude = latLongPair?.getOrNull(1)
         val hasLocation = latitude != null && longitude != null
         val altitude =
             exif

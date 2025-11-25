@@ -25,7 +25,12 @@ import Combine
  coordinator.start()
  ```
  */
+@MainActor
 class RegionCoordinator: ObservableObject {
+
+    // MARK: - Constants
+
+    private let maxRecentEvents = 50
 
     // MARK: - Properties
 
@@ -182,15 +187,7 @@ class RegionCoordinator: ObservableObject {
 
         // Save event to database via RegionRepository when available
         // For now, store in local cache until KMP RegionRepository is ready
-        let event = RegionEventInfo(
-            region: region,
-            type: .enter,
-            timestamp: Date()
-        )
-        recentEvents.insert(event, at: 0)
-        if recentEvents.count > 50 { // Keep only recent events
-            recentEvents = Array(recentEvents.prefix(50))
-        }
+        addRecentEvent(eventInfo)
 
         // TODO: When KMP RegionRepository is ready, uncomment:
         // Task {
@@ -226,15 +223,7 @@ class RegionCoordinator: ObservableObject {
 
         // Save event to database via RegionRepository when available
         // For now, store in local cache until KMP RegionRepository is ready
-        let event = RegionEventInfo(
-            region: region,
-            type: .exit,
-            timestamp: Date()
-        )
-        recentEvents.insert(event, at: 0)
-        if recentEvents.count > 50 { // Keep only recent events
-            recentEvents = Array(recentEvents.prefix(50))
-        }
+        addRecentEvent(eventInfo)
 
         // TODO: When KMP RegionRepository is ready, uncomment:
         // Task {
@@ -257,12 +246,14 @@ class RegionCoordinator: ObservableObject {
     }
 
     private func handleNotificationTapped(regionId: String) {
+        #if DEBUG
         print("Notification tapped for region: \(regionId)")
+        #endif
 
         // Navigate to map view showing the region
         // Post notification that the app's navigation system can listen to
         NotificationCenter.default.post(
-            name: NSNotification.Name("ShowRegionOnMap"),
+            name: .showRegionOnMap,
             object: nil,
             userInfo: [
                 "regionId": regionId,
@@ -273,7 +264,7 @@ class RegionCoordinator: ObservableObject {
 
         // Also post a more general navigation notification
         NotificationCenter.default.post(
-            name: NSNotification.Name("NavigateToMap"),
+            name: .navigateToMap,
             object: nil,
             userInfo: [
                 "tab": "map",
@@ -281,6 +272,14 @@ class RegionCoordinator: ObservableObject {
                 "zoomToRegion": true
             ]
         )
+    }
+
+    /// Add event to recent events list with efficient array manipulation
+    private func addRecentEvent(_ event: RegionEventInfo) {
+        recentEvents.insert(event, at: 0)
+        if recentEvents.count > maxRecentEvents {
+            recentEvents.removeLast()
+        }
     }
 
     private func updateMonitoredRegions(_ regions: [Region]) {
@@ -296,25 +295,20 @@ class RegionCoordinator: ObservableObject {
     private func updateRegionStatistics(region: Region, eventType: RegionEventType) {
         // Create updated region with incremented enter count and updated timestamp
         if eventType == .enter {
-            var updatedRegion = region
-
-            updatedRegion = Region(
-                id: updatedRegion.id,
-                userId: updatedRegion.userId,
-                name: updatedRegion.name,
-                description: updatedRegion.description,
-                latitude: updatedRegion.latitude,
-                longitude: updatedRegion.longitude,
-                radiusMeters: updatedRegion.radiusMeters,
-                notificationsEnabled: updatedRegion.notificationsEnabled,
-                createdAt: updatedRegion.createdAt,
-                updatedAt: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
-                    epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
-                ),
-                enterCount: updatedRegion.enterCount + 1,
-                lastEnterTime: Kotlinx_datetimeInstant.companion.fromEpochMilliseconds(
-                    epochMilliseconds: Int64(Date().timeIntervalSince1970 * 1000)
-                ),
+            let now = Date()
+            let updatedRegion = Region(
+                id: region.id,
+                userId: region.userId,
+                name: region.name,
+                description: region.description,
+                latitude: region.latitude,
+                longitude: region.longitude,
+                radiusMeters: region.radiusMeters,
+                notificationsEnabled: region.notificationsEnabled,
+                createdAt: region.createdAt,
+                updatedAt: now.kotlinInstant,
+                enterCount: region.enterCount + 1,
+                lastEnterTime: now.kotlinInstant,
                 lastExitTime: nil
             )
 
@@ -357,10 +351,4 @@ struct RegionEventInfo {
     var eventColor: Color {
         return type == .enter ? .green : .orange
     }
-}
-
-// MARK: - Notification Names
-
-extension Notification.Name {
-    static let showRegionOnMap = Notification.Name("ShowRegionOnMap")
 }

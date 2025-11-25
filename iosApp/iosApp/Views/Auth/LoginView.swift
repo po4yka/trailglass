@@ -155,6 +155,25 @@ struct LoginView: View {
                     .disabled(viewModel.isLoading)
                 }
 
+                // Continue as Guest
+                Divider()
+                    .padding(.vertical, 8)
+
+                Button(action: { viewModel.continueAsGuest() }) {
+                    HStack {
+                        Image(systemName: "person")
+                            .font(.system(size: 16))
+                        Text("Continue as Guest")
+                    }
+                }
+                .disabled(viewModel.isLoading)
+
+                Text("No account needed. All data stored locally only.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 4)
+
                 Spacer()
             }
             .padding(24)
@@ -193,8 +212,8 @@ class LoginViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: AuthState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
-                if let authState = state as? AuthController.AuthStateLoading {
+            Task { @MainActor in
+                if state is AuthController.AuthStateLoading {
                     self.isLoading = true
                     self.errorMessage = nil
                 } else if let errorState = state as? AuthController.AuthStateError {
@@ -211,6 +230,10 @@ class LoginViewModel: ObservableObject {
     func login() {
         guard canLogin else { return }
         controller.login(email: email, password: password)
+    }
+
+    func continueAsGuest() {
+        controller.continueAsGuest()
     }
 
     func clearError() {

@@ -113,23 +113,13 @@ class EnhancedStatsViewModel: ObservableObject {
     }
 
     private func observeState() {
-        // Assuming the controller has a state with isLoading, error, and stats properties
-        // This may need adjustment based on the actual Kotlin controller interface
-        stateObserver = controller.state.subscribe { [weak self] (state: Any?) in
+        stateObserver = controller.state.subscribe { [weak self] (state: EnhancedStatsState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
-                // Extract properties from the state object
-                // This implementation assumes the state has these properties
-                if let loading = (state as? NSObject)?.value(forKey: "isLoading") as? Bool {
-                    self.isLoading = loading
-                }
-                if let error = (state as? NSObject)?.value(forKey: "error") as? String {
-                    self.error = error
-                }
-                if let stats = (state as? NSObject)?.value(forKey: "stats") as? ComprehensiveStatistics {
-                    self.stats = stats
-                }
+            Task { @MainActor in
+                self.isLoading = state.isLoading
+                self.error = state.error
+                self.stats = state.stats
             }
         }
     }

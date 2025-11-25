@@ -226,7 +226,7 @@ class MapViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: MapState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.isLoading = state.isLoading
                 self.error = state.error
                 self.markers = (state.mapData.markers as? [Shared.MapMarker]) ?? []

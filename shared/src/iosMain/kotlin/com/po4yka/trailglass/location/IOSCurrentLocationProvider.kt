@@ -192,8 +192,8 @@ class IOSCurrentLocationProvider : CurrentLocationProvider {
             manager: CLLocationManager,
             didUpdateLocations: List<*>
         ) {
-            @Suppress("UNCHECKED_CAST")
-            val locations = didUpdateLocations as List<CLLocation>
+            // Safely filter to CLLocation instances to handle Kotlin/Objective-C interop
+            val locations = didUpdateLocations.filterIsInstance<CLLocation>()
             locations.lastOrNull()?.let { location ->
                 onLocationUpdate?.invoke(location)
             }

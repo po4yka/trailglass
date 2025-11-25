@@ -98,7 +98,7 @@ class TripsViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: TripsState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.trips = state.trips
                 self.filteredTrips = state.filteredTrips
                 self.ongoingTrips = state.ongoingTrips

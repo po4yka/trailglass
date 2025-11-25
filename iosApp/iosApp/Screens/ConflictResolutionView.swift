@@ -293,7 +293,7 @@ class ConflictResolutionViewModel: ObservableObject {
         stateObserver = controller.state.subscribe { [weak self] (state: ConflictResolutionState?) in
             guard let self = self, let state = state else { return }
 
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.currentConflict = state.currentConflict
                 self.currentIndex = Int(state.currentConflictIndex)
                 self.totalConflicts = state.conflicts.count

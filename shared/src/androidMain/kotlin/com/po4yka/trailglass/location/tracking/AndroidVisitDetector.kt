@@ -128,8 +128,10 @@ class AndroidVisitDetector(
             }
 
             !isStationary && currentVisit != null -> {
-                // Visit has ended
-                endVisit(currentVisit!!, sorted.last().timestamp)
+                // Visit has ended - use smart cast since we checked currentVisit != null
+                currentVisit?.let { visit ->
+                    endVisit(visit, sorted.last().timestamp)
+                }
                 currentVisit = null
             }
         }

@@ -8,6 +8,7 @@ import com.po4yka.trailglass.domain.model.TransitionType
 import com.po4yka.trailglass.feature.common.Lifecycle
 import com.po4yka.trailglass.location.CurrentLocationProvider
 import com.po4yka.trailglass.logging.logger
+import com.po4yka.trailglass.util.distanceMetersTo
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -18,13 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import me.tatarka.inject.annotations.Inject
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.sin
-import kotlin.math.sqrt
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -107,12 +102,7 @@ class RegionsController(
             RegionSortOption.DISTANCE -> {
                 if (currentLocation != null) {
                     filtered.sortedBy { region ->
-                        calculateDistance(
-                            currentLocation.latitude,
-                            currentLocation.longitude,
-                            region.latitude,
-                            region.longitude
-                        )
+                        currentLocation.distanceMetersTo(region.coordinate)
                     }
                 } else {
                     filtered.sortedBy { it.name.lowercase() }
@@ -121,26 +111,6 @@ class RegionsController(
             RegionSortOption.MOST_VISITED -> filtered.sortedByDescending { it.enterCount }
             RegionSortOption.LAST_ENTERED -> filtered.sortedByDescending { it.lastEnterTime }
         }
-    }
-
-    /**
-     * Calculate distance between two coordinates in meters using Haversine formula.
-     */
-    private fun calculateDistance(
-        lat1: Double,
-        lon1: Double,
-        lat2: Double,
-        lon2: Double
-    ): Double {
-        val earthRadiusKm = 6371.0
-        val dLat = (lat2 - lat1).toRadians()
-        val dLon = (lon2 - lon1).toRadians()
-        val a =
-            sin(dLat / 2) * sin(dLat / 2) +
-                cos(lat1.toRadians()) * cos(lat2.toRadians()) *
-                sin(dLon / 2) * sin(dLon / 2)
-        val c = 2 * atan2(sqrt(a), sqrt(1 - a))
-        return earthRadiusKm * c * 1000 // Convert to meters
     }
 
     /**
@@ -444,6 +414,4 @@ class RegionsController(
         controllerScope.cancel()
         logger.debug { "RegionsController cleanup complete" }
     }
-
-    private fun Double.toRadians(): Double = this * PI / 180.0
 }
