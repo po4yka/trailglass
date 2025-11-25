@@ -89,6 +89,28 @@ struct EnhancedMapView: UIViewRepresentable {
             polyline.colorInt = route.color?.int32Value
             mapView.addOverlay(polyline)
         }
+
+        // Update Heatmap
+        let existingHeatmap = mapView.overlays.first { $0 is HeatmapOverlay }
+
+        if let heatmapData = viewModel.heatmapData, viewModel.isHeatmapEnabled {
+            // If we have data and it's enabled
+            if let existing = existingHeatmap as? HeatmapOverlay {
+                // Check if data changed (simplified check)
+                if existing.points.count != heatmapData.points.count {
+                    mapView.removeOverlay(existing)
+                    mapView.addOverlay(HeatmapOverlay(data: heatmapData), level: .aboveLabels)
+                }
+            } else {
+                // No existing heatmap, add new one
+                mapView.addOverlay(HeatmapOverlay(data: heatmapData), level: .aboveLabels)
+            }
+        } else {
+            // Heatmap disabled or no data, remove if exists
+            if let existing = existingHeatmap {
+                mapView.removeOverlay(existing)
+            }
+        }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -125,6 +147,10 @@ struct EnhancedMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
+            if let heatmapOverlay = overlay as? HeatmapOverlay {
+                return HeatmapRenderer(overlay: heatmapOverlay)
+            }
+
             guard let polyline = overlay as? RoutePolyline else {
                 return MKOverlayRenderer(overlay: overlay)
             }
@@ -211,6 +237,8 @@ class MapViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: String?
     @Published var needsLocationPermission: Bool = false
+    @Published var heatmapData: HeatmapData?
+    @Published var isHeatmapEnabled: Bool = false
 
     init(controller: MapController) {
         self.controller = controller
@@ -248,6 +276,10 @@ class MapViewModel: ObservableObject {
                         )
                     )
                 }
+
+                // Update heatmap data
+                self.heatmapData = state.mapData.heatmapData
+                self.isHeatmapEnabled = state.mapData.heatmapEnabled
             }
         }
     }

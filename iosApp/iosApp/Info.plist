@@ -43,5 +43,11 @@
 	<!-- Motion permission for activity recognition (walking, driving, etc.) -->
 	<key>NSMotionUsageDescription</key>
 	<string>TrailGlass uses motion data to detect your activity type (walking, driving, cycling) during trips.</string>
+
+	<!-- Custom Fonts -->
+	<key>UIAppFonts</key>
+	<array>
+		<string>Outfit-VariableFont_wght.ttf</string>
+	</array>
 </dict>
 </plist>
