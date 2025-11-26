@@ -10,9 +10,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +46,7 @@ fun SectionHeader(text: String) {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PeriodSelector(
     selectedPeriod: GetStatsUseCase.Period?,
@@ -56,33 +61,29 @@ fun PeriodSelector(
 
     var isYearSelected by remember { mutableStateOf(true) }
 
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        tonalElevation = 2.dp
+    // Update selection based on external state if needed, but here we drive it locally for the toggle
+    // Ideally we should derive isYearSelected from selectedPeriod, but for now we keep the local state logic
+    // consistent with previous implementation, just changing the UI.
+
+    SingleChoiceSegmentedButtonRow(
+        modifier = modifier.padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            FilterChip(
-                selected = isYearSelected,
-                onClick = {
+        SegmentedButton(
+            selected = isYearSelected,
+            onClick = {
+                if (!isYearSelected) {
                     isYearSelected = true
                     onPeriodChange(GetStatsUseCase.Period.Year(currentYear))
-                },
-                label = { Text("Year") },
-                leadingIcon =
-                    if (isYearSelected) {
-                        { Icon(Icons.Default.Check, contentDescription = null) }
-                    } else {
-                        null
-                    }
-            )
+                }
+            },
+            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+            label = { Text("Year") }
+        )
 
-            FilterChip(
-                selected = !isYearSelected,
-                onClick = {
+        SegmentedButton(
+            selected = !isYearSelected,
+            onClick = {
+                if (isYearSelected) {
                     isYearSelected = false
                     val currentMonth =
                         Clock.System
@@ -90,16 +91,11 @@ fun PeriodSelector(
                             .toLocalDateTime(TimeZone.currentSystemDefault())
                             .monthNumber
                     onPeriodChange(GetStatsUseCase.Period.Month(currentYear, currentMonth))
-                },
-                label = { Text("Month") },
-                leadingIcon =
-                    if (!isYearSelected) {
-                        { Icon(Icons.Default.Check, contentDescription = null) }
-                    } else {
-                        null
-                    }
-            )
-        }
+                }
+            },
+            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+            label = { Text("Month") }
+        )
     }
 }
 
