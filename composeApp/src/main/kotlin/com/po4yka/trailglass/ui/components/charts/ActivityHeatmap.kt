@@ -21,6 +21,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import com.po4yka.trailglass.ui.theme.extended
 import kotlinx.datetime.DayOfWeek
 
@@ -35,6 +37,8 @@ fun ActivityHeatmap(
     val lowColor = gradientColors.first()
     val highColor = gradientColors.last()
 
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -45,62 +49,90 @@ fun ActivityHeatmap(
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // Hour labels (top)
-        Row(
-            modifier = Modifier.padding(start = 40.dp)
-        ) {
-            listOf("6am", "12pm", "6pm", "12am").forEachIndexed { index, label ->
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = if (index == 0) Alignment.CenterStart else Alignment.Center
-                ) {
-                    Text(
-                        text = label,
-                        style = MaterialTheme.typography.labelSmall,
-                        fontSize = 9.sp
-                    )
+        Row(modifier = Modifier.fillMaxWidth()) {
+            // Fixed Day Labels Column
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(top = 20.dp) // Offset for header row
+            ) {
+                DayOfWeek.entries.forEach { day ->
+                    Box(
+                        modifier = Modifier.height(20.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Text(
+                            text = day.name.take(3),
+                            style = MaterialTheme.typography.labelSmall,
+                            fontSize = 10.sp,
+                            modifier = Modifier.width(36.dp)
+                        )
+                    }
                 }
             }
-        }
 
-        // Heatmap grid
-        DayOfWeek.entries.forEach { day ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(2.dp),
-                verticalAlignment = Alignment.CenterVertically
+            // Scrollable Content
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .horizontalScroll(scrollState)
             ) {
-                // Day label
-                Text(
-                    text = day.name.take(3),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontSize = 10.sp,
-                    modifier = Modifier.width(36.dp)
-                )
-
-                // Hour cells
-                val hourData = data[day] ?: emptyMap()
+                // Hour labels (top)
                 Row(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.padding(bottom = 2.dp),
                     horizontalArrangement = Arrangement.spacedBy(2.dp)
                 ) {
                     (0..23).forEach { hour ->
-                        val activity = hourData[hour] ?: 0
-                        val intensity = if (maxActivity > 0) activity.toFloat() / maxActivity else 0f
-
-                        Canvas(
-                            modifier =
-                                Modifier
-                                    .weight(1f)
-                                    .height(20.dp)
+                        val label = when (hour) {
+                            0 -> "12am"
+                            6 -> "6am"
+                            12 -> "12pm"
+                            18 -> "6pm"
+                            else -> ""
+                        }
+                        Box(
+                            modifier = Modifier.width(32.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            val color = blendColors(lowColor, highColor, intensity)
-                            drawRoundRect(
-                                color = color,
-                                topLeft = Offset.Zero,
-                                size = Size(size.width, size.height),
-                                cornerRadius = CornerRadius(2.dp.toPx())
-                            )
+                            if (label.isNotEmpty()) {
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontSize = 9.sp,
+                                    maxLines = 1
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Heatmap grid
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    DayOfWeek.entries.forEach { day ->
+                        val hourData = data[day] ?: emptyMap()
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            (0..23).forEach { hour ->
+                                val activity = hourData[hour] ?: 0
+                                val intensity = if (maxActivity > 0) activity.toFloat() / maxActivity else 0f
+
+                                Canvas(
+                                    modifier =
+                                        Modifier
+                                            .width(32.dp)
+                                            .height(20.dp)
+                                ) {
+                                    val color = blendColors(lowColor, highColor, intensity)
+                                    drawRoundRect(
+                                        color = color,
+                                        topLeft = Offset.Zero,
+                                        size = Size(size.width, size.height),
+                                        cornerRadius = CornerRadius(2.dp.toPx())
+                                    )
+                                }
+                            }
                         }
                     }
                 }

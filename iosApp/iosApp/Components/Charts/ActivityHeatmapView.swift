@@ -34,52 +34,71 @@ struct ActivityHeatmapView: View {
                     .font(.headline)
             }
 
-            VStack(spacing: 0) {
-                // Hour labels with glass background
-                HStack(spacing: 0) {
-                    Spacer()
-                        .frame(width: 40)
-
-                    ForEach(0..<hourLabels.count, id: \.self) { index in
-                        Text(hourLabels[index])
-                            .font(.caption2)
-                            .fontWeight(.medium)
-                            .foregroundColor(.coolSteel)
-                            .frame(maxWidth: .infinity, alignment: index == 0 ? .leading : .center)
-                    }
-                }
-                .padding(.bottom, 8)
-
-                // Glass heatmap grid
-                VStack(spacing: 3) {
-                    ForEach(Array(days.enumerated()), id: \.offset) { _, day in
-                        HStack(spacing: 3) {
-                            // Glass day label
+                // Fixed Day Labels and Scrollable Grid
+                HStack(alignment: .top, spacing: 0) {
+                    // Fixed Day Labels Column
+                    VStack(spacing: 3) {
+                        ForEach(Array(days.enumerated()), id: \.offset) { _, day in
                             Text(day)
                                 .font(.caption2)
                                 .fontWeight(.semibold)
                                 .foregroundColor(.blueSlate)
-                                .frame(width: 36, alignment: .leading)
+                                .frame(width: 36, height: 18, alignment: .leading)
+                        }
+                    }
+                    .padding(.top, 20) // Offset for header row
 
-                            // Glass hour cells
-                            ForEach(0..<24, id: \.self) { hour in
-                                let activity = data[day]?[hour] ?? 0
-                                let animatedIntensity = animatedIntensities[day]?[hour] ?? 0
-                                let isSelected = selectedCell?.day == day && selectedCell?.hour == hour
+                    // Scrollable Content
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            // Hour labels (top)
+                            HStack(spacing: 2) {
+                                ForEach(0..<24, id: \.self) { hour in
+                                    let label: String = {
+                                        switch hour {
+                                        case 0: return "12am"
+                                        case 6: return "6am"
+                                        case 12: return "12pm"
+                                        case 18: return "6pm"
+                                        default: return ""
+                                        }
+                                    }()
 
-                                GlassHeatmapCell(
-                                    intensity: animatedIntensity,
-                                    lowColor: lowColor,
-                                    highColor: highColor,
-                                    isSelected: isSelected,
-                                    activityCount: activity
-                                )
-                                .onTapGesture {
-                                    withAnimation(MotionConfig.quickSpring) {
-                                        if isSelected {
-                                            selectedCell = nil
-                                        } else {
-                                            selectedCell = CellPosition(day: day, hour: hour)
+                                    Text(label)
+                                        .font(.caption2)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.coolSteel)
+                                        .frame(width: 32, alignment: .center)
+                                }
+                            }
+                            .padding(.bottom, 2)
+
+                            // Heatmap grid
+                            VStack(spacing: 3) {
+                                ForEach(Array(days.enumerated()), id: \.offset) { _, day in
+                                    HStack(spacing: 2) {
+                                        ForEach(0..<24, id: \.self) { hour in
+                                            let activity = data[day]?[hour] ?? 0
+                                            let animatedIntensity = animatedIntensities[day]?[hour] ?? 0
+                                            let isSelected = selectedCell?.day == day && selectedCell?.hour == hour
+
+                                            GlassHeatmapCell(
+                                                intensity: animatedIntensity,
+                                                lowColor: lowColor,
+                                                highColor: highColor,
+                                                isSelected: isSelected,
+                                                activityCount: activity
+                                            )
+                                            .frame(width: 32) // Fixed width for accessibility
+                                            .onTapGesture {
+                                                withAnimation(MotionConfig.quickSpring) {
+                                                    if isSelected {
+                                                        selectedCell = nil
+                                                    } else {
+                                                        selectedCell = CellPosition(day: day, hour: hour)
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
